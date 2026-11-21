@@ -1,4 +1,4 @@
-"""Put an arena's pieces (bells, flags) on its marker tiles in the open TTS game.
+"""Put an arena's 3D pieces (flags, optionally bells) on its marker tiles in the open TTS game.
 
 Usage:  python -I tools/place_pieces.py arenas/<name> [--board board-vN.json] [--local [folder]]
 --local loads the models from this repo (or from a folder holding a copy of props/) instead of the PCTTS site: a
@@ -6,11 +6,13 @@ preview only this computer can see. Run again without it, after publishing, befo
 model it has loaded for as long as it runs, so preview a changed model from a fresh folder.
 Reads the arena's map.json (markers) and its board geometry JSON (tile size, level heights; default: the
 highest-numbered board-v*.json), finds the locked board named after the arena, removes the pieces placed
-before (tag "ArenaPiece") and spawns new ones, locked, relative to the board:
+before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, for every legend entry with
+"piece": true (other markers are only painted on the board):
+  flag: a flag in the tile's corner farthest from the board's centre, its triangle pointing outward, so a Pokemon
+        can stand on the tile. Starts neutral; right-click > Capture tints it to the player's colour (Global.lua).
   bell-attack / bell-defense: a bronze bell ("ATK bell" / "DEF bell") hanging over the middle of the tile in a
         wooden stand whose posts stand on its sides, facing away from the pit (like the painted symbol).
-  flag: a flag in the tile's corner farthest from the board's centre, its cloth flying outward, so a Pokemon
-        can stand on the tile. Starts neutral; right-click > Capture tints it to the player's colour (Global.lua).
+        Pugilis keeps its bells as painted symbols only.
 Models come from tools/build_pieces.py. TTS only keeps the result in memory: save the game afterwards.
 """
 import json, math, re, sys
@@ -49,7 +51,7 @@ def pieces(arena, info):
         for c, ch in enumerate(row):
             tile = data["legend"].get(ch, {})
             marker = tile.get("marker", "")
-            if tile.get("void") or not (marker in BELLS or marker == "flag"):
+            if tile.get("void") or not tile.get("piece") or not (marker in BELLS or marker == "flag"):
                 continue
             cx, cz = (c + 0.5 - C / 2) * T, (R / 2 - r - 0.5) * T
             top = info["floor0"] + tile["level"] * info["level_height"]
