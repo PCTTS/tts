@@ -83,33 +83,38 @@ def recolor(img, frm, to, amount):
 
 
 def surface_layers(a, p):
-    """Surfaces textured with an image (map.json "textures": {surface: {"image": path, "span": tiles, "vary": bool}}):
-    the image is scaled so one copy covers `span` tiles and repeated across the board (span 1 = one copy per tile).
-    With "vary", every copy is turned and mirrored at random so the repetition doesn't show. With "match", the
-    image is recoloured so its typical (median) colour equals the surface's palette colour (e.g. the same dirt,
-    darker in a pit); details darker or lighter than the base keep their contrast. "recolor": [{"from", "to",
-    "amount"}] first moves a colour part of the way toward another (e.g. soften the darkest rocks).
-    Returns surface -> board-sized image."""
+    """Surfaces textured with images (map.json "textures": {surface: {...}}):
+      "image": path, or "images": [paths] — with several, each copy picks one at random (equal chances)
+      "span": tiles one copy covers (1 = one copy per tile); copies repeat across the board
+      "vary": every copy gets a random quarter-turn and mirror, so the repetition doesn't show
+      "match": recolour so each image's typical (median) colour equals the surface's palette colour (e.g. the same
+               dirt, darker in a pit); details darker or lighter than the base keep their contrast
+      "recolor": [{"from", "to", "amount"}] first moves a colour part of the way toward another
+    Random choices are seeded by arena and surface, so rebuilds come out the same. Returns surface -> board image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
-        src = Image.open(a.folder / spec["image"]).convert("RGB")
-        for rule in spec.get("recolor", []):
-            src = recolor(src, hex_rgb(rule["from"]), hex_rgb(rule["to"]), rule.get("amount", 1.0))
-        if spec.get("match"):  # recolour so the image's typical (median) colour equals this surface's palette colour
-            typical = ImageStat.Stat(src).median   # the median ignores dark/light details, so they keep their contrast
-            want = a.palette[surface]
-            src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, typical[i]): min(255, round(v * k)))
-                                      for i, band in enumerate(src.split())])
         size = round(spec.get("span", max(a.R, a.C)) * p)
-        tile = src.resize((size, size), Image.LANCZOS)
-        # "vary": each copy gets a random quarter-turn and mirror (fixed per position, so rebuilds match)
-        variants = [v for t in (tile, tile.transpose(Image.FLIP_LEFT_RIGHT)) for v in
-                    (t, t.transpose(Image.ROTATE_90), t.transpose(Image.ROTATE_180), t.transpose(Image.ROTATE_270))]
+        choices = []   # per image: its copies (all orientations when "vary", otherwise just the image)
+        for path in spec.get("images") or [spec["image"]]:
+            src = Image.open(a.folder / path).convert("RGB")
+            for rule in spec.get("recolor", []):
+                src = recolor(src, hex_rgb(rule["from"]), hex_rgb(rule["to"]), rule.get("amount", 1.0))
+            if spec.get("match"):
+                typical = ImageStat.Stat(src).median   # the median ignores dark/light details, so they keep contrast
+                want = a.palette[surface]
+                src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, typical[i]): min(255, round(v * k)))
+                                          for i, band in enumerate(src.split())])
+            tile = src.resize((size, size), Image.LANCZOS)
+            if spec.get("vary"):
+                choices.append([v for t in (tile, tile.transpose(Image.FLIP_LEFT_RIGHT)) for v in
+                                (t, t.transpose(Image.ROTATE_90), t.transpose(Image.ROTATE_180), t.transpose(Image.ROTATE_270))])
+            else:
+                choices.append([tile])
         rnd = random.Random(f"{a.data.get('name')}/{surface}")
         layer = Image.new("RGB", (a.C * p, a.R * p))
         for y in range(0, a.R * p, size):
             for x in range(0, a.C * p, size):
-                layer.paste(rnd.choice(variants) if spec.get("vary") else tile, (x, y))
+                layer.paste(rnd.choice(rnd.choice(choices)), (x, y))
         layers[surface] = layer
     return layers
 
