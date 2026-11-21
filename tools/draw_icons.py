@@ -1,15 +1,15 @@
 """Draw the toolbar icons (original art): white silhouettes on transparent, for the black toolbar.
-Shapes are designed on a 128-unit grid and rendered at N pixels. Writes ui/icons/<name>-v2.png.
+Shapes are designed on a 128-unit grid and rendered at N pixels. Writes ui/icons/<name>-<VERSION>.png.
 Give a changed icon a new file name: TTS caches images by their link."""
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-N, SS = 256, 4       # output size, supersampling for smooth edges
+N, SS = 64, 8        # output size (about its on-screen size), supersampling for smooth edges
 K = N * SS / 128     # design units -> drawing pixels
 STROKE = 9           # line weight in design units, shared by all icons
 OUT = Path(__file__).resolve().parent.parent / "ui" / "icons"
-VERSION = "v2"
+VERSION = "v3"
 
 
 def P(*v):
