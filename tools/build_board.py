@@ -252,7 +252,64 @@ def draw_texture(a):
                "W": [x0, y0t, x0 + w, y0t + p], "E": [x0 + p - w, y0t, x0 + p, y0t + p]}[side]
         o.rectangle(box, fill=a.palette["fall"] + (235,))
     img = Image.alpha_composite(img.convert("RGBA"), over).convert("RGB")
+    img = grass_fringe(a, img, layers, p)
     return img.resize((W // SS, H // SS), Image.LANCZOS)
+
+
+def grass_fringe(a, img, layers, p):
+    """Slanted tiles with "fringe": <surface>: that surface (the lawn around them) creeps a little way up the
+    bottom of each slope, with a ragged top edge, and small tufts of blades poke up the slope just above it.
+    The ragged edge comes from a smooth function of the board position, so it runs on across tiles and corners."""
+    rnd = random.Random(f"{a.data.get('name')}/fringe")
+    phases = [(rnd.uniform(0, 6.3), rnd.uniform(0, 6.3)) for _ in range(6)]
+
+    def ragged(gx, gy):   # 0..1, wavy along any edge, with fine roughness (gx, gy: board pixels at SS)
+        u, v = gx / SS, gy / SS
+        broad = sum(np.sin(u / w + a) * np.cos(v / (w * 1.3) + b) + np.sin((u + v) / (w * 0.8) + a + b)
+                    for w, (a, b) in zip((9.0, 15.0, 26.0), phases[:3]))
+        fine = sum(np.sin(u / w + a + v / (w * 0.7)) * np.cos(v / w - u / (w * 1.9) + b)
+                   for w, (a, b) in zip((1.6, 2.5, 3.7), phases[3:]))
+        return 0.5 + 0.5 * np.clip(broad / 3.2 + fine / 4.5, -1, 1)
+
+    tufts = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    td = ImageDraw.Draw(tufts)
+    out = np.asarray(img, np.float32).copy()
+    for r in range(a.R):
+        for c in range(a.C):
+            t = a.tile(r, c)
+            sloped = slopes(a, r, c) if t else {}
+            if not (sloped and t.get("fringe")):
+                continue
+            band = t["slant"] / TILE * p
+            x0, y0 = c * p, r * p
+            yy, xx = np.mgrid[0:p, 0:p].astype(np.float32) + 0.5
+            dists = {"N": yy, "S": p - yy, "W": xx, "E": p - xx}
+            d = np.minimum.reduce([dists[s] for s in sloped])
+            n = ragged(x0 + xx, y0 + yy)
+            reach = band * (0.12 + 0.6 * n)                      # how far up the slope the grass gets
+            alpha = np.clip((reach - d) / (3 * SS) + 0.5, 0, 1)[..., None]
+            src = t["fringe"]
+            grass = (np.asarray(layers[src].crop((x0, y0, x0 + p, y0 + p)), np.float32) if src in layers
+                     else np.full((p, p, 3), a.palette[src], np.float32))
+            tile = out[y0:y0 + p, x0:x0 + p]
+            out[y0:y0 + p, x0:x0 + p] = tile * (1 - alpha) + grass * alpha
+            # tufts: a few blades each, rooted just below the ragged edge, leaning up the slope
+            for _ in range(int(160 * len(sloped))):
+                px, py = rnd.uniform(0, p), rnd.uniform(0, p)
+                ds = {s: float(dists[s][int(py), int(px)]) for s in sloped}
+                side = min(ds, key=ds.get)
+                edge = band * (0.12 + 0.6 * ragged(x0 + px, y0 + py))
+                if not (edge - 3 * SS < ds[side] < edge + 4 * SS):
+                    continue
+                ux, uy = {"N": (0, 1), "S": (0, -1), "W": (1, 0), "E": (-1, 0)}[side]   # up the slope
+                for _ in range(rnd.randint(2, 4)):
+                    ln = rnd.uniform(6, 13) * SS
+                    ang = math.atan2(uy, ux) + rnd.uniform(-0.6, 0.6)
+                    bx, by = x0 + px + rnd.uniform(-2, 2) * SS, y0 + py + rnd.uniform(-2, 2) * SS
+                    col = rnd.choice([(58, 104, 38, 230), (92, 146, 56, 230), (136, 186, 82, 220)])
+                    td.line([(bx, by), (bx + ln * math.cos(ang), by + ln * math.sin(ang))], fill=col, width=SS)
+    img = Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), "RGB")
+    return Image.alpha_composite(img.convert("RGBA"), tufts).convert("RGB")
 
 
 def draw_steps(o, a, r, c, x0, y0, p):
