@@ -1,7 +1,8 @@
 """Build the table props: the slanted team stand (pedestals on top, item/skill cards on the slope) and a pillar.
 
 Usage:  python -I tools/build_props.py
-Writes props/stand-v2.obj (+ its solid collider props/stand-collider-v1.obj) with its dark wood texture
+Writes props/stand-v3.obj (with an HP sign above each pedestal; stand-v2 = without) (+ its solid collider
+props/stand-collider-v1.obj) with its dark wood texture
 props/stand-wood-v1.jpg, props/pillar-v2.obj with props/props-v1.jpg, and props/stand-v1.json (slot positions the
 TTS script uses: pedestals on top, two card slots per pedestal on the slope; the geometry is unchanged since v1).
 Published files are only written when missing: bump a file's version when what it holds changes (TTS caches by
@@ -41,6 +42,14 @@ WOOD_W, WOOD_H, WOOD_SEED = 4096, 2048, 7
 WOOD_BASE, WOOD_LIGHT, WOOD_DARK = (40, 20, 11), (80, 44, 27), (19, 9, 5)
 WOOD_GRAIN, WOOD_CONTRAST = 1.0, 1.25            # streak width (x the finest), streak strength
 WOOD_PAD = 0.1                                  # wood (in units) between neighbouring faces in the texture
+# HP signs (stand-v3): above each pedestal, a thin board on a post near the back edge of the stand top. Global.lua
+# shows the HP of the Pokemon on that pedestal on both faces (the stand's object UI); the solid board hides the
+# far face's label, so each side reads the right way round.
+PEDESTAL_TOP = 0.25                     # the pedestals' height above the stand top (Global.lua PEDESTAL_TOP)
+SIGN_W, SIGN_H, SIGN_D = 1.7, 0.5, 0.04
+SIGN_Y = TOP_H + PEDESTAL_TOP + 2.55    # the board's centre: just above a standee's art
+SIGN_Z = -0.16                          # its middle, near the back edge of the top
+POST_W = 0.1
 PPU = WOOD_W / (LENGTH + 2 * WOOD_PAD)          # texture pixels per unit
 
 
@@ -79,7 +88,7 @@ def wood_face(m, row, corners, normal, width):
     m.quad(corners, [wood_uv(row, 0, 0), wood_uv(row, LENGTH, 0), wood_uv(row, LENGTH, width), wood_uv(row, 0, width)], normal)
 
 
-def stand():
+def stand(signs=False):
     m = StandeeMesh()
     x0, x1 = -LENGTH / 2, LENGTH / 2
     zc, zd = -TOP_D, -TOP_D - RUN          # top front edge, slope bottom
@@ -105,7 +114,39 @@ def stand():
             m.tri(tri, [cap_uv(p) for p in tri], (nx, 0, 0))
         block = [(x, 0, zd), (x, yl, zd), (x, yl, ze), (x, 0, ze)]
         m.quad(block, [cap_uv(p) for p in block], (nx, 0, 0))
+    if signs:
+        for i in range(SLOTS):
+            cx = (i - (SLOTS - 1) / 2) * SLOT_W
+            base = 2 + i * 6.5
+            sy0 = SIGN_Y - SIGN_H / 2
+            wood_box(m, cx - POST_W / 2, cx + POST_W / 2, TOP_H, sy0, SIGN_Z - POST_W / 2, SIGN_Z + POST_W / 2, "y", (base, 18.5))
+            wood_box(m, cx - SIGN_W / 2, cx + SIGN_W / 2, sy0, SIGN_Y + SIGN_H / 2, SIGN_Z - SIGN_D / 2, SIGN_Z + SIGN_D / 2,
+                     "x", (base + 3.2, 18.5))
     return m
+
+
+def wood_box(m, x0, x1, y0, y1, z0, z1, grain, base):
+    """An axis-aligned box in the stand's wood at its real scale, grain along "x" or "y", `base` units into the
+    texture (a free strip below the stand's faces)."""
+    lo = {"x": x0, "y": y0, "z": z0}
+
+    def uv(p, axes):
+        if grain in axes:   # the grain runs along u when it lies in this face
+            a, b = grain, axes[1] if axes[0] == grain else axes[0]
+        else:
+            a, b = axes
+        return ((WOOD_PAD + base[0] + p[a] - lo[a]) * PPU / WOOD_W, 1 - (base[1] + p[b] - lo[b]) * PPU / WOOD_H)
+
+    def quad(corners, axes, normal):
+        pts = [dict(zip("xyz", c)) for c in corners]
+        m.quad(corners, [uv(p, axes) for p in pts], normal)
+
+    quad([(x0, y1, z0), (x1, y1, z0), (x1, y0, z0), (x0, y0, z0)], ("x", "y"), (0, 0, -1))
+    quad([(x0, y1, z1), (x1, y1, z1), (x1, y0, z1), (x0, y0, z1)], ("x", "y"), (0, 0, 1))
+    quad([(x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)], ("x", "z"), (0, 1, 0))
+    quad([(x0, y0, z0), (x1, y0, z0), (x1, y0, z1), (x0, y0, z1)], ("x", "z"), (0, -1, 0))
+    quad([(x0, y0, z0), (x0, y1, z0), (x0, y1, z1), (x0, y0, z1)], ("y", "z"), (-1, 0, 0))
+    quad([(x1, y0, z0), (x1, y1, z0), (x1, y1, z1), (x1, y0, z1)], ("y", "z"), (1, 0, 0))
 
 
 def stand_collider():
@@ -240,6 +281,7 @@ def main():
     OUT.mkdir(exist_ok=True)
     files = {
         "stand-v2.obj": lambda p: stand().write(p),
+        "stand-v3.obj": lambda p: stand(signs=True).write(p),
         "stand-collider-v1.obj": lambda p: stand_collider().write(p),
         "stand-wood-v1.jpg": lambda p: wood_texture().save(p, quality=90),
         "pillar-v2.obj": lambda p: pillar().write(p),
