@@ -305,7 +305,7 @@ function spawnPokemon(name, color)
     data.Name = "Custom_Model"
     data.ColorDiffuse = { r = 1, g = 1, b = 1 }
     data.CustomMesh = { MeshURL = BASE_URL .. STANDEE_MESH, DiffuseURL = BASE_URL .. files.standee, NormalURL = "",
-      ColliderURL = "", Convex = true, MaterialIndex = 0, TypeIndex = 1, CastShadows = true }
+      ColliderURL = "", Convex = true, MaterialIndex = 3, TypeIndex = 1, CastShadows = true }  -- matte (cardboard): plastic glare washed out the base
   else
     -- an older roster without standees: the flat two-sided figurine
     pos = Vector(pos.x, pos.y + 1, pos.z)
