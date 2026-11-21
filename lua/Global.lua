@@ -11,6 +11,7 @@ card on the slope under each. Which stand is yours depends on your seat colour (
               type colour). One main status at a time; Confused and Flinched can stack on top.
               "Clear status" returns a Pokémon to normal.
   * Map:      pick which arena the board shows.
+Flags on the board: right-click > Capture tints a flag to your seat colour; "Make neutral" resets it.
 Chat:  !spawn garchomp   !item sitrus   !skill belief   spawn the best match (or list close alternatives).
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
@@ -106,6 +107,7 @@ function onLoad(saved)
   if state.roster then setCatalog("dex", state.roster, "saved copy") end
   if state.cards then setCards(state.cards, "saved copy") end
   buildUI()
+  for _, obj in ipairs(getAllObjects()) do flagMenu(obj) end   -- context menus aren't saved with the game
   fetchJSON(ROSTER_URL, "roster", function(index) setCatalog("dex", index, "downloaded") end)
   fetchJSON(CARDS_URL, "cards", function(index) setCards(index, "downloaded") end)
 end
@@ -624,6 +626,50 @@ function onObjectPickUp(color, obj)
   armed[color] = nil
   applyStatus(obj, key)
   refreshStatus(color)
+end
+
+----------------------------------------------------------------------------------------------------
+-- Arena pieces (tools/place_pieces.py puts them on the board): bells, and flags that show who holds them.
+-- A flag's cloth is white, so its tint is the holder's colour; its memo keeps the holder's seat colour.
+----------------------------------------------------------------------------------------------------
+FLAG_NEUTRAL = { r = 0.6, g = 0.58, b = 0.54 }   -- an unclaimed flag
+
+function flagDescription(color)
+  return (color and ("Held by " .. color .. ".") or "Neutral.") .. " Right-click it to capture it for your colour."
+end
+
+-- color = the seat colour that now holds the flag (nil = neutral); by = the player who changed it
+function setFlagHolder(obj, color, by)
+  local was = obj.memo
+  if was == "" then was = nil end
+  if color then obj.setColorTint(Color.fromString(color)) else obj.setColorTint(FLAG_NEUTRAL) end
+  obj.memo = color or ""
+  obj.setDescription(flagDescription(color))
+  if by and color ~= was then
+    local who = Player[by].steam_name or by
+    if color then
+      printToAll(who .. " captured a flag.", Color.fromString(color))
+    else
+      printToAll(who .. " made a flag neutral.", { 0.9, 0.9, 0.9 })
+    end
+  end
+end
+
+function flagMenu(obj)
+  if not (obj and obj.hasTag("Flag")) then return end
+  obj.clearContextMenu()
+  obj.addContextMenuItem("Capture", function(color)
+    if color == "Grey" then
+      Player[color].broadcast("Take a seat to capture flags.", { 1, 0.6, 0.6 })
+    else
+      setFlagHolder(obj, color, color)
+    end
+  end)
+  obj.addContextMenuItem("Make neutral", function(color) setFlagHolder(obj, nil, color) end)
+end
+
+function onObjectSpawn(obj)
+  flagMenu(obj)
 end
 
 ----------------------------------------------------------------------------------------------------

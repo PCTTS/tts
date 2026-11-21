@@ -3,7 +3,8 @@
 Usage:  python -I tools/test_global.py
 Checks: the script compiles; onLoad builds well-formed UI XML with unique ids; search finds the right names;
 the search panel's result rows get text; spawning creates a figure (or a card in the player's hand) with the
-right images; the map list reads names from a fake map board; statuses arm, stack, replace and clear. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
+right images; the map list reads names from a fake map board; statuses arm, stack, replace and clear; a flag gets
+its Capture menu and takes the capturing player's colour. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
 """
 import json, re, sys, xml.etree.ElementTree as ET
 from pathlib import Path
@@ -41,7 +42,12 @@ JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t)
 function print(s) calls.printed[#calls.printed + 1] = s end
 function printToAll(s) calls.printed[#calls.printed + 1] = s end
 Wait = { frames = function(f) f() end }
-Player = setmetatable({}, { __index = function(_, c) return { color = c } end })
+Player = setmetatable({}, { __index = function(_, c)
+  return { color = c, steam_name = c .. "Player", broadcast = function(msg) calls.broadcast = msg end }
+end })
+Color = { fromString = function(c)
+  return ({ Red = { r = 0.856, g = 0.1, b = 0.094 }, Blue = { r = 0.118, g = 0.53, b = 1 } })[c] or { r = 1, g = 1, b = 1 }
+end }
 objects = {}
 local function stub(o)
   o.hasTag = o.hasTag or function(tag) for _, t in ipairs(o.tags or {}) do if t == tag then return true end end return false end
@@ -253,6 +259,30 @@ def main():
           "12 card snap points per stand, lifted off the slope, snapping rotation")
     g.spawnPokemon("Gengar", "Grey")
     check(abs(calls.spawned[n + 5].position.x - (-35)) < 0.01, "a spectator's Pokemon appears in the left strip")
+
+    # flags: a spawned flag gets the menu; Capture tints it to the player's colour, Make neutral resets it
+    lua.execute(r"""
+      flagObj = { memo = "", menu = {} }
+      flagObj.hasTag = function(t) return t == "Flag" or t == "ArenaPiece" end
+      flagObj.clearContextMenu = function() flagObj.menu = {} end
+      flagObj.addContextMenuItem = function(label, fn) flagObj.menu[#flagObj.menu + 1] = { label = label, fn = fn } end
+      flagObj.setColorTint = function(c) flagObj.tint = c end
+      flagObj.setDescription = function(d) flagObj.desc = d end
+      onObjectSpawn(flagObj)
+      onObjectSpawn(board)   -- not a flag: no menu, no error
+    """)
+    f = g.flagObj
+    check([f.menu[i].label for i in (1, 2)] == ["Capture", "Make neutral"], "a spawned flag gets Capture and Make neutral")
+    f.menu[1].fn("Red")
+    check(f.tint.r > 0.8 and f.tint.g < 0.2 and f.memo == "Red" and f.desc.startswith("Held by Red."),
+          f"Capture by Red tints it red and records Red ({f.desc})")
+    check(any(str(p) == "RedPlayer captured a flag." for p in calls.printed.values()), "capturing is announced")
+    f.menu[1].fn("Grey")
+    check(f.memo == "Red" and "Take a seat" in str(calls.broadcast), "a spectator can't capture it")
+    f.menu[1].fn("Blue")
+    check(f.memo == "Blue" and f.tint.b == 1, "Blue can take it over")
+    f.menu[2].fn("Blue")
+    check(f.memo == "" and f.tint.r == 0.6 and f.desc.startswith("Neutral."), "Make neutral resets it")
 
     print("\nall checks passed" if not failures else f"\n{len(failures)} check(s) failed")
     sys.exit(1 if failures else 0)
