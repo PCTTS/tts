@@ -131,6 +131,7 @@ function onLoad(saved)
   buildUI()
   for _, obj in ipairs(getAllObjects()) do flagMenu(obj) end   -- context menus aren't saved with the game
   refreshAllHp()
+  Wait.time(refreshAllHp, 2)   -- again once the objects have finished loading (their own saved UI can replace ours)
   fetchJSON(ROSTER_URL, "roster", function(index) setCatalog("dex", index, "downloaded") end)
   fetchJSON(CARDS_URL, "cards", function(index) setCards(index, "downloaded") end)
   fetchJSON(STATS_URL, "stats", function(data)
@@ -816,15 +817,37 @@ function maxHp(name)
   return s and tonumber(s.hp) and math.floor(tonumber(s.hp)) or nil
 end
 
-local function hpLabelXml(guid, side, rotation, dy, hp, max)
+-- Who sees which label: each side of the table gets the one facing it (spectators and the GM: the near side).
+-- Labels drawn on one object ignore depth (the later one always shows on top, mirrored from behind), so each
+-- player is shown just one.
+local function seatsOn(side, extra)
+  local list = {}
+  for _, c in ipairs(COLORS) do
+    if SEAT_SIDE[c] == side then list[#list + 1] = c end
+  end
+  for _, c in ipairs(extra or {}) do list[#list + 1] = c end
+  return table.concat(list, "|")
+end
+
+local function hpLabelXml(guid, side, rotation, seats, hp, max)
   return string.format([[
-<Panel id="hp%s" position="0 %d %d" rotation="%s" width="150" height="40" color="#000000C8">
-  <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" width="72" height="40"
-    fontSize="28" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
-    colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
-  <Text rectAlignment="MiddleRight" width="78" height="40" fontSize="28" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
-</Panel>
-]], side, dy, HP_HEIGHT, rotation, guid, side, hp, hp > 0 and HP_COLOR or HP_FAINTED, max)
+  <Panel id="hp%s" visibility="%s" rotation="%s" width="170" height="50" color="#000000C8">
+    <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" width="84" height="50"
+      fontSize="26" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
+      colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
+    <Text rectAlignment="MiddleRight" offsetXY="-9 0" width="84" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
+  </Panel>
+]], side, seats, rotation, guid, side, hp, hp > 0 and HP_COLOR or HP_FAINTED, max)
+end
+
+-- The labels hang from a "spinner" turned by the figure's own yaw, so they keep facing the two long sides of the
+-- table whichever way the Pokémon faces (an input box under 50 high hides its text).
+local function hpXml(obj, hp, max)
+  return string.format('<Panel id="hpSpin" position="0 0 %d" rotation="0 0 %d" width="10" height="10" color="#00000000">\n',
+      HP_HEIGHT, math.floor(obj.getRotation().y + 0.5))
+    .. hpLabelXml(obj.guid, "F", "-90 0 0", seatsOn("south", { "Grey", "Black" }), hp, max)
+    .. hpLabelXml(obj.guid, "B", "90 0 0", seatsOn("north"), hp, max)
+    .. "</Panel>\n"
 end
 
 -- Give a Pokémon its HP labels (or bring them up to date). Its memo gets hp/maxHp if it had none.
@@ -838,8 +861,22 @@ function showHp(obj)
     st.hp, st.maxHp = hp, max
     obj.memo = JSON.encode(st)
   end
-  -- front label faces the way the art does (-z), the back one the other way; each hides the other
-  obj.UI.setXml(hpLabelXml(obj.guid, "F", "-90 0 0", -2, hp, max) .. hpLabelXml(obj.guid, "B", "90 0 0", 2, hp, max))
+  obj.UI.setXml(hpXml(obj, hp, max))
+end
+
+-- Keep a Pokémon's labels facing the table's sides after it's turned or put down.
+function turnHp(obj, yaw)
+  if obj and obj.hasTag("Pokemon") then
+    obj.UI.setAttribute("hpSpin", "rotation", "0 0 " .. math.floor((yaw or obj.getRotation().y) + 0.5))
+  end
+end
+
+function onObjectRotate(obj, spin)
+  turnHp(obj, spin)
+end
+
+function onObjectDrop(_, obj)
+  turnHp(obj)
 end
 
 function refreshAllHp()

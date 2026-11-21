@@ -44,7 +44,7 @@ end }
 JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t) return py_json_encode(t) end }
 function print(s) calls.printed[#calls.printed + 1] = s end
 function printToAll(s) calls.printed[#calls.printed + 1] = s end
-Wait = { frames = function(f) f() end }
+Wait = { frames = function(f) f() end, time = function(f) f() end }
 Player = setmetatable({}, { __index = function(_, c)
   return { color = c, steam_name = c .. "Player", broadcast = function(msg) calls.broadcast = msg end }
 end })
@@ -312,6 +312,7 @@ def main():
     lua.execute(r"""
       hpFig = { memo = '{"pokemon":"Gengar"}', guid = "abc123", ui = { attrs = {} } }
       hpFig.hasTag = function(t) return t == "Pokemon" end
+      hpFig.getRotation = function() return Vector(0, 90, 0) end
       hpFig.UI = { setXml = function(x) hpFig.ui.xml = x end,
                    setAttribute = function(id, k, v) hpFig.ui.attrs[id .. "." .. k] = v end }
       getObjectFromGUID = function(g) if g == "abc123" then return hpFig end end
@@ -327,6 +328,16 @@ def main():
         check(True, "its label XML parses")
     except ET.ParseError as e:
         check(False, f"its label XML parses ({e})")
+    root_hp = ET.fromstring("<root>" + h.ui.xml + "</root>")
+    spin = next(e for e in root_hp.iter() if e.get("id") == "hpSpin")
+    front = next(e for e in root_hp.iter() if e.get("id") == "hpF")
+    back = next(e for e in root_hp.iter() if e.get("id") == "hpB")
+    check(spin.get("rotation") == "0 0 90" and "White" in front.get("visibility") and "Grey" in front.get("visibility")
+          and "Green" in back.get("visibility") and "White" not in back.get("visibility"),
+          "the labels turn with the figure's yaw (90) and each side of the table sees only its own")
+    g.onObjectRotate(h, 180)
+    check(h.ui.attrs["hpSpin.rotation"] == "0 0 180", "turning the figure turns the labels back to face the sides")
+
     def hp():
         return json.loads(h.memo)["hp"]
     g.hpEdited(player, "-35", "hpIn_abc123_F")
