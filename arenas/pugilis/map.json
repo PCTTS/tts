@@ -1,0 +1,51 @@
+{
+  "name": "Pugilis",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend.",
+  "grid": [
+    "#####.2.2.2#####",
+    "####........####",
+    "###..........###",
+    "##............##",
+    "#...sp..ppps...#",
+    "2..Dpp..ppppA...",
+    "....ppF..Fpp...1",
+    "2..spp....pps...",
+    "...spp....pps..1",
+    "2...ppF..Fpp....",
+    "...Apppp..ppD..1",
+    "#...sppp..ps...#",
+    "##............##",
+    "###..........###",
+    "####........####",
+    "#####1.1.1.#####"
+  ],
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. marker = something drawn on the tile.",
+  "legend": {
+    "#": { "void": true },
+    ".": { "level": 2, "surface": "floor" },
+    "p": { "level": 0, "surface": "pit" },
+    "s": { "level": 1, "surface": "stairs" },
+    "1": { "level": 2, "surface": "floor", "marker": "spawn1" },
+    "2": { "level": 2, "surface": "floor", "marker": "spawn2" },
+    "F": { "level": 2, "surface": "floor", "marker": "flag" },
+    "A": { "level": 2, "surface": "floor", "marker": "bell-attack" },
+    "D": { "level": 2, "surface": "floor", "marker": "bell-defense" }
+  },
+  "_edges": "Marked tile edges: [row, col, side N/E/S/W]. fall = taking damage next to this edge knocks a Pokemon into the pit.",
+  "edges": {
+    "fall": [
+      [6, 6, "W"], [7, 6, "W"], [8, 6, "W"], [9, 6, "W"],
+      [9, 6, "S"], [9, 7, "S"],
+      [6, 9, "E"], [7, 9, "E"], [8, 9, "E"], [9, 9, "E"],
+      [6, 8, "N"], [6, 9, "N"]
+    ]
+  },
+  "palette": {
+    "floor": "#D9BC8E",
+    "pit": "#A9845A",
+    "stairs": "#C8A676",
+    "cliff": "#8E6C48",
+    "base": "#5E4630",
+    "fall": "#D2392C"
+  }
+}
