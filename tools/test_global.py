@@ -37,7 +37,9 @@ UI = {
   setValue = function(id, v) calls.values[id] = v end,
 }
 WebRequest = { get = function(url, cb)
-  cb({ is_error = false, text = url:find("cards/", 1, true) and CARDS_JSON or ROSTER_JSON })
+  local text = ROSTER_JSON
+  if url:find("cards/", 1, true) then text = CARDS_JSON elseif url:find("data/pokemon", 1, true) then text = STATS_JSON end
+  cb({ is_error = false, text = text })
 end }
 JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t) return py_json_encode(t) end }
 function print(s) calls.printed[#calls.printed + 1] = s end
@@ -122,6 +124,7 @@ def main():
     g.py_json_encode = lambda t: json.dumps(from_lua(t))
     g.ROSTER_JSON = (REPO / "figures" / "index.json").read_text(encoding="utf-8")
     g.CARDS_JSON = (REPO / "cards" / "index.json").read_text(encoding="utf-8")
+    g.STATS_JSON = (REPO / "data" / "pokemon.json").read_text(encoding="utf-8")
     lua.execute(PRELUDE)
 
     src = (REPO / "lua" / "Global.lua").read_text(encoding="utf-8")
@@ -198,6 +201,9 @@ def main():
           and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v1.obj")
           and spawned.data.CustomMesh.DiffuseURL.endswith("standees/v2/charizard.webp") and spawned.data.CustomMesh.TypeIndex == 1,
           "clicking row 1 spawns Charizard as a standee (art on an arrowed base)")
+    memo = json.loads(spawned.data.Memo)
+    want = json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Charizard"]["hp"]
+    check(memo.get("hp") == want and memo.get("maxHp") == want, f"it starts at full HP ({memo})")
     check(abs(spawned.position.x - (-17.625)) < 0.01 and abs(spawned.position.z - (-28.0)) < 0.01,
           f"White's Pokemon goes on the first pedestal of the near stand ({spawned.position.x:.2f}, {spawned.position.z:.2f})")
 
@@ -301,6 +307,41 @@ def main():
     n = len(calls.spawned)
     g.listPick(player, "-1", f"itemsAll_{i}")
     check(len(calls.spawned) == n + 1 and calls.spawned[n + 1].data.Nickname == "Sitrus Berry", "clicking Sitrus Berry in the list spawns it")
+
+    # HP labels: a Pokemon gets "hp/max" over its head; typing sets or changes it, kept within 0..max
+    lua.execute(r"""
+      hpFig = { memo = '{"pokemon":"Gengar"}', guid = "abc123", ui = { attrs = {} } }
+      hpFig.hasTag = function(t) return t == "Pokemon" end
+      hpFig.UI = { setXml = function(x) hpFig.ui.xml = x end,
+                   setAttribute = function(id, k, v) hpFig.ui.attrs[id .. "." .. k] = v end }
+      getObjectFromGUID = function(g) if g == "abc123" then return hpFig end end
+      onObjectSpawn(hpFig)
+    """)
+    h = g.hpFig
+    gmax = json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Gengar"]["hp"]
+    check(json.loads(h.memo).get("hp") == gmax and f'id="hpIn_abc123_F"' in h.ui.xml and f'id="hpIn_abc123_B"' in h.ui.xml
+          and f'text="{gmax}"' in h.ui.xml and f"/{gmax}<" in h.ui.xml,
+          f"a Pokemon without HP gets full HP ({gmax}) and two labels, front and back")
+    try:
+        ET.fromstring("<root>" + h.ui.xml + "</root>")
+        check(True, "its label XML parses")
+    except ET.ParseError as e:
+        check(False, f"its label XML parses ({e})")
+    def hp():
+        return json.loads(h.memo)["hp"]
+    g.hpEdited(player, "-35", "hpIn_abc123_F")
+    check(hp() == gmax - 35 and h.ui.attrs["hpIn_abc123_B.text"] == str(gmax - 35)
+          and any(str(p) == f"Gengar: {gmax} → {gmax - 35} HP (-35)" for p in calls.printed.values()),
+          "typing -35 takes 35 HP, updates both labels and says so in chat")
+    g.hpEdited(player, "+500", "hpIn_abc123_B")
+    check(hp() == gmax, "+500 heals only up to the max")
+    g.hpEdited(player, "120/230", "hpIn_abc123_F")
+    check(hp() == 120, "typing a number sets it (a trailing /max is ignored)")
+    g.hpEdited(player, "0", "hpIn_abc123_F")
+    check(hp() == 0 and h.ui.attrs["hpIn_abc123_F.textColor"] == "#FF6B6B"
+          and any("Gengar fainted!" in str(p) for p in calls.printed.values()), "0 HP turns the number red and says it fainted")
+    g.hpEdited(player, "lots", "hpIn_abc123_F")
+    check(hp() == 0 and h.ui.attrs["hpIn_abc123_F.text"] == "0", "something that isn't a number changes nothing")
 
     # flags: a spawned flag gets the menu; Capture tints it to the player's colour, Make neutral resets it
     lua.execute(r"""

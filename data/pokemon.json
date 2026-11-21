@@ -1,0 +1,7514 @@
+{
+ "Abomasnow": {
+  "hp": 290,
+  "atk": 189,
+  "def": 210,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Ice"
+  ]
+ },
+ "Abomasnow Mega": {
+  "hp": 290,
+  "atk": 269,
+  "def": 260,
+  "spd": 65,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Ice"
+  ]
+ },
+ "Absol": {
+  "hp": 240,
+  "atk": 275,
+  "def": 180,
+  "spd": 155,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Absol Mega": {
+  "hp": 240,
+  "atk": 315,
+  "def": 180,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Absol Mega Z": {
+  "hp": 240,
+  "atk": 323,
+  "def": 180,
+  "spd": 307,
+  "rng": 4,
+  "types": [
+   "Dark",
+   "Ghost"
+  ]
+ },
+ "Accelgor": {
+  "hp": 270,
+  "atk": 205,
+  "def": 135,
+  "spd": 295,
+  "rng": 4,
+  "types": [
+   "Bug"
+  ]
+ },
+ "Aegislash Blade": {
+  "hp": 230,
+  "atk": 285,
+  "def": 125,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Ghost"
+  ]
+ },
+ "Aegislash Shield": {
+  "hp": 230,
+  "atk": 125,
+  "def": 285,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Ghost"
+  ]
+ },
+ "Aerodactyl": {
+  "hp": 270,
+  "atk": 215,
+  "def": 145,
+  "spd": 265,
+  "rng": 4,
+  "types": [
+   "Rock",
+   "Flying"
+  ]
+ },
+ "Aerodactyl Mega": {
+  "hp": 270,
+  "atk": 275,
+  "def": 185,
+  "spd": 305,
+  "rng": 4,
+  "types": [
+   "Rock",
+   "Flying"
+  ]
+ },
+ "Aggron": {
+  "hp": 250,
+  "atk": 250,
+  "def": 245,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Steel",
+   "Rock"
+  ]
+ },
+ "Aggron Mega": {
+  "hp": 250,
+  "atk": 310,
+  "def": 315,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Steel"
+  ]
+ },
+ "Alakazam": {
+  "hp": 220,
+  "atk": 275,
+  "def": 135,
+  "spd": 245,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Alakazam Mega": {
+  "hp": 220,
+  "atk": 355,
+  "def": 175,
+  "spd": 305,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Alcremie": {
+  "hp": 240,
+  "atk": 240,
+  "def": 237,
+  "spd": 133,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Alomomola": {
+  "hp": 440,
+  "atk": 155,
+  "def": 130,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Altaria": {
+  "hp": 260,
+  "atk": 160,
+  "def": 265,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Fairy"
+  ]
+ },
+ "Altaria Mega": {
+  "hp": 260,
+  "atk": 240,
+  "def": 285,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Fairy"
+  ]
+ },
+ "Ambipom": {
+  "hp": 260,
+  "atk": 205,
+  "def": 150,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Amoonguss": {
+  "hp": 338,
+  "atk": 215,
+  "def": 205,
+  "spd": 92,
+  "rng": 2,
+  "types": [
+   "Grass",
+   "Poison"
+  ]
+ },
+ "Ampharos": {
+  "hp": 290,
+  "atk": 265,
+  "def": 169,
+  "spd": 126,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Dragon"
+  ]
+ },
+ "Ampharos Mega": {
+  "hp": 290,
+  "atk": 365,
+  "def": 209,
+  "spd": 106,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Dragon"
+  ]
+ },
+ "Annihilape": {
+  "hp": 330,
+  "atk": 235,
+  "def": 180,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Ghost"
+  ]
+ },
+ "Appletun": {
+  "hp": 330,
+  "atk": 245,
+  "def": 210,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Grass",
+   "Dragon"
+  ]
+ },
+ "Araquanid": {
+  "hp": 246,
+  "atk": 145,
+  "def": 249,
+  "spd": 89,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Bug"
+  ]
+ },
+ "Arbok": {
+  "hp": 230,
+  "atk": 220,
+  "def": 210,
+  "spd": 190,
+  "rng": 3,
+  "types": [
+   "Poison"
+  ]
+ },
+ "Arboliva": {
+  "hp": 266,
+  "atk": 255,
+  "def": 224,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Normal"
+  ]
+ },
+ "Arcanine": {
+  "hp": 290,
+  "atk": 225,
+  "def": 165,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Arcanine Hisui": {
+  "hp": 300,
+  "atk": 235,
+  "def": 165,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Rock"
+  ]
+ },
+ "Archaludon": {
+  "hp": 290,
+  "atk": 255,
+  "def": 200,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Dragon"
+  ]
+ },
+ "Archeops": {
+  "hp": 260,
+  "atk": 285,
+  "def": 135,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Rock",
+   "Flying"
+  ]
+ },
+ "Arctovish": {
+  "hp": 290,
+  "atk": 230,
+  "def": 215,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ice"
+  ]
+ },
+ "Arctozolt": {
+  "hp": 290,
+  "atk": 250,
+  "def": 195,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Ice"
+  ]
+ },
+ "Ariados": {
+  "hp": 310,
+  "atk": 210,
+  "def": 220,
+  "spd": 110,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Poison"
+  ]
+ },
+ "Armaldo": {
+  "hp": 260,
+  "atk": 275,
+  "def": 200,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Bug"
+  ]
+ },
+ "Armarouge": {
+  "hp": 280,
+  "atk": 255,
+  "def": 185,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Psychic"
+  ]
+ },
+ "Aromatisse": {
+  "hp": 312,
+  "atk": 263,
+  "def": 196,
+  "spd": 79,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Articuno": {
+  "hp": 290,
+  "atk": 195,
+  "def": 229,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Flying"
+  ]
+ },
+ "Articuno Galar": {
+  "hp": 290,
+  "atk": 255,
+  "def": 190,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Flying"
+  ]
+ },
+ "Audino": {
+  "hp": 346,
+  "atk": 160,
+  "def": 239,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Fairy"
+  ]
+ },
+ "Audino Mega": {
+  "hp": 346,
+  "atk": 200,
+  "def": 319,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Fairy"
+  ]
+ },
+ "Aurorus": {
+  "hp": 356,
+  "atk": 203,
+  "def": 170,
+  "spd": 121,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Ice"
+  ]
+ },
+ "Avalugg": {
+  "hp": 300,
+  "atk": 239,
+  "def": 235,
+  "spd": 76,
+  "rng": 2,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Avalugg Hisui": {
+  "hp": 300,
+  "atk": 259,
+  "def": 225,
+  "spd": 81,
+  "rng": 2,
+  "types": [
+   "Ice",
+   "Rock"
+  ]
+ },
+ "Azelf": {
+  "hp": 260,
+  "atk": 255,
+  "def": 145,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Azumarill": {
+  "hp": 310,
+  "atk": 135,
+  "def": 175,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Fairy"
+  ]
+ },
+ "Banette": {
+  "hp": 238,
+  "atk": 304,
+  "def": 173,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Normal"
+  ]
+ },
+ "Banette Mega": {
+  "hp": 238,
+  "atk": 404,
+  "def": 203,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Normal"
+  ]
+ },
+ "Barbaracle": {
+  "hp": 254,
+  "atk": 235,
+  "def": 220,
+  "spd": 141,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Water"
+  ]
+ },
+ "Barbaracle Mega": {
+  "hp": 254,
+  "atk": 305,
+  "def": 255,
+  "spd": 181,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Fighting"
+  ]
+ },
+ "Barreskewda": {
+  "hp": 232,
+  "atk": 251,
+  "def": 115,
+  "spd": 277,
+  "rng": 4,
+  "types": [
+   "Water"
+  ]
+ },
+ "Basculegion F": {
+  "hp": 350,
+  "atk": 205,
+  "def": 145,
+  "spd": 161,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ghost"
+  ]
+ },
+ "Basculegion M": {
+  "hp": 350,
+  "atk": 229,
+  "def": 145,
+  "spd": 161,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ghost"
+  ]
+ },
+ "Bastiodon": {
+  "hp": 230,
+  "atk": 209,
+  "def": 311,
+  "spd": 100,
+  "rng": 2,
+  "types": [
+   "Rock",
+   "Steel"
+  ]
+ },
+ "Baxcalibur": {
+  "hp": 340,
+  "atk": 295,
+  "def": 183,
+  "spd": 179,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Ice"
+  ]
+ },
+ "Baxcalibur Mega": {
+  "hp": 340,
+  "atk": 355,
+  "def": 223,
+  "spd": 179,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Ice"
+  ]
+ },
+ "Beartic": {
+  "hp": 300,
+  "atk": 250,
+  "def": 195,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Fighting"
+  ]
+ },
+ "Beautifly": {
+  "hp": 230,
+  "atk": 235,
+  "def": 200,
+  "spd": 185,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Beedrill": {
+  "hp": 240,
+  "atk": 250,
+  "def": 140,
+  "spd": 220,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Poison"
+  ]
+ },
+ "Beedrill Mega": {
+  "hp": 240,
+  "atk": 370,
+  "def": 140,
+  "spd": 360,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Poison"
+  ]
+ },
+ "Beer": {
+  "hp": 473,
+  "atk": 63,
+  "def": 65,
+  "spd": 405,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Poison"
+  ]
+ },
+ "Beheeyem": {
+  "hp": 260,
+  "atk": 255,
+  "def": 175,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Bellibolt": {
+  "hp": 328,
+  "atk": 241,
+  "def": 186,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Bellossom": {
+  "hp": 290,
+  "atk": 205,
+  "def": 200,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Bewear": {
+  "hp": 350,
+  "atk": 255,
+  "def": 145,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Fighting"
+  ]
+ },
+ "Bibarel": {
+  "hp": 268,
+  "atk": 200,
+  "def": 195,
+  "spd": 187,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Water"
+  ]
+ },
+ "Blacephalon": {
+  "hp": 216,
+  "atk": 307,
+  "def": 137,
+  "spd": 219,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ghost"
+  ]
+ },
+ "Blastoise": {
+  "hp": 268,
+  "atk": 205,
+  "def": 216,
+  "spd": 161,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Blastoise Mega": {
+  "hp": 268,
+  "atk": 305,
+  "def": 246,
+  "spd": 161,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Blaziken": {
+  "hp": 270,
+  "atk": 255,
+  "def": 160,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Fighting"
+  ]
+ },
+ "Blaziken Mega": {
+  "hp": 270,
+  "atk": 335,
+  "def": 180,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Fighting"
+  ]
+ },
+ "Blissey": {
+  "hp": 620,
+  "atk": 155,
+  "def": 150,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Boltund": {
+  "hp": 248,
+  "atk": 205,
+  "def": 150,
+  "spd": 247,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Bombirdier": {
+  "hp": 250,
+  "atk": 236,
+  "def": 195,
+  "spd": 169,
+  "rng": 3,
+  "types": [
+   "Flying",
+   "Dark"
+  ]
+ },
+ "Bouffalant": {
+  "hp": 300,
+  "atk": 225,
+  "def": 210,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Brambleghast": {
+  "hp": 220,
+  "atk": 235,
+  "def": 210,
+  "spd": 185,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Ghost"
+  ]
+ },
+ "Braviary": {
+  "hp": 310,
+  "atk": 251,
+  "def": 155,
+  "spd": 165,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Braviary Hisui": {
+  "hp": 330,
+  "atk": 229,
+  "def": 156,
+  "spd": 135,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Flying"
+  ]
+ },
+ "Breloom": {
+  "hp": 230,
+  "atk": 285,
+  "def": 190,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fighting"
+  ]
+ },
+ "Bronzong": {
+  "hp": 274,
+  "atk": 238,
+  "def": 267,
+  "spd": 71,
+  "rng": 2,
+  "types": [
+   "Steel",
+   "Psychic"
+  ]
+ },
+ "Brute Bonnet": {
+  "hp": 332,
+  "atk": 259,
+  "def": 203,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Dark"
+  ]
+ },
+ "Bruxish": {
+  "hp": 246,
+  "atk": 215,
+  "def": 190,
+  "spd": 189,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Butterfree": {
+  "hp": 260,
+  "atk": 235,
+  "def": 180,
+  "spd": 175,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Buzzwole": {
+  "hp": 324,
+  "atk": 283,
+  "def": 197,
+  "spd": 163,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Fighting"
+  ]
+ },
+ "Cacturne": {
+  "hp": 250,
+  "atk": 245,
+  "def": 170,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Dark"
+  ]
+ },
+ "Calyrex": {
+  "hp": 310,
+  "atk": 165,
+  "def": 200,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Grass"
+  ]
+ },
+ "Camerupt": {
+  "hp": 310,
+  "atk": 235,
+  "def": 220,
+  "spd": 85,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ground"
+  ]
+ },
+ "Camerupt Mega": {
+  "hp": 310,
+  "atk": 320,
+  "def": 290,
+  "spd": 85,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "ground"
+  ]
+ },
+ "Carbink": {
+  "hp": 230,
+  "atk": 190,
+  "def": 305,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Fairy"
+  ]
+ },
+ "Carnivine": {
+  "hp": 258,
+  "atk": 265,
+  "def": 230,
+  "spd": 97,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Carracosta": {
+  "hp": 258,
+  "atk": 261,
+  "def": 233,
+  "spd": 98,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Rock"
+  ]
+ },
+ "Castform Rainy": {
+  "hp": 250,
+  "atk": 205,
+  "def": 210,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Castform Sandy": {
+  "hp": 250,
+  "atk": 205,
+  "def": 210,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Castform Snowy": {
+  "hp": 250,
+  "atk": 205,
+  "def": 210,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Castform Sunny": {
+  "hp": 250,
+  "atk": 205,
+  "def": 210,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Celebi": {
+  "hp": 310,
+  "atk": 205,
+  "def": 205,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Grass"
+  ]
+ },
+ "Celesteela": {
+  "hp": 304,
+  "atk": 219,
+  "def": 209,
+  "spd": 127,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Flying"
+  ]
+ },
+ "Centiskorch": {
+  "hp": 310,
+  "atk": 235,
+  "def": 170,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Bug"
+  ]
+ },
+ "Ceruledge": {
+  "hp": 260,
+  "atk": 255,
+  "def": 185,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ghost"
+  ]
+ },
+ "Cetitan": {
+  "hp": 450,
+  "atk": 231,
+  "def": 125,
+  "spd": 151,
+  "rng": 3,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Chandelure": {
+  "hp": 230,
+  "atk": 295,
+  "def": 185,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Fire"
+  ]
+ },
+ "Chandelure Mega": {
+  "hp": 230,
+  "atk": 355,
+  "def": 225,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Fire"
+  ]
+ },
+ "Charizard": {
+  "hp": 266,
+  "atk": 223,
+  "def": 167,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Dragon"
+  ]
+ },
+ "Charizard X Mega": {
+  "hp": 266,
+  "atk": 275,
+  "def": 205,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Dragon"
+  ]
+ },
+ "Charizard Y Mega": {
+  "hp": 266,
+  "atk": 233,
+  "def": 197,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Flying"
+  ]
+ },
+ "Chatot": {
+  "hp": 262,
+  "atk": 189,
+  "def": 92,
+  "spd": 187,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Cherrim": {
+  "hp": 250,
+  "atk": 179,
+  "def": 153,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Chesnaught": {
+  "hp": 286,
+  "atk": 229,
+  "def": 202,
+  "spd": 133,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fighting"
+  ]
+ },
+ "Chesnaught Mega": {
+  "hp": 286,
+  "atk": 289,
+  "def": 292,
+  "spd": 93,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fighting"
+  ]
+ },
+ "Chi-Yu": {
+  "hp": 220,
+  "atk": 275,
+  "def": 205,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Fire"
+  ]
+ },
+ "Chien-Pao": {
+  "hp": 270,
+  "atk": 245,
+  "def": 150,
+  "spd": 275,
+  "rng": 4,
+  "types": [
+   "Dark",
+   "Ice"
+  ]
+ },
+ "Chimecho": {
+  "hp": 240,
+  "atk": 215,
+  "def": 195,
+  "spd": 200,
+  "rng": 4,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Chimecho Mega": {
+  "hp": 240,
+  "atk": 295,
+  "def": 255,
+  "spd": 200,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Steel"
+  ]
+ },
+ "Cinccino": {
+  "hp": 260,
+  "atk": 195,
+  "def": 155,
+  "spd": 240,
+  "rng": 4,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Cinderace": {
+  "hp": 270,
+  "atk": 237,
+  "def": 155,
+  "spd": 243,
+  "rng": 4,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Clawitzer": {
+  "hp": 252,
+  "atk": 270,
+  "def": 205,
+  "spd": 123,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Claydol": {
+  "hp": 260,
+  "atk": 175,
+  "def": 260,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Psychic"
+  ]
+ },
+ "Clefable": {
+  "hp": 300,
+  "atk": 257,
+  "def": 168,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Clefable Mega": {
+  "hp": 300,
+  "atk": 337,
+  "def": 208,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Clodsire": {
+  "hp": 370,
+  "atk": 210,
+  "def": 225,
+  "spd": 45,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Ground"
+  ]
+ },
+ "Cloyster": {
+  "hp": 210,
+  "atk": 210,
+  "def": 245,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ice"
+  ]
+ },
+ "Coalossal": {
+  "hp": 330,
+  "atk": 225,
+  "def": 230,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Rock",
+   "Fire"
+  ]
+ },
+ "Cobalion": {
+  "hp": 292,
+  "atk": 185,
+  "def": 206,
+  "spd": 221,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Fighting"
+  ]
+ },
+ "Cofagrigus": {
+  "hp": 251,
+  "atk": 250,
+  "def": 265,
+  "spd": 84,
+  "rng": 3,
+  "types": [
+   "Ghost"
+  ]
+ },
+ "Comfey": {
+  "hp": 212,
+  "atk": 199,
+  "def": 234,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Conkeldurr": {
+  "hp": 320,
+  "atk": 285,
+  "def": 165,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Copperajah": {
+  "hp": 354,
+  "atk": 285,
+  "def": 181,
+  "spd": 30,
+  "rng": 2,
+  "types": [
+   "Steel"
+  ]
+ },
+ "Corsola": {
+  "hp": 315,
+  "atk": 235,
+  "def": 195,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Water",
+   "Rock"
+  ]
+ },
+ "Corsola Galar": {
+  "hp": 305,
+  "atk": 225,
+  "def": 215,
+  "spd": 115,
+  "rng": 2,
+  "types": [
+   "Ghost"
+  ]
+ },
+ "Corviknight": {
+  "hp": 306,
+  "atk": 194,
+  "def": 211,
+  "spd": 139,
+  "rng": 3,
+  "types": [
+   "Flying",
+   "Steel"
+  ]
+ },
+ "Crabominable": {
+  "hp": 304,
+  "atk": 279,
+  "def": 176,
+  "spd": 91,
+  "rng": 2,
+  "types": [
+   "Fighting",
+   "Ice"
+  ]
+ },
+ "Crabominable Mega": {
+  "hp": 304,
+  "atk": 329,
+  "def": 261,
+  "spd": 71,
+  "rng": 2,
+  "types": [
+   "Fighting",
+   "Ice"
+  ]
+ },
+ "Cradily": {
+  "hp": 282,
+  "atk": 233,
+  "def": 244,
+  "spd": 91,
+  "rng": 2,
+  "types": [
+   "Rock",
+   "Grass"
+  ]
+ },
+ "Cramorant": {
+  "hp": 250,
+  "atk": 215,
+  "def": 210,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Flying",
+   "Water"
+  ]
+ },
+ "Crawdaunt": {
+  "hp": 236,
+  "atk": 315,
+  "def": 184,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Dark"
+  ]
+ },
+ "Cresselia": {
+  "hp": 350,
+  "atk": 155,
+  "def": 235,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Crobat": {
+  "hp": 280,
+  "atk": 185,
+  "def": 165,
+  "spd": 265,
+  "rng": 4,
+  "types": [
+   "Poison",
+   "Flying"
+  ]
+ },
+ "Crustle": {
+  "hp": 250,
+  "atk": 260,
+  "def": 245,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Bug",
+   "Rock"
+  ]
+ },
+ "Cryogonal": {
+  "hp": 270,
+  "atk": 195,
+  "def": 190,
+  "spd": 215,
+  "rng": 3,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Cursola": {
+  "hp": 230,
+  "atk": 335,
+  "def": 220,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Ghost"
+  ]
+ },
+ "Cyclizar": {
+  "hp": 250,
+  "atk": 200,
+  "def": 153,
+  "spd": 247,
+  "rng": 4,
+  "types": [
+   "Dragon",
+   "Normal"
+  ]
+ },
+ "Dachsbun": {
+  "hp": 224,
+  "atk": 185,
+  "def": 200,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Darkrai": {
+  "hp": 250,
+  "atk": 275,
+  "def": 185,
+  "spd": 255,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Darkrai Mega": {
+  "hp": 250,
+  "atk": 335,
+  "def": 265,
+  "spd": 195,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Darmanitan": {
+  "hp": 320,
+  "atk": 285,
+  "def": 115,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Darmanitan Galar": {
+  "hp": 320,
+  "atk": 285,
+  "def": 115,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Darmanitan Galar Zen": {
+  "hp": 320,
+  "atk": 325,
+  "def": 115,
+  "spd": 275,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Fire"
+  ]
+ },
+ "Darmanitan Zen": {
+  "hp": 320,
+  "atk": 285,
+  "def": 215,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Psychic"
+  ]
+ },
+ "Decidueye": {
+  "hp": 266,
+  "atk": 239,
+  "def": 200,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Ghost"
+  ]
+ },
+ "Decidueye Hisui": {
+  "hp": 286,
+  "atk": 249,
+  "def": 190,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fighting"
+  ]
+ },
+ "Dedenne": {
+  "hp": 244,
+  "atk": 187,
+  "def": 182,
+  "spd": 237,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Fairy"
+  ]
+ },
+ "Delcatty": {
+  "hp": 250,
+  "atk": 240,
+  "def": 155,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Delibird": {
+  "hp": 220,
+  "atk": 175,
+  "def": 215,
+  "spd": 240,
+  "rng": 4,
+  "types": [
+   "Ice",
+   "Flying"
+  ]
+ },
+ "Delphox": {
+  "hp": 260,
+  "atk": 233,
+  "def": 177,
+  "spd": 213,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Psychic"
+  ]
+ },
+ "Delphox Mega": {
+  "hp": 260,
+  "atk": 333,
+  "def": 202,
+  "spd": 273,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Psychic"
+  ]
+ },
+ "Dewgong": {
+  "hp": 290,
+  "atk": 210,
+  "def": 205,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ice"
+  ]
+ },
+ "Dhelmise": {
+  "hp": 250,
+  "atk": 291,
+  "def": 224,
+  "spd": 85,
+  "rng": 2,
+  "types": [
+   "Ghost",
+   "Grass"
+  ]
+ },
+ "Diancie": {
+  "hp": 210,
+  "atk": 230,
+  "def": 305,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Fairy"
+  ]
+ },
+ "Diancie Mega": {
+  "hp": 210,
+  "atk": 350,
+  "def": 225,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Fairy"
+  ]
+ },
+ "Diggersby": {
+  "hp": 280,
+  "atk": 147,
+  "def": 174,
+  "spd": 176,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Ground"
+  ]
+ },
+ "Ditto": {
+  "hp": 206,
+  "atk": 101,
+  "def": 101,
+  "spd": 101,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Dodrio": {
+  "hp": 230,
+  "atk": 235,
+  "def": 160,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Dondozo": {
+  "hp": 410,
+  "atk": 235,
+  "def": 185,
+  "spd": 75,
+  "rng": 2,
+  "types": [
+   "Water"
+  ]
+ },
+ "Donphan": {
+  "hp": 290,
+  "atk": 260,
+  "def": 195,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Ground"
+  ]
+ },
+ "Dracovish": {
+  "hp": 290,
+  "atk": 220,
+  "def": 185,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Dragon"
+  ]
+ },
+ "Dracozolt": {
+  "hp": 290,
+  "atk": 240,
+  "def": 165,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Dragon"
+  ]
+ },
+ "Dragalge": {
+  "hp": 240,
+  "atk": 249,
+  "def": 268,
+  "spd": 93,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Dragon"
+  ]
+ },
+ "Dragalge Mega": {
+  "hp": 240,
+  "atk": 319,
+  "def": 323,
+  "spd": 93,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Dragon"
+  ]
+ },
+ "Dragapult": {
+  "hp": 286,
+  "atk": 245,
+  "def": 155,
+  "spd": 289,
+  "rng": 4,
+  "types": [
+   "Dragon",
+   "Ghost"
+  ]
+ },
+ "Dragonite": {
+  "hp": 292,
+  "atk": 273,
+  "def": 200,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Flying"
+  ]
+ },
+ "Dragonite Mega": {
+  "hp": 292,
+  "atk": 295,
+  "def": 245,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Flying"
+  ]
+ },
+ "Drampa": {
+  "hp": 266,
+  "atk": 275,
+  "def": 206,
+  "spd": 103,
+  "rng": 2,
+  "types": [
+   "Normal",
+   "Dragon"
+  ]
+ },
+ "Drampa Mega": {
+  "hp": 266,
+  "atk": 325,
+  "def": 256,
+  "spd": 103,
+  "rng": 2,
+  "types": [
+   "Normal",
+   "Dragon"
+  ]
+ },
+ "Drapion": {
+  "hp": 250,
+  "atk": 216,
+  "def": 189,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Dark"
+  ]
+ },
+ "Drednaw": {
+  "hp": 290,
+  "atk": 244,
+  "def": 163,
+  "spd": 153,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Rock"
+  ]
+ },
+ "Drifblim": {
+  "hp": 410,
+  "atk": 165,
+  "def": 110,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Flying"
+  ]
+ },
+ "Druddigon": {
+  "hp": 264,
+  "atk": 280,
+  "def": 205,
+  "spd": 101,
+  "rng": 3,
+  "types": [
+   "Dragon"
+  ]
+ },
+ "Dubwool": {
+  "hp": 254,
+  "atk": 200,
+  "def": 215,
+  "spd": 181,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Dudunsparce": {
+  "hp": 360,
+  "atk": 215,
+  "def": 160,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Dugtrio": {
+  "hp": 200,
+  "atk": 220,
+  "def": 170,
+  "spd": 260,
+  "rng": 4,
+  "types": [
+   "Ground"
+  ]
+ },
+ "Dugtrio Alola": {
+  "hp": 205,
+  "atk": 235,
+  "def": 165,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Ground",
+   "Steel"
+  ]
+ },
+ "Duraludon": {
+  "hp": 250,
+  "atk": 195,
+  "def": 240,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Dragon"
+  ]
+ },
+ "Durant": {
+  "hp": 226,
+  "atk": 223,
+  "def": 178,
+  "spd": 223,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Dusknoir": {
+  "hp": 230,
+  "atk": 235,
+  "def": 290,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Ghost"
+  ]
+ },
+ "Dustox": {
+  "hp": 280,
+  "atk": 190,
+  "def": 245,
+  "spd": 135,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Poison"
+  ]
+ },
+ "Eelektross": {
+  "hp": 280,
+  "atk": 290,
+  "def": 165,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Eelektross Mega": {
+  "hp": 280,
+  "atk": 350,
+  "def": 175,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Eiscue Ice": {
+  "hp": 260,
+  "atk": 200,
+  "def": 205,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Eiscue Noice": {
+  "hp": 260,
+  "atk": 200,
+  "def": 125,
+  "spd": 265,
+  "rng": 4,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Eldegoss": {
+  "hp": 270,
+  "atk": 210,
+  "def": 215,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Electivire": {
+  "hp": 260,
+  "atk": 251,
+  "def": 157,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Fighting"
+  ]
+ },
+ "Electrode": {
+  "hp": 230,
+  "atk": 165,
+  "def": 155,
+  "spd": 305,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Electrode Hisui": {
+  "hp": 230,
+  "atk": 165,
+  "def": 155,
+  "spd": 305,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Grass"
+  ]
+ },
+ "Emboar": {
+  "hp": 330,
+  "atk": 251,
+  "def": 135,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ground"
+  ]
+ },
+ "Emboar Mega": {
+  "hp": 330,
+  "atk": 301,
+  "def": 190,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ground"
+  ]
+ },
+ "Emolga": {
+  "hp": 220,
+  "atk": 215,
+  "def": 184,
+  "spd": 231,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Flying"
+  ]
+ },
+ "Empoleon": {
+  "hp": 278,
+  "atk": 237,
+  "def": 193,
+  "spd": 142,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Steel"
+  ]
+ },
+ "Enamorus I": {
+  "hp": 258,
+  "atk": 275,
+  "def": 155,
+  "spd": 217,
+  "rng": 3,
+  "types": [
+   "Fairy",
+   "Flying"
+  ]
+ },
+ "Enamorus T": {
+  "hp": 258,
+  "atk": 275,
+  "def": 220,
+  "spd": 97,
+  "rng": 2,
+  "types": [
+   "Fairy",
+   "Flying"
+  ]
+ },
+ "Entei": {
+  "hp": 340,
+  "atk": 235,
+  "def": 165,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Escavalier": {
+  "hp": 270,
+  "atk": 275,
+  "def": 245,
+  "spd": 60,
+  "rng": 2,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Espathra": {
+  "hp": 300,
+  "atk": 207,
+  "def": 128,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Espeon": {
+  "hp": 240,
+  "atk": 265,
+  "def": 159,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Excadrill": {
+  "hp": 330,
+  "atk": 275,
+  "def": 129,
+  "spd": 181,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Steel"
+  ]
+ },
+ "Excadrill Mega": {
+  "hp": 330,
+  "atk": 335,
+  "def": 169,
+  "spd": 211,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "steel"
+  ]
+ },
+ "Exeggutor": {
+  "hp": 300,
+  "atk": 255,
+  "def": 180,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Psychic"
+  ]
+ },
+ "Exeggutor Alola": {
+  "hp": 300,
+  "atk": 275,
+  "def": 180,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Dragon"
+  ]
+ },
+ "Exploud": {
+  "hp": 318,
+  "atk": 211,
+  "def": 180,
+  "spd": 141,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Falinks": {
+  "hp": 240,
+  "atk": 205,
+  "def": 165,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Falinks Mega": {
+  "hp": 240,
+  "atk": 275,
+  "def": 205,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Farigiraf": {
+  "hp": 350,
+  "atk": 225,
+  "def": 150,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Psychic"
+  ]
+ },
+ "Fearow": {
+  "hp": 240,
+  "atk": 210,
+  "def": 160,
+  "spd": 240,
+  "rng": 4,
+  "types": [
+   "Flying"
+  ]
+ },
+ "Feraligatr": {
+  "hp": 280,
+  "atk": 215,
+  "def": 194,
+  "spd": 161,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Feraligatr Mega": {
+  "hp": 280,
+  "atk": 325,
+  "def": 229,
+  "spd": 161,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Dragon"
+  ]
+ },
+ "Ferrothorn": {
+  "hp": 258,
+  "atk": 253,
+  "def": 272,
+  "spd": 67,
+  "rng": 2,
+  "types": [
+   "Grass",
+   "Steel"
+  ]
+ },
+ "Fezandipiti": {
+  "hp": 286,
+  "atk": 187,
+  "def": 212,
+  "spd": 203,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Fairy"
+  ]
+ },
+ "Flamigo": {
+  "hp": 274,
+  "atk": 235,
+  "def": 156,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Flying",
+   "Fighting"
+  ]
+ },
+ "Flapple": {
+  "hp": 250,
+  "atk": 270,
+  "def": 185,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Dragon"
+  ]
+ },
+ "Flareon": {
+  "hp": 240,
+  "atk": 300,
+  "def": 175,
+  "spd": 135,
+  "rng": 4,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Floatzel": {
+  "hp": 280,
+  "atk": 215,
+  "def": 120,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Water"
+  ]
+ },
+ "Floette Eternal": {
+  "hp": 258,
+  "atk": 255,
+  "def": 200,
+  "spd": 189,
+  "rng": 4,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Floette Mega": {
+  "hp": 258,
+  "atk": 315,
+  "def": 240,
+  "spd": 209,
+  "rng": 4,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Florges": {
+  "hp": 266,
+  "atk": 229,
+  "def": 227,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Flutter Mane": {
+  "hp": 220,
+  "atk": 275,
+  "def": 195,
+  "spd": 275,
+  "rng": 4,
+  "types": [
+   "Ghost",
+   "Fairy"
+  ]
+ },
+ "Flygon": {
+  "hp": 270,
+  "atk": 210,
+  "def": 165,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Dragon"
+  ]
+ },
+ "Forretress": {
+  "hp": 260,
+  "atk": 240,
+  "def": 265,
+  "spd": 85,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Froslass": {
+  "hp": 250,
+  "atk": 185,
+  "def": 165,
+  "spd": 250,
+  "rng": 4,
+  "types": [
+   "Ice",
+   "Ghost"
+  ]
+ },
+ "Froslass Mega": {
+  "hp": 250,
+  "atk": 305,
+  "def": 195,
+  "spd": 270,
+  "rng": 4,
+  "types": [
+   "Ice",
+   "Ghost"
+  ]
+ },
+ "Frosmoth": {
+  "hp": 250,
+  "atk": 285,
+  "def": 180,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Bug"
+  ]
+ },
+ "Furfrou": {
+  "hp": 260,
+  "atk": 205,
+  "def": 176,
+  "spd": 209,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Furret": {
+  "hp": 280,
+  "atk": 182,
+  "def": 183,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Gallade": {
+  "hp": 246,
+  "atk": 255,
+  "def": 185,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fighting"
+  ]
+ },
+ "Gallade Mega": {
+  "hp": 246,
+  "atk": 335,
+  "def": 215,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fighting"
+  ]
+ },
+ "Galvantula": {
+  "hp": 250,
+  "atk": 219,
+  "def": 160,
+  "spd": 221,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Electric"
+  ]
+ },
+ "Garbodor": {
+  "hp": 270,
+  "atk": 230,
+  "def": 195,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Poison"
+  ]
+ },
+ "Garchomp": {
+  "hp": 326,
+  "atk": 265,
+  "def": 185,
+  "spd": 209,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Ground"
+  ]
+ },
+ "Garchomp Mega": {
+  "hp": 326,
+  "atk": 345,
+  "def": 215,
+  "spd": 189,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Ground"
+  ]
+ },
+ "Garchomp Mega Z": {
+  "hp": 326,
+  "atk": 287,
+  "def": 175,
+  "spd": 307,
+  "rng": 4,
+  "types": [
+   "Dragon"
+  ]
+ },
+ "Gardevoir": {
+  "hp": 246,
+  "atk": 255,
+  "def": 185,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Gardevoir Mega": {
+  "hp": 246,
+  "atk": 235,
+  "def": 205,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Garganacl": {
+  "hp": 310,
+  "atk": 225,
+  "def": 225,
+  "spd": 90,
+  "rng": 2,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Gastrodon": {
+  "hp": 332,
+  "atk": 237,
+  "def": 198,
+  "spd": 83,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ground"
+  ]
+ },
+ "Genesect": {
+  "hp": 252,
+  "atk": 245,
+  "def": 195,
+  "spd": 203,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Gengar": {
+  "hp": 230,
+  "atk": 265,
+  "def": 139,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Poison"
+  ]
+ },
+ "Gengar Mega": {
+  "hp": 230,
+  "atk": 340,
+  "def": 179,
+  "spd": 265,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Poison"
+  ]
+ },
+ "Gholdengo": {
+  "hp": 284,
+  "atk": 271,
+  "def": 191,
+  "spd": 173,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Ghost"
+  ]
+ },
+ "Gigalith": {
+  "hp": 280,
+  "atk": 290,
+  "def": 205,
+  "spd": 75,
+  "rng": 2,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Glaceon": {
+  "hp": 240,
+  "atk": 265,
+  "def": 210,
+  "spd": 135,
+  "rng": 4,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Glalie": {
+  "hp": 270,
+  "atk": 220,
+  "def": 185,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Glalie Mega": {
+  "hp": 270,
+  "atk": 300,
+  "def": 185,
+  "spd": 215,
+  "rng": 3,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Glastrier": {
+  "hp": 310,
+  "atk": 295,
+  "def": 245,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Glimmora": {
+  "hp": 276,
+  "atk": 265,
+  "def": 176,
+  "spd": 177,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Poison"
+  ]
+ },
+ "Glimmora Mega": {
+  "hp": 276,
+  "atk": 305,
+  "def": 206,
+  "spd": 207,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Poison"
+  ]
+ },
+ "Gliscor": {
+  "hp": 260,
+  "atk": 195,
+  "def": 205,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Flying"
+  ]
+ },
+ "Gogoat": {
+  "hp": 356,
+  "atk": 205,
+  "def": 148,
+  "spd": 141,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Golduck": {
+  "hp": 270,
+  "atk": 195,
+  "def": 210,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Golem": {
+  "hp": 270,
+  "atk": 265,
+  "def": 220,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Ground"
+  ]
+ },
+ "Golem Alola": {
+  "hp": 270,
+  "atk": 265,
+  "def": 220,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Electric"
+  ]
+ },
+ "Golisopod": {
+  "hp": 260,
+  "atk": 255,
+  "def": 250,
+  "spd": 85,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Water"
+  ]
+ },
+ "Golisopod Mega": {
+  "hp": 260,
+  "atk": 305,
+  "def": 315,
+  "spd": 85,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Golurk": {
+  "hp": 288,
+  "atk": 282,
+  "def": 165,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Ghost"
+  ]
+ },
+ "Golurk Mega": {
+  "hp": 288,
+  "atk": 352,
+  "def": 215,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Ghost"
+  ]
+ },
+ "Goodra": {
+  "hp": 290,
+  "atk": 225,
+  "def": 225,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Dragon"
+  ]
+ },
+ "Goodra Hisui": {
+  "hp": 270,
+  "atk": 225,
+  "def": 255,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Steel"
+  ]
+ },
+ "Gorebyss": {
+  "hp": 220,
+  "atk": 287,
+  "def": 234,
+  "spd": 109,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Gothitelle": {
+  "hp": 250,
+  "atk": 245,
+  "def": 220,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Dark"
+  ]
+ },
+ "Gouging Fire": {
+  "hp": 320,
+  "atk": 235,
+  "def": 219,
+  "spd": 187,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Dragon"
+  ]
+ },
+ "Gourgeist": {
+  "hp": 240,
+  "atk": 215,
+  "def": 222,
+  "spd": 173,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Grass"
+  ]
+ },
+ "Gourgeist Large": {
+  "hp": 260,
+  "atk": 225,
+  "def": 222,
+  "spd": 143,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Grass"
+  ]
+ },
+ "Gourgeist Small": {
+  "hp": 220,
+  "atk": 205,
+  "def": 222,
+  "spd": 203,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Grass"
+  ]
+ },
+ "Gourgeist Super": {
+  "hp": 280,
+  "atk": 235,
+  "def": 222,
+  "spd": 113,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Grass"
+  ]
+ },
+ "Grafaiai": {
+  "hp": 236,
+  "atk": 215,
+  "def": 174,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Poison",
+   "Normal"
+  ]
+ },
+ "Granbull": {
+  "hp": 290,
+  "atk": 275,
+  "def": 190,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Grapploct": {
+  "hp": 270,
+  "atk": 261,
+  "def": 220,
+  "spd": 99,
+  "rng": 2,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Great Tusk": {
+  "hp": 340,
+  "atk": 267,
+  "def": 189,
+  "spd": 179,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Fighting"
+  ]
+ },
+ "Greedant": {
+  "hp": 350,
+  "atk": 230,
+  "def": 195,
+  "spd": 75,
+  "rng": 2,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Greninja": {
+  "hp": 254,
+  "atk": 211,
+  "def": 143,
+  "spd": 249,
+  "rng": 4,
+  "types": [
+   "Water",
+   "Dark"
+  ]
+ },
+ "Greninja Mega": {
+  "hp": 254,
+  "atk": 271,
+  "def": 163,
+  "spd": 289,
+  "rng": 4,
+  "types": [
+   "Water",
+   "Dark"
+  ]
+ },
+ "Grimmsnarl": {
+  "hp": 300,
+  "atk": 255,
+  "def": 170,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Fairy"
+  ]
+ },
+ "Grumpig": {
+  "hp": 270,
+  "atk": 215,
+  "def": 200,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Gumshoos": {
+  "hp": 286,
+  "atk": 245,
+  "def": 200,
+  "spd": 119,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Guzzlord": {
+  "hp": 556,
+  "atk": 207,
+  "def": 111,
+  "spd": 91,
+  "rng": 2,
+  "types": [
+   "Dark",
+   "Dragon"
+  ]
+ },
+ "Gyarados": {
+  "hp": 300,
+  "atk": 255,
+  "def": 184,
+  "spd": 167,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Flying"
+  ]
+ },
+ "Gyarados Mega": {
+  "hp": 300,
+  "atk": 315,
+  "def": 244,
+  "spd": 167,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Dark"
+  ]
+ },
+ "Hariyama": {
+  "hp": 398,
+  "atk": 245,
+  "def": 125,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Hatterene": {
+  "hp": 224,
+  "atk": 307,
+  "def": 238,
+  "spd": 81,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Hawlucha": {
+  "hp": 266,
+  "atk": 189,
+  "def": 154,
+  "spd": 241,
+  "rng": 4,
+  "types": [
+   "Fighting",
+   "Flying"
+  ]
+ },
+ "Hawlucha Mega": {
+  "hp": 266,
+  "atk": 281,
+  "def": 209,
+  "spd": 241,
+  "rng": 4,
+  "types": [
+   "Fighting",
+   "Flying"
+  ]
+ },
+ "Haxorus": {
+  "hp": 262,
+  "atk": 299,
+  "def": 165,
+  "spd": 199,
+  "rng": 3,
+  "types": [
+   "Dragon"
+  ]
+ },
+ "Heatmor": {
+  "hp": 280,
+  "atk": 215,
+  "def": 157,
+  "spd": 198,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Heatran": {
+  "hp": 292,
+  "atk": 265,
+  "def": 217,
+  "spd": 159,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Steel"
+  ]
+ },
+ "Heatran Mega": {
+  "hp": 292,
+  "atk": 355,
+  "def": 252,
+  "spd": 139,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Steel"
+  ]
+ },
+ "Heliolisk": {
+  "hp": 234,
+  "atk": 223,
+  "def": 170,
+  "spd": 223,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Normal"
+  ]
+ },
+ "Heracross": {
+  "hp": 270,
+  "atk": 255,
+  "def": 175,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Fighting"
+  ]
+ },
+ "Heracross Mega": {
+  "hp": 270,
+  "atk": 375,
+  "def": 215,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Fighting"
+  ]
+ },
+ "Hippowdon": {
+  "hp": 326,
+  "atk": 230,
+  "def": 195,
+  "spd": 99,
+  "rng": 2,
+  "types": [
+   "Ground"
+  ]
+ },
+ "Hitmonchan": {
+  "hp": 210,
+  "atk": 235,
+  "def": 248,
+  "spd": 157,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Hitmonlee": {
+  "hp": 220,
+  "atk": 245,
+  "def": 207,
+  "spd": 179,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Hitmontop": {
+  "hp": 210,
+  "atk": 205,
+  "def": 210,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Honchkrow": {
+  "hp": 310,
+  "atk": 255,
+  "def": 138,
+  "spd": 147,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Flying"
+  ]
+ },
+ "Hoopa Confined": {
+  "hp": 270,
+  "atk": 305,
+  "def": 195,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Ghost"
+  ]
+ },
+ "Houndoom": {
+  "hp": 260,
+  "atk": 245,
+  "def": 150,
+  "spd": 195,
+  "rng": 4,
+  "types": [
+   "Dark",
+   "Fire"
+  ]
+ },
+ "Houndoom Mega": {
+  "hp": 260,
+  "atk": 305,
+  "def": 210,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Dark",
+   "Fire"
+  ]
+ },
+ "Houndstone": {
+  "hp": 274,
+  "atk": 207,
+  "def": 228,
+  "spd": 141,
+  "rng": 3,
+  "types": [
+   "Ghost"
+  ]
+ },
+ "Huntail": {
+  "hp": 220,
+  "atk": 262,
+  "def": 259,
+  "spd": 109,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Hydrapple": {
+  "hp": 322,
+  "atk": 260,
+  "def": 175,
+  "spd": 93,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Dragon"
+  ]
+ },
+ "Hydreigon": {
+  "hp": 294,
+  "atk": 255,
+  "def": 185,
+  "spd": 201,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Dragon"
+  ]
+ },
+ "Hypno": {
+  "hp": 280,
+  "atk": 221,
+  "def": 210,
+  "spd": 139,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Illumise": {
+  "hp": 240,
+  "atk": 151,
+  "def": 165,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Bug"
+  ]
+ },
+ "Incineroar": {
+  "hp": 300,
+  "atk": 240,
+  "def": 185,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Dark"
+  ]
+ },
+ "Indeedee Female": {
+  "hp": 250,
+  "atk": 205,
+  "def": 220,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Normal"
+  ]
+ },
+ "Indeedee Male": {
+  "hp": 230,
+  "atk": 260,
+  "def": 165,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Normal"
+  ]
+ },
+ "Infernape": {
+  "hp": 262,
+  "atk": 213,
+  "def": 154,
+  "spd": 221,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Fighting"
+  ]
+ },
+ "Inteleon": {
+  "hp": 250,
+  "atk": 255,
+  "def": 135,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Water"
+  ]
+ },
+ "Iron Boulder": {
+  "hp": 290,
+  "atk": 245,
+  "def": 193,
+  "spd": 253,
+  "rng": 4,
+  "types": [
+   "Rock",
+   "Psychic"
+  ]
+ },
+ "Iron Bundle": {
+  "hp": 222,
+  "atk": 253,
+  "def": 179,
+  "spd": 277,
+  "rng": 4,
+  "types": [
+   "Ice",
+   "Water"
+  ]
+ },
+ "Iron Crown": {
+  "hp": 290,
+  "atk": 249,
+  "def": 213,
+  "spd": 201,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Psychic"
+  ]
+ },
+ "Iron Hands": {
+  "hp": 418,
+  "atk": 285,
+  "def": 181,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Electric"
+  ]
+ },
+ "Iron Jugulis": {
+  "hp": 298,
+  "atk": 249,
+  "def": 171,
+  "spd": 221,
+  "rng": 4,
+  "types": [
+   "Dark",
+   "Flying"
+  ]
+ },
+ "Iron Leaves": {
+  "hp": 290,
+  "atk": 265,
+  "def": 201,
+  "spd": 213,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Psychic"
+  ]
+ },
+ "Iron Moth": {
+  "hp": 270,
+  "atk": 285,
+  "def": 175,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Fire",
+   "Poison"
+  ]
+ },
+ "Iron Thorns": {
+  "hp": 310,
+  "atk": 273,
+  "def": 199,
+  "spd": 149,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Electric"
+  ]
+ },
+ "Iron Treads": {
+  "hp": 290,
+  "atk": 229,
+  "def": 195,
+  "spd": 217,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Steel"
+  ]
+ },
+ "Iron Valiant": {
+  "hp": 258,
+  "atk": 265,
+  "def": 165,
+  "spd": 237,
+  "rng": 3,
+  "types": [
+   "Fairy",
+   "Fighting"
+  ]
+ },
+ "Jellicent": {
+  "hp": 310,
+  "atk": 210,
+  "def": 205,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ghost"
+  ]
+ },
+ "Jirachi": {
+  "hp": 310,
+  "atk": 205,
+  "def": 205,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Psychic"
+  ]
+ },
+ "Jolteon": {
+  "hp": 240,
+  "atk": 225,
+  "def": 160,
+  "spd": 265,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Jumpluff": {
+  "hp": 260,
+  "atk": 145,
+  "def": 180,
+  "spd": 265,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Flying"
+  ]
+ },
+ "Jynx": {
+  "hp": 240,
+  "atk": 245,
+  "def": 170,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Psychic"
+  ]
+ },
+ "Kabutops": {
+  "hp": 230,
+  "atk": 255,
+  "def": 200,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Water"
+  ]
+ },
+ "Kangaskhan": {
+  "hp": 320,
+  "atk": 228,
+  "def": 187,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Kangaskhan Mega": {
+  "hp": 320,
+  "atk": 288,
+  "def": 227,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Kartana": {
+  "hp": 228,
+  "atk": 367,
+  "def": 167,
+  "spd": 223,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Steel"
+  ]
+ },
+ "Kecleon": {
+  "hp": 230,
+  "atk": 185,
+  "def": 195,
+  "spd": 85,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Keldeo": {
+  "hp": 292,
+  "atk": 263,
+  "def": 185,
+  "spd": 221,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Fighting"
+  ]
+ },
+ "Kilowattrel": {
+  "hp": 250,
+  "atk": 215,
+  "def": 130,
+  "spd": 255,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Flying"
+  ]
+ },
+ "Kingambit": {
+  "hp": 310,
+  "atk": 275,
+  "def": 210,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Dark",
+   "Steel"
+  ]
+ },
+ "Kingdra": {
+  "hp": 260,
+  "atk": 205,
+  "def": 205,
+  "spd": 180,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Dragon"
+  ]
+ },
+ "Kingler": {
+  "hp": 220,
+  "atk": 265,
+  "def": 210,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Klawf": {
+  "hp": 250,
+  "atk": 250,
+  "def": 195,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Kleavor": {
+  "hp": 250,
+  "atk": 275,
+  "def": 170,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Rock"
+  ]
+ },
+ "Klefki": {
+  "hp": 254,
+  "atk": 200,
+  "def": 241,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Fairy"
+  ]
+ },
+ "Klinklang": {
+  "hp": 230,
+  "atk": 215,
+  "def": 220,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Steel"
+  ]
+ },
+ "Komala": {
+  "hp": 240,
+  "atk": 255,
+  "def": 220,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Kommo-O": {
+  "hp": 260,
+  "atk": 225,
+  "def": 235,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Fighting"
+  ]
+ },
+ "Kricketune": {
+  "hp": 264,
+  "atk": 175,
+  "def": 257,
+  "spd": 154,
+  "rng": 3,
+  "types": [
+   "Bug"
+  ]
+ },
+ "Krookodile": {
+  "hp": 300,
+  "atk": 239,
+  "def": 145,
+  "spd": 189,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Dark"
+  ]
+ },
+ "Landorus I": {
+  "hp": 288,
+  "atk": 255,
+  "def": 175,
+  "spd": 207,
+  "rng": 4,
+  "types": [
+   "Ground",
+   "Flying"
+  ]
+ },
+ "Landorus T": {
+  "hp": 288,
+  "atk": 295,
+  "def": 175,
+  "spd": 187,
+  "rng": 4,
+  "types": [
+   "Ground",
+   "Flying"
+  ]
+ },
+ "Lanturn": {
+  "hp": 360,
+  "atk": 202,
+  "def": 149,
+  "spd": 139,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Electric"
+  ]
+ },
+ "Lapras": {
+  "hp": 370,
+  "atk": 176,
+  "def": 179,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ice"
+  ]
+ },
+ "Latias": {
+  "hp": 270,
+  "atk": 225,
+  "def": 225,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Dragon",
+   "Psychic"
+  ]
+ },
+ "Latios": {
+  "hp": 270,
+  "atk": 265,
+  "def": 195,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Dragon",
+   "Psychic"
+  ]
+ },
+ "Leafeon": {
+  "hp": 240,
+  "atk": 225,
+  "def": 199,
+  "spd": 195,
+  "rng": 4,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Leavanny": {
+  "hp": 260,
+  "atk": 195,
+  "def": 206,
+  "spd": 189,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Grass"
+  ]
+ },
+ "Ledian": {
+  "hp": 250,
+  "atk": 180,
+  "def": 205,
+  "spd": 215,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Lickilicky": {
+  "hp": 330,
+  "atk": 175,
+  "def": 215,
+  "spd": 130,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Liepard": {
+  "hp": 238,
+  "atk": 206,
+  "def": 189,
+  "spd": 217,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Lilligant": {
+  "hp": 250,
+  "atk": 225,
+  "def": 190,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Lilligant Hisui": {
+  "hp": 250,
+  "atk": 215,
+  "def": 170,
+  "spd": 215,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fighting"
+  ]
+ },
+ "Linoone": {
+  "hp": 266,
+  "atk": 185,
+  "def": 169,
+  "spd": 230,
+  "rng": 4,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Lokix": {
+  "hp": 252,
+  "atk": 244,
+  "def": 165,
+  "spd": 189,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Dark"
+  ]
+ },
+ "Lopunny": {
+  "hp": 240,
+  "atk": 210,
+  "def": 185,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Fighting"
+  ]
+ },
+ "Lopunny Mega": {
+  "hp": 240,
+  "atk": 330,
+  "def": 195,
+  "spd": 275,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Fighting"
+  ]
+ },
+ "Lucario": {
+  "hp": 250,
+  "atk": 250,
+  "def": 165,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Steel"
+  ]
+ },
+ "Lucario Mega": {
+  "hp": 250,
+  "atk": 310,
+  "def": 183,
+  "spd": 229,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Steel"
+  ]
+ },
+ "Lucario Mega Z": {
+  "hp": 250,
+  "atk": 348,
+  "def": 165,
+  "spd": 307,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Steel"
+  ]
+ },
+ "Ludicolo": {
+  "hp": 270,
+  "atk": 240,
+  "def": 195,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Grass"
+  ]
+ },
+ "Lumineon": {
+  "hp": 248,
+  "atk": 168,
+  "def": 202,
+  "spd": 232,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Lunatone": {
+  "hp": 290,
+  "atk": 210,
+  "def": 155,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Psychic"
+  ]
+ },
+ "Lurantis": {
+  "hp": 250,
+  "atk": 290,
+  "def": 205,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Luvdisc": {
+  "hp": 196,
+  "atk": 85,
+  "def": 125,
+  "spd": 199,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Luxray": {
+  "hp": 270,
+  "atk": 245,
+  "def": 173,
+  "spd": 162,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Dark"
+  ]
+ },
+ "Lycanroc Dusk": {
+  "hp": 260,
+  "atk": 239,
+  "def": 135,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Lycanroc Midday": {
+  "hp": 260,
+  "atk": 235,
+  "def": 135,
+  "spd": 229,
+  "rng": 4,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Lycanroc Midnight": {
+  "hp": 280,
+  "atk": 246,
+  "def": 155,
+  "spd": 169,
+  "rng": 4,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Mabostiff": {
+  "hp": 270,
+  "atk": 245,
+  "def": 165,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Machamp": {
+  "hp": 290,
+  "atk": 265,
+  "def": 180,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Magcargo": {
+  "hp": 270,
+  "atk": 260,
+  "def": 225,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Fire",
+   "Rock"
+  ]
+ },
+ "Magearna": {
+  "hp": 270,
+  "atk": 265,
+  "def": 235,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Fairy"
+  ]
+ },
+ "Magearna Mega": {
+  "hp": 270,
+  "atk": 345,
+  "def": 235,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "fairy"
+  ]
+ },
+ "Magmortar": {
+  "hp": 260,
+  "atk": 255,
+  "def": 167,
+  "spd": 171,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Magnezone": {
+  "hp": 250,
+  "atk": 265,
+  "def": 210,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Electric"
+  ]
+ },
+ "Malamar": {
+  "hp": 282,
+  "atk": 204,
+  "def": 213,
+  "spd": 151,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Psychic"
+  ]
+ },
+ "Malamar Mega": {
+  "hp": 282,
+  "atk": 224,
+  "def": 258,
+  "spd": 181,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Psychic"
+  ]
+ },
+ "Mamoswine": {
+  "hp": 330,
+  "atk": 265,
+  "def": 145,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Ground"
+  ]
+ },
+ "Manaphy": {
+  "hp": 310,
+  "atk": 205,
+  "def": 205,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Mandibuzz": {
+  "hp": 330,
+  "atk": 150,
+  "def": 205,
+  "spd": 165,
+  "rng": 4,
+  "types": [
+   "Dark",
+   "Flying"
+  ]
+ },
+ "Manectric": {
+  "hp": 250,
+  "atk": 235,
+  "def": 150,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Manectric Mega": {
+  "hp": 250,
+  "atk": 295,
+  "def": 190,
+  "spd": 275,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Mantine": {
+  "hp": 280,
+  "atk": 200,
+  "def": 225,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Flying"
+  ]
+ },
+ "Maractus": {
+  "hp": 260,
+  "atk": 261,
+  "def": 184,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Marowak": {
+  "hp": 250,
+  "atk": 225,
+  "def": 250,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Ground"
+  ]
+ },
+ "Marowak Alola": {
+  "hp": 250,
+  "atk": 225,
+  "def": 250,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ghost"
+  ]
+ },
+ "Marshadow": {
+  "hp": 290,
+  "atk": 255,
+  "def": 175,
+  "spd": 255,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Ghost"
+  ]
+ },
+ "Masquerain": {
+  "hp": 250,
+  "atk": 245,
+  "def": 190,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Water"
+  ]
+ },
+ "Maushold": {
+  "hp": 258,
+  "atk": 175,
+  "def": 190,
+  "spd": 227,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Mawile": {
+  "hp": 210,
+  "atk": 320,
+  "def": 185,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Fairy"
+  ]
+ },
+ "Mawile Mega": {
+  "hp": 210,
+  "atk": 360,
+  "def": 265,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Fairy"
+  ]
+ },
+ "Medicham": {
+  "hp": 230,
+  "atk": 145,
+  "def": 175,
+  "spd": 200,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Psychic"
+  ]
+ },
+ "Medicham Mega": {
+  "hp": 230,
+  "atk": 225,
+  "def": 195,
+  "spd": 240,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Psychic"
+  ]
+ },
+ "Meganium": {
+  "hp": 270,
+  "atk": 210,
+  "def": 205,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fairy"
+  ]
+ },
+ "Meganium Mega": {
+  "hp": 270,
+  "atk": 330,
+  "def": 235,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fairy"
+  ]
+ },
+ "Melmetal": {
+  "hp": 380,
+  "atk": 291,
+  "def": 213,
+  "spd": 73,
+  "rng": 2,
+  "types": [
+   "Steel"
+  ]
+ },
+ "Meloetta Aria": {
+  "hp": 310,
+  "atk": 261,
+  "def": 210,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Psychic"
+  ]
+ },
+ "Meloetta Pirouette": {
+  "hp": 310,
+  "atk": 261,
+  "def": 172,
+  "spd": 261,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Fighting"
+  ]
+ },
+ "Meowscarada": {
+  "hp": 262,
+  "atk": 225,
+  "def": 145,
+  "spd": 251,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Dark"
+  ]
+ },
+ "Meowstic Mega": {
+  "hp": 310,
+  "atk": 325,
+  "def": 225,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Meowstic-F": {
+  "hp": 258,
+  "atk": 194,
+  "def": 185,
+  "spd": 213,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Meowstic-M": {
+  "hp": 258,
+  "atk": 194,
+  "def": 185,
+  "spd": 213,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Mesprit": {
+  "hp": 270,
+  "atk": 215,
+  "def": 215,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Metagross": {
+  "hp": 270,
+  "atk": 275,
+  "def": 225,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Psychic"
+  ]
+ },
+ "Metagross Mega": {
+  "hp": 270,
+  "atk": 295,
+  "def": 265,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Psychic"
+  ]
+ },
+ "Mew": {
+  "hp": 310,
+  "atk": 205,
+  "def": 205,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Mienshao": {
+  "hp": 240,
+  "atk": 255,
+  "def": 140,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Mightyena": {
+  "hp": 250,
+  "atk": 215,
+  "def": 160,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Milotic": {
+  "hp": 300,
+  "atk": 205,
+  "def": 209,
+  "spd": 198,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Miltank": {
+  "hp": 300,
+  "atk": 165,
+  "def": 180,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Mimikyu": {
+  "hp": 220,
+  "atk": 225,
+  "def": 208,
+  "spd": 197,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Fairy"
+  ]
+ },
+ "Minior Core": {
+  "hp": 230,
+  "atk": 205,
+  "def": 125,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Rock",
+   "Flying"
+  ]
+ },
+ "Minior Meteor": {
+  "hp": 230,
+  "atk": 125,
+  "def": 255,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Flying"
+  ]
+ },
+ "Minun": {
+  "hp": 230,
+  "atk": 175,
+  "def": 120,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Mismagius": {
+  "hp": 230,
+  "atk": 215,
+  "def": 190,
+  "spd": 215,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Fairy"
+  ]
+ },
+ "Moltres": {
+  "hp": 290,
+  "atk": 255,
+  "def": 180,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Flying"
+  ]
+ },
+ "Moltres Galar": {
+  "hp": 290,
+  "atk": 205,
+  "def": 220,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Flying"
+  ]
+ },
+ "Morpeko Full Belly": {
+  "hp": 226,
+  "atk": 225,
+  "def": 200,
+  "spd": 199,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Dark"
+  ]
+ },
+ "Morpeko Hangry": {
+  "hp": 226,
+  "atk": 225,
+  "def": 200,
+  "spd": 199,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Dark"
+  ]
+ },
+ "Mothim": {
+  "hp": 250,
+  "atk": 238,
+  "def": 185,
+  "spd": 177,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Mr. Mime": {
+  "hp": 220,
+  "atk": 225,
+  "def": 220,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Mr. Rime": {
+  "hp": 225,
+  "atk": 200,
+  "def": 200,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Psychic"
+  ]
+ },
+ "Mudsdale": {
+  "hp": 310,
+  "atk": 255,
+  "def": 210,
+  "spd": 75,
+  "rng": 3,
+  "types": [
+   "Ground"
+  ]
+ },
+ "Muk": {
+  "hp": 320,
+  "atk": 235,
+  "def": 190,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Poison"
+  ]
+ },
+ "Muk Alola": {
+  "hp": 320,
+  "atk": 235,
+  "def": 190,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Dark"
+  ]
+ },
+ "Munkidori": {
+  "hp": 286,
+  "atk": 265,
+  "def": 161,
+  "spd": 217,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Psychic"
+  ]
+ },
+ "Musharna": {
+  "hp": 342,
+  "atk": 239,
+  "def": 185,
+  "spd": 84,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Naganadel": {
+  "hp": 256,
+  "atk": 259,
+  "def": 151,
+  "spd": 247,
+  "rng": 4,
+  "types": [
+   "Poison",
+   "Dragon"
+  ]
+ },
+ "Nidoking": {
+  "hp": 272,
+  "atk": 229,
+  "def": 174,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Ground"
+  ]
+ },
+ "Nidoqueen": {
+  "hp": 290,
+  "atk": 209,
+  "def": 194,
+  "spd": 157,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Ground"
+  ]
+ },
+ "Nihilego": {
+  "hp": 328,
+  "atk": 259,
+  "def": 183,
+  "spd": 211,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Poison"
+  ]
+ },
+ "Ninetales": {
+  "hp": 256,
+  "atk": 167,
+  "def": 200,
+  "spd": 227,
+  "rng": 4,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Ninetales Alola": {
+  "hp": 256,
+  "atk": 187,
+  "def": 184,
+  "spd": 223,
+  "rng": 4,
+  "types": [
+   "Ice",
+   "Fairy"
+  ]
+ },
+ "Ninjask": {
+  "hp": 232,
+  "atk": 185,
+  "def": 108,
+  "spd": 325,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Noctowl": {
+  "hp": 310,
+  "atk": 227,
+  "def": 161,
+  "spd": 152,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Flying"
+  ]
+ },
+ "Noivern": {
+  "hp": 280,
+  "atk": 199,
+  "def": 165,
+  "spd": 251,
+  "rng": 4,
+  "types": [
+   "Flying",
+   "Dragon"
+  ]
+ },
+ "Obstagoon": {
+  "hp": 296,
+  "atk": 185,
+  "def": 187,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Normal"
+  ]
+ },
+ "Octillery": {
+  "hp": 260,
+  "atk": 285,
+  "def": 210,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Ogerpon": {
+  "hp": 270,
+  "atk": 245,
+  "def": 145,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "mask"
+  ]
+ },
+ "Oinkologne": {
+  "hp": 340,
+  "atk": 200,
+  "def": 175,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Okidogi": {
+  "hp": 286,
+  "atk": 261,
+  "def": 206,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Fighting"
+  ]
+ },
+ "Omastar": {
+  "hp": 250,
+  "atk": 255,
+  "def": 220,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Water"
+  ]
+ },
+ "Oranguru": {
+  "hp": 300,
+  "atk": 185,
+  "def": 215,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Psychic"
+  ]
+ },
+ "Orbeetle": {
+  "hp": 245,
+  "atk": 165,
+  "def": 255,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Psychic"
+  ]
+ },
+ "Oricorio Baile": {
+  "hp": 260,
+  "atk": 211,
+  "def": 170,
+  "spd": 209,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Flying"
+  ]
+ },
+ "Oricorio Pa'u": {
+  "hp": 260,
+  "atk": 211,
+  "def": 170,
+  "spd": 209,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Flying"
+  ]
+ },
+ "Oricorio Pom-Pom": {
+  "hp": 260,
+  "atk": 211,
+  "def": 170,
+  "spd": 209,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Flying"
+  ]
+ },
+ "Oricorio Sensu": {
+  "hp": 260,
+  "atk": 211,
+  "def": 170,
+  "spd": 209,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Flying"
+  ]
+ },
+ "Orthworm": {
+  "hp": 280,
+  "atk": 225,
+  "def": 210,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Steel"
+  ]
+ },
+ "Overqwil": {
+  "hp": 280,
+  "atk": 235,
+  "def": 165,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Poison"
+  ]
+ },
+ "Pachirisu": {
+  "hp": 230,
+  "atk": 160,
+  "def": 215,
+  "spd": 245,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Palafin Hero": {
+  "hp": 310,
+  "atk": 325,
+  "def": 189,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Palafin Zero": {
+  "hp": 310,
+  "atk": 145,
+  "def": 159,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Palossand": {
+  "hp": 280,
+  "atk": 235,
+  "def": 260,
+  "spd": 75,
+  "rng": 2,
+  "types": [
+   "Ghost",
+   "Ground"
+  ]
+ },
+ "Pangoro": {
+  "hp": 300,
+  "atk": 263,
+  "def": 166,
+  "spd": 121,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Dark"
+  ]
+ },
+ "Parasect": {
+  "hp": 300,
+  "atk": 260,
+  "def": 195,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Grass"
+  ]
+ },
+ "Passimian": {
+  "hp": 310,
+  "atk": 245,
+  "def": 155,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Pawmot": {
+  "hp": 250,
+  "atk": 235,
+  "def": 150,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Fighting"
+  ]
+ },
+ "Pecharunt": {
+  "hp": 286,
+  "atk": 181,
+  "def": 253,
+  "spd": 181,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Ghost"
+  ]
+ },
+ "Pelipper": {
+  "hp": 260,
+  "atk": 195,
+  "def": 175,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Flying"
+  ]
+ },
+ "Perserker": {
+  "hp": 250,
+  "atk": 265,
+  "def": 230,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Steel"
+  ]
+ },
+ "Persian": {
+  "hp": 240,
+  "atk": 210,
+  "def": 165,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Persian Alola": {
+  "hp": 240,
+  "atk": 155,
+  "def": 190,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Pheromosa": {
+  "hp": 252,
+  "atk": 279,
+  "def": 79,
+  "spd": 307,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Fighting"
+  ]
+ },
+ "Phione": {
+  "hp": 280,
+  "atk": 190,
+  "def": 190,
+  "spd": 190,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Pidgeot": {
+  "hp": 276,
+  "atk": 210,
+  "def": 150,
+  "spd": 214,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Pidgeot Mega": {
+  "hp": 276,
+  "atk": 320,
+  "def": 165,
+  "spd": 254,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Pincurchin": {
+  "hp": 236,
+  "atk": 207,
+  "def": 230,
+  "spd": 35,
+  "rng": 2,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Pinsir": {
+  "hp": 240,
+  "atk": 260,
+  "def": 175,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Bug"
+  ]
+ },
+ "Pinsir Mega": {
+  "hp": 240,
+  "atk": 320,
+  "def": 215,
+  "spd": 215,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Plusle": {
+  "hp": 230,
+  "atk": 175,
+  "def": 120,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Politoed": {
+  "hp": 290,
+  "atk": 185,
+  "def": 180,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Poliwrath": {
+  "hp": 290,
+  "atk": 210,
+  "def": 205,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Fighting"
+  ]
+ },
+ "Polteageist": {
+  "hp": 230,
+  "atk": 273,
+  "def": 202,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Ghost"
+  ]
+ },
+ "Porygon-Z": {
+  "hp": 280,
+  "atk": 275,
+  "def": 150,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Primarina": {
+  "hp": 270,
+  "atk": 260,
+  "def": 195,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Fairy"
+  ]
+ },
+ "Primeape": {
+  "hp": 255,
+  "atk": 240,
+  "def": 160,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Probopass": {
+  "hp": 240,
+  "atk": 195,
+  "def": 300,
+  "spd": 115,
+  "rng": 2,
+  "types": [
+   "Rock",
+   "Electric"
+  ]
+ },
+ "Purugly": {
+  "hp": 252,
+  "atk": 169,
+  "def": 200,
+  "spd": 229,
+  "rng": 4,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Pyroar": {
+  "hp": 282,
+  "atk": 223,
+  "def": 143,
+  "spd": 217,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Normal"
+  ]
+ },
+ "Pyroar Mega": {
+  "hp": 282,
+  "atk": 263,
+  "def": 183,
+  "spd": 257,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Normal"
+  ]
+ },
+ "Pyukumuku": {
+  "hp": 270,
+  "atk": 125,
+  "def": 265,
+  "spd": 15,
+  "rng": 2,
+  "types": [
+   "Water"
+  ]
+ },
+ "Quagsire": {
+  "hp": 340,
+  "atk": 215,
+  "def": 220,
+  "spd": 75,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ground"
+  ]
+ },
+ "Quaquaval": {
+  "hp": 280,
+  "atk": 245,
+  "def": 160,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Fighting"
+  ]
+ },
+ "Qwilfish": {
+  "hp": 240,
+  "atk": 220,
+  "def": 215,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Water"
+  ]
+ },
+ "Rabsca": {
+  "hp": 260,
+  "atk": 255,
+  "def": 230,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Psychic"
+  ]
+ },
+ "Raging Bolt": {
+  "hp": 360,
+  "atk": 279,
+  "def": 185,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Dragon"
+  ]
+ },
+ "Raichu": {
+  "hp": 230,
+  "atk": 251,
+  "def": 164,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Raichu Alola": {
+  "hp": 240,
+  "atk": 195,
+  "def": 170,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Psychic"
+  ]
+ },
+ "Raichu Mega X": {
+  "hp": 240,
+  "atk": 285,
+  "def": 225,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Raichu Mega Y": {
+  "hp": 240,
+  "atk": 335,
+  "def": 170,
+  "spd": 285,
+  "rng": 4,
+  "types": [
+   "electric"
+  ]
+ },
+ "Raikou": {
+  "hp": 290,
+  "atk": 235,
+  "def": 180,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Rampardos": {
+  "hp": 304,
+  "atk": 335,
+  "def": 115,
+  "spd": 121,
+  "rng": 3,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Rapidash": {
+  "hp": 240,
+  "atk": 205,
+  "def": 190,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Fire",
+   "Fairy"
+  ]
+ },
+ "Rapidash Galar": {
+  "hp": 240,
+  "atk": 205,
+  "def": 190,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Raticate": {
+  "hp": 250,
+  "atk": 197,
+  "def": 179,
+  "spd": 224,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Raticate Alola": {
+  "hp": 290,
+  "atk": 207,
+  "def": 185,
+  "spd": 168,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Normal"
+  ]
+ },
+ "Regice": {
+  "hp": 270,
+  "atk": 205,
+  "def": 305,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Ice"
+  ]
+ },
+ "Regidrago": {
+  "hp": 510,
+  "atk": 205,
+  "def": 105,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Dragon"
+  ]
+ },
+ "Regileki": {
+  "hp": 270,
+  "atk": 205,
+  "def": 105,
+  "spd": 405,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Regirock": {
+  "hp": 270,
+  "atk": 205,
+  "def": 305,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Registeel": {
+  "hp": 270,
+  "atk": 170,
+  "def": 305,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Steel"
+  ]
+ },
+ "Relicanth": {
+  "hp": 310,
+  "atk": 215,
+  "def": 210,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Rock"
+  ]
+ },
+ "Reuniclus": {
+  "hp": 330,
+  "atk": 265,
+  "def": 175,
+  "spd": 80,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Revavroom": {
+  "hp": 270,
+  "atk": 243,
+  "def": 162,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Poison"
+  ]
+ },
+ "Rhyperior": {
+  "hp": 340,
+  "atk": 285,
+  "def": 189,
+  "spd": 85,
+  "rng": 2,
+  "types": [
+   "Ground",
+   "Rock"
+  ]
+ },
+ "Ribombee": {
+  "hp": 230,
+  "atk": 212,
+  "def": 155,
+  "spd": 253,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Fairy"
+  ]
+ },
+ "Rillaboom": {
+  "hp": 310,
+  "atk": 225,
+  "def": 165,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Roaring Moon": {
+  "hp": 320,
+  "atk": 283,
+  "def": 177,
+  "spd": 243,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Dark"
+  ]
+ },
+ "Roserade": {
+  "hp": 230,
+  "atk": 260,
+  "def": 175,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Poison"
+  ]
+ },
+ "Rotom": {
+  "hp": 220,
+  "atk": 215,
+  "def": 198,
+  "spd": 217,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Ghost"
+  ]
+ },
+ "Rotom Fan": {
+  "hp": 210,
+  "atk": 235,
+  "def": 228,
+  "spd": 177,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Flying"
+  ]
+ },
+ "Rotom Frost": {
+  "hp": 210,
+  "atk": 235,
+  "def": 228,
+  "spd": 177,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Ice"
+  ]
+ },
+ "Rotom Heat": {
+  "hp": 210,
+  "atk": 235,
+  "def": 228,
+  "spd": 177,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Fire"
+  ]
+ },
+ "Rotom Mow": {
+  "hp": 210,
+  "atk": 235,
+  "def": 228,
+  "spd": 177,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Grass"
+  ]
+ },
+ "Rotom Wash": {
+  "hp": 210,
+  "atk": 235,
+  "def": 228,
+  "spd": 177,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Water"
+  ]
+ },
+ "Runerigus": {
+  "hp": 251,
+  "atk": 250,
+  "def": 265,
+  "spd": 84,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Ghost"
+  ]
+ },
+ "Sableye": {
+  "hp": 270,
+  "atk": 175,
+  "def": 300,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Ghost"
+  ]
+ },
+ "Sableye Mega": {
+  "hp": 270,
+  "atk": 195,
+  "def": 410,
+  "spd": 45,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Ghost"
+  ]
+ },
+ "Salamence": {
+  "hp": 300,
+  "atk": 275,
+  "def": 165,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Flying"
+  ]
+ },
+ "Salamence Mega": {
+  "hp": 300,
+  "atk": 295,
+  "def": 225,
+  "spd": 245,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Flying"
+  ]
+ },
+ "Salazzle": {
+  "hp": 246,
+  "atk": 227,
+  "def": 138,
+  "spd": 239,
+  "rng": 4,
+  "types": [
+   "Poison",
+   "Fire"
+  ]
+ },
+ "Samurott": {
+  "hp": 300,
+  "atk": 225,
+  "def": 180,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Samurott Hisui": {
+  "hp": 290,
+  "atk": 221,
+  "def": 164,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Dark"
+  ]
+ },
+ "Sandaconda": {
+  "hp": 254,
+  "atk": 239,
+  "def": 210,
+  "spd": 147,
+  "rng": 3,
+  "types": [
+   "Ground"
+  ]
+ },
+ "Sandslash": {
+  "hp": 260,
+  "atk": 265,
+  "def": 180,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Ground"
+  ]
+ },
+ "Sandslash Alola": {
+  "hp": 260,
+  "atk": 215,
+  "def": 230,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Steel"
+  ]
+ },
+ "Sandy Shocks": {
+  "hp": 280,
+  "atk": 247,
+  "def": 187,
+  "spd": 207,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Ground"
+  ]
+ },
+ "Sawk": {
+  "hp": 260,
+  "atk": 255,
+  "def": 160,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Sawsbuck": {
+  "hp": 270,
+  "atk": 225,
+  "def": 160,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Grass"
+  ]
+ },
+ "Sceptile": {
+  "hp": 250,
+  "atk": 215,
+  "def": 155,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Dragon"
+  ]
+ },
+ "Sceptile Mega": {
+  "hp": 250,
+  "atk": 295,
+  "def": 165,
+  "spd": 295,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Dragon"
+  ]
+ },
+ "Scizor": {
+  "hp": 250,
+  "atk": 280,
+  "def": 185,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Scizor Mega": {
+  "hp": 250,
+  "atk": 320,
+  "def": 245,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Scolipede": {
+  "hp": 230,
+  "atk": 185,
+  "def": 173,
+  "spd": 262,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Poison"
+  ]
+ },
+ "Scolipede Mega": {
+  "hp": 230,
+  "atk": 265,
+  "def": 263,
+  "spd": 160,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Poison"
+  ]
+ },
+ "Scovillain": {
+  "hp": 240,
+  "atk": 231,
+  "def": 224,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fire"
+  ]
+ },
+ "Scovillain Mega": {
+  "hp": 240,
+  "atk": 291,
+  "def": 264,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fire"
+  ]
+ },
+ "Scrafty": {
+  "hp": 240,
+  "atk": 235,
+  "def": 254,
+  "spd": 121,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Fighting"
+  ]
+ },
+ "Scrafty Mega": {
+  "hp": 240,
+  "atk": 315,
+  "def": 294,
+  "spd": 141,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Fighting"
+  ]
+ },
+ "Scream Tail": {
+  "hp": 340,
+  "atk": 135,
+  "def": 219,
+  "spd": 227,
+  "rng": 3,
+  "types": [
+   "Fairy",
+   "Psychic"
+  ]
+ },
+ "Seaking": {
+  "hp": 270,
+  "atk": 234,
+  "def": 175,
+  "spd": 171,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Seismitoad": {
+  "hp": 320,
+  "atk": 222,
+  "def": 155,
+  "spd": 153,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ground"
+  ]
+ },
+ "Serperior": {
+  "hp": 260,
+  "atk": 164,
+  "def": 195,
+  "spd": 231,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Dragon"
+  ]
+ },
+ "Seviper": {
+  "hp": 276,
+  "atk": 205,
+  "def": 234,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Poison"
+  ]
+ },
+ "Sharpedo": {
+  "hp": 250,
+  "atk": 245,
+  "def": 140,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Water",
+   "Dark"
+  ]
+ },
+ "Sharpedo Mega": {
+  "hp": 250,
+  "atk": 285,
+  "def": 195,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Water",
+   "Dark"
+  ]
+ },
+ "Shaymin Land": {
+  "hp": 310,
+  "atk": 205,
+  "def": 205,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Shaymin Sky": {
+  "hp": 310,
+  "atk": 245,
+  "def": 155,
+  "spd": 259,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Flying"
+  ]
+ },
+ "Shiftry": {
+  "hp": 290,
+  "atk": 230,
+  "def": 140,
+  "spd": 190,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Dark"
+  ]
+ },
+ "Shiinotic": {
+  "hp": 260,
+  "atk": 270,
+  "def": 215,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fairy"
+  ]
+ },
+ "Shuckle": {
+  "hp": 200,
+  "atk": 25,
+  "def": 465,
+  "spd": 15,
+  "rng": 2,
+  "types": [
+   "Bug",
+   "Rock"
+  ]
+ },
+ "Sigilyph": {
+  "hp": 254,
+  "atk": 211,
+  "def": 186,
+  "spd": 199,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Flying"
+  ]
+ },
+ "Silvally": {
+  "hp": 300,
+  "atk": 195,
+  "def": 195,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Simipour": {
+  "hp": 260,
+  "atk": 211,
+  "def": 172,
+  "spd": 207,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Simisage": {
+  "hp": 260,
+  "atk": 211,
+  "def": 172,
+  "spd": 207,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Simisear": {
+  "hp": 260,
+  "atk": 211,
+  "def": 172,
+  "spd": 207,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Sinistcha": {
+  "hp": 252,
+  "atk": 271,
+  "def": 209,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Ghost"
+  ]
+ },
+ "Sirfetch'd": {
+  "hp": 234,
+  "atk": 285,
+  "def": 196,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Skarmory": {
+  "hp": 240,
+  "atk": 215,
+  "def": 250,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Flying"
+  ]
+ },
+ "Skarmory Mega": {
+  "hp": 240,
+  "atk": 335,
+  "def": 250,
+  "spd": 225,
+  "rng": 3,
+  "types": [
+   "Steel",
+   "Flying"
+  ]
+ },
+ "Skeledirge": {
+  "hp": 318,
+  "atk": 225,
+  "def": 180,
+  "spd": 137,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ghost"
+  ]
+ },
+ "Skuntank": {
+  "hp": 316,
+  "atk": 201,
+  "def": 160,
+  "spd": 173,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Dark"
+  ]
+ },
+ "Slaking": {
+  "hp": 410,
+  "atk": 325,
+  "def": 170,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Slitherwing": {
+  "hp": 280,
+  "atk": 275,
+  "def": 189,
+  "spd": 167,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Fighting"
+  ]
+ },
+ "Slowbro": {
+  "hp": 300,
+  "atk": 250,
+  "def": 205,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Slowbro Galar": {
+  "hp": 330,
+  "atk": 220,
+  "def": 205,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Poison",
+   "Psychic"
+  ]
+ },
+ "Slowbro Mega": {
+  "hp": 300,
+  "atk": 280,
+  "def": 275,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Slowking": {
+  "hp": 300,
+  "atk": 255,
+  "def": 215,
+  "spd": 80,
+  "rng": 2,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Slowking Galar": {
+  "hp": 300,
+  "atk": 250,
+  "def": 235,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Poison",
+   "Psychic"
+  ]
+ },
+ "Slurpuff": {
+  "hp": 274,
+  "atk": 175,
+  "def": 229,
+  "spd": 172,
+  "rng": 3,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Sneasler": {
+  "hp": 270,
+  "atk": 265,
+  "def": 145,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Fighting",
+   "Poison"
+  ]
+ },
+ "Snorlax": {
+  "hp": 430,
+  "atk": 225,
+  "def": 180,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Solrock": {
+  "hp": 290,
+  "atk": 210,
+  "def": 155,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Psychic"
+  ]
+ },
+ "Spectrier": {
+  "hp": 310,
+  "atk": 295,
+  "def": 145,
+  "spd": 265,
+  "rng": 4,
+  "types": [
+   "Ghost"
+  ]
+ },
+ "Spidops": {
+  "hp": 250,
+  "atk": 258,
+  "def": 267,
+  "spd": 75,
+  "rng": 3,
+  "types": [
+   "Bug"
+  ]
+ },
+ "Spinda": {
+  "hp": 230,
+  "atk": 125,
+  "def": 125,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Spiritomb": {
+  "hp": 225,
+  "atk": 219,
+  "def": 300,
+  "spd": 106,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Dark"
+  ]
+ },
+ "Stakataka": {
+  "hp": 232,
+  "atk": 270,
+  "def": 317,
+  "spd": 31,
+  "rng": 2,
+  "types": [
+   "Rock",
+   "Steel"
+  ]
+ },
+ "Staraptor": {
+  "hp": 280,
+  "atk": 245,
+  "def": 125,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Staraptor Mega": {
+  "hp": 280,
+  "atk": 285,
+  "def": 185,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Fighting",
+   "Flying"
+  ]
+ },
+ "Starmie": {
+  "hp": 230,
+  "atk": 205,
+  "def": 180,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Starmie Mega": {
+  "hp": 230,
+  "atk": 285,
+  "def": 220,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Steelix": {
+  "hp": 276,
+  "atk": 240,
+  "def": 269,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Steel",
+   "Ground"
+  ]
+ },
+ "Steelix Mega": {
+  "hp": 276,
+  "atk": 320,
+  "def": 329,
+  "spd": 65,
+  "rng": 2,
+  "types": [
+   "Steel",
+   "Ground"
+  ]
+ },
+ "Stonjourner": {
+  "hp": 310,
+  "atk": 255,
+  "def": 160,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Stoutland": {
+  "hp": 280,
+  "atk": 225,
+  "def": 185,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Stunfisk": {
+  "hp": 328,
+  "atk": 225,
+  "def": 218,
+  "spd": 79,
+  "rng": 2,
+  "types": [
+   "Ground",
+   "Electric"
+  ]
+ },
+ "Stunfisk Galar": {
+  "hp": 328,
+  "atk": 255,
+  "def": 188,
+  "spd": 79,
+  "rng": 2,
+  "types": [
+   "Ground",
+   "Steel"
+  ]
+ },
+ "Sudowoodo": {
+  "hp": 280,
+  "atk": 240,
+  "def": 225,
+  "spd": 105,
+  "rng": 2,
+  "types": [
+   "Rock"
+  ]
+ },
+ "Suicune": {
+  "hp": 310,
+  "atk": 185,
+  "def": 235,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Sunflora": {
+  "hp": 260,
+  "atk": 265,
+  "def": 195,
+  "spd": 130,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Swampert": {
+  "hp": 310,
+  "atk": 230,
+  "def": 185,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ground"
+  ]
+ },
+ "Swampert Mega": {
+  "hp": 310,
+  "atk": 310,
+  "def": 225,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ground"
+  ]
+ },
+ "Swanna": {
+  "hp": 260,
+  "atk": 204,
+  "def": 185,
+  "spd": 201,
+  "rng": 4,
+  "types": [
+   "Water",
+   "Flying"
+  ]
+ },
+ "Swellow": {
+  "hp": 230,
+  "atk": 205,
+  "def": 190,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Swoobat": {
+  "hp": 244,
+  "atk": 184,
+  "def": 179,
+  "spd": 243,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Flying"
+  ]
+ },
+ "Sylveon": {
+  "hp": 300,
+  "atk": 225,
+  "def": 200,
+  "spd": 125,
+  "rng": 4,
+  "types": [
+   "Fairy"
+  ]
+ },
+ "Talonflame": {
+  "hp": 266,
+  "atk": 167,
+  "def": 160,
+  "spd": 257,
+  "rng": 4,
+  "types": [
+   "Fire",
+   "Flying"
+  ]
+ },
+ "Tangrowth": {
+  "hp": 310,
+  "atk": 240,
+  "def": 195,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Tapu Bulu": {
+  "hp": 250,
+  "atk": 265,
+  "def": 215,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fairy"
+  ]
+ },
+ "Tapu Fini": {
+  "hp": 250,
+  "atk": 195,
+  "def": 250,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Fairy"
+  ]
+ },
+ "Tapu Koko": {
+  "hp": 250,
+  "atk": 235,
+  "def": 165,
+  "spd": 265,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Fairy"
+  ]
+ },
+ "Tapu Lele": {
+  "hp": 250,
+  "atk": 265,
+  "def": 195,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Tatsugiri": {
+  "hp": 246,
+  "atk": 255,
+  "def": 180,
+  "spd": 169,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Water"
+  ]
+ },
+ "Tatsugiri Mega": {
+  "hp": 246,
+  "atk": 285,
+  "def": 240,
+  "spd": 191,
+  "rng": 3,
+  "types": [
+   "Dragon",
+   "Water"
+  ]
+ },
+ "Tauros": {
+  "hp": 260,
+  "atk": 205,
+  "def": 170,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Tauros Aqua": {
+  "hp": 260,
+  "atk": 225,
+  "def": 180,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Fighting",
+   "Water"
+  ]
+ },
+ "Tauros Blaze": {
+  "hp": 260,
+  "atk": 225,
+  "def": 180,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Fighting",
+   "Fire"
+  ]
+ },
+ "Tauros Combat": {
+  "hp": 260,
+  "atk": 225,
+  "def": 180,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Tentacruel": {
+  "hp": 270,
+  "atk": 175,
+  "def": 200,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Poison"
+  ]
+ },
+ "Terrakion": {
+  "hp": 292,
+  "atk": 263,
+  "def": 185,
+  "spd": 221,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Fighting"
+  ]
+ },
+ "Thievul": {
+  "hp": 250,
+  "atk": 189,
+  "def": 206,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Throh": {
+  "hp": 350,
+  "atk": 205,
+  "def": 200,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Fighting"
+  ]
+ },
+ "Thundurus I": {
+  "hp": 268,
+  "atk": 255,
+  "def": 155,
+  "spd": 227,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Flying"
+  ]
+ },
+ "Thundurus T": {
+  "hp": 268,
+  "atk": 295,
+  "def": 155,
+  "spd": 207,
+  "rng": 4,
+  "types": [
+   "Electric",
+   "Flying"
+  ]
+ },
+ "Ting-Lu": {
+  "hp": 420,
+  "atk": 225,
+  "def": 195,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Dark",
+   "Ground"
+  ]
+ },
+ "Tinkaton": {
+  "hp": 280,
+  "atk": 175,
+  "def": 197,
+  "spd": 193,
+  "rng": 3,
+  "types": [
+   "Fairy",
+   "Steel"
+  ]
+ },
+ "Toedscruel": {
+  "hp": 270,
+  "atk": 185,
+  "def": 190,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Grass"
+  ]
+ },
+ "Togedemaru": {
+  "hp": 240,
+  "atk": 224,
+  "def": 189,
+  "spd": 197,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Steel"
+  ]
+ },
+ "Togekiss": {
+  "hp": 280,
+  "atk": 245,
+  "def": 215,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Fairy",
+   "Flying"
+  ]
+ },
+ "Torkoal": {
+  "hp": 270,
+  "atk": 175,
+  "def": 245,
+  "spd": 75,
+  "rng": 2,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Tornadus I": {
+  "hp": 268,
+  "atk": 255,
+  "def": 155,
+  "spd": 227,
+  "rng": 4,
+  "types": [
+   "Flying"
+  ]
+ },
+ "Tornadus T": {
+  "hp": 268,
+  "atk": 225,
+  "def": 175,
+  "spd": 247,
+  "rng": 4,
+  "types": [
+   "Flying"
+  ]
+ },
+ "Torterra": {
+  "hp": 300,
+  "atk": 238,
+  "def": 195,
+  "spd": 117,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Ground"
+  ]
+ },
+ "Toucannon": {
+  "hp": 270,
+  "atk": 265,
+  "def": 190,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Toxapex": {
+  "hp": 275,
+  "atk": 186,
+  "def": 299,
+  "spd": 90,
+  "rng": 2,
+  "types": [
+   "Poison",
+   "Water"
+  ]
+ },
+ "Toxicroak": {
+  "hp": 276,
+  "atk": 197,
+  "def": 157,
+  "spd": 220,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Fighting"
+  ]
+ },
+ "Toxtricity": {
+  "hp": 260,
+  "atk": 263,
+  "def": 172,
+  "spd": 155,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Poison"
+  ]
+ },
+ "Trevenant": {
+  "hp": 280,
+  "atk": 240,
+  "def": 198,
+  "spd": 132,
+  "rng": 3,
+  "types": [
+   "Ghost",
+   "Grass"
+  ]
+ },
+ "Tropius": {
+  "hp": 308,
+  "atk": 260,
+  "def": 175,
+  "spd": 107,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Flying"
+  ]
+ },
+ "Tsareena": {
+  "hp": 254,
+  "atk": 245,
+  "def": 201,
+  "spd": 150,
+  "rng": 3,
+  "types": [
+   "Grass"
+  ]
+ },
+ "Turtonator": {
+  "hp": 230,
+  "atk": 247,
+  "def": 266,
+  "spd": 107,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Dragon"
+  ]
+ },
+ "Typhlosion": {
+  "hp": 266,
+  "atk": 223,
+  "def": 168,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fire"
+  ]
+ },
+ "Typhlosion Hisui": {
+  "hp": 266,
+  "atk": 243,
+  "def": 168,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Ghost"
+  ]
+ },
+ "Tyranitar": {
+  "hp": 310,
+  "atk": 273,
+  "def": 215,
+  "spd": 127,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Dark"
+  ]
+ },
+ "Tyranitar Mega": {
+  "hp": 310,
+  "atk": 333,
+  "def": 275,
+  "spd": 147,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Dark"
+  ]
+ },
+ "Tyrantrum": {
+  "hp": 274,
+  "atk": 247,
+  "def": 182,
+  "spd": 147,
+  "rng": 3,
+  "types": [
+   "Rock",
+   "Dragon"
+  ]
+ },
+ "Umbreon": {
+  "hp": 300,
+  "atk": 135,
+  "def": 245,
+  "spd": 135,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Unfezant": {
+  "hp": 270,
+  "atk": 235,
+  "def": 154,
+  "spd": 191,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Flying"
+  ]
+ },
+ "Unown": {
+  "hp": 206,
+  "atk": 149,
+  "def": 101,
+  "spd": 101,
+  "rng": 3,
+  "types": [
+   "Psychic"
+  ]
+ },
+ "Ursaluna": {
+  "hp": 370,
+  "atk": 285,
+  "def": 190,
+  "spd": 105,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Normal"
+  ]
+ },
+ "Ursaluna Bloodmoon": {
+  "hp": 336,
+  "atk": 275,
+  "def": 190,
+  "spd": 109,
+  "rng": 3,
+  "types": [
+   "Ground",
+   "Normal"
+  ]
+ },
+ "Ursaring": {
+  "hp": 290,
+  "atk": 275,
+  "def": 170,
+  "spd": 115,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Ground"
+  ]
+ },
+ "Urshifu Rapid Strike": {
+  "hp": 310,
+  "atk": 265,
+  "def": 165,
+  "spd": 199,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Water"
+  ]
+ },
+ "Urshifu Single Strike": {
+  "hp": 310,
+  "atk": 265,
+  "def": 165,
+  "spd": 199,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Dark"
+  ]
+ },
+ "Uxie": {
+  "hp": 260,
+  "atk": 200,
+  "def": 265,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Fairy"
+  ]
+ },
+ "Vanilluxe": {
+  "hp": 252,
+  "atk": 225,
+  "def": 210,
+  "spd": 163,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Fairy"
+  ]
+ },
+ "Vaporeon": {
+  "hp": 370,
+  "atk": 225,
+  "def": 160,
+  "spd": 135,
+  "rng": 4,
+  "types": [
+   "Water"
+  ]
+ },
+ "Veluza": {
+  "hp": 290,
+  "atk": 254,
+  "def": 161,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Psychic"
+  ]
+ },
+ "Venomoth": {
+  "hp": 250,
+  "atk": 185,
+  "def": 195,
+  "spd": 220,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Poison"
+  ]
+ },
+ "Venusaur": {
+  "hp": 270,
+  "atk": 215,
+  "def": 200,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Poison"
+  ]
+ },
+ "Venusaur Mega": {
+  "hp": 270,
+  "atk": 258,
+  "def": 259,
+  "spd": 165,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Poison"
+  ]
+ },
+ "Vespiquen": {
+  "hp": 280,
+  "atk": 235,
+  "def": 250,
+  "spd": 85,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Victini": {
+  "hp": 310,
+  "atk": 205,
+  "def": 205,
+  "spd": 205,
+  "rng": 4,
+  "types": [
+   "Psychic",
+   "Fire"
+  ]
+ },
+ "Victreebel": {
+  "hp": 270,
+  "atk": 255,
+  "def": 180,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Poison"
+  ]
+ },
+ "Victreebel Mega": {
+  "hp": 270,
+  "atk": 315,
+  "def": 225,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Poison"
+  ]
+ },
+ "Vikavolt": {
+  "hp": 264,
+  "atk": 295,
+  "def": 170,
+  "spd": 121,
+  "rng": 2,
+  "types": [
+   "Bug",
+   "Electric"
+  ]
+ },
+ "Vileplume": {
+  "hp": 260,
+  "atk": 255,
+  "def": 210,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Poison"
+  ]
+ },
+ "Virizion": {
+  "hp": 292,
+  "atk": 185,
+  "def": 206,
+  "spd": 221,
+  "rng": 3,
+  "types": [
+   "Grass",
+   "Fighting"
+  ]
+ },
+ "Vivillon": {
+  "hp": 270,
+  "atk": 185,
+  "def": 172,
+  "spd": 223,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Volbeat": {
+  "hp": 240,
+  "atk": 151,
+  "def": 165,
+  "spd": 175,
+  "rng": 3,
+  "types": [
+   "Bug"
+  ]
+ },
+ "Volcanion": {
+  "hp": 270,
+  "atk": 265,
+  "def": 215,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Fire",
+   "Water"
+  ]
+ },
+ "Volcarona": {
+  "hp": 280,
+  "atk": 275,
+  "def": 175,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Fire"
+  ]
+ },
+ "Wailord": {
+  "hp": 450,
+  "atk": 185,
+  "def": 95,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Water"
+  ]
+ },
+ "Walking Wake": {
+  "hp": 308,
+  "atk": 255,
+  "def": 179,
+  "spd": 223,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Dragon"
+  ]
+ },
+ "Walrein": {
+  "hp": 330,
+  "atk": 210,
+  "def": 185,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Ice",
+   "Water"
+  ]
+ },
+ "Watchog": {
+  "hp": 270,
+  "atk": 214,
+  "def": 207,
+  "spd": 159,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Weavile": {
+  "hp": 250,
+  "atk": 245,
+  "def": 155,
+  "spd": 255,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Ice"
+  ]
+ },
+ "Weezing": {
+  "hp": 260,
+  "atk": 250,
+  "def": 215,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Poison"
+  ]
+ },
+ "Weezing Galar": {
+  "hp": 260,
+  "atk": 250,
+  "def": 215,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Poison",
+   "Fairy"
+  ]
+ },
+ "Whimsicott": {
+  "hp": 230,
+  "atk": 193,
+  "def": 190,
+  "spd": 237,
+  "rng": 4,
+  "types": [
+   "Grass",
+   "Fairy"
+  ]
+ },
+ "Whiscash": {
+  "hp": 370,
+  "atk": 196,
+  "def": 159,
+  "spd": 125,
+  "rng": 3,
+  "types": [
+   "Water",
+   "Ground"
+  ]
+ },
+ "Wigglytuff": {
+  "hp": 390,
+  "atk": 186,
+  "def": 179,
+  "spd": 95,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Fairy"
+  ]
+ },
+ "Wishiwashi": {
+  "hp": 200,
+  "atk": 285,
+  "def": 270,
+  "spd": 95,
+  "rng": 2,
+  "types": [
+   "Water"
+  ]
+ },
+ "Wishiwashi (Single)": {
+  "hp": 200,
+  "atk": 45,
+  "def": 50,
+  "spd": 85,
+  "rng": 4,
+  "types": [
+   "Water"
+  ]
+ },
+ "Wo-Chien": {
+  "hp": 280,
+  "atk": 195,
+  "def": 240,
+  "spd": 145,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Grass"
+  ]
+ },
+ "Wormadam Hidden": {
+  "hp": 250,
+  "atk": 163,
+  "def": 220,
+  "spd": 120,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Dark"
+  ]
+ },
+ "Wormadam Mind": {
+  "hp": 250,
+  "atk": 163,
+  "def": 220,
+  "spd": 120,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Ghost"
+  ]
+ },
+ "Wormadam Sand": {
+  "hp": 250,
+  "atk": 163,
+  "def": 220,
+  "spd": 120,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Ground"
+  ]
+ },
+ "Wormadam Trash": {
+  "hp": 250,
+  "atk": 163,
+  "def": 220,
+  "spd": 120,
+  "rng": 3,
+  "types": [
+   "Bug",
+   "Steel"
+  ]
+ },
+ "Wugtrio": {
+  "hp": 200,
+  "atk": 215,
+  "def": 190,
+  "spd": 245,
+  "rng": 4,
+  "types": [
+   "Water"
+  ]
+ },
+ "Wyrdeer": {
+  "hp": 316,
+  "atk": 246,
+  "def": 153,
+  "spd": 135,
+  "rng": 3,
+  "types": [
+   "Normal",
+   "Psychic"
+  ]
+ },
+ "Xatu": {
+  "hp": 240,
+  "atk": 195,
+  "def": 220,
+  "spd": 195,
+  "rng": 3,
+  "types": [
+   "Psychic",
+   "Flying"
+  ]
+ },
+ "Xurkitree": {
+  "hp": 276,
+  "atk": 351,
+  "def": 147,
+  "spd": 171,
+  "rng": 3,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Yanmega": {
+  "hp": 282,
+  "atk": 237,
+  "def": 147,
+  "spd": 195,
+  "rng": 4,
+  "types": [
+   "Bug",
+   "Flying"
+  ]
+ },
+ "Zangoose": {
+  "hp": 256,
+  "atk": 235,
+  "def": 174,
+  "spd": 185,
+  "rng": 3,
+  "types": [
+   "Normal"
+  ]
+ },
+ "Zapdos": {
+  "hp": 290,
+  "atk": 255,
+  "def": 180,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Electric",
+   "Flying"
+  ]
+ },
+ "Zapdos Galar": {
+  "hp": 290,
+  "atk": 255,
+  "def": 185,
+  "spd": 205,
+  "rng": 3,
+  "types": [
+   "Fighting",
+   "Flying"
+  ]
+ },
+ "Zarude": {
+  "hp": 320,
+  "atk": 245,
+  "def": 205,
+  "spd": 215,
+  "rng": 3,
+  "types": [
+   "Dark",
+   "Grass"
+  ]
+ },
+ "Zebstrika": {
+  "hp": 260,
+  "atk": 195,
+  "def": 158,
+  "spd": 237,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Zeraora": {
+  "hp": 286,
+  "atk": 229,
+  "def": 160,
+  "spd": 291,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Zeraora Mega": {
+  "hp": 286,
+  "atk": 319,
+  "def": 160,
+  "spd": 311,
+  "rng": 4,
+  "types": [
+   "Electric"
+  ]
+ },
+ "Zoroark": {
+  "hp": 230,
+  "atk": 245,
+  "def": 160,
+  "spd": 215,
+  "rng": 4,
+  "types": [
+   "Dark"
+  ]
+ },
+ "Zoroark Hisui": {
+  "hp": 220,
+  "atk": 255,
+  "def": 150,
+  "spd": 225,
+  "rng": 4,
+  "types": [
+   "Normal",
+   "Ghost"
+  ]
+ },
+ "Zygarde 10%": {
+  "hp": 218,
+  "atk": 215,
+  "def": 182,
+  "spd": 235,
+  "rng": 4,
+  "types": [
+   "Dragon",
+   "Ground"
+  ]
+ }
+}

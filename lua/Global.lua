@@ -12,6 +12,7 @@ card on the slope under each. Which stand is yours depends on your seat colour (
               "Clear status" returns a Pokémon to normal.
   * Map:      pick which arena the board shows.
 Flags on the board: right-click > Capture tints a flag to your seat colour; "Make neutral" resets it.
+HP: each Pokémon shows "current/max" HP over its head; click the number and type 120 (set), -35 or +20.
 Chat:  !spawn garchomp   !item sitrus   !skill belief   spawn the best match (or list close alternatives).
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
@@ -51,6 +52,7 @@ CATALOGS = {
 }
 ROSTER_URL = BASE_URL .. "figures/index.json"
 CARDS_URL = BASE_URL .. "cards/index.json"
+STATS_URL = BASE_URL .. "data/pokemon.json"   -- every Pokémon's stats from the sheet (tools/build_stats.py)
 
 -- Type colours, the same as the damage calculator sheets' type cells (their conditional formatting).
 TYPE_COLORS = {
@@ -111,6 +113,7 @@ catalog = {}         -- kind -> { index = name -> data, list = sorted search ent
 for _, k in ipairs(SEARCH_KINDS) do catalog[k] = { index = {}, list = {}, keys = {} } end
 roster = catalog.dex.index
 cardBacks = {}       -- kind -> back image path
+stats = {}           -- Pokémon name -> { hp, atk, def, spd, rng, types } (data/pokemon.json)
 openPanel, searchHits, mapRows, spawnCount = {}, {}, {}, {}
 armed = {}           -- [colour] = status key waiting for that player to pick up a Pokémon
 queries = {}         -- [colour .. kind] = what that player last typed in that search box
@@ -124,14 +127,20 @@ function onLoad(saved)
   local state = (saved and saved ~= "") and JSON.decode(saved) or {}
   if state.roster then setCatalog("dex", state.roster, "saved copy") end
   if state.cards then setCards(state.cards, "saved copy") end
+  if state.stats then stats = state.stats end
   buildUI()
   for _, obj in ipairs(getAllObjects()) do flagMenu(obj) end   -- context menus aren't saved with the game
+  refreshAllHp()
   fetchJSON(ROSTER_URL, "roster", function(index) setCatalog("dex", index, "downloaded") end)
   fetchJSON(CARDS_URL, "cards", function(index) setCards(index, "downloaded") end)
+  fetchJSON(STATS_URL, "stats", function(data)
+    stats = data
+    refreshAllHp()
+  end)
 end
 
 function onSave()
-  return JSON.encode({ roster = catalog.dex.index, cards = savedCards })
+  return JSON.encode({ roster = catalog.dex.index, cards = savedCards, stats = stats })
 end
 
 function log(msg)
@@ -297,7 +306,7 @@ function spawnPokemon(name, color)
     Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
     Nickname = name,
     Tags = { "Pokemon" },
-    Memo = JSON.encode({ pokemon = name }),
+    Memo = JSON.encode({ pokemon = name, hp = maxHp(name), maxHp = maxHp(name) }),
   }
   if files.standee then
     -- the standee: the art on a round base whose arrow points the way the Pokémon faces (the art's left);
@@ -791,6 +800,83 @@ end
 
 function onObjectSpawn(obj)
   flagMenu(obj)
+  showHp(obj)
+end
+
+----------------------------------------------------------------------------------------------------
+-- HP over each Pokémon's head: "Y/X", on two labels back to back so both sides of the table can read it.
+-- Click the number and type 120 to set it, -35 to take damage or +20 to heal (kept between 0 and its max).
+-- Current and max HP live in the figure's memo; the max comes from the sheet (data/pokemon.json).
+----------------------------------------------------------------------------------------------------
+HP_HEIGHT = -255        -- object UI units (100 = one world unit; up is -z): just above a standee's art
+HP_COLOR, HP_FAINTED = "#FFFFFF", "#FF6B6B"
+
+function maxHp(name)
+  local s = stats[name]
+  return s and tonumber(s.hp) and math.floor(tonumber(s.hp)) or nil
+end
+
+local function hpLabelXml(guid, side, rotation, dy, hp, max)
+  return string.format([[
+<Panel id="hp%s" position="0 %d %d" rotation="%s" width="150" height="40" color="#000000C8">
+  <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" width="72" height="40"
+    fontSize="28" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
+    colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
+  <Text rectAlignment="MiddleRight" width="78" height="40" fontSize="28" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
+</Panel>
+]], side, dy, HP_HEIGHT, rotation, guid, side, hp, hp > 0 and HP_COLOR or HP_FAINTED, max)
+end
+
+-- Give a Pokémon its HP labels (or bring them up to date). Its memo gets hp/maxHp if it had none.
+function showHp(obj)
+  if not (obj and obj.hasTag("Pokemon")) then return end
+  local st = figureState(obj)
+  local max = maxHp(st.pokemon) or (st.maxHp and math.floor(st.maxHp))
+  if not max then return end
+  local hp = math.max(0, math.min(max, math.floor(st.hp or max)))
+  if st.hp ~= hp or st.maxHp ~= max then
+    st.hp, st.maxHp = hp, max
+    obj.memo = JSON.encode(st)
+  end
+  -- front label faces the way the art does (-z), the back one the other way; each hides the other
+  obj.UI.setXml(hpLabelXml(obj.guid, "F", "-90 0 0", -2, hp, max) .. hpLabelXml(obj.guid, "B", "90 0 0", 2, hp, max))
+end
+
+function refreshAllHp()
+  for _, obj in ipairs(getAllObjects()) do showHp(obj) end
+end
+
+-- What a typed entry makes the HP: "120" sets it, "-35" / "+20" change it; nil if it isn't a number.
+function parseHp(text, current, max)
+  local s = (text or ""):gsub("%s", ""):gsub("/.*$", "")
+  local sign, n = s:match("^([%+%-]?)(%d+)$")
+  if not n then return nil end
+  local v = tonumber(n)
+  if sign == "-" then v = current - v elseif sign == "+" then v = current + v end
+  return math.max(0, math.min(max, v))
+end
+
+function hpEdited(player, value, id)
+  local guid = id:match("^hpIn_(%w+)_%a$")
+  local obj = guid and getObjectFromGUID(guid)
+  if not obj then return end
+  local st = figureState(obj)
+  if not st.maxHp then return end
+  local old = math.floor(st.hp or st.maxHp)
+  local new = parseHp(value, old, st.maxHp)
+  if new and new ~= old then
+    st.hp = new
+    obj.memo = JSON.encode(st)
+    local name = st.pokemon ~= "" and st.pokemon or "That Pokémon"
+    local change = new - old
+    printToAll(string.format("%s: %d → %d HP (%s%d)%s", name, old, new, change > 0 and "+" or "", change,
+      new == 0 and (". " .. name .. " fainted!") or ""), new == 0 and { 1, 0.45, 0.45 } or { 0.85, 0.85, 0.85 })
+  end
+  local shown = math.floor(st.hp or st.maxHp)
+  for _, side in ipairs({ "F", "B" }) do   -- show the result (or put back the number if the entry wasn't one)
+    obj.UI.setAttribute("hpIn_" .. guid .. "_" .. side, "text", tostring(shown))
+    obj.UI.setAttribute("hpIn_" .. guid .. "_" .. side, "textColor", shown > 0 and HP_COLOR or HP_FAINTED)
+  end
 end
 
 ----------------------------------------------------------------------------------------------------
