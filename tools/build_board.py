@@ -64,16 +64,37 @@ class Arena:
 
 
 # ------------------------------------------------------------------------------------------------ texture
+def recolor(img, frm, to, amount):
+    """Move one colour `amount` of the way toward another. Pixels count as that colour in proportion to how far
+    their brightness sits between the two (so anti-aliased edges shift smoothly, without halos); pixels at least
+    as bright as `to` are left alone."""
+    def lum(c):
+        return 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]
+    lf, lt = lum(frm), lum(to)
+    delta = [to[i] - frm[i] for i in range(3)]
+    out = []
+    pixels = img.get_flattened_data() if hasattr(img, "get_flattened_data") else img.getdata()
+    for px in pixels:
+        t = max(0.0, min(1.0, (lt - lum(px)) / (lt - lf))) * amount
+        out.append(tuple(max(0, min(255, round(px[i] + t * delta[i]))) for i in range(3)))
+    res = Image.new("RGB", img.size)
+    res.putdata(out)
+    return res
+
+
 def surface_layers(a, p):
     """Surfaces textured with an image (map.json "textures": {surface: {"image": path, "span": tiles, "vary": bool}}):
     the image is scaled so one copy covers `span` tiles and repeated across the board (span 1 = one copy per tile).
     With "vary", every copy is turned and mirrored at random so the repetition doesn't show. With "match", the
     image is recoloured so its typical (median) colour equals the surface's palette colour (e.g. the same dirt,
-    darker in a pit); details darker or lighter than the base keep their contrast.
+    darker in a pit); details darker or lighter than the base keep their contrast. "recolor": [{"from", "to",
+    "amount"}] first moves a colour part of the way toward another (e.g. soften the darkest rocks).
     Returns surface -> board-sized image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
         src = Image.open(a.folder / spec["image"]).convert("RGB")
+        for rule in spec.get("recolor", []):
+            src = recolor(src, hex_rgb(rule["from"]), hex_rgb(rule["to"]), rule.get("amount", 1.0))
         if spec.get("match"):  # recolour so the image's typical (median) colour equals this surface's palette colour
             typical = ImageStat.Stat(src).median   # the median ignores dark/light details, so they keep their contrast
             want = a.palette[surface]
