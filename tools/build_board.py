@@ -65,18 +65,23 @@ class Arena:
 
 # ------------------------------------------------------------------------------------------------ texture
 def surface_layers(a, p):
-    """Surfaces textured with an image (map.json "textures": {surface: {"image": path, "span": tiles}}): the image
-    is scaled so one copy covers `span` tiles and repeated across the whole board, so neighbouring tiles continue
-    the same picture instead of each showing a copy. Returns surface -> board-sized image."""
+    """Surfaces textured with an image (map.json "textures": {surface: {"image": path, "span": tiles, "vary": bool}}):
+    the image is scaled so one copy covers `span` tiles and repeated across the board (span 1 = one copy per tile).
+    With "vary", every copy is turned and mirrored at random so the repetition doesn't show.
+    Returns surface -> board-sized image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
         src = Image.open(a.folder / spec["image"]).convert("RGB")
         size = round(spec.get("span", max(a.R, a.C)) * p)
         tile = src.resize((size, size), Image.LANCZOS)
+        # "vary": each copy gets a random quarter-turn and mirror (fixed per position, so rebuilds match)
+        variants = [v for t in (tile, tile.transpose(Image.FLIP_LEFT_RIGHT)) for v in
+                    (t, t.transpose(Image.ROTATE_90), t.transpose(Image.ROTATE_180), t.transpose(Image.ROTATE_270))]
+        rnd = random.Random(f"{a.data.get('name')}/{surface}")
         layer = Image.new("RGB", (a.C * p, a.R * p))
         for y in range(0, a.R * p, size):
             for x in range(0, a.C * p, size):
-                layer.paste(tile, (x, y))
+                layer.paste(rnd.choice(variants) if spec.get("vary") else tile, (x, y))
         layers[surface] = layer
     return layers
 
