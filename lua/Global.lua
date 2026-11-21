@@ -855,7 +855,7 @@ end
 -- Current and max HP live in the figure's memo; the max comes from the sheet (data/pokemon.json).
 ----------------------------------------------------------------------------------------------------
 HP_HEIGHT = -255        -- object UI units (100 = one world unit; up is -z): the sign's centre (PLATE_Y in build_standee.py)
-HP_FACE = 3             -- how far each label sits from the plate's middle (the UI's +y is the object's -z, the front)
+HP_FACE = 3             -- how far each label sits from the plate's middle (the UI's +y is the object's +z, the back)
 HP_COLOR, HP_FAINTED = "#FFFFFF", "#FF6B6B"
 
 function maxHp(name)
@@ -876,7 +876,7 @@ local function hpLabelXml(guid, side, rotation, dy, hp, max)
 end
 
 local function hpXml(obj, hp, max)
-  return hpLabelXml(obj.guid, "F", "-90 0 0", HP_FACE, hp, max) .. hpLabelXml(obj.guid, "B", "90 0 0", -HP_FACE, hp, max)
+  return hpLabelXml(obj.guid, "F", "-90 0 0", -HP_FACE, hp, max) .. hpLabelXml(obj.guid, "B", "90 0 180", HP_FACE, hp, max)
 end
 
 -- Give a Pokémon its HP labels (or bring them up to date). Its memo gets hp/maxHp if it had none. A standee on

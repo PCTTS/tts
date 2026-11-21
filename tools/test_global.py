@@ -333,8 +333,8 @@ def main():
     root_hp = ET.fromstring("<root>" + h.ui.xml + "</root>")
     front = next(e for e in root_hp.iter() if e.get("id") == "hpF")
     back = next(e for e in root_hp.iter() if e.get("id") == "hpB")
-    check((front.get("rotation"), front.get("position")) == ("-90 0 0", "0 3 -255")
-          and (back.get("rotation"), back.get("position")) == ("90 0 0", "0 -3 -255")
+    check((front.get("rotation"), front.get("position")) == ("-90 0 0", "0 -3 -255")
+          and (back.get("rotation"), back.get("position")) == ("90 0 180", "0 3 -255")
           and not front.get("visibility") and not back.get("visibility"),
           "one label on each face of the sign, facing out, seen by everyone (the plate hides the far one)")
 
