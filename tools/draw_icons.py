@@ -1,69 +1,65 @@
-"""Draw the toolbar icons (original art). Writes ui/icons/<name>.png at 128x128."""
+"""Draw the toolbar icons (original art): white silhouettes on transparent, 128x128, for the black toolbar.
+Writes ui/icons/<name>.png. Give a changed icon a new file name: TTS caches images by their link."""
 from pathlib import Path
 
 from PIL import Image, ImageDraw
 
 S, N = 4, 128  # draw at 4x, output N x N
-INK = (24, 24, 28, 255)
 OUT = Path(__file__).resolve().parent.parent / "ui" / "icons"
-
-
-def canvas():
-    img = Image.new("RGBA", (N * S, N * S), (0, 0, 0, 0))
-    return img, ImageDraw.Draw(img)
+STROKE = 9     # line weight shared by all icons (in output pixels)
 
 
 def P(*v):
     return [x * S for x in v]
 
 
-def save(img, name):
+def save(mask, name):
+    """mask: 'L' image, 255 = ink. Saved as white ink with that alpha."""
     OUT.mkdir(parents=True, exist_ok=True)
+    img = Image.new("RGBA", mask.size, (255, 255, 255, 0))
+    img.putalpha(mask)
     img.resize((N, N), Image.LANCZOS).save(OUT / f"{name}.png")
     print("wrote ui/icons/" + name + ".png")
 
 
+def ring(d, c, r_out, r_in):
+    d.ellipse(P(c[0] - r_out, c[1] - r_out, c[0] + r_out, c[1] + r_out), fill=255)
+    d.ellipse(P(c[0] - r_in, c[1] - r_in, c[0] + r_in, c[1] + r_in), fill=0)
+
+
 def pokeball():
-    img, d = canvas()
-    c, r = 64, 56
-    d.ellipse(P(c - r, c - r, c + r, c + r), fill=INK)                         # outline
-    d.pieslice(P(c - r + 6, c - r + 6, c + r - 6, c + r - 6), 180, 360, fill=(228, 52, 40, 255))  # red top
-    d.pieslice(P(c - r + 6, c - r + 6, c + r - 6, c + r - 6), 0, 180, fill=(246, 246, 246, 255))  # white bottom
-    d.ellipse(P(c - 40, c - 46, c - 14, c - 30), fill=(255, 140, 120, 255))   # shine
-    d.rectangle(P(c - r + 4, c - 5, c + r - 4, c + 5), fill=INK)              # band
-    d.ellipse(P(c - 19, c - 19, c + 19, c + 19), fill=INK)                     # button ring
-    d.ellipse(P(c - 12, c - 12, c + 12, c + 12), fill=(246, 246, 246, 255))
-    d.ellipse(P(c - 6, c - 6, c + 6, c + 6), outline=(190, 190, 190, 255), width=2 * S)
-    save(img, "pokeball")
+    m = Image.new("L", (N * S, N * S), 0)
+    d = ImageDraw.Draw(m)
+    c, R = (64, 64), 58
+    ring(d, c, R, R - STROKE)                                   # outer ring
+    d.rectangle(P(c[0] - R + 2, c[1] - 3.5, c[0] + R - 2, c[1] + 3.5), fill=255)  # band
+    d.ellipse(P(c[0] - 22, c[1] - 22, c[0] + 22, c[1] + 22), fill=0)            # gap around the button
+    ring(d, c, 18, 18 - 7)                                      # button
+    save(m, "pokeball-line")
 
 
 def folded_map():
-    img, d = canvas()
-    # three panels folded in a zigzag
-    xs, top, bot, dip = [10, 46, 82, 118], 22, 106, 8
-    shades = [(242, 226, 178, 255), (222, 202, 150, 255), (242, 226, 178, 255)]
-    # each fold goes down then up: panel i's left/right top edges sit at these heights
+    m = Image.new("L", (N * S, N * S), 0)
+    d = ImageDraw.Draw(m)
+    xs, top, bot, dip = [12, 45, 78, 111], 26, 104, 9
     lefts, rights = [0, dip, 0], [dip, 0, dip]
-    panels = [P(xs[i], top + lefts[i], xs[i + 1], top + rights[i], xs[i + 1], bot + rights[i], xs[i], bot + lefts[i])
-              for i in range(3)]
-    for poly, shade in zip(panels, shades):
-        d.polygon(poly, fill=shade)
-    # green land, blue river, red dashed route and a pin
-    d.ellipse(P(16, 34, 44, 60), fill=(122, 190, 92, 255))
-    d.ellipse(P(86, 70, 112, 96), fill=(122, 190, 92, 255))
-    d.line(P(50, 30, 60, 60, 52, 98), fill=(80, 140, 230, 255), width=5 * S, joint="curve")
-    pts = [(22, 92), (38, 78), (56, 74), (74, 60), (94, 48)]
-    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
-        for t in (0.0, 0.5):
-            a, b = t, t + 0.3
-            d.line(P(x0 + (x1 - x0) * a, y0 + (y1 - y0) * a, x0 + (x1 - x0) * b, y0 + (y1 - y0) * b),
-                   fill=(214, 48, 40, 255), width=4 * S)
-    d.ellipse(P(88, 28, 106, 46), fill=(214, 48, 40, 255), outline=INK, width=2 * S)
-    d.polygon(P(90, 42, 104, 42, 97, 56), fill=(214, 48, 40, 255))
-    d.ellipse(P(94, 34, 100, 40), fill=(255, 255, 255, 255))
-    for poly in panels:  # outlines on top
-        d.line(poly + poly[:2], fill=INK, width=4 * S, joint="curve")
-    save(img, "map")
+    outline = []
+    for i in range(3):  # top edge, left to right
+        outline += [(xs[i], top + lefts[i]), (xs[i + 1], top + rights[i])]
+    for i in reversed(range(3)):  # bottom edge, right to left
+        outline += [(xs[i + 1], bot + rights[i]), (xs[i], bot + lefts[i])]
+    pts = [v * S for p in outline for v in p]
+    d.line(pts + pts[:2], fill=255, width=STROKE * S, joint="curve")
+    for x, y in ((xs[1], dip), (xs[2], 0)):                     # fold lines
+        d.line(P(x, top + y, x, bot + y), fill=255, width=(STROKE - 2) * S)
+    # location pin on the right panel, with a gap so it stands clear of the lines
+    px, py, pr = 92, 52, 15
+    d.ellipse(P(px - pr - 5, py - pr - 5, px + pr + 5, py + pr + 5), fill=0)
+    d.polygon(P(px - pr - 4, py + 2, px + pr + 4, py + 2, px, py + pr + 22), fill=0)
+    d.ellipse(P(px - pr, py - pr, px + pr, py + pr), fill=255)
+    d.polygon(P(px - pr + 1, py + 6, px + pr - 1, py + 6, px, py + pr + 16), fill=255)
+    d.ellipse(P(px - 6, py - 6, px + 6, py + 6), fill=0)
+    save(m, "map-line")
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ The last roster loaded is kept in the save, so the spawner still works if the si
 
 BASE_URL = "https://pctts.github.io/tts/"
 ROSTER_URL = BASE_URL .. "figures/index.json"
-ICONS = { pokeball = "ui/icons/pokeball.png", map = "ui/icons/map.png" }
+ICONS = { pokeball = "ui/icons/pokeball-line.png", map = "ui/icons/map-line.png" }
 FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
