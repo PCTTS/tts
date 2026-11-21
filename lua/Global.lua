@@ -12,7 +12,7 @@ The last roster loaded is kept in the save, so the spawner still works if the si
 
 BASE_URL = "https://pctts.github.io/tts/"
 ROSTER_URL = BASE_URL .. "figures/index.json"
-ICONS = { pokeball = "ui/icons/pokeball-line.png", map = "ui/icons/map-line.png" }
+ICONS = { pokeball = "ui/icons/pokeball-v2.png", map = "ui/icons/map-v2.png" }
 FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
@@ -181,7 +181,7 @@ end
 ----------------------------------------------------------------------------------------------------
 local function panelXml(kind, c, title, height, body)
   return string.format([[
-<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" pivot="1 1" offsetXY="-56 52"
+<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" pivot="1 1" offsetXY="-52 46"
        width="290" height="%d"
        color="#141414F2" outline="#303030" outlineSize="1 1" padding="8 8 8 8" spacing="4"
        childForceExpandHeight="false" childForceExpandWidth="true">
@@ -202,7 +202,7 @@ function buildUI()
 
   local xml = { [[
 <Defaults>
-  <Button class="bar" colors="#00000000|#FFFFFF33|#FFFFFF66|#00000000" tooltipPosition="Left" preferredHeight="44" flexibleHeight="0"/>
+  <Button class="bar" colors="#00000000|#FFFFFF33|#FFFFFF66|#00000000" tooltipPosition="Left" preferredHeight="42" flexibleHeight="0"/>
   <Button class="row" fontSize="15" textAlignment="MiddleLeft" padding="10 0 0 0" textColor="#111111"
           colors="#E4E4E4|#B3D1FF|#8DB8F7|#E4E4E4" preferredHeight="28" flexibleHeight="0"/>
   <Button class="close" fontSize="14" textColor="#FFFFFF" colors="#2a2a2a|#c0392b|#962d22|#2a2a2a"/>
@@ -210,7 +210,7 @@ function buildUI()
   <Text class="hint" fontSize="12" color="#AAAAAA" alignment="MiddleLeft" preferredHeight="18" flexibleHeight="0"/>
   <InputField class="search" fontSize="16" preferredHeight="34" flexibleHeight="0" characterLimit="40"/>
 </Defaults>
-<VerticalLayout id="toolbar" rectAlignment="MiddleRight" width="52" height="104" padding="4 4 4 4" spacing="4"
+<VerticalLayout id="toolbar" rectAlignment="MiddleRight" width="48" height="92" padding="3 3 3 3" spacing="2"
                 color="#000000E6" outline="#303030" outlineSize="1 1" childForceExpandHeight="false">
   <Button class="bar" icon="pokeball" tooltip="Spawn a Pokémon" onClick="toggleDex"/>
   <Button class="bar" icon="map" tooltip="Choose the map" onClick="toggleMaps"/>
