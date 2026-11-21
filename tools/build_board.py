@@ -13,7 +13,7 @@ TTS mirrors OBJ files on X when it loads them, so x is written negated.
 import json, math, random, sys
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageStat
 
 TILE = 2.35       # world units per tile (matches the old snap grid); --tile changes it
 LEVEL_H = 0.7     # height of one level step at TILE 2.35 (scales with the tile size)
@@ -68,15 +68,16 @@ def surface_layers(a, p):
     """Surfaces textured with an image (map.json "textures": {surface: {"image": path, "span": tiles, "vary": bool}}):
     the image is scaled so one copy covers `span` tiles and repeated across the board (span 1 = one copy per tile).
     With "vary", every copy is turned and mirrored at random so the repetition doesn't show. With "match", the
-    image is recoloured so its average equals the surface's palette colour (e.g. the same dirt, darker in a pit).
+    image is recoloured so its typical (median) colour equals the surface's palette colour (e.g. the same dirt,
+    darker in a pit); details darker or lighter than the base keep their contrast.
     Returns surface -> board-sized image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
         src = Image.open(a.folder / spec["image"]).convert("RGB")
-        if spec.get("match"):  # recolour so the image's average equals this surface's palette colour
-            mean = src.resize((1, 1), Image.BOX).getpixel((0, 0))
+        if spec.get("match"):  # recolour so the image's typical (median) colour equals this surface's palette colour
+            typical = ImageStat.Stat(src).median   # the median ignores dark/light details, so they keep their contrast
             want = a.palette[surface]
-            src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, mean[i]): min(255, round(v * k)))
+            src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, typical[i]): min(255, round(v * k)))
                                       for i, band in enumerate(src.split())])
         size = round(spec.get("span", max(a.R, a.C)) * p)
         tile = src.resize((size, size), Image.LANCZOS)
