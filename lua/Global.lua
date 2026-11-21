@@ -110,6 +110,7 @@ STAND = {
 }
 CARD_YAW = 270  -- cards lie landscape: turned a quarter so the name reads left-to-right for the stand's player
 PEDESTAL_TOP = 0.25  -- a pedestal's height above the stand top
+PEDESTAL_REACH = 1.5 -- a Pokémon this close (sideways) to a pedestal's centre counts as on it (shows its HP sign)
 COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
 
 catalog = {}         -- kind -> { index = name -> data, list = sorted search entries, keys = name -> deck id }
@@ -882,16 +883,35 @@ local function hpXml(obj, hp, max)
   return hpLabelXml(obj.guid, "F", "-90 0 0", -HP_FACE, hp, max) .. hpLabelXml(obj.guid, "B", "90 0 180", HP_FACE, hp, max)
 end
 
--- Give a Pokémon its HP labels (or bring them up to date). Its memo gets hp/maxHp if it had none. A standee on
--- the old model (no sign) is switched to the current one first; it comes back through onObjectSpawn.
+-- Is this Pokémon standing on one of the team stands' pedestals?
+function onPedestal(obj)
+  local p = obj.getPosition()
+  for _, stand in ipairs(getAllObjects()) do
+    if stand.hasTag("Stand") then
+      for _, x in ipairs(STAND.x) do
+        if near(p, stand.positionToWorld(Vector(x, STAND.pedestal.y, STAND.pedestal.z)), PEDESTAL_REACH) then return true end
+      end
+    end
+  end
+  return false
+end
+
+-- Give a Pokémon its HP sign, only while it's on a pedestal (or bring it up to date). On a pedestal it uses the
+-- model with the sign, anywhere else the plain one; switching models reloads it, and it comes back through
+-- onObjectSpawn. Its memo gets hp/maxHp if it had none.
 function showHp(obj)
   if not (obj and obj.hasTag("Pokemon")) then return end
+  local shown = onPedestal(obj)
   local custom = obj.name == "Custom_Model" and (obj.getCustomObject() or {}) or {}
   local mesh, collider = custom.mesh or "", custom.collider or ""
-  if mesh:find("models/standee-", 1, true)
-      and not (mesh:find(STANDEE_MESH, 1, true) and collider:find(STANDEE_COLLIDER, 1, true)) then
-    obj.setCustomObject({ mesh = BASE_URL .. STANDEE_MESH, collider = BASE_URL .. STANDEE_COLLIDER })
+  local want = shown and STANDEE_MESH or STANDEE_COLLIDER   -- the collider model is the one without the sign
+  if mesh:find("models/standee-", 1, true) and not (mesh:find(want, 1, true) and collider:find(STANDEE_COLLIDER, 1, true)) then
+    obj.setCustomObject({ mesh = BASE_URL .. want, collider = BASE_URL .. STANDEE_COLLIDER })
     obj.reload()
+    return
+  end
+  if not shown then
+    obj.UI.setXml("")
     return
   end
   local st = figureState(obj)
@@ -907,6 +927,11 @@ end
 
 function refreshAllHp()
   for _, obj in ipairs(getAllObjects()) do showHp(obj) end
+end
+
+-- Put down on a pedestal: the sign appears; put down anywhere else: it goes.
+function onObjectDrop(_, obj)
+  showHp(obj)
 end
 
 -- What a typed entry makes the HP: "120" sets it, "-35" / "+20" change it; nil if it isn't a number.

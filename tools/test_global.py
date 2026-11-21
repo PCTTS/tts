@@ -316,6 +316,7 @@ def main():
       hpFig = { memo = '{"pokemon":"Gengar"}', guid = "abc123", ui = { attrs = {} } }
       hpFig.hasTag = function(t) return t == "Pokemon" end
       hpFig.getRotation = function() return Vector(0, 90, 0) end
+      hpFig.getPosition = function() return Vector(-17.625, 3.8, -28.0) end   -- on White's first pedestal
       hpFig.UI = { setXml = function(x) hpFig.ui.xml = x end,
                    setAttribute = function(id, k, v) hpFig.ui.attrs[id .. "." .. k] = v end }
       getObjectFromGUID = function(g) if g == "abc123" then return hpFig end end
@@ -343,6 +344,7 @@ def main():
     lua.execute(r"""
       oldFig = { memo = '{"pokemon":"Gengar"}', guid = "old111", name = "Custom_Model", reloaded = false }
       oldFig.hasTag = function(t) return t == "Pokemon" end
+      oldFig.getPosition = function() return Vector(10.575, 3.8, -28.0) end
       oldFig.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/models/standee-v1.obj" } end
       oldFig.setCustomObject = function(c) oldFig.newMesh = c.mesh; oldFig.newCollider = c.collider end
       oldFig.reload = function() oldFig.reloaded = true end
@@ -352,6 +354,27 @@ def main():
     o = g.oldFig
     check(o.reloaded and str(o.newMesh).endswith("models/standee-v2.obj") and str(o.newCollider).endswith("models/standee-v1.obj")
           and o.xml is None, "a standee without the sign gets the new model and a collider without the sign (labels come on respawn)")
+
+    # the sign shows only on a pedestal: put down on the board, a Pokemon switches to the plain model, no labels
+    lua.execute(r"""
+      local function fig(id, mesh, pos)
+        local f = { memo = '{"pokemon":"Gengar","hp":100,"maxHp":230}', guid = id, name = "Custom_Model", reloaded = false }
+        f.hasTag = function(t) return t == "Pokemon" end
+        f.getPosition = function() return pos end
+        f.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/" .. mesh, collider = "https://pctts.github.io/tts/models/standee-v1.obj" } end
+        f.setCustomObject = function(c) f.newMesh = c.mesh end
+        f.reload = function() f.reloaded = true end
+        f.UI = { setXml = function(x) f.xml = x end }
+        return f
+      end
+      onBoardSigned = fig("b11111", "models/standee-v2.obj", Vector(0, 3.3, 0))
+      onBoardPlain = fig("b22222", "models/standee-v1.obj", Vector(3.2, 3.3, -3.2))
+      onObjectDrop("White", onBoardSigned)
+      onObjectDrop("White", onBoardPlain)
+    """)
+    a, b = g.onBoardSigned, g.onBoardPlain
+    check(a.reloaded and str(a.newMesh).endswith("models/standee-v1.obj") and not b.reloaded and b.xml == "",
+          "put down on the board, a Pokemon loses its HP sign (plain model, no labels)")
 
     def hp():
         return json.loads(h.memo)["hp"]
