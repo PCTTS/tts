@@ -8,7 +8,8 @@ Reads the arena's map.json (markers) and its board geometry JSON (tile size, lev
 highest-numbered board-v*.json), finds the locked board named after the arena, removes the pieces placed
 before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, for every legend entry with
 "piece": true (other markers are only painted on the board):
-  flag: a flag in the tile's corner farthest from the board's centre, its triangle pointing outward, so a Pokemon
+  flag: a flag in the tile's corner farthest from the board's centre, its triangle pointing back in over its own
+        tile (the user's choice: the flag stays over its tile), so a Pokemon
         can stand on the tile. Starts neutral; right-click > Capture tints it to the player's colour (Global.lua).
   bell-attack / bell-defense: a bronze bell ("ATK bell" / "DEF bell") hanging over the middle of the tile in a
         wooden stand whose posts stand on its sides, facing away from the pit (like the painted symbol).
@@ -36,7 +37,7 @@ BASE_URL = "https://pctts.github.io/tts/"
 FLAG_INSET = 0.38        # the pole's distance from the two tile edges of its corner
 BELL = {"mesh": "props/bell-v3.obj", "diffuse": "props/bell-v3.jpg", "collider": "props/bell-collider-v3.obj",
         "convex": True, "material": 2}
-FLAG = {"mesh": "props/flag-v2.obj", "diffuse": "props/flag-v2.jpg", "collider": "props/flag-collider-v2.obj",
+FLAG = {"mesh": "props/flag-v2.obj", "diffuse": "props/flag-v2.jpg", "collider": "props/flag-collider-v3.obj",
         "convex": False, "material": 3}
 STAND = {"mesh": "props/bellstand-v1.obj", "diffuse": "props/stand-wood-v1.jpg", "collider": "props/bellstand-v1.obj",
          "convex": False, "material": 1}
@@ -147,7 +148,7 @@ def pieces(arena, info):
             else:
                 sx, sz = (1 if cx >= 0 else -1), (1 if cz >= 0 else -1)
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
-                yaw = math.degrees(math.atan2(-sz, sx))      # TTS yaw that turns the model's +x toward (sx, sz)
+                yaw = math.degrees(math.atan2(-sz, sx)) + 180   # TTS yaw that turns the model's +x toward (-sx, -sz)
                 out.append({"kind": "Flag", "name": "Flag", "model": FLAG, "pos": pos, "yaw": yaw % 360, "desc": ""})
     for size, pos in zones(data, info):
         out.append({"kind": "Zone", "name": "Capture zone", "model": ZONES[size], "pos": list(pos), "yaw": 0,

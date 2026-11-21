@@ -5,7 +5,9 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/bell-v3.obj, props/bell-v3.jpg, props/bell-collider-v3.obj
   (superseded, kept for older saves: v1 a church bell with a loop, v2 a rocket-nozzle bell)
   props/bellstand-v1.obj  (textured with props/stand-wood-v1.jpg, from build_props.py; also its own collider)
-  props/flag-v2.obj, props/flag-v2.jpg, props/flag-collider-v2.obj  (v1: a waving cloth on a foot, superseded)
+  props/flag-v2.obj, props/flag-v2.jpg, props/flag-collider-v3.obj  (v1: a waving cloth on a foot, superseded;
+  collider v2 also covered the triangle, which could catch a Pokemon dropped on the tile once the triangle turned
+  in over it — v3 is the rod alone, a little thicker so it's easy to right-click)
   props/portal-v1.obj, props/portal-v1.jpg  (also its own collider)
   props/bridge1-v1.obj, props/bridge2-v1.obj, props/bridge-v1.jpg, props/bridge-collider1-v1.obj, -collider2-
   props/zoneframe2-v1.obj, props/zoneframe-v1.jpg  (also its own collider)
@@ -240,6 +242,13 @@ def flag_collider():
     return m
 
 
+def flag_collider_pole():
+    """Just the rod, a little thicker than it looks (used as a non-convex collider on a locked flag)."""
+    m = PieceMesh()
+    box(m, -0.16, 0.16, 0, POLE_H, -0.16, 0.16)
+    return m
+
+
 def flag_texture():
     rng = np.random.default_rng(12)
     img = np.zeros((FLAG_TH, FLAG_TW, 3), np.float32)
@@ -432,6 +441,7 @@ def main():
         "flag-v2.obj": lambda p: flag().write(p),
         "flag-v2.jpg": lambda p: flag_texture().save(p, quality=92),
         "flag-collider-v2.obj": lambda p: flag_collider().write(p),
+        "flag-collider-v3.obj": lambda p: flag_collider_pole().write(p),
         "portal-v1.obj": lambda p: portal().write(p),
         "portal-v1.jpg": lambda p: portal_texture().save(p, quality=92),
         "bridge1-v1.obj": lambda p: bridge(1).write(p),

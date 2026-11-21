@@ -534,11 +534,11 @@
      3.3147,
      25.61
     ],
-    "yaw": 225.0,
+    "yaw": 45.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -601,11 +601,11 @@
      3.3147,
      6.1175
     ],
-    "yaw": 315.0,
+    "yaw": 135.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -617,11 +617,11 @@
      3.3147,
      2.8687
     ],
-    "yaw": 315.0,
+    "yaw": 135.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -633,11 +633,11 @@
      3.3147,
      -2.8687
     ],
-    "yaw": 135.0,
+    "yaw": 315.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -649,11 +649,11 @@
      3.3147,
      -6.1175
     ],
-    "yaw": 135.0,
+    "yaw": 315.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -716,11 +716,11 @@
      3.3147,
      -25.61
     ],
-    "yaw": 45.0,
+    "yaw": 225.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -3172,11 +3172,11 @@
      2.3502,
      6.1175
     ],
-    "yaw": 225.0,
+    "yaw": 45.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -3188,11 +3188,11 @@
      2.3502,
      6.1175
     ],
-    "yaw": 315.0,
+    "yaw": 135.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -3204,11 +3204,11 @@
      2.3502,
      -6.1175
     ],
-    "yaw": 135.0,
+    "yaw": 315.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -3220,11 +3220,11 @@
      2.3502,
      -6.1175
     ],
-    "yaw": 45.0,
+    "yaw": 225.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    }
@@ -4270,11 +4270,11 @@
      0.4147,
      4.4931
     ],
-    "yaw": 315.0,
+    "yaw": 135.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -4286,11 +4286,11 @@
      0.4147,
      1.2444
     ],
-    "yaw": 225.0,
+    "yaw": 45.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    },
@@ -4302,11 +4302,11 @@
      0.4147,
      -4.4931
     ],
-    "yaw": 135.0,
+    "yaw": 315.0,
     "desc": "",
     "mesh": "props/flag-v2.obj",
     "diffuse": "props/flag-v2.jpg",
-    "collider": "props/flag-collider-v2.obj",
+    "collider": "props/flag-collider-v3.obj",
     "convex": false,
     "material": 3
    }
