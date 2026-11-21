@@ -91,7 +91,21 @@ def swords(d):
     sword(-135, True)   # drawn over the first with a small gap so the two read apart
 
 
-SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords}
+def sparkle(d):
+    """Pokemon abilities: a four-pointed sparkle, with a small one beside it."""
+    def star(cx, cy, r_out, r_in):
+        pts = []
+        for i in range(8):
+            a = math.pi / 4 * i - math.pi / 2
+            r = r_out if i % 2 == 0 else r_in
+            pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+        return pts
+    big = star(56, 70, 52, 15)
+    d.line([v * K for p in big + big[:2] for v in p], fill=255, width=round(STROKE * K), joint="curve")
+    d.polygon([(x * K, y * K) for x, y in star(102, 24, 20, 6)], fill=255)
+
+
+SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords, "ability": sparkle}
 
 
 def render(shape, size=N, ss=SS):

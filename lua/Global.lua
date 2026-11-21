@@ -5,6 +5,7 @@ Toolbar (right edge, a third of the way down the screen), one panel open at a ti
   * Pokéball: search the roster, click a result and that figure goes on your next free pedestal.
   * Potion:   scroll through (or search) the item cards, click one and it goes in the next free item slot.
   * Swords:   scroll through (or search) the warrior skill cards, click one and it goes in the next free skill slot.
+  * Sparkle:  the same for Pokémon ability cards (the bottom row of the stand).
 Team stands (tagged "Stand") sit on the two long sides: six pedestals on top, an item card and a warrior skill
 card on the slope under each. Which stand is yours depends on your seat colour (SEAT_SIDE).
   * Swirl:    pick a status, then pick up a Pokémon to give it that status (it's tinted in the status's
@@ -13,7 +14,7 @@ card on the slope under each. Which stand is yours depends on your seat colour (
   * Map:      pick which arena goes on the table (3D boards from arenas/index.json, with snap points and pieces).
 Flags on the board: right-click > Capture tints a flag to your seat colour; "Make neutral" resets it.
 HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
-Chat:  !spawn garchomp   !item sitrus   !skill belief   spawn the best match (or list close alternatives).
+Chat:  !spawn garchomp   !item sitrus   !skill belief   !ability levitate   spawn the best match (or list close alternatives).
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
 game loads, so new Pokémon and changed cards appear without editing the mod. The last copies are kept in the
@@ -23,7 +24,7 @@ save, so everything still works if the site can't be reached.
 BASE_URL = "https://pctts.github.io/tts/"
 ICONS = {
   pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png", status = "ui/icons/status-v3.png",
-  item = "ui/icons/item-v3.png", skill = "ui/icons/skill-v3.png",
+  item = "ui/icons/item-v3.png", skill = "ui/icons/skill-v3.png", ability = "ui/icons/ability-v3.png",
 }
 -- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
 -- UI images it shrinks, so a much larger image looks jagged.
@@ -32,6 +33,7 @@ TOOLS = {
   { kind = "dex", icon = "pokeball", tip = "Spawn a Pokémon" },
   { kind = "items", icon = "item", tip = "Item cards" },
   { kind = "skills", icon = "skill", tip = "Warrior skill cards" },
+  { kind = "abilities", icon = "ability", tip = "Pokémon ability cards" },
   { kind = "status", icon = "status", tip = "Give a status" },
   { kind = "maps", icon = "map", tip = "Choose the map" },
 }
@@ -39,9 +41,10 @@ TOOLS = {
 -- middle: a third of the way down the screen at any resolution. A panel's top stays level with the toolbar's.
 HUD_HEIGHT = "66.667%"
 -- Searchable catalogues behind the search panels.
-SEARCH_KINDS = { "dex", "items", "skills" }
+SEARCH_KINDS = { "dex", "items", "skills", "abilities" }
+CARD_KINDS = { "items", "skills", "abilities" }   -- the stand's card rows, top to bottom
 -- Panels that also list every name to scroll through (shown while the search box is empty), LIST_ROWS rows tall.
-LIST_KINDS = { items = true, skills = true }
+LIST_KINDS = { items = true, skills = true, abilities = true }
 LIST_ROWS = 10
 CATALOGS = {
   dex = { title = "Spawn a Pokémon", noun = "Pokémon", hint = "Click a result to put it on your next free pedestal." },
@@ -49,6 +52,8 @@ CATALOGS = {
     deckBase = 1000, tag = "Item" },
   skills = { title = "Warrior skill cards", noun = "warrior skill", hint = "Click a card to place it, or type to search.",
     deckBase = 3000, tag = "WarriorSkill" },
+  abilities = { title = "Pokémon ability cards", noun = "ability", hint = "Click a card to place it, or type to search.",
+    deckBase = 5000, tag = "Ability" },
 }
 ROSTER_URL = BASE_URL .. "figures/index.json"
 CARDS_URL = BASE_URL .. "cards/index.json"
@@ -97,13 +102,15 @@ NO_SEAT_SPOT = { -35, 4, 22 }  -- where things appear for players without a seat
 SEAT_SIDE = { White = "south", Brown = "south", Red = "south", Orange = "south", Pink = "south",
   Green = "north", Teal = "north", Blue = "north", Yellow = "north", Purple = "north" }
 -- Team stand geometry, in the stand's own frame (from tools/build_props.py, props/stand-v1.json): six columns,
--- each a pedestal on top with an item card and a warrior skill card below it on the slope.
+-- each a pedestal on top with an item card, a warrior skill card and an ability card below it on the slope.
 STAND = {
   x = { -17.625, -10.575, -3.525, 3.525, 10.575, 17.625 },
   pedestal = { y = 2.6, z = -1.6 },
-  cards = { items = { y = 2.0644, z = -5.1105 },
-            skills = { y = 1.0467, z = -8.5481 } },
-  tilt = 16.492, cardScale = 1.5, length = 42.3,
+  cards = { items = { y = 2.2198, z = -4.5856 },
+            skills = { y = 1.5272, z = -6.9252 },
+            abilities = { y = 0.8345, z = -9.2648 } },
+  tilt = 16.492, length = 42.3,
+  cardScale = { 1.0, 1.5 },  -- (across, along) the card: shorter than TTS's standard card so three rows fit
   snapLift = 0.55,  -- card snap points float this far off the slope, so a card held flat clears the rising slope
 }
 CARD_YAW = 270  -- cards lie landscape: turned a quarter so the name reads left-to-right for the stand's player
@@ -119,7 +126,7 @@ arenas = {}          -- arena name -> { mesh, texture, table, snaps, pieces } (a
 openPanel, searchHits, mapRows, spawnCount = {}, {}, {}, {}
 armed = {}           -- [colour] = status key waiting for that player to pick up a Pokémon
 queries = {}         -- [colour .. kind] = what that player last typed in that search box
-listViewers = { items = {}, skills = {} }  -- [kind][colour] = true while that player sees the full list
+listViewers = { items = {}, skills = {}, abilities = {} }  -- [kind][colour] = true while that player sees the full list
 listNames, builtLists = {}, {}             -- names in each full list as built, and a signature of them
 
 ----------------------------------------------------------------------------------------------------
@@ -243,6 +250,7 @@ function setCards(data, from)
   cardBacks = data.backs or {}
   if data.items then setCatalog("items", data.items, from) end
   if data.skills then setCatalog("skills", data.skills, from) end
+  if data.abilities then setCatalog("abilities", data.abilities, from) end
 end
 
 -- Best matches for a typed query: whole-name prefix first, then a word prefix, then anywhere; shorter names first.
@@ -315,7 +323,7 @@ function standSnapPoints()
   local tilt = STAND.tilt * (CARD_YAW == 270 and 1 or -1)
   local snaps = {}
   for _, x in ipairs(STAND.x) do
-    for _, kind in ipairs({ "items", "skills" }) do
+    for _, kind in ipairs(CARD_KINDS) do
       local c = STAND.cards[kind]
       snaps[#snaps + 1] = { position = { x, c.y + dy, c.z + dz }, rotation = { 0, CARD_YAW, tilt }, rotation_snap = true }
     end
@@ -376,7 +384,7 @@ function spawnPokemon(name, color)
 end
 
 -- A single landscape card (its own one-card deck sheet) on the next free slot of the player's stand:
--- items in the upper row, warrior skills in the lower. The effect is its hover description.
+-- items in the top row, warrior skills in the middle, abilities at the bottom. The effect is its hover description.
 function spawnCard(kind, name, color)
   local card, key = catalog[kind].index[name], catalog[kind].keys[name]
   if not (card and key and cardBacks[kind]) then return nil end
@@ -392,11 +400,11 @@ function spawnCard(kind, name, color)
     pos = spot and Vector(spot.x, spot.y + 1, spot.z) or Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3])
     rot = Vector(0, (stand and stand.getRotation().y or 0) + CARD_YAW, 0)
   end
-  local k = STAND.cardScale
+  local kx, kz = STAND.cardScale[1], STAND.cardScale[2]
   return spawnObjectData({
     data = {
       Name = "CardCustom",
-      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = k, scaleY = 1, scaleZ = k },
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = kx, scaleY = 1, scaleZ = kz },
       Nickname = name,
       Description = card.effect or "",
       Tags = { CATALOGS[kind].tag },
@@ -571,7 +579,7 @@ function buildUI()
   for name, path in pairs(ICONS) do assets[#assets + 1] = { name = name, url = BASE_URL .. path } end
   UI.setCustomAssets(assets)
   openPanel, armed, queries = {}, {}, {}
-  listViewers = { items = {}, skills = {} }
+  listViewers = { items = {}, skills = {}, abilities = {} }
 
   local xml = { [[
 <Defaults>
@@ -980,7 +988,7 @@ function setupStand(stand)
     stand.reload()
     return
   end
-  if #(stand.getSnapPoints() or {}) == 0 then stand.setSnapPoints(standSnapPoints()) end
+  if #(stand.getSnapPoints() or {}) ~= #STAND.x * #CARD_KINDS then stand.setSnapPoints(standSnapPoints()) end   -- card slots: one per row per column
   refreshStand(stand)
 end
 
@@ -1040,9 +1048,9 @@ function hpEdited(player, value, id)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Chat commands: !spawn <pokemon>, !item <item>, !skill <warrior skill>
+-- Chat commands: !spawn <pokemon>, !item <item>, !skill <warrior skill>, !ability <ability>
 ----------------------------------------------------------------------------------------------------
-CHAT_KINDS = { spawn = "dex", item = "items", skill = "skills" }
+CHAT_KINDS = { spawn = "dex", item = "items", skill = "skills", ability = "abilities" }
 
 function onChat(message, player)
   local cmd, query = message:match("^!(%a+)%s+(.+)$")

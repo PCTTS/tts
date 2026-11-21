@@ -1,10 +1,10 @@
-"""Build the table props: the slanted team stand (pedestals on top, item/skill cards on the slope) and a pillar.
+"""Build the table props: the slanted team stand (pedestals on top, item/skill/ability cards on the slope) and a pillar.
 
 Usage:  python -I tools/build_props.py
 Writes props/stand-v4.obj (a black HP sign floating above each pedestal; v3 = wooden signs on posts, v2 = none) (+ its solid collider
 props/stand-collider-v1.obj) with its dark wood texture
 props/stand-wood-v1.jpg, props/pillar-v2.obj with props/props-v1.jpg, and props/stand-v1.json (slot positions the
-TTS script uses: pedestals on top, two card slots per pedestal on the slope; the geometry is unchanged since v1).
+TTS script uses: pedestals on top, three card slots per pedestal on the slope; the stand's shape is unchanged since v1).
 Published files are only written when missing: bump a file's version when what it holds changes (TTS caches by
 link). stand-v1.obj (the light stand on props-v1.jpg) stays published for saves made before the wood.
 
@@ -29,8 +29,9 @@ LENGTH = SLOTS * SLOT_W
 TOP_H, TOP_D = 2.6, 3.2          # top surface height above the table, and its depth
 RUN, LOW_H = 7.6, 0.35           # slope: horizontal run toward the player, height at its bottom
 LIP_H, LIP_W = 0.22, 0.25        # lip at the bottom of the slope
-CARD_SCALE = 1.5                 # cards lie landscape: 3.06 x 2.19 at scale 1
-CARD_ALONG = 2.19 * CARD_SCALE   # card size along the slope
+CARD_SCALE = (1.0, 1.5)          # cards lie landscape, scaled (across, along) their 2.19 x 3.06: thin, so 3 rows fit
+CARD_ALONG = 2.19 * CARD_SCALE[0]   # card size down the slope
+CARD_GAP = 0.25                  # between the rows
 SNAP_LIFT = 0.55                 # card snap points float this far off the slope: a card held flat clears it
 PILLAR_H, SEG = 2.6, 96          # pillar height (level with the stand top), segments around
 TEX_W, TEX_H = 1024, 256         # texture: four 256px regions
@@ -280,11 +281,12 @@ def slots():
     ux, uy = -RUN / length, -(TOP_H - LOW_H) / length          # down the slope: (z, y) per unit
     first = 0.35 + CARD_ALONG / 2
     cards = {}
-    for kind, t in (("items", first), ("skills", first + CARD_ALONG + 0.3)):
+    for i, kind in enumerate(("items", "skills", "abilities")):
+        t = first + i * (CARD_ALONG + CARD_GAP)
         cards[kind] = {"z": round(-TOP_D + ux * t, 4), "y": round(TOP_H + uy * t + 0.03, 4)}
     return {"x": [round((i - (SLOTS - 1) / 2) * SLOT_W, 4) for i in range(SLOTS)],
             "pedestal": {"z": -TOP_D / 2, "y": TOP_H}, "cards": cards, "tilt": round(tilt, 3),
-            "card_scale": CARD_SCALE, "snap_lift": SNAP_LIFT, "depth": TOP_D + RUN + LIP_W, "length": LENGTH, "pillar_height": PILLAR_H}
+            "card_scale": list(CARD_SCALE), "snap_lift": SNAP_LIFT, "depth": TOP_D + RUN + LIP_W, "length": LENGTH, "pillar_height": PILLAR_H}
 
 
 def main():

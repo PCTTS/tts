@@ -162,15 +162,15 @@ def main():
         ids = [e.get("id") for e in root.iter() if e.get("id")]
         check(len(ids) == len(set(ids)), f"UI XML parses; {len(ids)} ids, all unique")
         bar = next(e for e in root.iter() if e.get("id") == "toolbar")
-        check((bar.get("width"), bar.get("height")) == ("38", "190"), f"toolbar is 38 x 190 ({bar.get('width')} x {bar.get('height')})")
+        check((bar.get("width"), bar.get("height")) == ("38", "228"), f"toolbar is 38 x 228, six icons ({bar.get('width')} x {bar.get('height')})")
         hud = next(e for e in root.iter() if e.get("id") == "hud")
         check(hud.get("rectAlignment") == "UpperRight" and hud.get("height") == "66.667%" and bar in list(hud),
               "the toolbar sits in a frame over the top two-thirds of the screen (so a third of the way down)")
         dock = next(e for e in root.iter() if e.get("id") == "dock")
         panels = [e for e in dock if (e.get("id") or "").endswith("_White")]
-        check(len(panels) == 5 and all(e.get("rectAlignment") == "UpperRight" and not e.get("pivot") for e in panels)
-              and dock.get("height") == "190" and dock in list(hud),
-              "White's five panels hang from the top of a dock the toolbar's height (so their top stays put)")
+        check(len(panels) == 6 and all(e.get("rectAlignment") == "UpperRight" and not e.get("pivot") for e in panels)
+              and dock.get("height") == "228" and dock in list(hud),
+              "White's six panels hang from the top of a dock the toolbar's height (so their top stays put)")
         lists = {k: next(e for e in root.iter() if e.get("id") == k + "List") for k in ("items", "skills")}
         counts = {k: len([b for b in v.iter("Button")]) for k, v in lists.items()}
         check(counts == {"items": 246, "skills": 67}, f"scrolling lists hold every item and warrior skill ({counts})")
@@ -183,7 +183,7 @@ def main():
         check(sw.get("color") == "#FF4421", "each status row has a full-colour square in its type's colour (Burned: Fire #FF4421)")
     except ET.ParseError as e:
         check(False, f"UI XML parses ({e})")
-    check(len(list(calls.assets.values())) == 5, "five toolbar icons registered")
+    check(len(list(calls.assets.values())) == 6, "six toolbar icons registered")
     printed = [str(p) for p in calls.printed.values()]
     check(any("Pokémon: 704" in p for p in printed), "roster downloaded (704 names)")
     check(any("Item cards: 246" in p for p in printed) and any("Warrior skill cards: 67" in p for p in printed),
@@ -284,28 +284,36 @@ def main():
           and "/cards/items/sitrus-berry-" in entry.FaceURL and "cards/back-items-v" in entry.BackURL
           and card.data.CardID == int(next(iter(deck.keys()))) * 100, "clicking it spawns the Sitrus Berry card")
     lift_z = 0.15 * __import__("math").sin(__import__("math").radians(16.492))
-    check(abs(card.position.x - (-17.625)) < 0.01 and abs(card.position.z - (-26.4 - 5.1105 - lift_z)) < 0.01
-          and card.rotation.y == 270 and abs(card.rotation.z - 16.492) < 0.01 and card.data.SidewaysCard,
-          "the item card lies landscape in the first item slot on White's stand, tilted to the slope")
+    check(abs(card.position.x - (-17.625)) < 0.01 and abs(card.position.z - (-26.4 - 4.5856 - lift_z)) < 0.01
+          and card.rotation.y == 270 and abs(card.rotation.z - 16.492) < 0.01 and card.data.SidewaysCard
+          and (card.data.Transform.scaleX, card.data.Transform.scaleZ) == (1.0, 1.5),
+          "the item card lies landscape in the first item slot on White's stand, tilted to the slope, short (1.0 x 1.5)")
     check("1/2 hp" in card.data.Description, "the card's description is its effect")
     g.searchChanged(player, "belief", "skillsIn_White")
     g.searchPick(player, "-1", "skillsRes_White_1")
     sk = calls.spawned[n + 2]
     check(sk.data.Nickname == "Belief" and sk.data.Tags[1] == "WarriorSkill"
-          and abs(sk.position.x - (-17.625)) < 0.01 and abs(sk.position.z - (-26.4 - 8.5481 - lift_z)) < 0.01,
+          and abs(sk.position.x - (-17.625)) < 0.01 and abs(sk.position.z - (-26.4 - 6.9252 - lift_z)) < 0.01,
           "the warrior skill card goes in the first skill slot (below the item)")
+    g.searchChanged(player, "levitate", "abilitiesIn_White")
+    g.searchPick(player, "-1", "abilitiesRes_White_1")
+    ab = calls.spawned[n + 3]
+    check(ab.data.Nickname == "Levitate" and ab.data.Tags[1] == "Ability" and "/cards/abilities/levitate-" in next(iter(ab.data.CustomDeck.values())).FaceURL
+          and abs(ab.position.z - (-26.4 - 9.2648 - lift_z)) < 0.01,
+          "the ability card goes in the first ability slot (the bottom row)")
+    n = n + 1
     g.searchPick(player, "-1", "itemsRes_White_1")
     check(len(calls.spawned) == n + 2, "a stale click on the other panel's rows does nothing")
     g.spawnCard("items", "Sitrus Berry", "White")
     check(abs(calls.spawned[n + 3].position.x - (-10.575)) < 0.01, "the next item card takes the next column")
     g.spawnCard("items", "Sitrus Berry", "Green")
     far = calls.spawned[n + 4]
-    check(abs(far.position.x - 17.625) < 0.01 and abs(far.position.z - (26.4 + 5.1105 + lift_z)) < 0.01 and far.rotation.y == 450,
+    check(abs(far.position.x - 17.625) < 0.01 and abs(far.position.z - (26.4 + 4.5856 + lift_z)) < 0.01 and far.rotation.y == 450,
           "a far-side seat (Green) uses the far stand, starting from its own left")
     snaps = g.standSnapPoints()
     first = snaps[1].position
-    check(len(snaps) == 12 and abs(first[2] - (2.0644 + 0.55 * 0.9589)) < 0.01 and snaps[1].rotation_snap,
-          "12 card snap points per stand, lifted off the slope, snapping rotation")
+    check(len(snaps) == 18 and abs(first[2] - (2.2198 + 0.55 * 0.9589)) < 0.01 and snaps[1].rotation_snap,
+          "18 card snap points per stand (3 rows), lifted off the slope, snapping rotation")
     g.spawnPokemon("Gengar", "Grey")
     check(abs(calls.spawned[n + 5].position.x - (-35)) < 0.01, "a spectator's Pokemon appears in the left strip")
 

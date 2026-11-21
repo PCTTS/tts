@@ -6,11 +6,12 @@ hairline triangle grid that fades in toward the right edge. Every card uses the 
 which every name fits in at most two lines. The effect text is not printed; it is the card's hover description.
 Back: the kind's colour with stripes and a large icon.
 
-Usage:  python -I tools/build_cards.py <spreadsheet.xlsx>     (sheets "items" and "warriorSkills")
+Usage:  python -I tools/build_cards.py <spreadsheet.xlsx> [--prune]   (sheets "items", "warriorSkills", "abilitiesDB")
 Writes cards/items/<name>-<hash>.jpg, cards/skills/<name>-<hash>.jpg, the two card backs, and
 cards/index.json (kind -> name -> card file + text). The hash covers everything drawn on the card (design,
 text, name size), so a card that looks different gets a new file name (TTS caches images by their link) and
-unchanged cards keep theirs. Old card files that the index no longer uses are deleted. Uses every CPU core.
+unchanged cards keep theirs. Old card files the index no longer uses are kept (saved games may still use them)
+unless --prune. Uses every CPU core. Three kinds: items (green), warrior skills (red), Pokemon abilities (blue).
 """
 import hashlib, json, math, os, sys
 from concurrent.futures import ProcessPoolExecutor
@@ -24,12 +25,15 @@ from build_figures import file_name  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "cards"
-DESIGN = "5"            # front design version (5 = "Y2"); bump to rebuild every front after a change
-BACK_DESIGN = "4"       # back design version (unchanged since design 4)
-W, H, SS = 600, 840, 2  # card image size (portrait, as TTS maps it), supersampling
-LW, LH = H, W           # the design is drawn landscape (840 x 600) and turned onto the portrait card
-CORE = {"items": "#2E8B57", "skills": "#B83A30"}  # each kind's single colour, front and back (green, red)
-ICON = {"items": "item", "skills": "skill"}
+DESIGN = "6"            # front design version (6 = "Y2" on the thinner card); bump to rebuild every front after a change
+BACK_DESIGN = "5"       # back design version (5 = thinner card)
+# Cards are thinner than TTS's standard card so three rows (items, warrior skills, abilities) fit on a stand's
+# slope: spawned at scale 1.0 across (2.19) and 1.5 along (4.59), a 2.1 : 1 landscape card.
+W, H, SS = 400, 840, 2  # card image size (portrait, as TTS maps it), supersampling
+LW, LH = H, W           # the design is drawn landscape (840 x 400) and turned onto the portrait card
+CORE = {"items": "#2E8B57", "skills": "#B83A30", "abilities": "#3B6FB6"}  # each kind's colour (green, red, blue)
+ICON = {"items": "item", "skills": "skill", "abilities": "ability"}
+ICON_SIZE = 100
 BAND = 200                         # right edge of the icon band (landscape design units)
 NAME_X, NAME_W = 232, LW - 290     # where the name sits, and how wide a line may be
 TRI_SIZE, TRI_LINE, TRI_TONE = 48, 1.0, 1.10   # triangle grid: side, line width, brightness vs the card colour
@@ -131,8 +135,8 @@ def draw_face(kind, card, size):
     overlay(img, band, stripes(img.size, shade(col, 0.8) + (255,)))
     overlay(img, main, triangle_grid(img.size, shade(col, TRI_TONE) + (255,)))
     d.line(P(BAND, 40, BAND, LH - 40), fill=(255, 255, 255), width=3 * SS)
-    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], 110 * SS, 4))
-    img.paste(icon, (round((18 + BAND) / 2 - 55) * SS, 60 * SS), icon)
+    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], ICON_SIZE * SS, 4))
+    img.paste(icon, (round((18 + BAND) / 2 - ICON_SIZE / 2) * SS, round((LH - ICON_SIZE) / 2) * SS), icon)
     f = name_font(size * SS)
     lines = wrap(card["name"], f, NAME_W * SS)
     step = size * 1.12 * SS
@@ -152,21 +156,26 @@ def draw_back(kind):
     for i in range(-h, w, 46):  # faint diagonal stripes
         d.line([(i * s, h * s), ((i + h) * s, 0)], fill=tuple(min(255, v + 10) for v in col), width=10 * s)
     d.rounded_rectangle([40 * s, 40 * s, (w - 40) * s, (h - 40) * s], radius=14 * s, outline=(255, 255, 255), width=3 * s)
-    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], 230 * s, 4))
-    img.paste(icon, ((w - 230) // 2 * s, (h - 230) // 2 * s), icon)
+    big = 200
+    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], big * s, 4))
+    img.paste(icon, ((w - big) // 2 * s, (h - big) // 2 * s), icon)
     return landscape_to_card(img.resize((w, h), Image.LANCZOS))
 
 
 def read_sheet(path):
     import openpyxl
     wb = openpyxl.load_workbook(path, read_only=True)
-    cards = {"items": [], "skills": []}
+    cards = {"items": [], "skills": [], "abilities": []}
     for r in list(wb["items"].iter_rows(min_row=2, values_only=True)):
         if r and r[0]:
             cards["items"].append({"name": str(r[0]).strip(), "class": r[1], "group": r[2], "effect": str(r[3] or "").strip()})
     for r in list(wb["warriorSkills"].iter_rows(min_row=2, values_only=True)):
         if r and r[0]:
             cards["skills"].append({"name": str(r[0]).strip(), "class": r[1], "group": r[2], "effect": str(r[3] or "").strip()})
+    for r in list(wb["abilitiesDB"].iter_rows(min_row=2, values_only=True)):
+        if r and r[0]:
+            effect = r[1] if len(r) > 1 else ""
+            cards["abilities"].append({"name": str(r[0]).strip(), "class": None, "group": None, "effect": str(effect or "").strip()})
     return cards
 
 
@@ -207,10 +216,11 @@ def main(argv):
         made = sum(pool.map(render_job, jobs, chunksize=4))
     used = {j[2] for j in jobs}
     stale = [p for kind in cards for p in (OUT / kind).glob("*.jpg") if f"cards/{kind}/{p.name}" not in used]
-    for p in stale:
-        p.unlink()
+    if "--prune" in argv:   # only once saved games no longer use them (TTS loads cards by their link)
+        for p in stale:
+            p.unlink()
     (OUT / "index.json").write_text(json.dumps(index, indent=1, ensure_ascii=False, sort_keys=True), encoding="utf-8")
-    print(f"{len(jobs)} cards, name size {size}px ({made} new, {len(stale)} removed) + backs + cards/index.json")
+    print(f"{len(jobs)} cards, name size {size}px ({made} new, {len(stale)} old ones {'removed' if '--prune' in argv else 'kept (--prune removes them)'}) + backs + cards/index.json")
 
 
 if __name__ == "__main__":

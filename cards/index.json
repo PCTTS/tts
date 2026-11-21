@@ -1,1483 +1,3724 @@
 {
+ "abilities": {
+  "Adaptability": {
+   "class": null,
+   "effect": "this pokemons positive stat changes last until the mega ends",
+   "face": "cards/abilities/adaptability-cf1db4ce.jpg",
+   "group": null
+  },
+  "Aerialate": {
+   "class": null,
+   "effect": "if flying damage would deal more damage to the target, this pokemons attack is treated as flying type against that target",
+   "face": "cards/abilities/aerialate-0287123e.jpg",
+   "group": null
+  },
+  "Aftermath": {
+   "class": null,
+   "effect": "start of game choose one - when knocked out by a contact move, attacker takes 1/4 of their max hp or when knocked out by a non contact move, attacker takes 1/4 of their max hp",
+   "face": "cards/abilities/aftermath-fc8ec65d.jpg",
+   "group": null
+  },
+  "Analytic": {
+   "class": null,
+   "effect": "attacks base power is multiplied by 1.3x when attacking a target who has already moved",
+   "face": "cards/abilities/analytic-e213c371.jpg",
+   "group": null
+  },
+  "Anger Point": {
+   "class": null,
+   "effect": "gains 6 stages of attack when crit",
+   "face": "cards/abilities/anger-point-8030f89a.jpg",
+   "group": null
+  },
+  "Anger Shell": {
+   "class": null,
+   "effect": "while hp is below 50%, defense is at -1 stage and attack, speed, and range are at +1 stage",
+   "face": "cards/abilities/anger-shell-2344a04e.jpg",
+   "group": null
+  },
+  "Aqua Boost": {
+   "class": null,
+   "effect": "Adjacent pokemons Water attacks deal 1.5 damage",
+   "face": "cards/abilities/aqua-boost-9c844d61.jpg",
+   "group": null
+  },
+  "Arena Trap": {
+   "class": null,
+   "effect": "reduce range of pokemon within 2 by 1 at the start of each turn",
+   "face": "cards/abilities/arena-trap-2c63ae8b.jpg",
+   "group": null
+  },
+  "Armor Tail": {
+   "class": null,
+   "effect": "enemies within 2 do not move forward during their attacks (hitboxes treat starting location as ending location)",
+   "face": "cards/abilities/armor-tail-b7ab88d3.jpg",
+   "group": null
+  },
+  "Aroma Veil": {
+   "class": null,
+   "effect": "allied pokemon within 3 are not affected by effects that force them to target certain pokemon",
+   "face": "cards/abilities/aroma-veil-3df9522f.jpg",
+   "group": null
+  },
+  "Aura Break": {
+   "class": null,
+   "effect": "Any aura ability that affects a tile that this pokemon stands on has its effect canceled completely until this pokemon is no longer in the aura",
+   "face": "cards/abilities/aura-break-8e5d661f.jpg",
+   "group": null
+  },
+  "Aura Guard": {
+   "class": null,
+   "effect": "allied pokemon within 3 are protected from all passive auras",
+   "face": "cards/abilities/aura-guard-dbc02752.jpg",
+   "group": null
+  },
+  "Bad Dreams": {
+   "class": null,
+   "effect": "20% chance to make enemies within 2 drowsy (start of turn). drowsy enemies lose 1/8 hp at the end of each turn",
+   "face": "cards/abilities/bad-dreams-37d4d8fc.jpg",
+   "group": null
+  },
+  "Barnacled": {
+   "class": null,
+   "effect": "this pokemon cannot take more than 1/5 of its total hp in damage in a single hit",
+   "face": "cards/abilities/barnacled-d0541494.jpg",
+   "group": null
+  },
+  "Battle Armor": {
+   "class": null,
+   "effect": "cannot be crit",
+   "face": "cards/abilities/battle-armor-ac7a7b17.jpg",
+   "group": null
+  },
+  "Battle Formation": {
+   "class": null,
+   "effect": "start of turn:gain 1 stage of attack and defense, pokemon cannot make a 180 turn(even to attack)",
+   "face": "cards/abilities/battle-formation-5de92e9d.jpg",
+   "group": null
+  },
+  "Beads of Ruin": {
+   "class": null,
+   "effect": "aura that lowers defense of all pokemon within 2 by 25%",
+   "face": "cards/abilities/beads-of-ruin-9d8c5763.jpg",
+   "group": null
+  },
+  "Beast Boost": {
+   "class": null,
+   "effect": "when this pokemon makes a ko, gain 1 stage to highest stat",
+   "face": "cards/abilities/beast-boost-a0c8f2a3.jpg",
+   "group": null
+  },
+  "Berserk": {
+   "class": null,
+   "effect": "raises attack 1 stage when hp drops to 50% or lower",
+   "face": "cards/abilities/berserk-4ffd60fa.jpg",
+   "group": null
+  },
+  "Big Pecks": {
+   "class": null,
+   "effect": "defense cannot be lowered",
+   "face": "cards/abilities/big-pecks-ee53c7d5.jpg",
+   "group": null
+  },
+  "Black Hole": {
+   "class": null,
+   "effect": "adjacent enemies cannot move",
+   "face": "cards/abilities/black-hole-269a425e.jpg",
+   "group": null
+  },
+  "Blaze": {
+   "class": null,
+   "effect": "base attack power is 1.5x when hp is 1/3 or lower",
+   "face": "cards/abilities/blaze-fb5da882.jpg",
+   "group": null
+  },
+  "Bodyguard": {
+   "class": null,
+   "effect": "Switches places with adjacent allies when they are attacked",
+   "face": "cards/abilities/bodyguard-aee512f8.jpg",
+   "group": null
+  },
+  "Calming": {
+   "class": null,
+   "effect": "50% chance to make enemies within 2 drowsy (start of turn)",
+   "face": "cards/abilities/calming-155dec8f.jpg",
+   "group": null
+  },
+  "Catastrophe": {
+   "class": null,
+   "effect": "deal 1.5x damage per every secondary attack effect check that fails, and 1.2x per each that succeeds",
+   "face": "cards/abilities/catastrophe-b22bed5f.jpg",
+   "group": null
+  },
+  "Celebrate": {
+   "class": null,
+   "effect": "after knocking out an enemy, this pokemon can move a second time (this pokemon must end on an objective or an item during its second move to count as taking control of the objective)",
+   "face": "cards/abilities/celebrate-572341da.jpg",
+   "group": null
+  },
+  "Cheek Pouch": {
+   "class": null,
+   "effect": "restores 1/4 hp when eating a berry (in addition to other effects)",
+   "face": "cards/abilities/cheek-pouch-bcf39770.jpg",
+   "group": null
+  },
+  "Chilling Neigh": {
+   "class": null,
+   "effect": "raises attack 1 stage when this pokemon makes a ko",
+   "face": "cards/abilities/chilling-neigh-afca6ee2.jpg",
+   "group": null
+  },
+  "Chilly Reception": {
+   "class": null,
+   "effect": "The first time this pokemon takes damage each turn, set snow on all tiles within 2",
+   "face": "cards/abilities/chilly-reception-42871b43.jpg",
+   "group": null
+  },
+  "Chlorophyll": {
+   "class": null,
+   "effect": "doubles speed in the sun (start of turn)",
+   "face": "cards/abilities/chlorophyll-cd95e0d2.jpg",
+   "group": null
+  },
+  "Clear Body": {
+   "class": null,
+   "effect": "stats cannot be lowered by other pokemon or their effects",
+   "face": "cards/abilities/clear-body-475cad8e.jpg",
+   "group": null
+  },
+  "Climber": {
+   "class": null,
+   "effect": "Can climb high spaces",
+   "face": "cards/abilities/climber-b1931939.jpg",
+   "group": null
+  },
+  "Cloud Nine": {
+   "class": null,
+   "effect": "removes the effect of weather within 2 (start of turn, is considered a weather condition, triggers after other weather conditions)",
+   "face": "cards/abilities/cloud-nine-a5ce86d6.jpg",
+   "group": null
+  },
+  "Color Change": {
+   "class": null,
+   "effect": "changes type to match attacking type (triggers before damage is taken)",
+   "face": "cards/abilities/color-change-a0958efd.jpg",
+   "group": null
+  },
+  "Comatose": {
+   "class": null,
+   "effect": "pokemon is always treated as if drowsy (does not incur the negative effects of it)",
+   "face": "cards/abilities/comatose-5d8729e9.jpg",
+   "group": null
+  },
+  "Commander": {
+   "class": null,
+   "effect": "starts the game in dondozo's mouth, giving dondozo +1 stage to all stats (including range) and changing properties of order up (+attack for curly, + defense for droopy, and +speed for stretchy). when dondozo is defeated tatsugiri pops out and can be placed on any adjacent tile, or the tile dondozo was standing on",
+   "face": "cards/abilities/commander-bf2338b3.jpg",
+   "group": null
+  },
+  "Competitive": {
+   "class": null,
+   "effect": "raises attack 2 stages when any stat is lowered by an enemy pokemon or effect",
+   "face": "cards/abilities/competitive-630a94f2.jpg",
+   "group": null
+  },
+  "Compound Eyes": {
+   "class": null,
+   "effect": "attacks have 1.3x base accuracy",
+   "face": "cards/abilities/compound-eyes-49d2c979.jpg",
+   "group": null
+  },
+  "Confidence": {
+   "class": null,
+   "effect": "Raises defense of allies within 2",
+   "face": "cards/abilities/confidence-589f36e3.jpg",
+   "group": null
+  },
+  "Conqueror": {
+   "class": null,
+   "effect": "1.2x defense and attack per defeated enemy",
+   "face": "cards/abilities/conqueror-fda1f6f1.jpg",
+   "group": null
+  },
+  "Contrary": {
+   "class": null,
+   "effect": "stat changes on this pokemon are reversed",
+   "face": "cards/abilities/contrary-d743d653.jpg",
+   "group": null
+  },
+  "Corrosion": {
+   "class": null,
+   "effect": "can damage and Poison Steel types",
+   "face": "cards/abilities/corrosion-075f3d61.jpg",
+   "group": null
+  },
+  "Costar": {
+   "class": null,
+   "effect": "copies all stat changes of allies within 2 tiles",
+   "face": "cards/abilities/costar-897fdc93.jpg",
+   "group": null
+  },
+  "Cotton Down": {
+   "class": null,
+   "effect": "when this pokemon is hit, all pokemon within 2 have their speed lowered 1 stage",
+   "face": "cards/abilities/cotton-down-ac7727f1.jpg",
+   "group": null
+  },
+  "Crushing Grip": {
+   "class": null,
+   "effect": "reduce the range of closest target hit by 2",
+   "face": "cards/abilities/crushing-grip-0b97e925.jpg",
+   "group": null
+  },
+  "Cud Chew": {
+   "class": null,
+   "effect": "when this pokemon eats a berry, it eats it a second time at the end of the turn",
+   "face": "cards/abilities/cud-chew-3a9b707b.jpg",
+   "group": null
+  },
+  "Curious Medicine": {
+   "class": null,
+   "effect": "pokemon within 2 have their stat changes eliminated (start of turn)",
+   "face": "cards/abilities/curious-medicine-8d363272.jpg",
+   "group": null
+  },
+  "Current Flow": {
+   "class": null,
+   "effect": "Double speed and defense and increase range by 1 when in rain (start of turn)",
+   "face": "cards/abilities/current-flow-6bffd4c6.jpg",
+   "group": null
+  },
+  "Cursed Body": {
+   "class": null,
+   "effect": "enemies that target this pokemon who damaged this pokemon with an attack the previous turn will auto fail",
+   "face": "cards/abilities/cursed-body-64d18340.jpg",
+   "group": null
+  },
+  "Damp": {
+   "class": null,
+   "effect": "prevents explosion and on death effects from enemies within 2 (aura)",
+   "face": "cards/abilities/damp-f0375e75.jpg",
+   "group": null
+  },
+  "Dancer": {
+   "class": null,
+   "effect": "gains all stat changes applied to pokemon within 2 (aura)",
+   "face": "cards/abilities/dancer-375f9257.jpg",
+   "group": null
+  },
+  "Data Drive": {
+   "class": null,
+   "effect": "This pokemon does not consume its plate item when it is used. Ignore attacks secondary text when attacking if this pokemon is holding a plate",
+   "face": "cards/abilities/data-drive-2b4b9060.jpg",
+   "group": null
+  },
+  "Dauntless": {
+   "class": null,
+   "effect": "pokemon damaged by this pokemons attacks are pulled one tile closer",
+   "face": "cards/abilities/dauntless-b27579ac.jpg",
+   "group": null
+  },
+  "Daze": {
+   "class": null,
+   "effect": "75% chance to make enemies within 2 drowsy (start of turn)",
+   "face": "cards/abilities/daze-cba6aef0.jpg",
+   "group": null
+  },
+  "Dazzling": {
+   "class": null,
+   "effect": "enemies within 2 do not move forward during their attacks (hitboxes treat starting location as ending location)",
+   "face": "cards/abilities/dazzling-6a41273a.jpg",
+   "group": null
+  },
+  "Dazzling Diamond": {
+   "class": null,
+   "effect": "allies within 2 can make two attacks on their turn, each with half their normal power",
+   "face": "cards/abilities/dazzling-diamond-8f9851cd.jpg",
+   "group": null
+  },
+  "Deep Sleep": {
+   "class": null,
+   "effect": "Heals 1/4 hp per turn while drowsy",
+   "face": "cards/abilities/deep-sleep-70d4fad7.jpg",
+   "group": null
+  },
+  "Defeatist": {
+   "class": null,
+   "effect": "attack has 1.2 power when hp is above 50% and 0.8 when hp is below",
+   "face": "cards/abilities/defeatist-2f95631c.jpg",
+   "group": null
+  },
+  "Defend Order": {
+   "class": null,
+   "effect": "This pokemon has +1 defense until the end of its activation each turn",
+   "face": "cards/abilities/defend-order-102b917a.jpg",
+   "group": null
+  },
+  "Defiant": {
+   "class": null,
+   "effect": "raises attack 2 stages when a stat is lowered by an enemy effect",
+   "face": "cards/abilities/defiant-6052e297.jpg",
+   "group": null
+  },
+  "Defiant (Grass)": {
+   "class": null,
+   "effect": "raises attack 2 stages when a stat is lowered by an enemy effect",
+   "face": "cards/abilities/defiant-grass-367502ff.jpg",
+   "group": null
+  },
+  "Devouring Storm": {
+   "class": null,
+   "effect": "pokemon with water attacks must target this pokemon if possible. water attacks that include this pokemon are completely nullified, and this pokemon restores 1/8th of its total hp",
+   "face": "cards/abilities/devouring-storm-859ceb00.jpg",
+   "group": null
+  },
+  "Directionally Challenged": {
+   "class": null,
+   "effect": "all pokemon within 2 have any directional damage multipliers from attacks on them doubled",
+   "face": "cards/abilities/directionally-challenged-0a2fbbad.jpg",
+   "group": null
+  },
+  "Disguise": {
+   "class": null,
+   "effect": "prevents the first attack this pokemon takes from doing damage",
+   "face": "cards/abilities/disguise-9f71c49d.jpg",
+   "group": null
+  },
+  "Disgust": {
+   "class": null,
+   "effect": "Pokemon hit by this pokemon will switch places with a friendly neighbor",
+   "face": "cards/abilities/disgust-1e709bce.jpg",
+   "group": null
+  },
+  "Dodge": {
+   "class": null,
+   "effect": "start of game choose one - 20% chance to dodge attacks that make contact, lowers attackers speed on proc or 20% chance to dodge attacks that make do not make contact, lowers attackers speed on proc",
+   "face": "cards/abilities/dodge-0e7c2355.jpg",
+   "group": null
+  },
+  "Doodle": {
+   "class": null,
+   "effect": "start of turn: choose a pokemon within 3 and gain its ability until the end of this turn",
+   "face": "cards/abilities/doodle-be8d3a65.jpg",
+   "group": null
+  },
+  "Download": {
+   "class": null,
+   "effect": "if targets defense is higher than this pokemons attack, gain +1 attack before hitting",
+   "face": "cards/abilities/download-e1f5dcde.jpg",
+   "group": null
+  },
+  "Dragon Fury": {
+   "class": null,
+   "effect": "this pokemons attacks push targets 1 tile back",
+   "face": "cards/abilities/dragon-fury-734ea0ea.jpg",
+   "group": null
+  },
+  "Dragon's Maw": {
+   "class": null,
+   "effect": "friendly Dragon pokemon within 2 have their attacks base power multiplied by 1.3x",
+   "face": "cards/abilities/dragons-maw-3be49d51.jpg",
+   "group": null
+  },
+  "Dragonize": {
+   "class": null,
+   "effect": "Enemy pokemon within 3 are treated as having the dragon type",
+   "face": "cards/abilities/dragonize-5e16530b.jpg",
+   "group": null
+  },
+  "Drizzle": {
+   "class": null,
+   "effect": "Summon rain weather within 2 tiles (start of turn)",
+   "face": "cards/abilities/drizzle-70ce56fc.jpg",
+   "group": null
+  },
+  "Drought": {
+   "class": null,
+   "effect": "Summons sun weather condition within 2 tiles (start of turn)",
+   "face": "cards/abilities/drought-02f06476.jpg",
+   "group": null
+  },
+  "Dry Skin": {
+   "class": null,
+   "effect": "takes 1/8 damage each turn in sun, heal 1/8 each turn in rain or when hit by Water move. takes 1.25 damage from Fire moves",
+   "face": "cards/abilities/dry-skin-936f4e55.jpg",
+   "group": null
+  },
+  "Duelist": {
+   "class": null,
+   "effect": "this pokemon has a permanent 1.5x attack and defense multiplier. Reduced by .1x for each pokemon within 2, minimum of 1.0x",
+   "face": "cards/abilities/duelist-062ad337.jpg",
+   "group": null
+  },
+  "Earth Eater": {
+   "class": null,
+   "effect": "restores 1/8 hp when hit by a Ground type move",
+   "face": "cards/abilities/earth-eater-eac10536.jpg",
+   "group": null
+  },
+  "Eelevate": {
+   "class": null,
+   "effect": "this pokemon floats above the ground. when this pokemon ko's an enemy pokemon, it gains 1 attack stage",
+   "face": "cards/abilities/eelevate-fad32a4b.jpg",
+   "group": null
+  },
+  "Effect Spore": {
+   "class": null,
+   "effect": "Start of game chose one - enemies that make contact have a 30% chance of suffering a random status ailment (1-2 paralysis, 3-4 Poison, 5-6 drowsy) or enemies that make do not make contact have a 30% chance of suffering a random status ailment (1-2 paralysis, 3-4 Poison, 5-6 drowsy)",
+   "face": "cards/abilities/effect-spore-4ded9f33.jpg",
+   "group": null
+  },
+  "Electric Surge": {
+   "class": null,
+   "effect": "summons Electric terrain within 2 tiles (start of turn)",
+   "face": "cards/abilities/electric-surge-3c7225d9.jpg",
+   "group": null
+  },
+  "Electromorphosis": {
+   "class": null,
+   "effect": "raises the base power of next attack by 50% when hit",
+   "face": "cards/abilities/electromorphosis-797236ab.jpg",
+   "group": null
+  },
+  "Emergency Exit": {
+   "class": null,
+   "effect": "when this pokemon reaches 50% hp or lower, move directly away from attacker (in a straight line) up to 3 tiles. reset counter for first impression",
+   "face": "cards/abilities/emergency-exit-15f94c74.jpg",
+   "group": null
+  },
+  "Explode": {
+   "class": null,
+   "effect": "On death all surrounding pokemon take damage. Damage is calculated as an attack with 50 base power, calculated with users attack stat. Cannot be avoided",
+   "face": "cards/abilities/explode-c67d092f.jpg",
+   "group": null
+  },
+  "Eye of the Storm": {
+   "class": null,
+   "effect": "any weather or terrain set within 2 is completely canceled (start of turn). this effect checks every time a weather ability is activated",
+   "face": "cards/abilities/eye-of-the-storm-0631cda9.jpg",
+   "group": null
+  },
+  "Fairy Aura": {
+   "class": null,
+   "effect": "friendly pokemon within 2 with fairy type attacks gain a 1.5x damage multiplier",
+   "face": "cards/abilities/fairy-aura-044bd7e7.jpg",
+   "group": null
+  },
+  "Fairy Lock": {
+   "class": null,
+   "effect": "Any pokemon that hit this pokemon have the range of their next move set to 2, ignoring any other range buffs or debuffs",
+   "face": "cards/abilities/fairy-lock-7de40049.jpg",
+   "group": null
+  },
+  "Fillet Away": {
+   "class": null,
+   "effect": "When this pokemon is damaged, gain +1 attack and speed",
+   "face": "cards/abilities/fillet-away-28c89402.jpg",
+   "group": null
+  },
+  "Filter": {
+   "class": null,
+   "effect": "super effective attacks that target this pokemon have their base power treated as .75x (only effects this pokemon)",
+   "face": "cards/abilities/filter-b6578b49.jpg",
+   "group": null
+  },
+  "Fire Mane": {
+   "class": null,
+   "effect": "water type attacks that pass through the row of 3 tiles in front of this pokemon do not continue to target through it. allied attacks that pass through these tiles may change their type to fire, only on tiles on or after the affected tiles",
+   "face": "cards/abilities/fire-mane-ebdc55bf.jpg",
+   "group": null
+  },
+  "Fisticuffs": {
+   "class": null,
+   "effect": "this pokemon ignores immunities. this pokemons attacks gain an addative .2x multiplier for each enemy within 2 at the time of the hit",
+   "face": "cards/abilities/fisticuffs-72e94fe6.jpg",
+   "group": null
+  },
+  "Flame Body": {
+   "class": null,
+   "effect": "start of game choose one - 30% chance to burn attackers that make contact or 30% chance to burn attackers that do not make contact",
+   "face": "cards/abilities/flame-body-a487011d.jpg",
+   "group": null
+  },
+  "Flame Boost": {
+   "class": null,
+   "effect": "adjacent friendly Fire pokemon's attacks have 1.5x base power",
+   "face": "cards/abilities/flame-boost-982e57e4.jpg",
+   "group": null
+  },
+  "Flash Fire": {
+   "class": null,
+   "effect": "raises attack one stage when hit by a Fire move. take no damage from attack",
+   "face": "cards/abilities/flash-fire-03df508a.jpg",
+   "group": null
+  },
+  "Flower Gift": {
+   "class": null,
+   "effect": "attack and defense are 1.5x in the sunlight",
+   "face": "cards/abilities/flower-gift-3c5363f9.jpg",
+   "group": null
+  },
+  "Flower Veil": {
+   "class": null,
+   "effect": "friendly Grass pokemon within 4 tiles cannot have their stats lowered by enemy pokemon and effects",
+   "face": "cards/abilities/flower-veil-1d18d04c.jpg",
+   "group": null
+  },
+  "Fluffy": {
+   "class": null,
+   "effect": "start of game choose one - damage from physical moves is halved or damage from special moves is halved. damage from Fire moves is doubled",
+   "face": "cards/abilities/fluffy-e33aebc9.jpg",
+   "group": null
+  },
+  "Friend Guard": {
+   "class": null,
+   "effect": "when a friendly pokemon within 2 tiles is attacked, treat the attack as having .75x base power",
+   "face": "cards/abilities/friend-guard-8e9a898f.jpg",
+   "group": null
+  },
+  "Frighten": {
+   "class": null,
+   "effect": "lowers speed and range of enemies within 2 (start of turn)",
+   "face": "cards/abilities/frighten-c6645d36.jpg",
+   "group": null
+  },
+  "Frostbite": {
+   "class": null,
+   "effect": "start of game choose one - 30% chance to inflict frostbite on attackers that make contact or 30% chance to inflict frostbite attackers that do not make contact",
+   "face": "cards/abilities/frostbite-f0987296.jpg",
+   "group": null
+  },
+  "Fur Coat": {
+   "class": null,
+   "effect": "start of game choose one - take 1/2 damage from physical attacks or take 1/2 damage from special attacks",
+   "face": "cards/abilities/fur-coat-d42fe626.jpg",
+   "group": null
+  },
+  "Gale Wings": {
+   "class": null,
+   "effect": "move forward 1 extra tile before attacking",
+   "face": "cards/abilities/gale-wings-3789cb49.jpg",
+   "group": null
+  },
+  "Galvanize": {
+   "class": null,
+   "effect": "",
+   "face": "cards/abilities/galvanize-0cedfe15.jpg",
+   "group": null
+  },
+  "Gem Shield": {
+   "class": null,
+   "effect": "any attack that hits this pokemon can be redirected. when redirecting an attack, take all tiles behind this pokemon (based on attackers position) and choose a different side for those tiles to be moved to. can double target mons that already were hit, and can cause user to take damage. distance is calculated from attacker",
+   "face": "cards/abilities/gem-shield-d263cbeb.jpg",
+   "group": null
+  },
+  "Gluttony": {
+   "class": null,
+   "effect": "when a pokemon within 2 tiles eats a berry, this pokemon gains that bonus as well",
+   "face": "cards/abilities/gluttony-77e1d57c.jpg",
+   "group": null
+  },
+  "Good as Gold": {
+   "class": null,
+   "effect": "cannot be statused",
+   "face": "cards/abilities/good-as-gold-e965274f.jpg",
+   "group": null
+  },
+  "Gooey": {
+   "class": null,
+   "effect": "Start of game choose one - attackers that make contact have their speed lowered 1 stage or attackers that do not make contact have their speed lowered 1 stage",
+   "face": "cards/abilities/gooey-fa58f07d.jpg",
+   "group": null
+  },
+  "Grand Champion": {
+   "class": null,
+   "effect": "has an addative .1x attack and defense multiplier per fainted pokemon",
+   "face": "cards/abilities/grand-champion-ca849832.jpg",
+   "group": null
+  },
+  "Grass Pelt": {
+   "class": null,
+   "effect": "base defense is 1.5x when standing on Grassy terrain (start of turn)",
+   "face": "cards/abilities/grass-pelt-a03cf2d7.jpg",
+   "group": null
+  },
+  "Grassy Surge": {
+   "class": null,
+   "effect": "summons Grassy terrain within 2 tiles (start of turn)",
+   "face": "cards/abilities/grassy-surge-af40769f.jpg",
+   "group": null
+  },
+  "Grim Neigh": {
+   "class": null,
+   "effect": "raises attack 1 stage when this pokemon makes a ko",
+   "face": "cards/abilities/grim-neigh-eeca7044.jpg",
+   "group": null
+  },
+  "Guard Dog": {
+   "class": null,
+   "effect": "Intimidate causes pokemon to gain 1 attack instead, cannot be forced backwards",
+   "face": "cards/abilities/guard-dog-04a4ec3a.jpg",
+   "group": null
+  },
+  "Gulp Missile": {
+   "class": null,
+   "effect": "collects either an arrokuda or pikachu after attacking (pikachu if cramorant has 50% hp or less). when hit while holding one, shoot missle that deals 1/8 hp and paralyzes if it is a pikachu. counts as a physical attack that does not make contact.",
+   "face": "cards/abilities/gulp-missile-85259438.jpg",
+   "group": null
+  },
+  "Harvest": {
+   "class": null,
+   "effect": "50% chance to regain a used berry each turn if no item is held, 100% in sun",
+   "face": "cards/abilities/harvest-48162f9c.jpg",
+   "group": null
+  },
+  "Healer": {
+   "class": null,
+   "effect": "50% chance to heal adjacent allies status conditions (end of turn)",
+   "face": "cards/abilities/healer-dc379958.jpg",
+   "group": null
+  },
+  "Healiong Steps": {
+   "class": null,
+   "effect": "all adjacent tiles and tiles this pokemon walks over provide allies who end their turn on them 1/8 their total hp. each time a new movement occurs, previous trail dissapears",
+   "face": "cards/abilities/healiong-steps-0655b4cc.jpg",
+   "group": null
+  },
+  "Heart of Ice": {
+   "class": null,
+   "effect": "friendly Ice type pokemon within 2 have their attacks base power multiplied by 1.3x",
+   "face": "cards/abilities/heart-of-ice-a84de9a1.jpg",
+   "group": null
+  },
+  "Heart of Rock": {
+   "class": null,
+   "effect": "friendly Rock type pokemon within 2 have their attacks base power multiplied by 1.3x",
+   "face": "cards/abilities/heart-of-rock-be8f265e.jpg",
+   "group": null
+  },
+  "Heart of Steel": {
+   "class": null,
+   "effect": "friendly Steel type pokemon within 2 have their attacks base power multiplied by 1.3x",
+   "face": "cards/abilities/heart-of-steel-aa958339.jpg",
+   "group": null
+  },
+  "Heatproof": {
+   "class": null,
+   "effect": "Fire attacks that target this pokemon have their base power treated as half (only applied to this pokemon)",
+   "face": "cards/abilities/heatproof-0c83255e.jpg",
+   "group": null
+  },
+  "Hero": {
+   "class": null,
+   "effect": "gain 1 attack and defense if you have 2 less pokemon than your oponent lasts until the end of the following turn)",
+   "face": "cards/abilities/hero-1ddbd36f.jpg",
+   "group": null
+  },
+  "Hexapod": {
+   "class": null,
+   "effect": "this pokemon has 2 extra range, and can use its range to move in any way it would like",
+   "face": "cards/abilities/hexapod-83ba1b34.jpg",
+   "group": null
+  },
+  "High Rise": {
+   "class": null,
+   "effect": "attack gains 1.5x base power if attacking from above target",
+   "face": "cards/abilities/high-rise-5bdd92e0.jpg",
+   "group": null
+  },
+  "Honey Gatherer": {
+   "class": null,
+   "effect": "when this pokemon uses a non-honey item, gain honey",
+   "face": "cards/abilities/honey-gatherer-4b0ec1ad.jpg",
+   "group": null
+  },
+  "Hospitality": {
+   "class": null,
+   "effect": "restores 1/16 hp to all allies within 2 (end of turn)",
+   "face": "cards/abilities/hospitality-eacfab20.jpg",
+   "group": null
+  },
+  "Huge Power": {
+   "class": null,
+   "effect": "this pokemons attack stat is doubled",
+   "face": "cards/abilities/huge-power-2b082877.jpg",
+   "group": null
+  },
+  "Hunger Switch": {
+   "class": null,
+   "effect": "switches forms at the end of each turn",
+   "face": "cards/abilities/hunger-switch-f670a053.jpg",
+   "group": null
+  },
+  "Hustle": {
+   "class": null,
+   "effect": "attack base power is 1.5, accuracy is .8",
+   "face": "cards/abilities/hustle-262f09cd.jpg",
+   "group": null
+  },
+  "Hydration": {
+   "class": null,
+   "effect": "cures all status ailment in the rain (end of turn)",
+   "face": "cards/abilities/hydration-19152aa1.jpg",
+   "group": null
+  },
+  "Hyper Cutter": {
+   "class": null,
+   "effect": "attack cannot be lowered",
+   "face": "cards/abilities/hyper-cutter-4ea70a43.jpg",
+   "group": null
+  },
+  "Ice Body": {
+   "class": null,
+   "effect": "restores 1/8 hp at the end of each turn when in snow",
+   "face": "cards/abilities/ice-body-dac9a0da.jpg",
+   "group": null
+  },
+  "Ice Face": {
+   "class": null,
+   "effect": "pokemon does not take damage from the first physical/special (choose at start of game) attack it takes, then transforms. turns back into Ice head form when you end turn in snow",
+   "face": "cards/abilities/ice-face-8d3b2c25.jpg",
+   "group": null
+  },
+  "Ice Scales": {
+   "class": null,
+   "effect": "start of game choose one - damage from physical moves is halved or damage from special moves is halved. damage from Fire moves is doubled",
+   "face": "cards/abilities/ice-scales-025f6baf.jpg",
+   "group": null
+  },
+  "Illuminate": {
+   "class": null,
+   "effect": "allies within 3 gain a +10% accuracy modifier",
+   "face": "cards/abilities/illuminate-0d06e09f.jpg",
+   "group": null
+  },
+  "Illusion": {
+   "class": null,
+   "effect": "start disguised as a friendly pokemon (until you take damage from an attack)",
+   "face": "cards/abilities/illusion-9dd775b4.jpg",
+   "group": null
+  },
+  "Immunity": {
+   "class": null,
+   "effect": "cannot be Poisoned",
+   "face": "cards/abilities/immunity-40e963aa.jpg",
+   "group": null
+  },
+  "Impenetrable Shell": {
+   "class": null,
+   "effect": "if this pokemon is hit by a crit, ignore the normal effect and instead lower attackers attack 1 stage",
+   "face": "cards/abilities/impenetrable-shell-b6e6c8ca.jpg",
+   "group": null
+  },
+  "Imposter": {
+   "class": null,
+   "effect": "at the end of the turn, if ditto is in its base form, it can become an amalgam form. when it does this, choose an enemy pokemon within 5 and copy its attack, defense, speed, attack, and ability. this transformation lasts for two turns",
+   "face": "cards/abilities/imposter-d4c6ff23.jpg",
+   "group": null
+  },
+  "Infiltrator": {
+   "class": null,
+   "effect": "doubles positive accuracy and damage bonuses from direction and height differences",
+   "face": "cards/abilities/infiltrator-2bcbc026.jpg",
+   "group": null
+  },
+  "Innards Out": {
+   "class": null,
+   "effect": "If this pokemon is ko'd, the attacker takes damage equal to the damage dealt in the hit that ko'd this. does not count overkill damage",
+   "face": "cards/abilities/innards-out-53b04402.jpg",
+   "group": null
+  },
+  "Inner Focus": {
+   "class": null,
+   "effect": "this pokemon cannot be flinched. this pokemon is immune to abilities that would lower its stats at the start of a turn",
+   "face": "cards/abilities/inner-focus-01885efe.jpg",
+   "group": null
+  },
+  "Instinct": {
+   "class": null,
+   "effect": "20% chance to dodge attacks",
+   "face": "cards/abilities/instinct-c10a0ff6.jpg",
+   "group": null
+  },
+  "Interference": {
+   "class": null,
+   "effect": "lowers accuracy of enemies within 2 (start of turn)",
+   "face": "cards/abilities/interference-a644358b.jpg",
+   "group": null
+  },
+  "Intimidate": {
+   "class": null,
+   "effect": "lowers attack of enemies within 2 (start of turn)",
+   "face": "cards/abilities/intimidate-41da8a57.jpg",
+   "group": null
+  },
+  "Iron Barbs": {
+   "class": null,
+   "effect": "attackers that make contact lose 1/8 hp",
+   "face": "cards/abilities/iron-barbs-3b6c1caf.jpg",
+   "group": null
+  },
+  "Iron Claws": {
+   "class": null,
+   "effect": "this pokemons attack is split into 4 hits, each of which have 1/3 the base power of the original attack and make their bonus effect checks seperately",
+   "face": "cards/abilities/iron-claws-4c2c31ed.jpg",
+   "group": null
+  },
+  "Iron Fist": {
+   "class": null,
+   "effect": "this pokemon can make a second attack against a different target if it did not move during this turn",
+   "face": "cards/abilities/iron-fist-8f922923.jpg",
+   "group": null
+  },
+  "Ironbark": {
+   "class": null,
+   "effect": "This pokemon has no weaknesses",
+   "face": "cards/abilities/ironbark-217012e7.jpg",
+   "group": null
+  },
+  "Jagged Edge": {
+   "class": null,
+   "effect": "start of game choose one - attackers that make contact lose 1/16 hp or attackers that do not make contact lose 1/16 hp",
+   "face": "cards/abilities/jagged-edge-b8be52e8.jpg",
+   "group": null
+  },
+  "Jungle Healing": {
+   "class": null,
+   "effect": "restore adjacent allies 1/8hp and cure status conditions (end of turn)",
+   "face": "cards/abilities/jungle-healing-2cca85fd.jpg",
+   "group": null
+  },
+  "Justified": {
+   "class": null,
+   "effect": "raises attack when hit by a Dark type move (does not absorb attack)",
+   "face": "cards/abilities/justified-070d9635.jpg",
+   "group": null
+  },
+  "Keen Eye": {
+   "class": null,
+   "effect": "base accuracy cannot be lowerd",
+   "face": "cards/abilities/keen-eye-42d146f5.jpg",
+   "group": null
+  },
+  "Kickin Hawk": {
+   "class": null,
+   "effect": "gain an 8% speed and attack boost, multiplied by the round count",
+   "face": "cards/abilities/kickin-hawk-f804e303.jpg",
+   "group": null
+  },
+  "Last Bastion": {
+   "class": null,
+   "effect": "increases attack and defense 2 stages if all allies have been defeated (lasts until the end of next turn)",
+   "face": "cards/abilities/last-bastion-7cfb74c7.jpg",
+   "group": null
+  },
+  "Leaf Guard": {
+   "class": null,
+   "effect": "prevents from being statused in the sun (check for in the sun at the start of each turn)",
+   "face": "cards/abilities/leaf-guard-14b2e17c.jpg",
+   "group": null
+  },
+  "Levitate": {
+   "class": null,
+   "effect": "this pokemon floats above the Ground",
+   "face": "cards/abilities/levitate-52cbe37b.jpg",
+   "group": null
+  },
+  "Libero": {
+   "class": null,
+   "effect": "this pokemons first attack against a target who would Normal resist the attack is dealt as neutral damage instead",
+   "face": "cards/abilities/libero-6a09498c.jpg",
+   "group": null
+  },
+  "Life Force": {
+   "class": null,
+   "effect": "Restores 1/8 hp at the end of each turn",
+   "face": "cards/abilities/life-force-44e32a07.jpg",
+   "group": null
+  },
+  "Lighting Crater": {
+   "class": null,
+   "effect": "pokemon with electric attacks must target this pokemon if possible. electric attacks that include this pokemon are completely nullified, and this pokemon restores 1/8th of its total hp",
+   "face": "cards/abilities/lighting-crater-69fe983f.jpg",
+   "group": null
+  },
+  "Lightning Rod": {
+   "class": null,
+   "effect": "raises attack 1 stage if hit by an Electric move, takes no damage from attack, pokemon with Electric attacks must target this pokemon if possible",
+   "face": "cards/abilities/lightning-rod-0e35476d.jpg",
+   "group": null
+  },
+  "Limber": {
+   "class": null,
+   "effect": "cannot be paralyzed",
+   "face": "cards/abilities/limber-d0db3d46.jpg",
+   "group": null
+  },
+  "Lingering Aroma": {
+   "class": null,
+   "effect": "start of game choose one - pokemon that make contact while attacking this pokemon have their ability changed to lingering aroma or pokemon that do not make contact while attacking this pokemon have their ability changed to lingering aroma",
+   "face": "cards/abilities/lingering-aroma-08ca9cd1.jpg",
+   "group": null
+  },
+  "Liquid Ooze": {
+   "class": null,
+   "effect": "when this pokemon takes damage from an attack which heals the user, the user losese ⅛ hp instead of healing",
+   "face": "cards/abilities/liquid-ooze-cc485874.jpg",
+   "group": null
+  },
+  "Liquid Voice": {
+   "class": null,
+   "effect": "this pokemons attack is Water and Fairy type at the same time",
+   "face": "cards/abilities/liquid-voice-48858eff.jpg",
+   "group": null
+  },
+  "Luchador": {
+   "class": null,
+   "effect": "attacks targeting this pokemon make their accuracy check twice. if one misses, attack deals 1/2 damage. if both miss, attack misses",
+   "face": "cards/abilities/luchador-926d0c8e.jpg",
+   "group": null
+  },
+  "Lullaby": {
+   "class": null,
+   "effect": "enemies within 2 have a 50% to become drowsy at the start of each turn",
+   "face": "cards/abilities/lullaby-3d713274.jpg",
+   "group": null
+  },
+  "Lunar Opposite": {
+   "class": null,
+   "effect": "if solRock is on the field, this pokemon ignores any stat changes (negative or positive) on enemy pokemon when attacking or defending",
+   "face": "cards/abilities/lunar-opposite-d0ad6ceb.jpg",
+   "group": null
+  },
+  "Magic Bounce": {
+   "class": null,
+   "effect": "secondary attack effects that are not stat reductions that affect this pokemon affect the attacker instead",
+   "face": "cards/abilities/magic-bounce-e6afa57d.jpg",
+   "group": null
+  },
+  "Magic Guard": {
+   "class": null,
+   "effect": "can only take damage from direct attacks",
+   "face": "cards/abilities/magic-guard-d96186a3.jpg",
+   "group": null
+  },
+  "Magic Powder": {
+   "class": null,
+   "effect": "start of turn: make the nearest enemy within 2 a pure psychic type until the end of the turn",
+   "face": "cards/abilities/magic-powder-c4319f83.jpg",
+   "group": null
+  },
+  "Magic Roulette": {
+   "class": null,
+   "effect": "when a status condition is applied to a pokemon, you can choose to randomly assign that status to a pokemon on the team of the target",
+   "face": "cards/abilities/magic-roulette-2d83e46b.jpg",
+   "group": null
+  },
+  "Magician": {
+   "class": null,
+   "effect": "steals the targets item if you have no item",
+   "face": "cards/abilities/magician-497aca12.jpg",
+   "group": null
+  },
+  "Magma Armor": {
+   "class": null,
+   "effect": "cannot be frostbitten",
+   "face": "cards/abilities/magma-armor-a8d6b792.jpg",
+   "group": null
+  },
+  "Magnet Pull": {
+   "class": null,
+   "effect": "enemy Steel types within 2 have their range lowerd by 2 unless they are taking the most direct path towards this pokemon",
+   "face": "cards/abilities/magnet-pull-c81694b8.jpg",
+   "group": null
+  },
+  "Majesty": {
+   "class": null,
+   "effect": "if the target of this pokemons attack would take more damage from electric type, treat the attack as electric",
+   "face": "cards/abilities/majesty-039b3645.jpg",
+   "group": null
+  },
+  "Marvel Scale": {
+   "class": null,
+   "effect": "gains 2 stages of defense while suffering from status ailment",
+   "face": "cards/abilities/marvel-scale-7d7e1ed8.jpg",
+   "group": null
+  },
+  "Mechanized Marvel": {
+   "class": null,
+   "effect": "when this pokemon is attacked, it may make an attack with half base power if there is a valid target",
+   "face": "cards/abilities/mechanized-marvel-9ae6e2b3.jpg",
+   "group": null
+  },
+  "Medic": {
+   "class": null,
+   "effect": "restores adjacent allies hp 1/8 (end of turn)",
+   "face": "cards/abilities/medic-6739b139.jpg",
+   "group": null
+  },
+  "Mega Launcher": {
+   "class": null,
+   "effect": "This pokemon pushes targets back 1 tile for every 40 damage done",
+   "face": "cards/abilities/mega-launcher-5bb5b114.jpg",
+   "group": null
+  },
+  "Mega Sol": {
+   "class": null,
+   "effect": "Allied pokemon within 3 are treated as being in sun while making attacks",
+   "face": "cards/abilities/mega-sol-79456ea3.jpg",
+   "group": null
+  },
+  "Melee": {
+   "class": null,
+   "effect": "when adjacent enemy is attacked, turn to face and deal 1/8 hp. this counts as a contact attack",
+   "face": "cards/abilities/melee-e363385b.jpg",
+   "group": null
+  },
+  "Merciless": {
+   "class": null,
+   "effect": "always crits against Poisoned target",
+   "face": "cards/abilities/merciless-80dd68b0.jpg",
+   "group": null
+  },
+  "Metabolic Supercharge": {
+   "class": null,
+   "effect": "pokemon with fire attacks must target this pokemon if possible. fire attacks that include this pokemon are completely nullified, and this pokemon restores 1/8th of its total hp",
+   "face": "cards/abilities/metabolic-supercharge-d0acfb19.jpg",
+   "group": null
+  },
+  "Mimicry": {
+   "class": null,
+   "effect": "type changes when standing on terrain (start of turn)",
+   "face": "cards/abilities/mimicry-0facd416.jpg",
+   "group": null
+  },
+  "Mind's Eye": {
+   "class": null,
+   "effect": "ignores opponenets base evasion bonuses, cannot have its accuracy lowered, and can hit Ghosts",
+   "face": "cards/abilities/minds-eye-ca9c251c.jpg",
+   "group": null
+  },
+  "Mirror Armor": {
+   "class": null,
+   "effect": "when this pokemons stats are lowered, the pokemon that inflicted that change has their stats lowered instead",
+   "face": "cards/abilities/mirror-armor-8355249b.jpg",
+   "group": null
+  },
+  "Misty Surge": {
+   "class": null,
+   "effect": "summons misty terrain within 2 tiles (start of turn)",
+   "face": "cards/abilities/misty-surge-0aae86ac.jpg",
+   "group": null
+  },
+  "Mold Breaker": {
+   "class": null,
+   "effect": "ignores targets abilities while attacking",
+   "face": "cards/abilities/mold-breaker-fff1e5e2.jpg",
+   "group": null
+  },
+  "Mold Breaker (Fire)": {
+   "class": null,
+   "effect": "ignores targets abilities while attacking",
+   "face": "cards/abilities/mold-breaker-fire-3f06e68d.jpg",
+   "group": null
+  },
+  "Moody": {
+   "class": null,
+   "effect": "at the start of each turn raise 1 stat 2 stages and lower one stat 1 stage (1=attack, 2=defense, 3=speed, 4=range, 5=accuracy, 6=evasion, D6)",
+   "face": "cards/abilities/moody-634fdc44.jpg",
+   "group": null
+  },
+  "Motor Drive": {
+   "class": null,
+   "effect": "raises speed when hit by an Electric move",
+   "face": "cards/abilities/motor-drive-5a71ac64.jpg",
+   "group": null
+  },
+  "Mountaineer": {
+   "class": null,
+   "effect": "Can climb high places",
+   "face": "cards/abilities/mountaineer-2a2534e3.jpg",
+   "group": null
+  },
+  "Moxie": {
+   "class": null,
+   "effect": "raises attack 1 stage on kill",
+   "face": "cards/abilities/moxie-7c0b8326.jpg",
+   "group": null
+  },
+  "Multiscale": {
+   "class": null,
+   "effect": "when this pokemon is attacked at full hp, treat the attack as having half as much base power (only applies to this pokemon)",
+   "face": "cards/abilities/multiscale-5f1d1968.jpg",
+   "group": null
+  },
+  "Mummy": {
+   "class": null,
+   "effect": "start of game choose one - pokemon that make contact have their ability changed to mummy or pokemon that do not make contact have their ability changed to mummy. With either choice the ability retains its properties",
+   "face": "cards/abilities/mummy-98e233de.jpg",
+   "group": null
+  },
+  "Mycelium Might": {
+   "class": null,
+   "effect": "skips accuracy check if attacking a target who has already moved this turn",
+   "face": "cards/abilities/mycelium-might-c78f0665.jpg",
+   "group": null
+  },
+  "Natural Cure": {
+   "class": null,
+   "effect": "30% chance to cure the status ailments of surrounding allies (end of turn)",
+   "face": "cards/abilities/natural-cure-f63b32a8.jpg",
+   "group": null
+  },
+  "Negative Outlook": {
+   "class": null,
+   "effect": "Any bonus effect checks made on or by a pokemon within 2 tiles has their odds halved",
+   "face": "cards/abilities/negative-outlook-b2382c75.jpg",
+   "group": null
+  },
+  "Neutralizing Gas": {
+   "class": null,
+   "effect": "all poekmon within 2 tiles have no abilities (aura)",
+   "face": "cards/abilities/neutralizing-gas-76880df9.jpg",
+   "group": null
+  },
+  "Nightmare": {
+   "class": null,
+   "effect": "50% chance to make enemies within 3 drowsy (start of turn). drowsy enemies lose 1/8 hp at the end of each turn",
+   "face": "cards/abilities/nightmare-9028b3a9.jpg",
+   "group": null
+  },
+  "No Guard": {
+   "class": null,
+   "effect": "this pokemon skips accuracy checks. pokemon attacking this pokemon skip accuracy checks",
+   "face": "cards/abilities/no-guard-44f355d8.jpg",
+   "group": null
+  },
+  "Nurse": {
+   "class": null,
+   "effect": "50% chance to heal neighbors from status conditions at the end of each turn",
+   "face": "cards/abilities/nurse-7e2ac164.jpg",
+   "group": null
+  },
+  "Oblivious": {
+   "class": null,
+   "effect": "while defending, attacker does not get accuracy or attack bonuses for direction and height difference. this pokemon is immune to abilities that would lower its stats at the start of a turn",
+   "face": "cards/abilities/oblivious-f44c3b9e.jpg",
+   "group": null
+  },
+  "Opportunist": {
+   "class": null,
+   "effect": "when an enemy within 2 gains a stat bonus, this pokemon gains an identical stat bonus",
+   "face": "cards/abilities/opportunist-2b8ab69b.jpg",
+   "group": null
+  },
+  "Overcoat": {
+   "class": null,
+   "effect": "This pokemon ignores all effects of the weather",
+   "face": "cards/abilities/overcoat-63c643a2.jpg",
+   "group": null
+  },
+  "Overgrow": {
+   "class": null,
+   "effect": "base attack power is 1.5x when hp is 1/3 or lower",
+   "face": "cards/abilities/overgrow-f9df811f.jpg",
+   "group": null
+  },
+  "Own Tempo": {
+   "class": null,
+   "effect": "cannot be slept, confused, or paralyzed. this pokemon is immune to abilities that would lower its stats at the start of a turn",
+   "face": "cards/abilities/own-tempo-00bda817.jpg",
+   "group": null
+  },
+  "Parental Bond": {
+   "class": null,
+   "effect": "this pokemon makes 2 checks for any attack effects",
+   "face": "cards/abilities/parental-bond-c03f252a.jpg",
+   "group": null
+  },
+  "Parry": {
+   "class": null,
+   "effect": "start of game choose one - 30% chance tododge attacks that make contact or 30% chance to dodge attacks that do not make contact",
+   "face": "cards/abilities/parry-7bc4f38d.jpg",
+   "group": null
+  },
+  "Pastel Veil": {
+   "class": null,
+   "effect": "this pokemon and friendly pokemon within 4 cannot be Poisoned. friendly pokemon that enter within range 4 of this pokemon are cured of Poison (aura)",
+   "face": "cards/abilities/pastel-veil-e0b41a4c.jpg",
+   "group": null
+  },
+  "Perfect Mimic": {
+   "class": null,
+   "effect": "triples positive accuracy and damage bonuses from direction and height differences",
+   "face": "cards/abilities/perfect-mimic-cae47b4c.jpg",
+   "group": null
+  },
+  "Perish Body": {
+   "class": null,
+   "effect": "",
+   "face": "cards/abilities/perish-body-239162c3.jpg",
+   "group": null
+  },
+  "Perpetual Motion": {
+   "class": null,
+   "effect": "Get a copy of any item consumed by allies within 3. Must replace current item.",
+   "face": "cards/abilities/perpetual-motion-ab513422.jpg",
+   "group": null
+  },
+  "Pickpocket": {
+   "class": null,
+   "effect": "steals item from pokemon it hits if this pokemon has no item",
+   "face": "cards/abilities/pickpocket-7f5234ee.jpg",
+   "group": null
+  },
+  "Pickup": {
+   "class": null,
+   "effect": "picks up and uses consumable items dropped within 2 tiles (aura). also picks up the egg in capture the egg when dropped within 2",
+   "face": "cards/abilities/pickup-7c4efd27.jpg",
+   "group": null
+  },
+  "Piercing Drill": {
+   "class": null,
+   "effect": "while attacking, each consecutive attack gains an addative .1x multiplier per successful attack on previous turns",
+   "face": "cards/abilities/piercing-drill-228a0087.jpg",
+   "group": null
+  },
+  "Pixilate": {
+   "class": null,
+   "effect": "if fairy damage would deal more damage to the target, this pokemons attack is treated as fairy type against that target",
+   "face": "cards/abilities/pixilate-c4cd540f.jpg",
+   "group": null
+  },
+  "Poison Current": {
+   "class": null,
+   "effect": "all adjacent tiles and tiles this pokemon poison enemies who and heal allies for 1/16 their total hp end their turn on them. each time a new movement occurs, previous trail dissapears",
+   "face": "cards/abilities/poison-current-f8183a92.jpg",
+   "group": null
+  },
+  "Poison Heal": {
+   "class": null,
+   "effect": "restores 1/8 hp each turn when Poisoned (instead of suffering damage)",
+   "face": "cards/abilities/poison-heal-6942f84d.jpg",
+   "group": null
+  },
+  "Poison Point": {
+   "class": null,
+   "effect": "start of game choose one - 30% chance to Poison attackers that make contact or 30% chance to Poison attackers that do not make contact",
+   "face": "cards/abilities/poison-point-ee8c6ea8.jpg",
+   "group": null
+  },
+  "Poison Puppeteer": {
+   "class": null,
+   "effect": "enemy pokemon within 4 that become Poisoned also become confused",
+   "face": "cards/abilities/poison-puppeteer-5f2af4a5.jpg",
+   "group": null
+  },
+  "Poison Touch": {
+   "class": null,
+   "effect": "extra 30% chance to Poison target on hit",
+   "face": "cards/abilities/poison-touch-9c12f3b7.jpg",
+   "group": null
+  },
+  "Polyscale": {
+   "class": null,
+   "effect": "the first hit each turn that damages this pokemon has its damage halved",
+   "face": "cards/abilities/polyscale-eb162539.jpg",
+   "group": null
+  },
+  "Positive Outlook": {
+   "class": null,
+   "effect": "Any bonus effect checks made on or by a pokemon within 2 tiles has their odds doubled. automatically succeeds if chance goes above 100%",
+   "face": "cards/abilities/positive-outlook-6d6c00de.jpg",
+   "group": null
+  },
+  "Powder": {
+   "class": null,
+   "effect": "at the start of the game choose a type. If any pokemon within 2 uses a move of that type, it loses 1/4 of its maximum hp",
+   "face": "cards/abilities/powder-e95473ba.jpg",
+   "group": null
+  },
+  "Power Construct": {
+   "class": null,
+   "effect": "transform into zygarde complete when hp drops to 50% or lower",
+   "face": "cards/abilities/power-construct-35b5eef6.jpg",
+   "group": null
+  },
+  "Power Spot": {
+   "class": null,
+   "effect": "friendly pokemon within 2 have their attacks base power multiplied by 1.3x (aura)",
+   "face": "cards/abilities/power-spot-a6663f28.jpg",
+   "group": null
+  },
+  "Power of Alchemy": {
+   "class": null,
+   "effect": "this pokemon steals the ability from the first enemy it hits (steals the closer enemies ability if many are hit at once)",
+   "face": "cards/abilities/power-of-alchemy-aba40e8b.jpg",
+   "group": null
+  },
+  "Prehistoric Predator": {
+   "class": null,
+   "effect": "while attacking a pokemon who has an attack that is supereffective on you, treat your attack as being super effective. If it is already super effective, it is double super effective. if it is already double supper effective, add an extra 1.5x multiplier",
+   "face": "cards/abilities/prehistoric-predator-76b1b339.jpg",
+   "group": null
+  },
+  "Pride": {
+   "class": null,
+   "effect": "has 1.5x base attack and defense when suffering from status ailment. ignores the attack drop from burn or frostbite",
+   "face": "cards/abilities/pride-ba8079e9.jpg",
+   "group": null
+  },
+  "Propeller Tail": {
+   "class": null,
+   "effect": "ignores effects that force user to hit a certain target",
+   "face": "cards/abilities/propeller-tail-b87d681c.jpg",
+   "group": null
+  },
+  "Protean": {
+   "class": null,
+   "effect": "when attacking, you may swap this pokemons water type with a type that is super effective on the target. your attack switches to match this type",
+   "face": "cards/abilities/protean-4791664c.jpg",
+   "group": null
+  },
+  "Protosynthesis": {
+   "class": null,
+   "effect": "start of turn: gain +1 stages to highest stat in the sun",
+   "face": "cards/abilities/protosynthesis-ccdab616.jpg",
+   "group": null
+  },
+  "Psychic Surge": {
+   "class": null,
+   "effect": "summons Psychic terrain within 2 tiles (start of turn)",
+   "face": "cards/abilities/psychic-surge-84889f75.jpg",
+   "group": null
+  },
+  "Punk Rock": {
+   "class": null,
+   "effect": "attack gains 5% base power for each target above 1 within attack's tiles",
+   "face": "cards/abilities/punk-rock-29f683f0.jpg",
+   "group": null
+  },
+  "Pure Power": {
+   "class": null,
+   "effect": "this pokemons attack stat is doubled",
+   "face": "cards/abilities/pure-power-6aa68aec.jpg",
+   "group": null
+  },
+  "Purify": {
+   "class": null,
+   "effect": "start of turn: heal the status of all friendly pokemon within 2 and restore 1/4 of their hp if you do",
+   "face": "cards/abilities/purify-45831cd2.jpg",
+   "group": null
+  },
+  "Purifying Salt": {
+   "class": null,
+   "effect": "this pokemon is protected from status conditions and takes half damage from Ghost moves",
+   "face": "cards/abilities/purifying-salt-a55d03b0.jpg",
+   "group": null
+  },
+  "Quark Drive": {
+   "class": null,
+   "effect": "start of turn: gain +1 stages to highest stat in Electric terrain",
+   "face": "cards/abilities/quark-drive-4269e930.jpg",
+   "group": null
+  },
+  "Queenly Majesty": {
+   "class": null,
+   "effect": "enemies within 2 do not move forward during their attacks (hitboxes treat starting location as ending location)",
+   "face": "cards/abilities/queenly-majesty-91f40532.jpg",
+   "group": null
+  },
+  "Quick Draw": {
+   "class": null,
+   "effect": "after this pokemon attacks, it has a 30% chance to move (must end its second move on an objective to capture it)",
+   "face": "cards/abilities/quick-draw-c185aee2.jpg",
+   "group": null
+  },
+  "Quick Feet": {
+   "class": null,
+   "effect": "raises speed 1 stage while being affected by status ailment",
+   "face": "cards/abilities/quick-feet-1c92d8c8.jpg",
+   "group": null
+  },
+  "Rain Dish": {
+   "class": null,
+   "effect": "heal 1/8hp each turn in the rain",
+   "face": "cards/abilities/rain-dish-37d93219.jpg",
+   "group": null
+  },
+  "Rattled": {
+   "class": null,
+   "effect": "raises speed 1 stage when hit by Bug Ghost or Dark move",
+   "face": "cards/abilities/rattled-835ebd97.jpg",
+   "group": null
+  },
+  "Refridgerate": {
+   "class": null,
+   "effect": "if ice damage would deal more damage to the target, this pokemons attack is treated as ice type against that target",
+   "face": "cards/abilities/refridgerate-6638bb54.jpg",
+   "group": null
+  },
+  "Regenerator": {
+   "class": null,
+   "effect": "restores 1/8 hp at the end of each turn",
+   "face": "cards/abilities/regenerator-4ebeca26.jpg",
+   "group": null
+  },
+  "Reversi": {
+   "class": null,
+   "effect": "stat changes applied to this pokemon by enemies are reversed",
+   "face": "cards/abilities/reversi-47b4eda4.jpg",
+   "group": null
+  },
+  "Ripen": {
+   "class": null,
+   "effect": "doubles effects of berries",
+   "face": "cards/abilities/ripen-63adf601.jpg",
+   "group": null
+  },
+  "Rivalry": {
+   "class": null,
+   "effect": "deals 1.5x damage when targetting a pokemon with the same type as this pokemon",
+   "face": "cards/abilities/rivalry-1e097c57.jpg",
+   "group": null
+  },
+  "Rocky Payload": {
+   "class": null,
+   "effect": "",
+   "face": "cards/abilities/rocky-payload-55fc4bfd.jpg",
+   "group": null
+  },
+  "Rough Skin": {
+   "class": null,
+   "effect": "start of game choose one - attackers that make contact lose 1/16 hp or attackers that do not make contact lose 1/16 hp",
+   "face": "cards/abilities/rough-skin-534ef17b.jpg",
+   "group": null
+  },
+  "Run Away": {
+   "class": null,
+   "effect": "when hit by an attack, this pokemon may move 1 tile",
+   "face": "cards/abilities/run-away-bdb5f8f5.jpg",
+   "group": null
+  },
+  "Run Up": {
+   "class": null,
+   "effect": "5% extra base power for each tile moved this turn before attack",
+   "face": "cards/abilities/run-up-a329c59e.jpg",
+   "group": null
+  },
+  "Sand Force": {
+   "class": null,
+   "effect": "attack has 1.3 base power if used in sandstorm",
+   "face": "cards/abilities/sand-force-8dfb4867.jpg",
+   "group": null
+  },
+  "Sand Rush": {
+   "class": null,
+   "effect": "doubles speed in sandstorm (start of turn) and protects from sand damage",
+   "face": "cards/abilities/sand-rush-c890aceb.jpg",
+   "group": null
+  },
+  "Sand Slither": {
+   "class": null,
+   "effect": "this pokemons attacks have a 1.5x multiplier while in sandstorm",
+   "face": "cards/abilities/sand-slither-9da41215.jpg",
+   "group": null
+  },
+  "Sand Spit": {
+   "class": null,
+   "effect": "summons sandstorm weather within 2 tiles when hit",
+   "face": "cards/abilities/sand-spit-11186444.jpg",
+   "group": null
+  },
+  "Sand Stream": {
+   "class": null,
+   "effect": "Summon sandstorm weather within 2 tiles (start of turn)",
+   "face": "cards/abilities/sand-stream-bc9cbc3a.jpg",
+   "group": null
+  },
+  "Sand Veil": {
+   "class": null,
+   "effect": "increases evasion 1.25x during sandstorm (start of turn)",
+   "face": "cards/abilities/sand-veil-2253ac6a.jpg",
+   "group": null
+  },
+  "Sap Sipper": {
+   "class": null,
+   "effect": "raises attack 1 stage when hit by a Grass move, takes no damage from attack",
+   "face": "cards/abilities/sap-sipper-8ac8ca51.jpg",
+   "group": null
+  },
+  "Schooling": {
+   "class": null,
+   "effect": "transforms into schooling wishiwashi when hp is 20% or higher",
+   "face": "cards/abilities/schooling-2f983aa5.jpg",
+   "group": null
+  },
+  "Scrappy": {
+   "class": null,
+   "effect": "can hit Ghosts",
+   "face": "cards/abilities/scrappy-b06777c2.jpg",
+   "group": null
+  },
+  "Seed Sower": {
+   "class": null,
+   "effect": "summon Grassy terrain within 2 tiles when hit",
+   "face": "cards/abilities/seed-sower-2f9e94d3.jpg",
+   "group": null
+  },
+  "Seeing Red": {
+   "class": null,
+   "effect": "raises attack 1 stage when this pokemon drops to 75, 50, and 25% hp",
+   "face": "cards/abilities/seeing-red-a1e96f60.jpg",
+   "group": null
+  },
+  "Sequence": {
+   "class": null,
+   "effect": "extra .5x attack per Electric pokemon within 3",
+   "face": "cards/abilities/sequence-353e6a3b.jpg",
+   "group": null
+  },
+  "Serene Grace": {
+   "class": null,
+   "effect": "doubles the chance of secondary effects",
+   "face": "cards/abilities/serene-grace-d92bea71.jpg",
+   "group": null
+  },
+  "Shackle": {
+   "class": null,
+   "effect": "Lowers range of target by 1 tile",
+   "face": "cards/abilities/shackle-59e0bc1c.jpg",
+   "group": null
+  },
+  "Shadow Dash": {
+   "class": null,
+   "effect": "When no pokemon within 3, range increases 2",
+   "face": "cards/abilities/shadow-dash-ce3965f2.jpg",
+   "group": null
+  },
+  "Shadow Tag": {
+   "class": null,
+   "effect": "enemy pokemon within 2 cannot move away from this pokemon",
+   "face": "cards/abilities/shadow-tag-17fb6600.jpg",
+   "group": null
+  },
+  "Share": {
+   "class": null,
+   "effect": "This pokemon receives buffs from warrior abilities applied to other friendly pokemon",
+   "face": "cards/abilities/share-85da50aa.jpg",
+   "group": null
+  },
+  "Sharpness": {
+   "class": null,
+   "effect": "gain an addative .2x multiplier for each consecutive turn the target pokemon has been attacked by this pokemon",
+   "face": "cards/abilities/sharpness-5f22a6b4.jpg",
+   "group": null
+  },
+  "Shattering Presence": {
+   "class": null,
+   "effect": "enemy pokemon within 3 have their abilities turned off",
+   "face": "cards/abilities/shattering-presence-f719d60a.jpg",
+   "group": null
+  },
+  "Shed Skin": {
+   "class": null,
+   "effect": "50% chance to heal from status ailments (end of turn)",
+   "face": "cards/abilities/shed-skin-9b74e133.jpg",
+   "group": null
+  },
+  "Sheer Force": {
+   "class": null,
+   "effect": "removes secondary effect of attack, multiplies its base power by 1.3x",
+   "face": "cards/abilities/sheer-force-226a69e6.jpg",
+   "group": null
+  },
+  "Shell Armor": {
+   "class": null,
+   "effect": "cannot be crit",
+   "face": "cards/abilities/shell-armor-e0b5c783.jpg",
+   "group": null
+  },
+  "Shield": {
+   "class": null,
+   "effect": "protects allies from multitile attacks",
+   "face": "cards/abilities/shield-0d247fe2.jpg",
+   "group": null
+  },
+  "Shield Dust": {
+   "class": null,
+   "effect": "protects against secondary effects from moves",
+   "face": "cards/abilities/shield-dust-0fe29901.jpg",
+   "group": null
+  },
+  "Shields Down": {
+   "class": null,
+   "effect": "transforms into core form at 50% hp. cannot be statused or have stats lowered while in core form",
+   "face": "cards/abilities/shields-down-35b4c2c8.jpg",
+   "group": null
+  },
+  "Simple": {
+   "class": null,
+   "effect": "doubles effects of positive stat multipliers. halves the effect of negative ones",
+   "face": "cards/abilities/simple-3c3722d1.jpg",
+   "group": null
+  },
+  "Skater": {
+   "class": null,
+   "effect": "increases range to all Ice tiles connected to Ice within range and adjacent tiles",
+   "face": "cards/abilities/skater-34ddefe6.jpg",
+   "group": null
+  },
+  "Skill Link": {
+   "class": null,
+   "effect": "multihit attacks always hit the maximum number of times",
+   "face": "cards/abilities/skill-link-2c74db44.jpg",
+   "group": null
+  },
+  "Slush Rush": {
+   "class": null,
+   "effect": "doubles speed in snow (start of turn)",
+   "face": "cards/abilities/slush-rush-a91197c9.jpg",
+   "group": null
+  },
+  "Sniper": {
+   "class": null,
+   "effect": "crits deal 2.25x damage instead of 1.5x",
+   "face": "cards/abilities/sniper-0c1b97ae.jpg",
+   "group": null
+  },
+  "Snow Cloak": {
+   "class": null,
+   "effect": "increases evasion 1.25x in the snow",
+   "face": "cards/abilities/snow-cloak-8b97d008.jpg",
+   "group": null
+  },
+  "Snow Warning": {
+   "class": null,
+   "effect": "summons snow weather effect within 2 tiles (start of turn)",
+   "face": "cards/abilities/snow-warning-5cfcab70.jpg",
+   "group": null
+  },
+  "Solar Opposite": {
+   "class": null,
+   "effect": "if lunatone is on the field, this pokemon can make a second move after attacking with a range of 2. This pokemon must end its move on a map asset to be affected by or affect it",
+   "face": "cards/abilities/solar-opposite-aebe366b.jpg",
+   "group": null
+  },
+  "Solar Power": {
+   "class": null,
+   "effect": "attack base power is 1.5x when in sun, but pokemon takes 1/8hp at the end of turn (checks at the start of turn)",
+   "face": "cards/abilities/solar-power-251ddfc2.jpg",
+   "group": null
+  },
+  "Solid Rock": {
+   "class": null,
+   "effect": "super effective moves deal 1/4 damage",
+   "face": "cards/abilities/solid-rock-7aed6cb7.jpg",
+   "group": null
+  },
+  "Son of God": {
+   "class": null,
+   "effect": "always deals neutral damage. can jump high places. restores 1/16 hp at the end of each turn. 10% chance to dodge attacks",
+   "face": "cards/abilities/son-of-god-c91781d4.jpg",
+   "group": null
+  },
+  "Soul Heart": {
+   "class": null,
+   "effect": "raises attack 1 stage when this pokemon makes a ko",
+   "face": "cards/abilities/soul-heart-f98a47bb.jpg",
+   "group": null
+  },
+  "Speed Boost": {
+   "class": null,
+   "effect": "Gain 15% base speed multiplied by the turn count",
+   "face": "cards/abilities/speed-boost-8eea1ae9.jpg",
+   "group": null
+  },
+  "Speed Swap": {
+   "class": null,
+   "effect": "When this pokemon takes its turn, you may swap speed with a pokemon within 3 (this swaps the final value with stat stages and other buffs included)",
+   "face": "cards/abilities/speed-swap-7163933e.jpg",
+   "group": null
+  },
+  "Spicy Spray": {
+   "class": null,
+   "effect": "any pokemon that damages this pokemon is burned",
+   "face": "cards/abilities/spicy-spray-0d83da82.jpg",
+   "group": null
+  },
+  "Spirit": {
+   "class": null,
+   "effect": "Restore hp to 1/2 and gain 1 attack when hp reaches 1/4",
+   "face": "cards/abilities/spirit-f1ec13b6.jpg",
+   "group": null
+  },
+  "Splashback": {
+   "class": null,
+   "effect": "Takes 1/16 damage per attack missed. Emotional type damage",
+   "face": "cards/abilities/splashback-b60236cd.jpg",
+   "group": null
+  },
+  "Sponge": {
+   "class": null,
+   "effect": "when an adjacent enemy is attacked, turn to face them and deal 1/16 their hp as damage. heal half of this. this counts as an attack that makes contact",
+   "face": "cards/abilities/sponge-7216e88c.jpg",
+   "group": null
+  },
+  "Sprint": {
+   "class": null,
+   "effect": "One extra range",
+   "face": "cards/abilities/sprint-bc9dd569.jpg",
+   "group": null
+  },
+  "Stakeout": {
+   "class": null,
+   "effect": "this pokemons attack has 1.5x base power when attacking a pokemon that changed the tile it stands on this turn (includes pokemon who moved due to an attack)",
+   "face": "cards/abilities/stakeout-85f99aac.jpg",
+   "group": null
+  },
+  "Stalwart": {
+   "class": null,
+   "effect": "ignores effects that force this pokemon to target certain pokemon",
+   "face": "cards/abilities/stalwart-22c23068.jpg",
+   "group": null
+  },
+  "Stamina": {
+   "class": null,
+   "effect": "raises defense 1 stage when hit",
+   "face": "cards/abilities/stamina-b6a708a6.jpg",
+   "group": null
+  },
+  "Stance Change": {
+   "class": null,
+   "effect": "when this pokemon attacks, switch to shield form",
+   "face": "cards/abilities/stance-change-8ce6b39e.jpg",
+   "group": null
+  },
+  "Static": {
+   "class": null,
+   "effect": "start of game choose one - 30% chance to paralyze attackers that make contact or 30% chance to paralyze attackers that do not make contact",
+   "face": "cards/abilities/static-123fe70d.jpg",
+   "group": null
+  },
+  "Steam Engine": {
+   "class": null,
+   "effect": "raises speed 6 stages when hit by a Water move (does not absorb attack)",
+   "face": "cards/abilities/steam-engine-8b71f6d7.jpg",
+   "group": null
+  },
+  "Steel Ball": {
+   "class": null,
+   "effect": "allied pokemon within 3 gain 1 stage of defense whenever they are hit by an attack",
+   "face": "cards/abilities/steel-ball-3cb04dd4.jpg",
+   "group": null
+  },
+  "Steely Spirit": {
+   "class": null,
+   "effect": "adjacent Steel type allies have their attacks base power multiplied by 1.5x",
+   "face": "cards/abilities/steely-spirit-6f5d00d3.jpg",
+   "group": null
+  },
+  "Stench": {
+   "class": null,
+   "effect": "attacks have a 10% chance to flinch target",
+   "face": "cards/abilities/stench-b5b460bd.jpg",
+   "group": null
+  },
+  "Sticky Hold": {
+   "class": null,
+   "effect": "",
+   "face": "cards/abilities/sticky-hold-36a4446f.jpg",
+   "group": null
+  },
+  "Storm Drain": {
+   "class": null,
+   "effect": "enemy pokemon with Water attacks must attack this pokemon if possible. when this pokemon is hit by a Water move, raises attack 1 stage and take no damage",
+   "face": "cards/abilities/storm-drain-ef2bd795.jpg",
+   "group": null
+  },
+  "Strong Jaw": {
+   "class": null,
+   "effect": "ignore all positive defense modifiers while attacking",
+   "face": "cards/abilities/strong-jaw-9381186a.jpg",
+   "group": null
+  },
+  "Sturdy": {
+   "class": null,
+   "effect": "The first time this pokemons hp is lowerd to 0, it survives on 1 hp",
+   "face": "cards/abilities/sturdy-40fe9528.jpg",
+   "group": null
+  },
+  "Suction Cups": {
+   "class": null,
+   "effect": "cannot be forced backwards by enemy pokemon effects",
+   "face": "cards/abilities/suction-cups-ef0ff13b.jpg",
+   "group": null
+  },
+  "Super Fighting Robot": {
+   "class": null,
+   "effect": "this pokemon can make a second attack using its base form's attack with 1/2 power",
+   "face": "cards/abilities/super-fighting-robot-130832ab.jpg",
+   "group": null
+  },
+  "Super Luck": {
+   "class": null,
+   "effect": "one extra crit stage",
+   "face": "cards/abilities/super-luck-8099895c.jpg",
+   "group": null
+  },
+  "Supersweet Syrup": {
+   "class": null,
+   "effect": "lowers speed of enemy pokemon within 2 by 2 stages (start of turn)",
+   "face": "cards/abilities/supersweet-syrup-8e80fc46.jpg",
+   "group": null
+  },
+  "Supreme Overlord": {
+   "class": null,
+   "effect": "gains 10% base attack per fallen ally",
+   "face": "cards/abilities/supreme-overlord-5f80812c.jpg",
+   "group": null
+  },
+  "Surge Surfer": {
+   "class": null,
+   "effect": "doubles speed when on Electric terrain",
+   "face": "cards/abilities/surge-surfer-ae064a20.jpg",
+   "group": null
+  },
+  "Swarm": {
+   "class": null,
+   "effect": "base attack power is 1.5x when hp is 1/3 or lower",
+   "face": "cards/abilities/swarm-d881470b.jpg",
+   "group": null
+  },
+  "Sweet Veil": {
+   "class": null,
+   "effect": "friendly pokemon within 4 cannot be slept",
+   "face": "cards/abilities/sweet-veil-f8fab655.jpg",
+   "group": null
+  },
+  "Swift Swim": {
+   "class": null,
+   "effect": "double speed when in the rain (start of turn)",
+   "face": "cards/abilities/swift-swim-17472868.jpg",
+   "group": null
+  },
+  "Sword of Ruin": {
+   "class": null,
+   "effect": "aura that lowers defense of all pokemon within 2 by 25%",
+   "face": "cards/abilities/sword-of-ruin-fa14bb45.jpg",
+   "group": null
+  },
+  "Symbiosis": {
+   "class": null,
+   "effect": "when a friendly pokemon within 2 uses an item, give it this pokemons item (cannot be used this turn if it is a manual consumable)",
+   "face": "cards/abilities/symbiosis-01d6f2f1.jpg",
+   "group": null
+  },
+  "Synchronize": {
+   "class": null,
+   "effect": "status ailments and stat changes applied to this pokemon by enemies are applied to the enemy as well",
+   "face": "cards/abilities/synchronize-9c580958.jpg",
+   "group": null
+  },
+  "Syrup Bomb": {
+   "class": null,
+   "effect": "When you hit a target, lower its speed by 2 stages",
+   "face": "cards/abilities/syrup-bomb-3026a174.jpg",
+   "group": null
+  },
+  "Tablets of Ruin": {
+   "class": null,
+   "effect": "aura that lowers attack of all pokemon within 2 by 25%",
+   "face": "cards/abilities/tablets-of-ruin-d5996986.jpg",
+   "group": null
+  },
+  "Take Soul": {
+   "class": null,
+   "effect": "when any pokemon faints, this pokemon gains an addative .3x attack and defense multipliers",
+   "face": "cards/abilities/take-soul-04417308.jpg",
+   "group": null
+  },
+  "Tangled Feet": {
+   "class": null,
+   "effect": "evasion bonuses are doubled when pokemon is confused. evasion deductions are halved",
+   "face": "cards/abilities/tangled-feet-de24baa4.jpg",
+   "group": null
+  },
+  "Tangling Hair": {
+   "class": null,
+   "effect": "start of game choose one - enemies that make contact lose 1 speed or enemies that do not make contact lose 1 speed",
+   "face": "cards/abilities/tangling-hair-78dd952b.jpg",
+   "group": null
+  },
+  "Tar Shot": {
+   "class": null,
+   "effect": "start of turn: make the nearest enemy within 2 take 1.5x damage from fire type attacks until the end of the turn",
+   "face": "cards/abilities/tar-shot-1705f201.jpg",
+   "group": null
+  },
+  "Teatime": {
+   "class": null,
+   "effect": "when this pokemon hits an opponent, the target immediately consumes its held item if it is consumable",
+   "face": "cards/abilities/teatime-1e0d12f5.jpg",
+   "group": null
+  },
+  "Telepathy": {
+   "class": null,
+   "effect": "always dodges friendly pokemons attacks",
+   "face": "cards/abilities/telepathy-dc53228b.jpg",
+   "group": null
+  },
+  "Tenacity": {
+   "class": null,
+   "effect": "start of game choose one - 30% chance to flinch attackers who make contact or 30% chance to flinch attackers that do not make contact",
+   "face": "cards/abilities/tenacity-35a630ae.jpg",
+   "group": null
+  },
+  "Terrify": {
+   "class": null,
+   "effect": "lowers attack and defense of enemy pokemon within 3 (start of turn)",
+   "face": "cards/abilities/terrify-5f51e27f.jpg",
+   "group": null
+  },
+  "Thermal Exchange": {
+   "class": null,
+   "effect": "gains 1 attack when hit by a Fire move, cannot be burned",
+   "face": "cards/abilities/thermal-exchange-f0a59fe5.jpg",
+   "group": null
+  },
+  "Thick Fat": {
+   "class": null,
+   "effect": "halves damage from Ice and Fire type attacks",
+   "face": "cards/abilities/thick-fat-2240f4b2.jpg",
+   "group": null
+  },
+  "Thrust": {
+   "class": null,
+   "effect": "this pokemons attacks have 1 extra knockback",
+   "face": "cards/abilities/thrust-e39a391c.jpg",
+   "group": null
+  },
+  "Tinted Lens": {
+   "class": null,
+   "effect": "doubles base power of attack when attack is not very effective",
+   "face": "cards/abilities/tinted-lens-481a58a3.jpg",
+   "group": null
+  },
+  "Toilet Man": {
+   "class": null,
+   "effect": "This pokemons attack is super effective against water type",
+   "face": "cards/abilities/toilet-man-9204a734.jpg",
+   "group": null
+  },
+  "Topsy Turvy": {
+   "class": null,
+   "effect": "Reverses all stat changed on targets after hitting them",
+   "face": "cards/abilities/topsy-turvy-5f69e01a.jpg",
+   "group": null
+  },
+  "Torrent": {
+   "class": null,
+   "effect": "base attack power is 1.5x when hp is 1/3 or lower",
+   "face": "cards/abilities/torrent-745159c3.jpg",
+   "group": null
+  },
+  "Tough Claws": {
+   "class": null,
+   "effect": "If this pokemon triggers an on hit effect, make a second attack with 1/4 base power on the target that ignores on hit effects",
+   "face": "cards/abilities/tough-claws-390f39f5.jpg",
+   "group": null
+  },
+  "Toxic Boost": {
+   "class": null,
+   "effect": "attacks base power is 1.5x when Poisoned",
+   "face": "cards/abilities/toxic-boost-fd263f20.jpg",
+   "group": null
+  },
+  "Toxic Chain": {
+   "class": null,
+   "effect": "30% chance to badly Poison on hit(triggers before attacks effect)",
+   "face": "cards/abilities/toxic-chain-f88f37d0.jpg",
+   "group": null
+  },
+  "Toxic Debris": {
+   "class": null,
+   "effect": "when hit, put toxic spikes on surrounding tiles (lasts until the end of next turn, any pokemon that end their turn on debris is Poisoned)",
+   "face": "cards/abilities/toxic-debris-4be6412c.jpg",
+   "group": null
+  },
+  "Trace": {
+   "class": null,
+   "effect": "Copy the ability of the first enemy you hit. You choose the ability if many are hit at once",
+   "face": "cards/abilities/trace-163b7083.jpg",
+   "group": null
+  },
+  "Transistor": {
+   "class": null,
+   "effect": "friendly Electric pokemon within 2 have thier attacks base power multiplied by 1.3x",
+   "face": "cards/abilities/transistor-bad359a4.jpg",
+   "group": null
+  },
+  "Triage": {
+   "class": null,
+   "effect": "this pokemon doubles any healing recieved",
+   "face": "cards/abilities/triage-53658017.jpg",
+   "group": null
+  },
+  "Truant": {
+   "class": null,
+   "effect": "cannot attack twice in a row",
+   "face": "cards/abilities/truant-088eb700.jpg",
+   "group": null
+  },
+  "Unaware": {
+   "class": null,
+   "effect": "ignores any stat changes that would reduce damage dealt when attacking. ignores any stat changes that would increase damage dealt when defending",
+   "face": "cards/abilities/unaware-c7c7af96.jpg",
+   "group": null
+  },
+  "Unburden": {
+   "class": null,
+   "effect": "gain 2 speed stages when item is used",
+   "face": "cards/abilities/unburden-52417ba2.jpg",
+   "group": null
+  },
+  "Unnerve": {
+   "class": null,
+   "effect": "enemy pokemon within 2 cannot use consumable items, and active items that are consumed automatically do not trigger",
+   "face": "cards/abilities/unnerve-0688de51.jpg",
+   "group": null
+  },
+  "Unseen Fist": {
+   "class": null,
+   "effect": "this pokemons attacks do not trigger any on hit effects from target",
+   "face": "cards/abilities/unseen-fist-7e4dcb45.jpg",
+   "group": null
+  },
+  "Unstoppable Force": {
+   "class": null,
+   "effect": "this pokemon pushes enemy pokemon with its movement",
+   "face": "cards/abilities/unstoppable-force-7a35af54.jpg",
+   "group": null
+  },
+  "Vanguard": {
+   "class": null,
+   "effect": "attack has 1.5x base power when this pokemon is the first to move",
+   "face": "cards/abilities/vanguard-e541f0f5.jpg",
+   "group": null
+  },
+  "Vessel of Ruin": {
+   "class": null,
+   "effect": "aura that lowers attack of all pokemon within 2 by 25%",
+   "face": "cards/abilities/vessel-of-ruin-3343e838.jpg",
+   "group": null
+  },
+  "Victory Dance": {
+   "class": null,
+   "effect": "Gain +1 speed, attack, and defense when this pokemon KO's an opponent",
+   "face": "cards/abilities/victory-dance-0cb5f52f.jpg",
+   "group": null
+  },
+  "Victory Star": {
+   "class": null,
+   "effect": "allies within 2 have 1.1x base accuracy (aura)",
+   "face": "cards/abilities/victory-star-16931b20.jpg",
+   "group": null
+  },
+  "Volt Absorb": {
+   "class": null,
+   "effect": "Heal 1/8 when hit by Electric move",
+   "face": "cards/abilities/volt-absorb-f0f72a1f.jpg",
+   "group": null
+  },
+  "Voltage Amp": {
+   "class": null,
+   "effect": "pokemon within 2 may choose to change their attack type to electric when they make an attack",
+   "face": "cards/abilities/voltage-amp-7d9b87fc.jpg",
+   "group": null
+  },
+  "Voltage Mirror": {
+   "class": null,
+   "effect": "when this pokemon is attacked by an electric attack, you may force the attack to bounce to another pokemon within 2",
+   "face": "cards/abilities/voltage-mirror-cedb800d.jpg",
+   "group": null
+  },
+  "Wandering Spirit": {
+   "class": null,
+   "effect": "when a pokemon makes contact/does not make contact (choose at start of game) with this pokemon, swap abilities with it",
+   "face": "cards/abilities/wandering-spirit-05e0f898.jpg",
+   "group": null
+  },
+  "Warm Glow": {
+   "class": null,
+   "effect": "when a pokemon starts its turn within 2 tiles, it may choose to gain the electric type until the end of the next round",
+   "face": "cards/abilities/warm-glow-eb09e308.jpg",
+   "group": null
+  },
+  "Water Absorb": {
+   "class": null,
+   "effect": "restores 1/8 hp when hit by a Water type move",
+   "face": "cards/abilities/water-absorb-623be7a2.jpg",
+   "group": null
+  },
+  "Water Absorb (Water)": {
+   "class": null,
+   "effect": "restores 1/8 hp when hit by a Water type move",
+   "face": "cards/abilities/water-absorb-water-80326a72.jpg",
+   "group": null
+  },
+  "Water Bubble": {
+   "class": null,
+   "effect": "base power of attack is doubled, cannot be burned, takes half damage from Fire moves",
+   "face": "cards/abilities/water-bubble-aa4dff6b.jpg",
+   "group": null
+  },
+  "Water Compaction": {
+   "class": null,
+   "effect": "raises defense 2 stages when hit by a Water move. does not absorb the attack",
+   "face": "cards/abilities/water-compaction-9664de80.jpg",
+   "group": null
+  },
+  "Water Veil": {
+   "class": null,
+   "effect": "cannot be burned",
+   "face": "cards/abilities/water-veil-62ce8ef6.jpg",
+   "group": null
+  },
+  "Wave Rider": {
+   "class": null,
+   "effect": "Extends range to all connected Water tiles if one is in range and adjacent tiles to that Water",
+   "face": "cards/abilities/wave-rider-7b4f6575.jpg",
+   "group": null
+  },
+  "Weak Armor": {
+   "class": null,
+   "effect": "raises speed 2 stages and lowers defense 1 when hit",
+   "face": "cards/abilities/weak-armor-8f2fd017.jpg",
+   "group": null
+  },
+  "Well-Baked Body": {
+   "class": null,
+   "effect": "raises defense 2 stages when hit by a Fire move",
+   "face": "cards/abilities/well-baked-body-51c0eb3e.jpg",
+   "group": null
+  },
+  "White Smoke": {
+   "class": null,
+   "effect": "friendly pokemon within 2 cannot have their stats lowered (aura)",
+   "face": "cards/abilities/white-smoke-288f7d01.jpg",
+   "group": null
+  },
+  "Wind Power": {
+   "class": null,
+   "effect": "doubles speed when hit by a wind move, does not take damage from the move(wind move list)",
+   "face": "cards/abilities/wind-power-85f64e85.jpg",
+   "group": null
+  },
+  "Wind Rider": {
+   "class": null,
+   "effect": "raises attack when hit by a wind move. does not take damage from attack (wind move list)",
+   "face": "cards/abilities/wind-rider-413df90e.jpg",
+   "group": null
+  },
+  "Wonder Skin": {
+   "class": null,
+   "effect": "before being targetted with an attack that can lower the targets stats, gain 1 stage of evasion",
+   "face": "cards/abilities/wonder-skin-0a9227b9.jpg",
+   "group": null
+  },
+  "Zen Mode": {
+   "class": null,
+   "effect": "Switch to zen mode at half hp",
+   "face": "cards/abilities/zen-mode-035a1447.jpg",
+   "group": null
+  },
+  "Zero to Hero": {
+   "class": null,
+   "effect": "after this pokemon attacks an enemy AND THEN ends a turn 3 tiles or more away from any enemy pokemon, transform into palafin hero",
+   "face": "cards/abilities/zero-to-hero-52d925f5.jpg",
+   "group": null
+  }
+ },
  "backs": {
-  "items": "cards/back-items-v4.jpg",
-  "skills": "cards/back-skills-v4.jpg"
+  "abilities": "cards/back-abilities-v5.jpg",
+  "items": "cards/back-items-v5.jpg",
+  "skills": "cards/back-skills-v5.jpg"
  },
  "items": {
   "Abomasite": {
    "class": null,
    "effect": "abomasnow holding this item can mega evolve. when this pokemon is standing in snow weather, that weather cannot be replaced by a different weather condition",
-   "face": "cards/items/abomasite-b362cefe.jpg",
+   "face": "cards/items/abomasite-eedd95eb.jpg",
    "group": "Mega Stone"
   },
   "Absolite": {
    "class": "Consumable",
    "effect": "absol holding this item can mega evolve into normal mega absol. this item can be \"consumed\" to make its next attack lower targets range by 1",
-   "face": "cards/items/absolite-9fb02c61.jpg",
+   "face": "cards/items/absolite-701589ed.jpg",
    "group": "Mega Stone"
   },
   "Absolite Z": {
    "class": "Active",
    "effect": "absol holding this item can mega evolve into absol z. holder cannot have its attack stages lowered",
-   "face": "cards/items/absolite-z-8e27ff05.jpg",
+   "face": "cards/items/absolite-z-e4d11f20.jpg",
    "group": "Mega Stone"
   },
   "Aerodactylite": {
    "class": "Active",
    "effect": "aerodactyl holding this item can mega evolve. when attacked by a super effective attack, the attack has a .9x multiplier applied to it",
-   "face": "cards/items/aerodactylite-08877046.jpg",
+   "face": "cards/items/aerodactylite-0b2c9dec.jpg",
    "group": "Mega Stone"
   },
   "Aggronite": {
    "class": "Consumable",
    "effect": "aggron holding this item can mega evolve. this item can be \"consumed\" to give the users next attack an addative .1x attack multiplier per enemy pokemon within 3 that has a super effective attack on this pokemon",
-   "face": "cards/items/aggronite-8d2ba719.jpg",
+   "face": "cards/items/aggronite-01da1079.jpg",
    "group": "Mega Stone"
   },
   "Alakazite": {
    "class": "Consumable",
    "effect": "alakazam holding this item can mega evolve. this item can be \"consumed\" to gain 1 stage of attack",
-   "face": "cards/items/alakazite-936599e4.jpg",
+   "face": "cards/items/alakazite-d926f252.jpg",
    "group": "Mega Stone"
   },
   "Altarianite": {
    "class": "Active",
    "effect": "altaria holding this item cann mega evolve. holder restores 1/16 hp when they end their turn outside or any weather or terrain",
-   "face": "cards/items/altarianite-fbf95310.jpg",
+   "face": "cards/items/altarianite-4115f7eb.jpg",
    "group": "Mega Stone"
   },
   "Ampharosite": {
    "class": "Active",
    "effect": "ampharos holding this item can mega evolve. when this pokemon attacks, it gains a .05x addative multiplier for every tile that would have been within its move range that it could not move to for any reason (including borders of arena)",
-   "face": "cards/items/ampharosite-1f30e0c0.jpg",
+   "face": "cards/items/ampharosite-2da1d60c.jpg",
    "group": "Mega Stone"
   },
   "Antidote": {
    "class": "Consumable",
    "effect": "heals poison for pokemon and allies within 2",
-   "face": "cards/items/antidote-dbbb0e74.jpg",
+   "face": "cards/items/antidote-399887bf.jpg",
    "group": "Type 1"
   },
   "Apicot Berry": {
    "class": "Consumable",
    "effect": "eaten at 1/2 hp, raises defense until the end of next turn",
-   "face": "cards/items/apicot-berry-f20791d0.jpg",
+   "face": "cards/items/apicot-berry-be74ee92.jpg",
    "group": "Berry"
   },
   "Attack Bell": {
    "class": "Consumable",
    "effect": "increases attack of all allies by 1.15x this turn",
-   "face": "cards/items/attack-bell-d5597a04.jpg",
+   "face": "cards/items/attack-bell-8df09613.jpg",
    "group": null
   },
   "Audinite": {
    "class": "Consumable",
    "effect": "audino holding this item can mega evolved. this item can be \"consumed\" to double the effect or chances of any healing effect this pokemon caused",
-   "face": "cards/items/audinite-4c9cd77d.jpg",
+   "face": "cards/items/audinite-40a3b099.jpg",
    "group": "Mega Stone"
   },
   "Awakening": {
    "class": "Consumable",
    "effect": "heals sleep for pokemon and allies within 2",
-   "face": "cards/items/awakening-a7e6e101.jpg",
+   "face": "cards/items/awakening-d1ff31ab.jpg",
    "group": "Type 1"
   },
   "Banettite": {
    "class": "Consumable",
    "effect": "bannette holding this item can mega evolve. this item can be \"consumed\" to supress one distance based aura being created from an enemy pokemon within 2 until the end of the round",
-   "face": "cards/items/banettite-54f5c979.jpg",
+   "face": "cards/items/banettite-aea453b2.jpg",
    "group": "Mega Stone"
   },
   "Barbaracite": {
    "class": "Consumable",
    "effect": "barbaracle holding this item can mega evolve. this item can be \"consumed\" to gain 1 stage of defense until the end of the round",
-   "face": "cards/items/barbaracite-bcb84ed5.jpg",
+   "face": "cards/items/barbaracite-4334986c.jpg",
    "group": "Mega Stone"
   },
   "Battle Shield": {
    "class": "Active",
    "effect": "this pokemon protects allies from attacks",
-   "face": "cards/items/battle-shield-ffc4c1f4.jpg",
+   "face": "cards/items/battle-shield-802f74fb.jpg",
    "group": null
   },
   "Baxcalibrite": {
    "class": "Consumable",
    "effect": "baxcalibur holding this item can mega evolve. this item can be \"consumed\" to ignore the downside of glaive rush or greatsword until the end of the round",
-   "face": "cards/items/baxcalibrite-e8c1d5e5.jpg",
+   "face": "cards/items/baxcalibrite-93c7c8e9.jpg",
    "group": "Mega Stone"
   },
   "Beedrillite": {
    "class": "Active",
    "effect": "beedrill holding this item can mega evolve. attacks on this pokemon deal 3 less damage for every 10 speed lower than holder",
-   "face": "cards/items/beedrillite-dcf21213.jpg",
+   "face": "cards/items/beedrillite-9df53edc.jpg",
    "group": "Mega Stone"
   },
   "Big Root": {
    "class": "Active",
    "effect": "attacks that steal hp from their target heal 30% more than they ordinarily would",
-   "face": "cards/items/big-root-c23e26c5.jpg",
+   "face": "cards/items/big-root-356831f7.jpg",
    "group": null
   },
   "Big Stick": {
    "class": "Consumable",
    "effect": "warrior skills do not affect you for this turn. attackers/defenders under the influence of warrior skills are treated as if those skills are not active",
-   "face": "cards/items/big-stick-730506df.jpg",
+   "face": "cards/items/big-stick-ede4412b.jpg",
    "group": null
   },
   "Blank Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals normal type damage (instead of its normal type)",
-   "face": "cards/items/blank-plate-4adcb35b.jpg",
+   "face": "cards/items/blank-plate-f3371847.jpg",
    "group": null
   },
   "Blast Furnace": {
    "class": "Active",
    "effect": "when hit by a fire move, attack is increased 2 stages (consumed)",
-   "face": "cards/items/blast-furnace-65a6578b.jpg",
+   "face": "cards/items/blast-furnace-c7b1f58e.jpg",
    "group": null
   },
   "Blastoisinite": {
    "class": "Active",
    "effect": "blastoise holding this item can mega evolve. when this pokemon would be affected by a status condition from an enemy, ignore it and give the next attack this pokemon makes an addative 0.1x multiplier",
-   "face": "cards/items/blastoisinite-f1220cef.jpg",
+   "face": "cards/items/blastoisinite-b8bcf57e.jpg",
    "group": "Mega Stone"
   },
   "Blazikenite": {
    "class": "Consumable",
    "effect": "blaziken holding this item can mega evolve. this item can be \"consumed\" to give an addative .1x attack multiplier on for each turn before the current that this pokemon has attacked",
-   "face": "cards/items/blazikenite-4fe8de97.jpg",
+   "face": "cards/items/blazikenite-0cc54b93.jpg",
    "group": "Mega Stone"
   },
   "Booster Energy": {
    "class": "Consumable",
    "effect": "trigger this pokemons ability if that ability is protosynthesis or quark drive",
-   "face": "cards/items/booster-energy-efd0f947.jpg",
+   "face": "cards/items/booster-energy-f6fac433.jpg",
    "group": null
   },
   "Burn Block": {
    "class": "Consumable",
    "effect": "blocks burn for 3 turns for pokemon and allies within 2",
-   "face": "cards/items/burn-block-e348ec8c.jpg",
+   "face": "cards/items/burn-block-c467a187.jpg",
    "group": "Type 2"
   },
   "Burn Heal": {
    "class": "Consumable",
    "effect": "heals burn for pokemon and allies within 2",
-   "face": "cards/items/burn-heal-913c1990.jpg",
+   "face": "cards/items/burn-heal-8fddc79f.jpg",
    "group": "Type 1"
   },
   "Cameruptite": {
    "class": "Consumable",
    "effect": "camerupt holding this item can mega evolve. this item can be \"consumed\" to add a 50% chance to lower targets attack during holders next attack",
-   "face": "cards/items/cameruptite-15e086d2.jpg",
+   "face": "cards/items/cameruptite-4c9b393b.jpg",
    "group": "Mega Stone"
   },
   "Chandelurite": {
    "class": "Active",
    "effect": "chandelure holding this item can mega evolve. this pokemon is always treated as being on high ground while attacking or being attacked",
-   "face": "cards/items/chandelurite-a5cbeb7e.jpg",
+   "face": "cards/items/chandelurite-da61ec96.jpg",
    "group": "Mega Stone"
   },
   "Charizardite X": {
    "class": "Active",
    "effect": "charizard holding this item can mega evolve into charizard x. whenever this pokemon takes damage, it may move 1 tile",
-   "face": "cards/items/charizardite-x-903213a9.jpg",
+   "face": "cards/items/charizardite-x-63c99aaf.jpg",
    "group": "Mega Stone"
   },
   "Charizardite Y": {
    "class": "Active",
    "effect": "charizard holding this item can mega evolve into charizard y. when this pokemon is standing in sun weather, that weather cannot be replaced by a different weather condition",
-   "face": "cards/items/charizardite-y-cd54488d.jpg",
+   "face": "cards/items/charizardite-y-2ca603d9.jpg",
    "group": "Mega Stone"
   },
   "Chesnaughtite": {
    "class": "Consumable",
    "effect": "chesnaught holding this item can mega evolve. this item can be \"consumed\" to treat its ability as if holder has ko'd 1 more pokemon",
-   "face": "cards/items/chesnaughtite-aff2ab17.jpg",
+   "face": "cards/items/chesnaughtite-08542e1b.jpg",
    "group": "Mega Stone"
   },
   "Chili Powder": {
    "class": "Active",
    "effect": "when defeated, nearby pokemon are burned",
-   "face": "cards/items/chili-powder-88ec311c.jpg",
+   "face": "cards/items/chili-powder-8d0b37c0.jpg",
    "group": null
   },
   "Chimechite": {
    "class": "Active",
    "effect": "chimecho holding this item can mega evolve. this pokemon makes a second accuracy check when an attack hits a target. if it hits, confuse the target",
-   "face": "cards/items/chimechite-bb340b6a.jpg",
+   "face": "cards/items/chimechite-926a57ca.jpg",
    "group": "Mega Stone"
   },
   "Clear Amulet": {
    "class": "Active",
    "effect": "prevents stats from being lowered by enemy pokemon and their effects",
-   "face": "cards/items/clear-amulet-11f34f22.jpg",
+   "face": "cards/items/clear-amulet-74683aef.jpg",
    "group": null
   },
   "Clefableite": {
    "class": "Active",
    "effect": "clefable holding this item can mega evolve. this pokemon restores 1/32 of its total hp at the end of each turn",
-   "face": "cards/items/clefableite-191dcab2.jpg",
+   "face": "cards/items/clefableite-c71c092d.jpg",
    "group": "Mega Stone"
   },
   "Clodsire Heart": {
    "class": "Active",
    "effect": "ignores opponents positive stat changes during attacks",
-   "face": "cards/items/clodsire-heart-c15c7b05.jpg",
+   "face": "cards/items/clodsire-heart-af53c8d7.jpg",
    "group": null
   },
   "Cloud in a Jar": {
    "class": "Consumable",
    "effect": "Remove all weather from tiles within 3",
-   "face": "cards/items/cloud-in-a-jar-a9b10893.jpg",
+   "face": "cards/items/cloud-in-a-jar-65cb15e2.jpg",
    "group": null
   },
   "Counter Charm": {
    "class": "Active",
    "effect": "attacker take 20% recoil damage while attacking. Does not stack with effects like jagged edge",
-   "face": "cards/items/counter-charm-e0a448fc.jpg",
+   "face": "cards/items/counter-charm-41871d6f.jpg",
    "group": null
   },
   "Covert Cloak": {
    "class": "Active",
    "effect": "protects this pokemon from the secondary effects of attacks",
-   "face": "cards/items/covert-cloak-a8487196.jpg",
+   "face": "cards/items/covert-cloak-e3ec3576.jpg",
    "group": null
   },
   "Crabominite": {
    "class": "Active",
    "effect": "crabominable holding this item can mega evolve. holder does not trigger on hit effects",
-   "face": "cards/items/crabominite-42aa416b.jpg",
+   "face": "cards/items/crabominite-649ef1a2.jpg",
    "group": "Mega Stone"
   },
   "Cursed Flute": {
    "class": "Active",
    "effect": "when defeated, nearby pokemon are confused",
-   "face": "cards/items/cursed-flute-7f69b05b.jpg",
+   "face": "cards/items/cursed-flute-162ab992.jpg",
    "group": null
   },
   "Custap Berry": {
    "class": "Consumable",
    "effect": "eaten at 1/2 hp, raises speed until the end of next turn",
-   "face": "cards/items/custap-berry-cef60ced.jpg",
+   "face": "cards/items/custap-berry-f6e2593b.jpg",
    "group": "Berry"
   },
   "DNA Splicer": {
    "class": "Consumable",
    "effect": "Choose a friendly pokemon within 3 and one core stat (attack, defense, speed). Set both pokemons base value of that stat to the average of the two until the end of the following turn",
-   "face": "cards/items/dna-splicer-d50349de.jpg",
+   "face": "cards/items/dna-splicer-1f32688a.jpg",
    "group": null
   },
   "Darkranite": {
    "class": "Active",
    "effect": "darkrai holding this item can mega evolve. holder deals an extra 1.1x damage to non drowsy targets",
-   "face": "cards/items/darkranite-ad47cd09.jpg",
+   "face": "cards/items/darkranite-81a7fc5e.jpg",
    "group": "Mega Stone"
   },
   "Defense Bell": {
    "class": "Consumable",
    "effect": "increases defense of all allies by 1.15x this turn",
-   "face": "cards/items/defense-bell-1c87f6b9.jpg",
+   "face": "cards/items/defense-bell-f149bb40.jpg",
    "group": null
   },
   "Defensive Underdog Charm": {
    "class": "Active",
    "effect": "when attacked, gain a +.01 defense multiplier for each 10 BST lower the holder is than the attacker",
-   "face": "cards/items/defensive-underdog-charm-8ca38df3.jpg",
+   "face": "cards/items/defensive-underdog-charm-98496e74.jpg",
    "group": null
   },
   "Delphoxite": {
    "class": "Active",
    "effect": "delphox holding this item can mega evolve. holder restores 1/8th its total hp whenever it lowers an enemies stats",
-   "face": "cards/items/delphoxite-f7565414.jpg",
+   "face": "cards/items/delphoxite-621d1732.jpg",
    "group": "Mega Stone"
   },
   "Diancite": {
    "class": "Active",
    "effect": "diancie holding this item can mega evolve. this pokemon has a 1.05x defense multiplier",
-   "face": "cards/items/diancite-f2b96700.jpg",
+   "face": "cards/items/diancite-8f604473.jpg",
    "group": "Mega Stone"
   },
   "Discharger": {
    "class": "Active",
    "effect": "when defeated, nearby pokemon are paralyzed",
-   "face": "cards/items/discharger-e204238a.jpg",
+   "face": "cards/items/discharger-c6a23e35.jpg",
    "group": null
   },
   "Draco Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals dragon type damage (instead of its normal type)",
-   "face": "cards/items/draco-plate-854659d0.jpg",
+   "face": "cards/items/draco-plate-c77aa3a8.jpg",
    "group": null
   },
   "Dragalgite": {
    "class": "Consumable",
    "effect": "dragalge holding this item can mega evolve. this item can be \"consumed\" to cleanse the status of all enemy pokemon within 3. holder restores 1/8 its total hp per pokemon cleansed",
-   "face": "cards/items/dragalgite-4d49c023.jpg",
+   "face": "cards/items/dragalgite-658e824b.jpg",
    "group": "Mega Stone"
   },
   "Dragon Heart": {
    "class": "Active",
    "effect": "ignores opponents positive abilities during attacks",
-   "face": "cards/items/dragon-heart-e4fd0f12.jpg",
+   "face": "cards/items/dragon-heart-1ac1839d.jpg",
    "group": null
   },
   "Dragoninite": {
    "class": "Consumable",
    "effect": "dragonite holding this item can mega evolve. this item can be \"consumed\" to give holder +1 defense",
-   "face": "cards/items/dragoninite-e272cb1c.jpg",
+   "face": "cards/items/dragoninite-73ce5dcd.jpg",
    "group": "Mega Stone"
   },
   "Dread Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals dark type damage (instead of its normal type)",
-   "face": "cards/items/dread-plate-c9c02372.jpg",
+   "face": "cards/items/dread-plate-8f1381b3.jpg",
    "group": null
   },
   "Dry Ice": {
    "class": "Active",
    "effect": "when defeated, nearby pokemon are afflicted with frostbite",
-   "face": "cards/items/dry-ice-1544db7f.jpg",
+   "face": "cards/items/dry-ice-72aaa0e1.jpg",
    "group": null
   },
   "Dumbell": {
    "class": "Active",
    "effect": "increases attack 1.15x",
-   "face": "cards/items/dumbell-76c76c1e.jpg",
+   "face": "cards/items/dumbell-f234f7ba.jpg",
    "group": null
   },
   "Earth Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals ground type damage (instead of its normal type)",
-   "face": "cards/items/earth-plate-1a7c5db1.jpg",
+   "face": "cards/items/earth-plate-dc4fd9cf.jpg",
    "group": null
   },
   "Eelektrossite": {
    "class": "Active",
    "effect": "eelectross holding this item can mega evolve. this pokemons attack restore 1/8th the damage dealt as hp",
-   "face": "cards/items/eelektrossite-14aba153.jpg",
+   "face": "cards/items/eelektrossite-ff7bc153.jpg",
    "group": "Mega Stone"
   },
   "Eject Button": {
    "class": "Active",
    "effect": "when hit by an attack, will move up to 3 spaces (in a line) directly away from attacker (consumed)",
-   "face": "cards/items/eject-button-74036a0e.jpg",
+   "face": "cards/items/eject-button-063d1f3b.jpg",
    "group": null
   },
   "Electric Seed": {
    "class": "Consumable",
    "effect": "summon electric terrain effect for 2 turn within 2 spaces",
-   "face": "cards/items/electric-seed-581e3f6a.jpg",
+   "face": "cards/items/electric-seed-e365cb52.jpg",
    "group": null
   },
   "Emboarite": {
    "class": "Active",
    "effect": "emboar holding this item can mega evolve. holders attacks cannot be blocked or redirected",
-   "face": "cards/items/emboarite-311dee47.jpg",
+   "face": "cards/items/emboarite-46cfc54b.jpg",
    "group": "Mega Stone"
   },
   "Enchanted Earmuffs": {
    "class": "Active",
    "effect": "protects pokemon and adjacent allies from sleep and confusion",
-   "face": "cards/items/enchanted-earmuffs-bd2b405d.jpg",
+   "face": "cards/items/enchanted-earmuffs-918e4038.jpg",
    "group": "Type 3"
   },
   "Enigma Berry": {
    "class": "Consumable",
    "effect": "eaten after being hit with a super effective move, restores 1/4 hp",
-   "face": "cards/items/enigma-berry-effcb92b.jpg",
+   "face": "cards/items/enigma-berry-a84c3f81.jpg",
    "group": "Berry"
   },
   "Excadrite": {
    "class": "Active",
    "effect": "excadrill holding this item can mega evolve. holder takes .9x damage from attacks targetting the side or rear of this pokemon",
-   "face": "cards/items/excadrite-eeab1674.jpg",
+   "face": "cards/items/excadrite-4e355afe.jpg",
    "group": "Mega Stone"
   },
   "Expert Belt": {
    "class": "Active",
    "effect": "super effective attacks get a 1.3x damage boost",
-   "face": "cards/items/expert-belt-46791cdd.jpg",
+   "face": "cards/items/expert-belt-85158406.jpg",
    "group": null
   },
   "Falinksite": {
    "class": "Consumable",
    "effect": "Falinks holding this item can mega evolve. this item can be \"consumed\" to give the holder the effects of battle formation if the ability is not currently active",
-   "face": "cards/items/falinksite-858276b2.jpg",
+   "face": "cards/items/falinksite-c1ddbf1d.jpg",
    "group": "Mega Stone"
   },
   "Feraligite": {
    "class": "Active",
    "effect": "feraligatr holding this item can mega evolve. this pokemon takes .9x damage from dragon type attacks",
-   "face": "cards/items/feraligite-56e8924b.jpg",
+   "face": "cards/items/feraligite-512506f9.jpg",
    "group": "Mega Stone"
   },
   "Fist Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals fighting type damage (instead of its normal type)",
-   "face": "cards/items/fist-plate-59bdf4ac.jpg",
+   "face": "cards/items/fist-plate-7beb417a.jpg",
    "group": null
   },
   "Flame Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals fire type damage (instead of its normal type)",
-   "face": "cards/items/flame-plate-7834922b.jpg",
+   "face": "cards/items/flame-plate-877f2b7c.jpg",
    "group": null
   },
   "Floettite": {
    "class": "Active",
    "effect": "floette eternal holding this item can mega evolve. holder cannot have its stats lowered",
-   "face": "cards/items/floettite-d88bb9f9.jpg",
+   "face": "cards/items/floettite-f5180573.jpg",
    "group": "Mega Stone"
   },
   "Focus Sash": {
    "class": "Active",
    "effect": "the first time this pokemon takes fatal damage, it survives on 1 hp instead",
-   "face": "cards/items/focus-sash-ddcae151.jpg",
+   "face": "cards/items/focus-sash-75914f3c.jpg",
    "group": null
   },
   "Fog Machine": {
    "class": "Active",
    "effect": "extra 10% evasion bonus when attacked",
-   "face": "cards/items/fog-machine-40288868.jpg",
+   "face": "cards/items/fog-machine-a4d34b2f.jpg",
    "group": null
   },
   "Froslassite": {
    "class": "Active",
    "effect": "froslass holding this item can mega evolve. when this pokemon is standing in snow weather, that weather cannot be replaced by a different weather condition",
-   "face": "cards/items/froslassite-c0bc0aa7.jpg",
+   "face": "cards/items/froslassite-703d6246.jpg",
    "group": "Mega Stone"
   },
   "Frozen Stone": {
    "class": "Consumable",
    "effect": "summon snow weather effect for 2 turn within 2 spaces",
-   "face": "cards/items/frozen-stone-e66acc20.jpg",
+   "face": "cards/items/frozen-stone-c4121cc8.jpg",
    "group": null
   },
   "Full Heal": {
    "class": "Consumable",
    "effect": "heals all status conditions for pokemon and allies within 2",
-   "face": "cards/items/full-heal-6a7f580a.jpg",
+   "face": "cards/items/full-heal-65a65e19.jpg",
    "group": null
   },
   "Galladite": {
    "class": "Active",
    "effect": "gallade holding this item can mega evolve. this pokemon has +1 crit stage",
-   "face": "cards/items/galladite-38bff75c.jpg",
+   "face": "cards/items/galladite-d772c3e6.jpg",
    "group": "Mega Stone"
   },
   "Garchompite": {
    "class": "Active",
    "effect": "garchomp holding this item can mega evolve into normal mega garchomp. this pokemons attacks ignore immunities",
-   "face": "cards/items/garchompite-db5b2751.jpg",
+   "face": "cards/items/garchompite-f41c08d9.jpg",
    "group": "Mega Stone"
   },
   "Garchompite Z": {
    "class": "Active",
    "effect": "garchomp holding this item can mega evolve into garchomp z. this pokemons attacks gain 1.5 accuracy (rounded down) per 10 speed higher instead of 1, and attacks made against this pokemon lose 1.5 accruacy (rounded down) per 10 speed lower instead of 1",
-   "face": "cards/items/garchompite-z-2b9177b1.jpg",
+   "face": "cards/items/garchompite-z-26ac7a46.jpg",
    "group": "Mega Stone"
   },
   "Gardevoirite": {
    "class": "Active",
    "effect": "gardevoir holding this item can mega evolve. allied pokemon within 2 take 1/2 damage from allied pokemons attacks",
-   "face": "cards/items/gardevoirite-449175e1.jpg",
+   "face": "cards/items/gardevoirite-c5be4be9.jpg",
    "group": "Mega Stone"
   },
   "Garlic Powder": {
    "class": "Active",
    "effect": "hitting a pokemon causes them to switch places with an allied neighbor",
-   "face": "cards/items/garlic-powder-f5ed8eef.jpg",
+   "face": "cards/items/garlic-powder-8bc07f9f.jpg",
    "group": null
   },
   "Generator": {
    "class": "Active",
    "effect": "when hit by an electric move range is increased 2 stages (consumed)",
-   "face": "cards/items/generator-4ce54a84.jpg",
+   "face": "cards/items/generator-b94346bc.jpg",
    "group": null
   },
   "Gengarite": {
    "class": "Active",
    "effect": "gengar holding this item can mega evolve. when this pokemon attacks, gain a .05x multiplier for each tile the user could have moved this turn but did not",
-   "face": "cards/items/gengarite-084848d0.jpg",
+   "face": "cards/items/gengarite-e3a82c04.jpg",
    "group": "Mega Stone"
   },
   "Glalitite": {
    "class": "Active",
    "effect": "glalie holding this item can mega evolve. holder cannot be statused",
-   "face": "cards/items/glalitite-78b9f98e.jpg",
+   "face": "cards/items/glalitite-47a05074.jpg",
    "group": "Mega Stone"
   },
   "Glimmoranite": {
    "class": "Active",
    "effect": "glimmora holding this item can mega evolve. once per round, when a pokemon within 2 tiles takes damage from poison, this pokemon restores that much hp",
-   "face": "cards/items/glimmoranite-e842decd.jpg",
+   "face": "cards/items/glimmoranite-23c8123d.jpg",
    "group": "Mega Stone"
   },
   "Golisopite": {
    "class": "Active",
    "effect": "golisopod holding this item can mega evolve. holders first impression is reset on a target if golisopod moves to a tile more than 3 tiles away from target at any point during its turn",
-   "face": "cards/items/golisopite-fb166c18.jpg",
+   "face": "cards/items/golisopite-b1c7a200.jpg",
    "group": "Mega Stone"
   },
   "Golurkite": {
    "class": "Consumable",
    "effect": "golurk holding this item can mega evolve. this item can be \"consumed\" to treat golurk as discarding its item, allowing it to hold a second item",
-   "face": "cards/items/golurkite-254e8690.jpg",
+   "face": "cards/items/golurkite-f27370e4.jpg",
    "group": "Mega Stone"
   },
   "Grass Seed": {
    "class": "Consumable",
    "effect": "summon grassy terrain effect for 2 turn within 2 spaces",
-   "face": "cards/items/grass-seed-8b3d4ce0.jpg",
+   "face": "cards/items/grass-seed-90df39e4.jpg",
    "group": null
   },
   "Gravity Essence": {
    "class": "Consumable",
    "effect": "all pokemon within 4 are grounded until the end of the following turn (a grounded flying type pokemon retains its weaknesses and takes 1x damage from ground moves)",
-   "face": "cards/items/gravity-essence-f6bd270b.jpg",
+   "face": "cards/items/gravity-essence-a6166898.jpg",
    "group": null
   },
   "Greninjite": {
    "class": "Active",
    "effect": "greninja holding this item can mega evolve. this pokemon has a 1.05x speed multiplier",
-   "face": "cards/items/greninjite-9cf70335.jpg",
+   "face": "cards/items/greninjite-8905f0a9.jpg",
    "group": "Mega Stone"
   },
   "Gyradosite": {
    "class": "Active",
    "effect": "gyrados holding this item can mega evolve. holder can not be considered grounded.",
-   "face": "cards/items/gyradosite-010c6fbb.jpg",
+   "face": "cards/items/gyradosite-4b9b304f.jpg",
    "group": "Mega Stone"
   },
   "Hare Charm": {
    "class": "Active",
    "effect": "This pokemon has +1 speed until the end of its activation",
-   "face": "cards/items/hare-charm-7cfba15f.jpg",
+   "face": "cards/items/hare-charm-4cc64b71.jpg",
    "group": null
   },
   "Hawluchanite": {
    "class": "Active",
    "effect": "hawlucha holding this item can mega evolve. holder can choose any combination of their attacks viable types to use for each attack",
-   "face": "cards/items/hawluchanite-5b999d3d.jpg",
+   "face": "cards/items/hawluchanite-447d3e9d.jpg",
    "group": "Mega Stone"
   },
   "Heatranite": {
    "class": "Consumable",
    "effect": "heatran holding this item can mega evolve. this item can be \"consumed\" to make any 4x super effective attacks normally supereffective until the end of the round",
-   "face": "cards/items/heatranite-69c450e4.jpg",
+   "face": "cards/items/heatranite-21399eab.jpg",
    "group": "Mega Stone"
   },
   "Heavy Duty Boots": {
    "class": "Active",
    "effect": "This pokemon and any pokemon it attacks or is attacked by are treated as not standing on terrain during the attack. This pokemon ignores any passive secondary effects from terrain",
-   "face": "cards/items/heavy-duty-boots-8e687f1c.jpg",
+   "face": "cards/items/heavy-duty-boots-faa7af85.jpg",
    "group": null
   },
   "Heracronite": {
    "class": "Consumable",
    "effect": "heracross holding this item can mega evolve. this item can be \"consumed\" to give the user an addative .1x attack and defense multiplier per enemy within 3 tiles that shares at least 1 type with user",
-   "face": "cards/items/heracronite-f8ec6eb6.jpg",
+   "face": "cards/items/heracronite-d453365d.jpg",
    "group": "Mega Stone"
   },
   "Hero's Mantle": {
    "class": "Active",
    "effect": "when taking damage that would kill pokemon, 10% chance to survive on 1 hp",
-   "face": "cards/items/heros-mantle-f6934706.jpg",
+   "face": "cards/items/heros-mantle-df376e0c.jpg",
    "group": null
   },
   "Hero's Proof": {
    "class": "Consumable",
    "effect": "raises attack 1 stage for 3 turns, pokemon faints at the end of those turns",
-   "face": "cards/items/heros-proof-c9c6a8f3.jpg",
+   "face": "cards/items/heros-proof-d8f1581d.jpg",
    "group": null
   },
   "Heros Shield": {
    "class": "Consumable",
    "effect": "this pokemon cannot attack this turn. If this pokemon is attacked this turn, treat the attack as failing against this target. This pokemon cannot end its turn on a flag",
-   "face": "cards/items/heros-shield-6f9e7144.jpg",
+   "face": "cards/items/heros-shield-1941ed37.jpg",
    "group": null
   },
   "Honey": {
    "class": "Consumable",
    "effect": "Restore 70 hp, lowers users range by 1",
-   "face": "cards/items/honey-d29eefed.jpg",
+   "face": "cards/items/honey-9037f2c3.jpg",
    "group": null
   },
   "Houndoominite": {
    "class": "Active",
    "effect": "houndoom holding this item can mega evolve. this pokemon restores 1/16 its total hp when it ends its turn outside of sun",
-   "face": "cards/items/houndoominite-cafc7c03.jpg",
+   "face": "cards/items/houndoominite-1ffad088.jpg",
    "group": "Mega Stone"
   },
   "Ice Block": {
    "class": "Consumable",
    "effect": "protects from freeze for 3 turns for pokemon and allies within 2",
-   "face": "cards/items/ice-block-023b0f91.jpg",
+   "face": "cards/items/ice-block-874fced6.jpg",
    "group": "Type 2"
   },
   "Ice Heal": {
    "class": "Consumable",
    "effect": "heals freeze for pokemon and allies within 2",
-   "face": "cards/items/ice-heal-5123774b.jpg",
+   "face": "cards/items/ice-heal-faf61926.jpg",
    "group": "Type 1"
   },
   "Icicle Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals ice type damage (instead of its normal type)",
-   "face": "cards/items/icicle-plate-3637fcf2.jpg",
+   "face": "cards/items/icicle-plate-bfdaa6d5.jpg",
    "group": null
   },
   "Insect Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals bug type damage (instead of its normal type)",
-   "face": "cards/items/insect-plate-ef8fc121.jpg",
+   "face": "cards/items/insect-plate-ef5b1a6e.jpg",
    "group": null
   },
   "Iron Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals steel type damage (instead of its normal type)",
-   "face": "cards/items/iron-plate-a52297cd.jpg",
+   "face": "cards/items/iron-plate-233386b4.jpg",
    "group": null
   },
   "Joboca Berry": {
    "class": "Consumable",
    "effect": "eaten when hit with a physical move, attacker loses 1 stage of attack until end of next turn",
-   "face": "cards/items/joboca-berry-94664807.jpg",
+   "face": "cards/items/joboca-berry-11f91f9e.jpg",
    "group": "Type 5, Berry"
   },
   "Kangaskhanite": {
    "class": "Active",
    "effect": "kangaskhan holding this item can mega evolve. when this pokemon fails a bonus effect check, it pushes its target 1 tile back",
-   "face": "cards/items/kangaskhanite-b66afd73.jpg",
+   "face": "cards/items/kangaskhanite-54185e70.jpg",
    "group": "Mega Stone"
   },
   "Kings Rock": {
    "class": "Active",
    "effect": "all attacks have a 20% chance to flinch (affects all hits of a multihit)",
-   "face": "cards/items/kings-rock-d92c53fb.jpg",
+   "face": "cards/items/kings-rock-77d36b2a.jpg",
    "group": null
   },
   "Lansat Berry": {
    "class": "Consumable",
    "effect": "eaten at 1/2 hp, raises crit stage by 2 until end of next turn",
-   "face": "cards/items/lansat-berry-01a1c28d.jpg",
+   "face": "cards/items/lansat-berry-d46b221c.jpg",
    "group": "Berry"
   },
   "Lawn Mower": {
    "class": "Consumable",
    "effect": "Remove all terrain from tiles within 3",
-   "face": "cards/items/lawn-mower-2231b037.jpg",
+   "face": "cards/items/lawn-mower-a69ebb62.jpg",
    "group": null
   },
   "Legend Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals neutral damage to all target (instead of its normal type)",
-   "face": "cards/items/legend-plate-349b9911.jpg",
+   "face": "cards/items/legend-plate-3a1c7a53.jpg",
    "group": null
   },
   "Liechi Berry": {
    "class": "Consumable",
    "effect": "eaten at 1/2 hp, raises attack until the end of the next turn",
-   "face": "cards/items/liechi-berry-209f0242.jpg",
+   "face": "cards/items/liechi-berry-a79d2936.jpg",
    "group": "Berry"
   },
   "Loaded Dice": {
    "class": "Active",
    "effect": "when making a multihit attack, you roll twice to determine how many hits complete and can choose which die result to use",
-   "face": "cards/items/loaded-dice-1e56f954.jpg",
+   "face": "cards/items/loaded-dice-fb4837cf.jpg",
    "group": null
   },
   "Lopunnite": {
    "class": "Active",
    "effect": "lopunny holding this item can mega evolve. holder has a 1.05x speed multiplier",
-   "face": "cards/items/lopunnite-f677f6c7.jpg",
+   "face": "cards/items/lopunnite-1ef319fa.jpg",
    "group": "Mega Stone"
   },
   "Lucarionite": {
    "class": "Active",
    "effect": "lucario holding this item can mega evolve into normal mega lucario. holder is immune to effects of enemy auras",
-   "face": "cards/items/lucarionite-4031b464.jpg",
+   "face": "cards/items/lucarionite-2cd08b49.jpg",
    "group": "Mega Stone"
   },
   "Lucarionite Z": {
    "class": "Active",
    "effect": "lucario holding this item can mega evolve into lucario z. holder cannot have its defense lowered",
-   "face": "cards/items/lucarionite-z-fbfc4afd.jpg",
+   "face": "cards/items/lucarionite-z-4bca15ba.jpg",
    "group": "Mega Stone"
   },
   "Lucky Charm": {
    "class": "Active",
    "effect": "50% chance to heal status conditions at the begining of each turn",
-   "face": "cards/items/lucky-charm-57d7fa7d.jpg",
+   "face": "cards/items/lucky-charm-a0dc22dc.jpg",
    "group": null
   },
   "Lum Berry": {
    "class": "Consumable",
    "effect": "eaten when statused, removes status effect",
-   "face": "cards/items/lum-berry-89ea0258.jpg",
+   "face": "cards/items/lum-berry-f35c652a.jpg",
    "group": "Berry"
   },
   "Magearnite": {
    "class": "Active",
    "effect": "magearna holding this item can mega evolve. holder has a 1.05x attack multiplier",
-   "face": "cards/items/magearnite-0d99b45a.jpg",
+   "face": "cards/items/magearnite-1a05a70f.jpg",
    "group": "Mega Stone"
   },
   "Magic Balloon": {
    "class": "Active",
    "effect": "allows pokemon to jump high spaces and jump over enemies",
-   "face": "cards/items/magic-balloon-d15d9107.jpg",
+   "face": "cards/items/magic-balloon-ee62be36.jpg",
    "group": null
   },
   "Magic Mirror": {
    "class": "Active",
    "effect": "increases speed 1.15x",
-   "face": "cards/items/magic-mirror-1643ce18.jpg",
+   "face": "cards/items/magic-mirror-ead93120.jpg",
    "group": null
   },
   "Malamarite": {
    "class": "Active",
    "effect": "Malamar holding this item can mega evolve. holder gains an addative .1x damage multiplier for each stat that has a stage adjustment",
-   "face": "cards/items/malamarite-38433ea9.jpg",
+   "face": "cards/items/malamarite-ddd3cb6f.jpg",
    "group": "Mega Stone"
   },
   "Manectite": {
    "class": "Active",
    "effect": "manectric holding this item can mega evolve. supereffective attacks on holder deal .9x damage",
-   "face": "cards/items/manectite-cf20f28d.jpg",
+   "face": "cards/items/manectite-8cf1c218.jpg",
    "group": "Mega Stone"
   },
   "Mark Of Moxie": {
    "class": "Consumable",
    "effect": "for 3 turns, defeating an opponent raises attack until the end of next turn",
-   "face": "cards/items/mark-of-moxie-7e1d8298.jpg",
+   "face": "cards/items/mark-of-moxie-7065f111.jpg",
    "group": null
   },
   "Mawilite": {
    "class": "Active",
    "effect": "mawile holding this item can mega evolve. holder cannot have its ability turned off or supressed in any way",
-   "face": "cards/items/mawilite-e769b8ca.jpg",
+   "face": "cards/items/mawilite-870d3740.jpg",
    "group": "Mega Stone"
   },
   "Meadow Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals grass type damage (instead of its normal type)",
-   "face": "cards/items/meadow-plate-90c6119c.jpg",
+   "face": "cards/items/meadow-plate-d0df75dc.jpg",
    "group": null
   },
   "Medichamite": {
    "class": "Active",
    "effect": "medicham holding this item can mega evolve. this pokemons ability can not be turned off or supressed in any way",
-   "face": "cards/items/medichamite-254df5de.jpg",
+   "face": "cards/items/medichamite-abec9ec0.jpg",
    "group": "Mega Stone"
   },
   "Meganiumite": {
    "class": "Active",
    "effect": "meganium holding this item can mega evolve. this pokemon ignores the effects of all non sun weather while attacking or being attacked",
-   "face": "cards/items/meganiumite-b4749660.jpg",
+   "face": "cards/items/meganiumite-7fc0b709.jpg",
    "group": "Mega Stone"
   },
   "Meowsticite": {
    "class": "Consumable",
    "effect": "mewostic holding this item can mega evolve. holder can change its attack type to grass or ghost",
-   "face": "cards/items/meowsticite-2c54872b.jpg",
+   "face": "cards/items/meowsticite-7907237c.jpg",
    "group": "Mega Stone"
   },
   "Metagrossite": {
    "class": "Active",
    "effect": "metagross holding this item can mega evolve. when holder fails an attack check, it pushes target back 1 tile",
-   "face": "cards/items/metagrossite-c5ea826e.jpg",
+   "face": "cards/items/metagrossite-c8f632c5.jpg",
    "group": "Mega Stone"
   },
   "Metal Mirror": {
    "class": "Active",
    "effect": "attacker takes 30% recoil damage when attacking with a special attack. Does not stack with effects like jagged edge",
-   "face": "cards/items/metal-mirror-977e4ef1.jpg",
+   "face": "cards/items/metal-mirror-9d584404.jpg",
    "group": "Type 4"
   },
   "Micle Berry": {
    "class": "Consumable",
    "effect": "eaten at 1/2 hp, raises accuracy until the end of next turn",
-   "face": "cards/items/micle-berry-8f967a32.jpg",
+   "face": "cards/items/micle-berry-291bab1b.jpg",
    "group": "Berry"
   },
   "Mind Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals psychic type damage (instead of its normal type)",
-   "face": "cards/items/mind-plate-2c7b59fc.jpg",
+   "face": "cards/items/mind-plate-f0de1ab6.jpg",
    "group": null
   },
   "Mirror Herb": {
    "class": "Active",
    "effect": "copies first positive stat change that enemy pokemon gains while within 4 (is consumed)",
-   "face": "cards/items/mirror-herb-23ce786d.jpg",
+   "face": "cards/items/mirror-herb-71de7483.jpg",
    "group": null
   },
   "Misty Seed": {
    "class": "Consumable",
    "effect": "summon misty terrain effect for 2 turn within 2 spaces",
-   "face": "cards/items/misty-seed-d5aded2e.jpg",
+   "face": "cards/items/misty-seed-78ec6051.jpg",
    "group": null
   },
   "Mundane Potion": {
    "class": "Consumable",
    "effect": "for 3 turns, restore 1/16 hp at the end of each turn",
-   "face": "cards/items/mundane-potion-1432a9d4.jpg",
+   "face": "cards/items/mundane-potion-57f5c3b1.jpg",
    "group": null
   },
   "Ninja Cloak": {
    "class": "Active",
    "effect": "pokemon can walk through oponents",
-   "face": "cards/items/ninja-cloak-6385544f.jpg",
+   "face": "cards/items/ninja-cloak-f71e0a7b.jpg",
    "group": null
   },
   "Noise Maker": {
    "class": "Consumable",
    "effect": "stops warrior abilities from being activated at all next turn",
-   "face": "cards/items/noise-maker-ec3cf5e5.jpg",
+   "face": "cards/items/noise-maker-ff5e6155.jpg",
    "group": null
   },
   "Obvious Weak Spot": {
    "class": "Active",
    "effect": "if an enemy attacks this pokemon, you can choose for their secondary attack effect roll to automatically succeed. If you chose not to, they perform the check normally",
-   "face": "cards/items/obvious-weak-spot-9cccf890.jpg",
+   "face": "cards/items/obvious-weak-spot-ee669169.jpg",
    "group": null
   },
   "Offensive Underdog Charm": {
    "class": "Active",
    "effect": "when attacked, gain a +.01 attack multiplier for each 10 BST lower the holder is than the attacker",
-   "face": "cards/items/offensive-underdog-charm-976b8c9d.jpg",
+   "face": "cards/items/offensive-underdog-charm-f41f9711.jpg",
    "group": null
   },
   "Omniblock": {
    "class": "Consumable",
    "effect": "blocks all status conditions for pokemon and allies within 2 for 3 turns",
-   "face": "cards/items/omniblock-60b1ad51.jpg",
+   "face": "cards/items/omniblock-8987dd2b.jpg",
    "group": null
   },
   "Padded Cloak": {
    "class": "Active",
    "effect": "protects pokemon and adjacent allies from burn and freeze",
-   "face": "cards/items/padded-cloak-fd8be2ad.jpg",
+   "face": "cards/items/padded-cloak-253cf2ad.jpg",
    "group": "Type 3"
   },
   "Paralyz Block": {
    "class": "Consumable",
    "effect": "block paralysis for 3 turns for pokemon allies within 2",
-   "face": "cards/items/paralyz-block-3c5b1dd0.jpg",
+   "face": "cards/items/paralyz-block-5019e4d2.jpg",
    "group": "Type 2"
   },
   "Paralyz Heal": {
    "class": "Consumable",
    "effect": "heals paralysis for pokemon and allies within 2",
-   "face": "cards/items/paralyz-heal-7b549060.jpg",
+   "face": "cards/items/paralyz-heal-2f5de40e.jpg",
    "group": "Type 1"
   },
   "Pidgeotite": {
    "class": "Active",
    "effect": "pidgeot holding this item can mega evolve. enemy pokemon within 2 have the effect of any positive multiplier halved when attacking or being attacked",
-   "face": "cards/items/pidgeotite-320b14ab.jpg",
+   "face": "cards/items/pidgeotite-3e0fa601.jpg",
    "group": "Mega Stone"
   },
   "Pinsirite": {
    "class": "Consumable",
    "effect": "pinsir holding this item can mega evolve. this item can be \"consumed\" to give the user an addative .1x attack and defense multiplier per enemy within 3 tiles that shares at least 1 type with user",
-   "face": "cards/items/pinsirite-9906e8c2.jpg",
+   "face": "cards/items/pinsirite-f75dd7ab.jpg",
    "group": "Mega Stone"
   },
   "Pixie Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals fairy type damage (instead of its normal type)",
-   "face": "cards/items/pixie-plate-cef85665.jpg",
+   "face": "cards/items/pixie-plate-4a6f3ea1.jpg",
    "group": null
   },
   "Plush Doll": {
    "class": "Consumable",
    "effect": "move 1 tile in any direction and sacrafice 1/4 hp to summon a plush doll with twice that many hitpoints and the users base defense (the plush doll is cosidered an allied pokemon that cannot receive stat bonuses, obstructs enemies from moving, does not take a turn, and will count towards objectives)",
-   "face": "cards/items/plush-doll-6fb047a1.jpg",
+   "face": "cards/items/plush-doll-6f059857.jpg",
    "group": null
   },
   "Pocket Sand": {
    "class": "Active",
    "effect": "attacker takes 30% recoil damage when attacking with a physical non-contact move. Does not stack with effects like jagged edge",
-   "face": "cards/items/pocket-sand-1c672748.jpg",
+   "face": "cards/items/pocket-sand-af07e895.jpg",
    "group": "Type 4"
   },
   "Poison Block": {
    "class": "Consumable",
    "effect": "protects form poison for 3 turns for pokemon and allies within 2",
-   "face": "cards/items/poison-block-45f6a354.jpg",
+   "face": "cards/items/poison-block-6baf156c.jpg",
    "group": "Type 2"
   },
   "Poison Capsule": {
    "class": "Active",
    "effect": "when defeated, nearby pokemon are poisoned",
-   "face": "cards/items/poison-capsule-290abd26.jpg",
+   "face": "cards/items/poison-capsule-f461b0c2.jpg",
    "group": null
   },
   "Potion": {
    "class": "Consumable",
    "effect": "heals 50 hp",
-   "face": "cards/items/potion-f688c269.jpg",
+   "face": "cards/items/potion-b4250d1a.jpg",
    "group": null
   },
   "Power Charm": {
    "class": "Active",
    "effect": "if this pokemon is your last to move, increase attack by 1",
-   "face": "cards/items/power-charm-8e8762b0.jpg",
+   "face": "cards/items/power-charm-e2c4eea2.jpg",
    "group": null
   },
   "Power Herb": {
    "class": "Active",
    "effect": "2 turn moves finish in one turn (consumed)",
-   "face": "cards/items/power-herb-b6b547fe.jpg",
+   "face": "cards/items/power-herb-5a9fbfc3.jpg",
    "group": null
   },
   "Protective Pads": {
    "class": "Active",
    "effect": "pokemon is not affected by \"on hit\" effects (includes tenacity)",
-   "face": "cards/items/protective-pads-a95f93c7.jpg",
+   "face": "cards/items/protective-pads-5cc1df36.jpg",
    "group": null
   },
   "Psychic Seed": {
    "class": "Consumable",
    "effect": "summon psychic terrain effect for 2 turn within 2 spaces",
-   "face": "cards/items/psychic-seed-899d5a3e.jpg",
+   "face": "cards/items/psychic-seed-c6b00eb4.jpg",
    "group": null
   },
   "Puzzle Box": {
    "class": "Consumable",
    "effect": "once consumed, produce an aura that reverses all speed interactions for any pokemon within 3 tiles. This does not change basepower for moves that are determined by speed. Lasts for 2 turns",
-   "face": "cards/items/puzzle-box-ea18ce8b.jpg",
+   "face": "cards/items/puzzle-box-d4cafd71.jpg",
    "group": null
   },
   "Pyroarite": {
    "class": "Active",
    "effect": "pyroar holding this item can mega evolve. this pokemon has a 1.05x attack multiplier",
-   "face": "cards/items/pyroarite-d842961d.jpg",
+   "face": "cards/items/pyroarite-dcc84313.jpg",
    "group": "Mega Stone"
   },
   "Raichunite X": {
    "class": "Active",
    "effect": "raichu holding this item can mega evolve into raichu x. if electric terrain is set and this pokemon is standing on an affected tile, that terrain lasts for an extra turn",
-   "face": "cards/items/raichunite-x-e96bfefe.jpg",
+   "face": "cards/items/raichunite-x-69f5d212.jpg",
    "group": "Mega Stone"
   },
   "Raichunite Y": {
    "class": "Consumable",
    "effect": "raichu holding this item can mega evolve into raichu y. this item can be \"consumed\" to give user 1 stage of speed",
-   "face": "cards/items/raichunite-y-dab12714.jpg",
+   "face": "cards/items/raichunite-y-52866c54.jpg",
    "group": "Mega Stone"
   },
   "Rain Stone": {
    "class": "Consumable",
    "effect": "summon rain weather effect for 2 turn within 2 spaces",
-   "face": "cards/items/rain-stone-2bd4c8bb.jpg",
+   "face": "cards/items/rain-stone-25af5506.jpg",
    "group": null
   },
   "Recovery Herb": {
    "class": "Active",
    "effect": "Eliminates the \"unique\" downsides of moves (consumed)",
-   "face": "cards/items/recovery-herb-b1612e43.jpg",
+   "face": "cards/items/recovery-herb-34dee2b6.jpg",
    "group": null
   },
   "Red Card": {
    "class": "Active",
    "effect": "when this pokemon takes damage, attacker moves directly backwards 2 squares (consumed)",
-   "face": "cards/items/red-card-17856848.jpg",
+   "face": "cards/items/red-card-50f2ee7f.jpg",
    "group": null
   },
   "Rocky Helmet": {
    "class": "Active",
    "effect": "attacker takes 30% recoil damage when attacking with a contact move. Does not stack with effects like jagged edge",
-   "face": "cards/items/rocky-helmet-15b313bb.jpg",
+   "face": "cards/items/rocky-helmet-ba7320d7.jpg",
    "group": "Type 4"
   },
   "Rubber Gloves": {
    "class": "Active",
    "effect": "protects pokemon and adjacent allies from poison and paralysis",
-   "face": "cards/items/rubber-gloves-66cb5079.jpg",
+   "face": "cards/items/rubber-gloves-79c88d70.jpg",
    "group": "Type 3"
   },
   "Sablenite": {
    "class": "Active",
    "effect": "sableye holding this item can mega evolve. holder cannot be statused",
-   "face": "cards/items/sablenite-1083a1fd.jpg",
+   "face": "cards/items/sablenite-a1fa5b7b.jpg",
    "group": "Mega Stone"
   },
   "Sacrificial Lamb": {
    "class": "Active",
    "effect": "this pokemon will switch with adjacent allies who are attacked before the attack",
-   "face": "cards/items/sacrificial-lamb-f2c903b5.jpg",
+   "face": "cards/items/sacrificial-lamb-c507d383.jpg",
    "group": null
   },
   "Salamencite": {
    "class": "Consumable",
    "effect": "salamence holding this item can mega evolve. this item can be consumed to change the type of the holders next attack to fire type",
-   "face": "cards/items/salamencite-1fa40322.jpg",
+   "face": "cards/items/salamencite-fc26b567.jpg",
    "group": "Mega Stone"
   },
   "Sand Stone": {
    "class": "Consumable",
    "effect": "summon sandstorm weather effect for 2 turn within 2 spaces",
-   "face": "cards/items/sand-stone-3983d14c.jpg",
+   "face": "cards/items/sand-stone-67581ee2.jpg",
    "group": null
   },
   "Savory Sandwich": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to lower targets defense",
-   "face": "cards/items/savory-sandwich-fceb1648.jpg",
+   "face": "cards/items/savory-sandwich-5a88bde4.jpg",
    "group": null
   },
   "Savory Smoothie": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to raise defense (stats raised this way count as an attack effect stat raise)",
-   "face": "cards/items/savory-smoothie-9a797e6f.jpg",
+   "face": "cards/items/savory-smoothie-8e4e7360.jpg",
    "group": null
   },
   "Sceptilite": {
    "class": "Active",
    "effect": "sceptile holding this item can mega evolve. holder cannot be statused",
-   "face": "cards/items/sceptilite-dd6fa5dc.jpg",
+   "face": "cards/items/sceptilite-f8c2ca19.jpg",
    "group": "Mega Stone"
   },
   "Scizorite": {
    "class": "Active",
    "effect": "scizor holding this item can mega evolve. this pokemon deals 1.1x damage to the closest target it attacks",
-   "face": "cards/items/scizorite-776f8f27.jpg",
+   "face": "cards/items/scizorite-dfb02516.jpg",
    "group": "Mega Stone"
   },
   "Scolipite": {
    "class": "Active",
    "effect": "scolipede holding this item can mega evolve. this pokemon can use its movement however it would like",
-   "face": "cards/items/scolipite-f0a93549.jpg",
+   "face": "cards/items/scolipite-993f8344.jpg",
    "group": "Mega Stone"
   },
   "Scovillainite": {
    "class": "Active",
    "effect": "scovillain holding this item can mega evolve. holders attack cleanses targets of status effects and restores 1/8 total hp per cleansed target",
-   "face": "cards/items/scovillainite-5ceae212.jpg",
+   "face": "cards/items/scovillainite-26350b43.jpg",
    "group": "Mega Stone"
   },
   "Scraftinite": {
    "class": "Consumable",
    "effect": "scrafty holding this item can mega evolve. this item can be \"consumed\" to prevent and cleanse any status on a friendly pokemon within 3",
-   "face": "cards/items/scraftinite-42e88ade.jpg",
+   "face": "cards/items/scraftinite-d66c84b5.jpg",
    "group": "Mega Stone"
   },
   "Second Wind": {
    "class": "Active",
    "effect": "this pokemon can chose to reroll their damage roll and accuracy roll while attacking",
-   "face": "cards/items/second-wind-8c4e0a4d.jpg",
+   "face": "cards/items/second-wind-86d3cc2c.jpg",
    "group": null
   },
   "Sharpedonite": {
    "class": "Consumable",
    "effect": "sharpedo holding this item can mega evolve. this item can be \"consumed\" to remove any negative stat stage changes on holder",
-   "face": "cards/items/sharpedonite-f21192af.jpg",
+   "face": "cards/items/sharpedonite-23a430e1.jpg",
    "group": "Mega Stone"
   },
   "Shell Bell": {
    "class": "Active",
    "effect": "holder restores 1/8 of the damage it deals when attacking as hp",
-   "face": "cards/items/shell-bell-a28fab65.jpg",
+   "face": "cards/items/shell-bell-cc76a34c.jpg",
    "group": null
   },
   "Siren Song": {
    "class": "Consumable",
    "effect": "for 2 turns, enemies that have the option to target you MUST target you",
-   "face": "cards/items/siren-song-6d9a298e.jpg",
+   "face": "cards/items/siren-song-899084fb.jpg",
    "group": null
   },
   "Sitrus Berry": {
    "class": "Consumable",
    "effect": "eaten at 1/2 hp, restore 1/4 hp",
-   "face": "cards/items/sitrus-berry-d3499fc2.jpg",
+   "face": "cards/items/sitrus-berry-ef671460.jpg",
    "group": "Berry"
   },
   "Skarmorite": {
    "class": "Active",
    "effect": "skarmory holding this item can mega evolve. any attack that targets this pokemon and another pokemon has a negative, addative .1x multiplier on each target for each target over 1 that the attack suceeds on",
-   "face": "cards/items/skarmorite-b2b16fb5.jpg",
+   "face": "cards/items/skarmorite-bc9ebcfe.jpg",
    "group": "Mega Stone"
   },
   "Sky Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals flying type damage (instead of its normal type)",
-   "face": "cards/items/sky-plate-be04ae14.jpg",
+   "face": "cards/items/sky-plate-c6563e7a.jpg",
    "group": null
   },
   "Sleep Block": {
    "class": "Consumable",
    "effect": "protects from sleep for 3 turns for pokemon and allies within 2",
-   "face": "cards/items/sleep-block-39174619.jpg",
+   "face": "cards/items/sleep-block-35972042.jpg",
    "group": "Type 2"
   },
   "Sleeping Salts": {
    "class": "Active",
    "effect": "when defeated, nearby pokemon are made drowsy",
-   "face": "cards/items/sleeping-salts-48b6f078.jpg",
+   "face": "cards/items/sleeping-salts-8d8ca53c.jpg",
    "group": null
   },
   "Slippery Fish": {
    "class": "Active",
    "effect": "when this pokemon makes contact or has contact made with it, switch this item with the other pokemons held item",
-   "face": "cards/items/slippery-fish-17a3d066.jpg",
+   "face": "cards/items/slippery-fish-7be576f6.jpg",
    "group": null
   },
   "Slowbronite": {
    "class": "Active",
    "effect": "slowbro holding this item can mega evolve. attacks on user have -1 crit stage, which switches to +1 while mega evolved",
-   "face": "cards/items/slowbronite-b654149e.jpg",
+   "face": "cards/items/slowbronite-4e80cd77.jpg",
    "group": "Mega Stone"
   },
   "Sniper Lense": {
    "class": "Consumable",
    "effect": "for 2 turns this pokemons attack has +3 crit stage (only affects first hit of multihits)",
-   "face": "cards/items/sniper-lense-6735ef5d.jpg",
+   "face": "cards/items/sniper-lense-e4f18efd.jpg",
    "group": null
   },
   "Speed Bell": {
    "class": "Consumable",
    "effect": "increase speed for all allies by 1.15x this turn",
-   "face": "cards/items/speed-bell-7aa62c4a.jpg",
+   "face": "cards/items/speed-bell-1b64a481.jpg",
    "group": null
   },
   "Speedy Underdog Charm": {
    "class": "Active",
    "effect": "when attacking or defending, gain a +.01 speed multiplier for each 10 BST lower the holder is than the attacker/target",
-   "face": "cards/items/speedy-underdog-charm-4db89fbc.jpg",
+   "face": "cards/items/speedy-underdog-charm-0b33391f.jpg",
    "group": null
   },
   "Spicy Sandwich": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to lower targets attack",
-   "face": "cards/items/spicy-sandwich-5bcbb741.jpg",
+   "face": "cards/items/spicy-sandwich-2443e84e.jpg",
    "group": null
   },
   "Spicy Smoothie": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to raise attack (stats raised this way count as an attack effect stat raise)",
-   "face": "cards/items/spicy-smoothie-bf866669.jpg",
+   "face": "cards/items/spicy-smoothie-40dc67b7.jpg",
    "group": null
   },
   "Spider Tac": {
    "class": "Consumable",
    "effect": "for 3 turn, this pokemon will lower targets range by 1",
-   "face": "cards/items/spider-tac-e86cd8c5.jpg",
+   "face": "cards/items/spider-tac-7cb85ed2.jpg",
    "group": null
   },
   "Splash Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals water type damage (instead of its normal type)",
-   "face": "cards/items/splash-plate-7f412635.jpg",
+   "face": "cards/items/splash-plate-d90bceb1.jpg",
    "group": null
   },
   "Spooky Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals ghost type damage (instead of its normal type)",
-   "face": "cards/items/spooky-plate-6b196e36.jpg",
+   "face": "cards/items/spooky-plate-a7ab131f.jpg",
    "group": null
   },
   "Staff Of Purpose": {
    "class": "Active",
    "effect": "restores 1/16 hp at the end of each turn",
-   "face": "cards/items/staff-of-purpose-069ce5f8.jpg",
+   "face": "cards/items/staff-of-purpose-768317d8.jpg",
    "group": null
   },
   "Staraptite": {
    "class": "Consumable",
    "effect": "staraptor holding this item can mega evolve. this item can be \"consumed\" to give the user the effect of vanguard this turn if vanguard is not already active",
-   "face": "cards/items/staraptite-b86bce3a.jpg",
+   "face": "cards/items/staraptite-cf189044.jpg",
    "group": "Mega Stone"
   },
   "Starf Berry": {
    "class": "Consumable",
    "effect": "eaten at 1/2 hp, raise a random stat by 2 stages until end of next turn (attack defense speed)",
-   "face": "cards/items/starf-berry-48f9c582.jpg",
+   "face": "cards/items/starf-berry-7dfee300.jpg",
    "group": "Berry"
   },
   "Starminite": {
    "class": "Active",
    "effect": "starmie holding this item can mega evolve. this pokemon can move 1 tile after attacking",
-   "face": "cards/items/starminite-2d26bf6f.jpg",
+   "face": "cards/items/starminite-743d7e7e.jpg",
    "group": "Mega Stone"
   },
   "Steelixite": {
    "class": "Consumable",
    "effect": "steelix holding this item can mega evolve. this item can be \"consumed\" to set sand within 2 tiles for 1 turn",
-   "face": "cards/items/steelixite-03bc7e85.jpg",
+   "face": "cards/items/steelixite-a994da5f.jpg",
    "group": "Mega Stone"
   },
   "Sticky Barb": {
    "class": "Active",
    "effect": "when this pokemon is hit by a (start of game choose one) contact/non-contact attack, the barb attatches to the attacker and deals 1/8 of their hp in damage at the end of each turn",
-   "face": "cards/items/sticky-barb-8b03a32a.jpg",
+   "face": "cards/items/sticky-barb-3b7d625a.jpg",
    "group": null
   },
   "Stone Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals rock type damage (instead of its normal type)",
-   "face": "cards/items/stone-plate-5b939867.jpg",
+   "face": "cards/items/stone-plate-6adc8d16.jpg",
    "group": null
   },
   "Strategy Tome": {
    "class": "Active",
    "effect": "increases defense 1.15x",
-   "face": "cards/items/strategy-tome-0b0461ab.jpg",
+   "face": "cards/items/strategy-tome-eff310d6.jpg",
    "group": null
   },
   "Succulent Sandwich": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to lower targets range",
-   "face": "cards/items/succulent-sandwich-fc8b7837.jpg",
+   "face": "cards/items/succulent-sandwich-c55f6961.jpg",
    "group": null
   },
   "Succulent Smoothie": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to raise range (stats raised this way count as an attack effect stat raise)",
-   "face": "cards/items/succulent-smoothie-6962413c.jpg",
+   "face": "cards/items/succulent-smoothie-3d774165.jpg",
    "group": null
   },
   "Sun Stone": {
    "class": "Consumable",
    "effect": "summon sun weather effect for 2 turn within 2 spaces",
-   "face": "cards/items/sun-stone-ae318935.jpg",
+   "face": "cards/items/sun-stone-bbed241f.jpg",
    "group": null
   },
   "Super Potion": {
    "class": "Consumable",
    "effect": "heals 80 hp",
-   "face": "cards/items/super-potion-4bc387d4.jpg",
+   "face": "cards/items/super-potion-e29732bb.jpg",
    "group": null
   },
   "Swampertite": {
    "class": "Consumable",
    "effect": "swampert holding this item can mega evolve. item can be \"consumed\" to make holders next attack push targets one tile away",
-   "face": "cards/items/swampertite-c2e0eb18.jpg",
+   "face": "cards/items/swampertite-9099e4fc.jpg",
    "group": "Mega Stone"
   },
   "Sweet Sandwich": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to lower targets speed",
-   "face": "cards/items/sweet-sandwich-f4e9d133.jpg",
+   "face": "cards/items/sweet-sandwich-969df30f.jpg",
    "group": null
   },
   "Sweet Smoothie": {
    "class": "Consumable",
    "effect": "for 3 turns, attacks have a 50% chance to raise speed (stats raised this way count as an attack effect stat raise)",
-   "face": "cards/items/sweet-smoothie-16998d2c.jpg",
+   "face": "cards/items/sweet-smoothie-3014db4e.jpg",
    "group": null
   },
   "Swift Charm": {
    "class": "Active",
    "effect": "If this pokemon is your last to move, increase range 1 stage",
-   "face": "cards/items/swift-charm-6d266208.jpg",
+   "face": "cards/items/swift-charm-d9d5473a.jpg",
    "group": null
   },
   "Sylph Wings": {
    "class": "Consumable",
    "effect": "Gain 15% evasion bonus for 2 turns",
-   "face": "cards/items/sylph-wings-8503251a.jpg",
+   "face": "cards/items/sylph-wings-68080a1c.jpg",
    "group": null
   },
   "Tamato Berry": {
    "class": "Consumable",
    "effect": "eaten when hit with a special move, attacker loses 1 stage of attack until end of next turn",
-   "face": "cards/items/tamato-berry-feb71755.jpg",
+   "face": "cards/items/tamato-berry-88dc7e02.jpg",
    "group": "Type 5, Berry"
   },
   "Target Charm": {
    "class": "Active",
    "effect": "increases crit chance 2 stages",
-   "face": "cards/items/target-charm-a384738c.jpg",
+   "face": "cards/items/target-charm-5080c541.jpg",
    "group": null
   },
   "Tatsugirinite": {
    "class": "Consumable",
    "effect": "tatsugiri holding this pokemon can mega evolve. this item can be \"consumed\" to remove 1 weather or terrain this pokemon is standing in",
-   "face": "cards/items/tatsugirinite-cf2a063a.jpg",
+   "face": "cards/items/tatsugirinite-3e74d540.jpg",
    "group": "Mega Stone"
   },
   "Terrain Orb": {
    "class": "Active",
    "effect": "increases range of terrain effects by 1 tile",
-   "face": "cards/items/terrain-orb-c51d33d5.jpg",
+   "face": "cards/items/terrain-orb-4fad3a8c.jpg",
    "group": null
   },
   "Theiving Sack": {
    "class": "Active",
    "effect": "at the end of each turn, will collect and use any collectable items that are dropped as a present within 3 (does not affect passively active items) (this pokemon will pickup the egg in capture the egg if it in range and no other egg is held)",
-   "face": "cards/items/theiving-sack-8dbeb606.jpg",
+   "face": "cards/items/theiving-sack-a0af8fcb.jpg",
    "group": null
   },
   "Third Eye": {
    "class": "Active",
    "effect": "this pokemon will always dodge friendly pokemons attacks",
-   "face": "cards/items/third-eye-eb1d3b51.jpg",
+   "face": "cards/items/third-eye-c54f359a.jpg",
    "group": null
   },
   "Toxic Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals poison type damage (instead of its normal type)",
-   "face": "cards/items/toxic-plate-fc0f0128.jpg",
+   "face": "cards/items/toxic-plate-c0768915.jpg",
    "group": null
   },
   "Travelers Charm": {
    "class": "Active",
    "effect": "cannot be statused, must be equipped to a pokemon with single tile target attack",
-   "face": "cards/items/travelers-charm-a0516ac5.jpg",
+   "face": "cards/items/travelers-charm-902cdce8.jpg",
    "group": null
   },
   "Trekking Pole": {
    "class": "Consumable",
    "effect": "for 2 turns, gain +.05 attack multiplier for each tile moved during this turn (Does NOT stack with nomad or run up)",
-   "face": "cards/items/trekking-pole-f92da3ae.jpg",
+   "face": "cards/items/trekking-pole-1ad10b4f.jpg",
    "group": null
   },
   "Turtle Charm": {
    "class": "Active",
    "effect": "This pokemon has +1 defense until the end of its activation",
-   "face": "cards/items/turtle-charm-279cb9b8.jpg",
+   "face": "cards/items/turtle-charm-67571f78.jpg",
    "group": null
   },
   "Turtle Shell": {
    "class": "Active",
    "effect": "this pokemon cannot be crit",
-   "face": "cards/items/turtle-shell-fc6945d6.jpg",
+   "face": "cards/items/turtle-shell-0452853b.jpg",
    "group": null
   },
   "Twice Lucky": {
    "class": "Consumable",
    "effect": "Refresh warrior skill (cannot be used on hero or recovery class abilities)",
-   "face": "cards/items/twice-lucky-dcfa9b55.jpg",
+   "face": "cards/items/twice-lucky-e2912ea5.jpg",
    "group": null
   },
   "Type 1": {
    "class": "Consumable",
    "effect": "choose \"type 1 status item\" and then choose which to use at the start of the game",
-   "face": "cards/items/type-1-499d5cea.jpg",
+   "face": "cards/items/type-1-a131c97a.jpg",
    "group": null
   },
   "Type 2": {
    "class": "Consumable",
    "effect": "choose \"type 2 status item\" and then choose which to use at the start of the game",
-   "face": "cards/items/type-2-32e14aa4.jpg",
+   "face": "cards/items/type-2-361a877a.jpg",
    "group": null
   },
   "Type 3": {
    "class": "Active",
    "effect": "choose \"type 3 status item\" and then choose which to use at the start of the game",
-   "face": "cards/items/type-3-1b888717.jpg",
+   "face": "cards/items/type-3-7d27fca9.jpg",
    "group": null
   },
   "Type 4": {
    "class": "Active",
    "effect": "choose \"type 4 item\" and then choose which to use at the start of the game",
-   "face": "cards/items/type-4-2900ac19.jpg",
+   "face": "cards/items/type-4-7324129f.jpg",
    "group": null
   },
   "Type 5": {
    "class": "Active",
    "effect": "choose \"type 5 item\" and then choose which to use at the start of the game",
-   "face": "cards/items/type-5-386a57f8.jpg",
+   "face": "cards/items/type-5-e9ebc301.jpg",
    "group": null
   },
   "Tyranitarite": {
    "class": "Active",
    "effect": "tyranitar holding this item can mega evolve. when this pokemon is standing in the sand weather, that weather cannot be replaced by a different weather condition",
-   "face": "cards/items/tyranitarite-8f1c84e4.jpg",
+   "face": "cards/items/tyranitarite-ce672a31.jpg",
    "group": "Mega Stone"
   },
   "Utility Umbrella": {
    "class": "Active",
    "effect": "This pokemon and any pokemon it attacks or is attacked by are treated as not standing in the weather during the attack. This pokemon ignores any passive secondary effects from the weather",
-   "face": "cards/items/utility-umbrella-50895cd9.jpg",
+   "face": "cards/items/utility-umbrella-091f4c68.jpg",
    "group": null
   },
   "Venusaurite": {
    "class": "Active",
    "effect": "venusaur holding this item can mega evolve. whenver this pokemon ends its turn, enemy pokemon within 2 have a 20% chance to become poisoned",
-   "face": "cards/items/venusaurite-7f305dcd.jpg",
+   "face": "cards/items/venusaurite-df0c8dd2.jpg",
    "group": "Mega Stone"
   },
   "Victreebelite": {
    "class": "Consumable",
    "effect": "victreebell holding this item can mega evolve. this item can be \"consumed\" to force any attacks that have the option to target this pokemon to target this pokemon for 2 turns",
-   "face": "cards/items/victreebelite-975fefb7.jpg",
+   "face": "cards/items/victreebelite-0f446252.jpg",
    "group": "Mega Stone"
   },
   "Water Wheel": {
    "class": "Active",
    "effect": "when hit by a water move, speed is increased 2 stages (consumed)",
-   "face": "cards/items/water-wheel-57292e8a.jpg",
+   "face": "cards/items/water-wheel-e4235cd2.jpg",
    "group": null
   },
   "Weak Spot Lense": {
    "class": "Active",
    "effect": "when opponent within 2 gains a stat bonus, they take 1/16 damage (this counts as an attack that makes contact)",
-   "face": "cards/items/weak-spot-lense-c242a1e8.jpg",
+   "face": "cards/items/weak-spot-lense-9ca774bb.jpg",
    "group": null
   },
   "Weakness Policy": {
    "class": "Active",
    "effect": "when hit by a super effective move, increase attack 2 stages until the end of next turn (consumed)",
-   "face": "cards/items/weakness-policy-fe780c11.jpg",
+   "face": "cards/items/weakness-policy-b2bde57f.jpg",
    "group": null
   },
   "Weather Stone": {
    "class": "Active",
    "effect": "increases range of weather abilities by 1 tile",
-   "face": "cards/items/weather-stone-1975c0df.jpg",
+   "face": "cards/items/weather-stone-d3f15111.jpg",
    "group": null
   },
   "Weighted Bat": {
    "class": "Active",
    "effect": "this pokemon will force targets backwards one additional tile on hit",
-   "face": "cards/items/weighted-bat-73757101.jpg",
+   "face": "cards/items/weighted-bat-a5923efe.jpg",
    "group": null
   },
   "White Herb": {
    "class": "Active",
    "effect": "restores negative stat change when it is applied (consumed)",
-   "face": "cards/items/white-herb-ad09cbd8.jpg",
+   "face": "cards/items/white-herb-26bb34c8.jpg",
    "group": null
   },
   "Wide Lense": {
    "class": "Active",
    "effect": "gain 10% accuracy bonus",
-   "face": "cards/items/wide-lense-1a93180c.jpg",
+   "face": "cards/items/wide-lense-3b3b916e.jpg",
    "group": null
   },
   "Winged Boots": {
    "class": "Consumable",
    "effect": "increases range by 1 for 2 turns",
-   "face": "cards/items/winged-boots-2fcfea13.jpg",
+   "face": "cards/items/winged-boots-998e8f17.jpg",
    "group": null
   },
   "Yache Berry": {
    "class": "Consumable",
    "effect": "eaten before attacked with a super effective move, halves the attacks damage",
-   "face": "cards/items/yache-berry-68ecf9ce.jpg",
+   "face": "cards/items/yache-berry-ab19b39a.jpg",
    "group": "Berry"
   },
   "Zap Plate": {
    "class": "Consumable",
    "effect": "for this turn, this pokemon's attack deals electric type damage (instead of its normal type)",
-   "face": "cards/items/zap-plate-51638c52.jpg",
+   "face": "cards/items/zap-plate-e321ca4e.jpg",
    "group": null
   },
   "Zeraorite": {
    "class": "Active",
    "effect": "zeraora holding this item can mega evolve. holders attack ignores immunities",
-   "face": "cards/items/zeraorite-a772e930.jpg",
+   "face": "cards/items/zeraorite-406fd3ba.jpg",
    "group": "Mega Stone"
   },
   "Zoom Lense": {
    "class": "Active",
    "effect": "gain 20% accuracy bonus if you attack a pokemon that has already moved",
-   "face": "cards/items/zoom-lense-075b4102.jpg",
+   "face": "cards/items/zoom-lense-bffd8bcb.jpg",
    "group": null
   }
  },
@@ -1485,403 +3726,403 @@
   "Added Bonus": {
    "class": "Normal",
    "effect": "gain +30% chance to inflict status condition for 2 turns",
-   "face": "cards/skills/added-bonus-ee6a171b.jpg",
+   "face": "cards/skills/added-bonus-27d6f19f.jpg",
    "group": null
   },
   "Adrenaline": {
    "class": "Normal",
    "effect": "gain 1 attack stage for 1 turn",
-   "face": "cards/skills/adrenaline-84eacddc.jpg",
+   "face": "cards/skills/adrenaline-9f588b3c.jpg",
    "group": null
   },
   "Belief": {
    "class": "Hero",
    "effect": "increase defense 2 stage and block status for 3 turns",
-   "face": "cards/skills/belief-4a25f962.jpg",
+   "face": "cards/skills/belief-261e77ff.jpg",
    "group": null
   },
   "Bewilder": {
    "class": "Hero",
    "effect": "all allies have an 80% chance to confuse for 1 turn",
-   "face": "cards/skills/bewilder-a6a0c01d.jpg",
+   "face": "cards/skills/bewilder-49b12836.jpg",
    "group": null
   },
   "Brace For Impact": {
    "class": "Normal",
    "effect": "Gain +2 defense",
-   "face": "cards/skills/brace-for-impact-a3d3cd95.jpg",
+   "face": "cards/skills/brace-for-impact-513b6c7c.jpg",
    "group": null
   },
   "Brotherhood": {
    "class": "Normal",
    "effect": "give self and allies within 3 +1 defense stage for 1 turn",
-   "face": "cards/skills/brotherhood-882f802a.jpg",
+   "face": "cards/skills/brotherhood-bce2dda6.jpg",
    "group": null
   },
   "Bustle": {
    "class": "Normal",
    "effect": "give self and allies within 2 +1 range for 1 turn",
-   "face": "cards/skills/bustle-d39d04e8.jpg",
+   "face": "cards/skills/bustle-26f2fb76.jpg",
    "group": null
   },
   "Call To Action": {
    "class": "Recovery",
    "effect": "Restore 40 hp to all allies. Can be used twice",
-   "face": "cards/skills/call-to-action-d3b2d5b3.jpg",
+   "face": "cards/skills/call-to-action-8d3d1baa.jpg",
    "group": null
   },
   "Camouflage": {
    "class": "Normal",
    "effect": "Choose one of your types and replace it with a new type until the end of the following turn. New type cannot match your second type",
-   "face": "cards/skills/camouflage-067eade5.jpg",
+   "face": "cards/skills/camouflage-54fcd621.jpg",
    "group": null
   },
   "Chesto": {
    "class": "Hero",
    "effect": "increase attack 3 stages and decrease defense 2 stages for pokemon and allies within 2",
-   "face": "cards/skills/chesto-a06317f4.jpg",
+   "face": "cards/skills/chesto-5585e2c9.jpg",
    "group": null
   },
   "Cold Eyes": {
    "class": "Hero",
    "effect": "increases speed, and evasion 1 stage and skip accuracy check for 3 turns",
-   "face": "cards/skills/cold-eyes-ebec0588.jpg",
+   "face": "cards/skills/cold-eyes-66a5d68e.jpg",
    "group": null
   },
   "Compassion": {
    "class": "Hero",
    "effect": "heal allies within 3 and self for 80 and give affected allies 2 stages of defense",
-   "face": "cards/skills/compassion-e78c4ce5.jpg",
+   "face": "cards/skills/compassion-ecd51b7a.jpg",
    "group": null
   },
   "Convalesce": {
    "class": "Recovery",
    "effect": "apply following buff to all allies: for three turns at the end of each turn restore 10% hp",
-   "face": "cards/skills/convalesce-74fbad46.jpg",
+   "face": "cards/skills/convalesce-0a632768.jpg",
    "group": null
   },
   "Courage": {
    "class": "Hero",
    "effect": "increase range and attack by 2 stages for 1 turn",
-   "face": "cards/skills/courage-01c809a7.jpg",
+   "face": "cards/skills/courage-e7a38cd2.jpg",
    "group": null
   },
   "Crack Shot": {
    "class": "Normal",
    "effect": "allies within 2 skip accuracy check for 1 turn",
-   "face": "cards/skills/crack-shot-84db2d4d.jpg",
+   "face": "cards/skills/crack-shot-e2cc6b16.jpg",
    "group": null
   },
   "Critical Success": {
    "class": "Normal",
    "effect": "This pokemons next attack roll this turn will roll a 20 on the damage roll and succeed any secondary attack effect rolls",
-   "face": "cards/skills/critical-success-d32c5bab.jpg",
+   "face": "cards/skills/critical-success-5f9edaaa.jpg",
    "group": null
   },
   "Cunning": {
    "class": "Hero",
    "effect": "increase speed 2 stages and add 50% chance to status for 3 turns",
-   "face": "cards/skills/cunning-64c43f28.jpg",
+   "face": "cards/skills/cunning-c4cc219a.jpg",
    "group": null
   },
   "Cyclone": {
    "class": "Normal",
    "effect": "Push enemies back 2 additional tiles this turn",
-   "face": "cards/skills/cyclone-a5b55b2d.jpg",
+   "face": "cards/skills/cyclone-e2c035dc.jpg",
    "group": null
   },
   "Deafening Shout": {
    "class": "Normal",
    "effect": "For the rest of this turn all pokemon are treated as having no abilities during attacks. Any active stat changes as a result of the pokemons ability are nullified during the attack. This does not include form change abilities",
-   "face": "cards/skills/deafening-shout-9599289a.jpg",
+   "face": "cards/skills/deafening-shout-08c334a9.jpg",
    "group": null
   },
   "Detox": {
    "class": "Normal",
    "effect": "heal all allied pokemon from poison or paralysis. Heal any pokemon that had a status removed for 1/4 their max hp",
-   "face": "cards/skills/detox-f2aac8f8.jpg",
+   "face": "cards/skills/detox-7129dd24.jpg",
    "group": "Type X"
   },
   "Eagle Eye": {
    "class": "Normal",
    "effect": "increase accuracy by 1 stage for 3 turns for allies within 2",
-   "face": "cards/skills/eagle-eye-3d790455.jpg",
+   "face": "cards/skills/eagle-eye-52fa76fb.jpg",
    "group": null
   },
   "Elegance": {
    "class": "Hero",
    "effect": "for 3 turns increases range 2 and attack skips accuracy checks",
-   "face": "cards/skills/elegance-c100524e.jpg",
+   "face": "cards/skills/elegance-060a47db.jpg",
    "group": null
   },
   "Elements Blessing": {
    "class": "Normal",
    "effect": "If this pokemons attack makes a bonus check against its target, replace it with a 30% chance to burn and a 30% chance to inflict frostbite for 2 turns",
-   "face": "cards/skills/elements-blessing-e0754126.jpg",
+   "face": "cards/skills/elements-blessing-5eecd006.jpg",
    "group": null
   },
   "Empathy": {
    "class": "Recovery",
    "effect": "Restore 100 hp to user and all allies within 4",
-   "face": "cards/skills/empathy-053cdf86.jpg",
+   "face": "cards/skills/empathy-59c32864.jpg",
    "group": null
   },
   "Faith": {
    "class": "Hero",
    "effect": "all allies skip accuracy check for 3 turns",
-   "face": "cards/skills/faith-2f81c196.jpg",
+   "face": "cards/skills/faith-7391e520.jpg",
    "group": null
   },
   "Fortify": {
    "class": "Normal",
    "effect": "gain 1 defense stage for 3 turns",
-   "face": "cards/skills/fortify-088e294d.jpg",
+   "face": "cards/skills/fortify-2c00b036.jpg",
    "group": null
   },
   "Furin Kazan": {
    "class": "Hero",
    "effect": "raise attack, defense, and accuracy of all allies by 1 for 1 turn",
-   "face": "cards/skills/furin-kazan-1445db9b.jpg",
+   "face": "cards/skills/furin-kazan-eedcf03a.jpg",
    "group": null
   },
   "Grace": {
    "class": "Hero",
    "effect": "fully restore hp of pokemon and allies within 3 but also makes them drowsy",
-   "face": "cards/skills/grace-cffb9c47.jpg",
+   "face": "cards/skills/grace-1bd6b5d7.jpg",
    "group": null
   },
   "Great Uniter": {
    "class": "Hero",
    "effect": "raise attack and accuracy 1 stage for 3 turns and restore 1/4 max hp when you defeat an enemy for those three turns",
-   "face": "cards/skills/great-uniter-171e5973.jpg",
+   "face": "cards/skills/great-uniter-9d5a80c2.jpg",
    "group": null
   },
   "Greed": {
    "class": "Normal",
    "effect": "defeated targets drop a second gift for 3 turns. This gift contains a copy of your help item. If you hold no item, it contains a super potion instead. You choose which surrounding tile the box lands on",
-   "face": "cards/skills/greed-b76b2b55.jpg",
+   "face": "cards/skills/greed-730da626.jpg",
    "group": null
   },
   "High Jump": {
    "class": "Normal",
    "effect": "can jump high elevations and enemy pokemon for 3 turns. This pokemon is treated as standing on high ground for 3 turns",
-   "face": "cards/skills/high-jump-f79ed3dc.jpg",
+   "face": "cards/skills/high-jump-0f6cae85.jpg",
    "group": null
   },
   "Impact": {
    "class": "Normal",
    "effect": "gain 50% chance to flinch for 2 turns",
-   "face": "cards/skills/impact-c6d2e823.jpg",
+   "face": "cards/skills/impact-07ccbb0c.jpg",
    "group": null
   },
   "Inspiration": {
    "class": "Hero",
    "effect": "raise attack and evasion for all allies for 1 turn",
-   "face": "cards/skills/inspiration-492690b0.jpg",
+   "face": "cards/skills/inspiration-3e0db4a3.jpg",
    "group": null
   },
   "Invigorate": {
    "class": "Normal",
    "effect": "Gain +2 speed",
-   "face": "cards/skills/invigorate-7c6c5692.jpg",
+   "face": "cards/skills/invigorate-60a01869.jpg",
    "group": null
   },
   "Kabuki Dance": {
    "class": "Hero",
    "effect": "raise all allies attack and speed 1 stage for 1 turn",
-   "face": "cards/skills/kabuki-dance-24edba20.jpg",
+   "face": "cards/skills/kabuki-dance-8586df7f.jpg",
    "group": null
   },
   "Lazybones": {
    "class": "Hero",
    "effect": "block all crits and stops checks for secondary effects on all allies for 3 turns",
-   "face": "cards/skills/lazybones-5dba18ed.jpg",
+   "face": "cards/skills/lazybones-e140f35c.jpg",
    "group": null
   },
   "Love N Honor": {
    "class": "Hero",
    "effect": "pokemon and allies within 3 restore 80 health and gain 1 attack for 1 turn",
-   "face": "cards/skills/love-n-honor-57856390.jpg",
+   "face": "cards/skills/love-n-honor-92fd2cb8.jpg",
    "group": null
   },
   "Marksman": {
    "class": "Normal",
    "effect": "gain +2 crit stages and +1 accuracy for allies within 2",
-   "face": "cards/skills/marksman-38eadd7e.jpg",
+   "face": "cards/skills/marksman-d861bd37.jpg",
    "group": null
   },
   "Mayhem": {
    "class": "Hero",
    "effect": "pokemon can jump high ledges and enemies, increase range by 1, and 50% chance to flinch for 3 turns",
-   "face": "cards/skills/mayhem-d6ebf77e.jpg",
+   "face": "cards/skills/mayhem-4457d80f.jpg",
    "group": null
   },
   "Mighty Blow": {
    "class": "Normal",
    "effect": "this pokemons next attack has a 1.3x multiplier applied to it. This affects all hits of a multihit",
-   "face": "cards/skills/mighty-blow-8efce9b8.jpg",
+   "face": "cards/skills/mighty-blow-a974863b.jpg",
    "group": null
   },
   "Natures Blessing": {
    "class": "Recovery",
    "effect": "Restore 80 hp to all grounded allies",
-   "face": "cards/skills/natures-blessing-615ee88e.jpg",
+   "face": "cards/skills/natures-blessing-dc182b1e.jpg",
    "group": null
   },
   "Nene Ninpo": {
    "class": "Hero",
    "effect": "all moves that target pokemon have a base accuracy of 0 for 1 turn. this pokemons attack has a base accuracy of 100 for this turn",
-   "face": "cards/skills/nene-ninpo-2fba663e.jpg",
+   "face": "cards/skills/nene-ninpo-b66ce9b3.jpg",
    "group": null
   },
   "Ninjitsu": {
    "class": "Hero",
    "effect": "increases range, lets pokemon jump enemies and high ledges, and increases crit chance 3 stages for 3 turns",
-   "face": "cards/skills/ninjitsu-a3c1dd20.jpg",
+   "face": "cards/skills/ninjitsu-8acb1acf.jpg",
    "group": null
   },
   "One Eyed Dragon": {
    "class": "Hero",
    "effect": "increase range of pokemon and allies within 2 by 3 for 1 turn",
-   "face": "cards/skills/one-eyed-dragon-3761582e.jpg",
+   "face": "cards/skills/one-eyed-dragon-7234566c.jpg",
    "group": null
   },
   "Quick Strike": {
    "class": "Normal",
    "effect": "gain 1 range and 50% chance to flinch (does not count as an attack effect)",
-   "face": "cards/skills/quick-strike-62e368bc.jpg",
+   "face": "cards/skills/quick-strike-e60e7b9b.jpg",
    "group": null
   },
   "Rebellion": {
    "class": "Hero",
    "effect": "increase crit chance by 2 for all allies for 3 turns",
-   "face": "cards/skills/rebellion-9ee3cc03.jpg",
+   "face": "cards/skills/rebellion-8d12895e.jpg",
    "group": null
   },
   "Resolution": {
    "class": "Hero",
    "effect": "increase defense 3 stages for 3 turns",
-   "face": "cards/skills/resolution-3c884b94.jpg",
+   "face": "cards/skills/resolution-af799f11.jpg",
    "group": null
   },
   "Sacrifice": {
    "class": "Hero",
    "effect": "increase range and attack by 2 stages, accuracy and speed by 1 permanantly. Set max HP to 1/4 of base hp",
-   "face": "cards/skills/sacrifice-99cd3353.jpg",
+   "face": "cards/skills/sacrifice-20374536.jpg",
    "group": null
   },
   "Salve": {
    "class": "Normal",
    "effect": "cure pokemon and allies within 3 of all status conditions. Heal any pokemon that had a status removed for 1/4 their max hp",
-   "face": "cards/skills/salve-feffec73.jpg",
+   "face": "cards/skills/salve-0df378a1.jpg",
    "group": null
   },
   "Shout": {
    "class": "Normal",
    "effect": "cure any allies who are confused or sleeping. Heal any pokemon that had a status removed for 1/4 their max hp",
-   "face": "cards/skills/shout-e4cf153c.jpg",
+   "face": "cards/skills/shout-76a78403.jpg",
    "group": "Type X"
   },
   "Sirens Blessing": {
    "class": "Normal",
    "effect": "If this pokemons attack makes a bonus check against its target, replace it with a 30% chance to make drowsy and a 30% chance to confuse for 2 turns",
-   "face": "cards/skills/sirens-blessing-8676005b.jpg",
+   "face": "cards/skills/sirens-blessing-75a2667a.jpg",
    "group": null
   },
   "Soft Light": {
    "class": "Hero",
    "effect": "heals all allies for 70 and removes status conditions",
-   "face": "cards/skills/soft-light-ac7ab855.jpg",
+   "face": "cards/skills/soft-light-1f899f77.jpg",
    "group": null
   },
   "Strategist": {
    "class": "Hero",
    "effect": "all allies gain +1 speed and +1 crit chance for 3 turns",
-   "face": "cards/skills/strategist-f18219cc.jpg",
+   "face": "cards/skills/strategist-8fcbde4c.jpg",
    "group": null
   },
   "Stroke Of Genius": {
    "class": "Normal",
    "effect": "Recover one of your previously held items (replace current item if holding one)",
-   "face": "cards/skills/stroke-of-genius-83a6b6ad.jpg",
+   "face": "cards/skills/stroke-of-genius-fa038a48.jpg",
    "group": null
   },
   "Sweet Song": {
    "class": "Recovery",
    "effect": "Restore 50 hp to all allies",
-   "face": "cards/skills/sweet-song-0ecea2bf.jpg",
+   "face": "cards/skills/sweet-song-8b74d5ef.jpg",
    "group": null
   },
   "Tactical Retreat": {
    "class": "Recovery",
    "effect": "restore 40 hp to all allies and give them +1 range. Allies with no enemies within 2 tiles (ignoring all terrain) restore 80 hp but do not receive the range bonus",
-   "face": "cards/skills/tactical-retreat-18853651.jpg",
+   "face": "cards/skills/tactical-retreat-a8553ddd.jpg",
    "group": null
   },
   "Temperate": {
    "class": "Normal",
    "effect": "heal all allies who are burned or frozen. Heal any pokemon that had a status removed for 1/4 their max hp",
-   "face": "cards/skills/temperate-fe0685ad.jpg",
+   "face": "cards/skills/temperate-79823a33.jpg",
    "group": "Type X"
   },
   "Terminate": {
    "class": "Hero",
    "effect": "cancel all active warrior effects",
-   "face": "cards/skills/terminate-9e777083.jpg",
+   "face": "cards/skills/terminate-8d3956dd.jpg",
    "group": null
   },
   "The Pharoah's Curse": {
    "class": "Normal",
    "effect": "Replace this pokemons ability with mummy for 2 turns (you choose contact or non contact)",
-   "face": "cards/skills/the-pharoahs-curse-a368c878.jpg",
+   "face": "cards/skills/the-pharoahs-curse-b2515989.jpg",
    "group": null
   },
   "Top Speed": {
    "class": "Normal",
    "effect": "Increase range by 2",
-   "face": "cards/skills/top-speed-8d9e4222.jpg",
+   "face": "cards/skills/top-speed-a854046a.jpg",
    "group": null
   },
   "Trickster": {
    "class": "Hero",
    "effect": "increase speed 2 stages, allow pokemon to jump enemies and high ledges, and increase crit chance for 3 turns",
-   "face": "cards/skills/trickster-aacaddb6.jpg",
+   "face": "cards/skills/trickster-c6ff1a4a.jpg",
    "group": null
   },
   "Type X": {
    "class": "Normal",
    "effect": "choose \"type x skill\" and then choose which to use at the start of the game",
-   "face": "cards/skills/type-x-14828648.jpg",
+   "face": "cards/skills/type-x-eff7ddba.jpg",
    "group": null
   },
   "Unrivaled": {
    "class": "Hero",
    "effect": "increase attack, speed, and defense 1 stage for 4 turns",
-   "face": "cards/skills/unrivaled-fd1ee5af.jpg",
+   "face": "cards/skills/unrivaled-651990f6.jpg",
    "group": null
   },
   "Vipers Bite": {
    "class": "Hero",
    "effect": "attack gains extra effect \"inflict random status condition\" for 3 turns",
-   "face": "cards/skills/vipers-bite-e488bef4.jpg",
+   "face": "cards/skills/vipers-bite-0bc7cb32.jpg",
    "group": null
   },
   "Vipers Blessing": {
    "class": "Normal",
    "effect": "If this pokemons attack makes a bonus check against its target, replace it with a 30% chance to poison and a 30% chance to paralyze for 2 turns",
-   "face": "cards/skills/vipers-blessing-08a5310e.jpg",
+   "face": "cards/skills/vipers-blessing-4f050f60.jpg",
    "group": null
   },
   "Warrior Woman": {
    "class": "Hero",
    "effect": "gain +1 speed and 100% flinch chance for 1 turn",
-   "face": "cards/skills/warrior-woman-39b4f680.jpg",
+   "face": "cards/skills/warrior-woman-0b44a3e8.jpg",
    "group": null
   },
   "Willpower": {
    "class": "Hero",
    "effect": "increases crit chance 2 stages and attack 1 stage for 1 turn",
-   "face": "cards/skills/willpower-35a8ca57.jpg",
+   "face": "cards/skills/willpower-814fbe01.jpg",
    "group": null
   }
  }
