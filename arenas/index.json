@@ -1,7 +1,7 @@
 {
  "Illusio": {
   "mesh": "arenas/illusio/board-v2.obj",
-  "texture": "arenas/illusio/board-v3.jpg",
+  "texture": "arenas/illusio/board-v4.jpg",
   "table": "misc/sky-placeholder-v1.jpg",
   "snaps": [
    [

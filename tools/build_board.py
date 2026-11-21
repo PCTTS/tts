@@ -256,20 +256,25 @@ def draw_texture(a):
     return img.resize((W // SS, H // SS), Image.LANCZOS)
 
 
+FRINGE = {"reach": 0.42, "wobble": 0.3, "rough": 1.0, "tufts": 160}   # defaults (board v3's look)
+
+
 def grass_fringe(a, img, layers, p):
-    """Slanted tiles with "fringe": <surface>: that surface (the lawn around them) creeps a little way up the
-    bottom of each slope, with a ragged top edge, and small tufts of blades poke up the slope just above it.
-    The ragged edge comes from a smooth function of the board position, so it runs on across tiles and corners."""
+    """Slanted tiles with "fringe": {"surface", "reach", "wobble", "rough", "tufts"} (or just the surface's
+    name): that surface (the lawn around them) creeps up the bottom of each slope to `reach` (a fraction of the
+    slope) give or take `wobble`; `rough` adds fine jaggedness to its top edge; `tufts` = blade tufts tried per
+    slope, leaning up the slope just above the edge. The edge comes from a smooth function of the board position,
+    so it runs on across tiles and corners."""
     rnd = random.Random(f"{a.data.get('name')}/fringe")
     phases = [(rnd.uniform(0, 6.3), rnd.uniform(0, 6.3)) for _ in range(6)]
 
-    def ragged(gx, gy):   # 0..1, wavy along any edge, with fine roughness (gx, gy: board pixels at SS)
+    def ragged(gx, gy, rough):   # -1..1, wavy along any edge (gx, gy: board pixels at SS)
         u, v = gx / SS, gy / SS
         broad = sum(np.sin(u / w + a) * np.cos(v / (w * 1.3) + b) + np.sin((u + v) / (w * 0.8) + a + b)
                     for w, (a, b) in zip((9.0, 15.0, 26.0), phases[:3]))
         fine = sum(np.sin(u / w + a + v / (w * 0.7)) * np.cos(v / w - u / (w * 1.9) + b)
                    for w, (a, b) in zip((1.6, 2.5, 3.7), phases[3:]))
-        return 0.5 + 0.5 * np.clip(broad / 3.2 + fine / 4.5, -1, 1)
+        return np.clip(broad / 3.2 + rough * fine / 4.5, -1, 1)
 
     tufts = Image.new("RGBA", img.size, (0, 0, 0, 0))
     td = ImageDraw.Draw(tufts)
@@ -280,25 +285,30 @@ def grass_fringe(a, img, layers, p):
             sloped = slopes(a, r, c) if t else {}
             if not (sloped and t.get("fringe")):
                 continue
+            spec = t["fringe"] if isinstance(t["fringe"], dict) else {"surface": t["fringe"]}
+            f = {**FRINGE, **spec}
             band = t["slant"] / TILE * p
+
+            def edge_at(gx, gy):   # how far up the slope the grass gets
+                return band * (f["reach"] + f["wobble"] * ragged(gx, gy, f["rough"]))
             x0, y0 = c * p, r * p
             yy, xx = np.mgrid[0:p, 0:p].astype(np.float32) + 0.5
             dists = {"N": yy, "S": p - yy, "W": xx, "E": p - xx}
             d = np.minimum.reduce([dists[s] for s in sloped])
-            n = ragged(x0 + xx, y0 + yy)
-            reach = band * (0.12 + 0.6 * n)                      # how far up the slope the grass gets
-            alpha = np.clip((reach - d) / (3 * SS) + 0.5, 0, 1)[..., None]
-            src = t["fringe"]
+            reach = edge_at(x0 + xx, y0 + yy)
+            soft = min(3 * SS, max(1.0, 0.5 * float(reach.mean())))   # a thin fringe gets a crisper edge
+            alpha = np.clip((reach - d) / soft + 0.5, 0, 1)[..., None]
+            src = f["surface"]
             grass = (np.asarray(layers[src].crop((x0, y0, x0 + p, y0 + p)), np.float32) if src in layers
                      else np.full((p, p, 3), a.palette[src], np.float32))
             tile = out[y0:y0 + p, x0:x0 + p]
             out[y0:y0 + p, x0:x0 + p] = tile * (1 - alpha) + grass * alpha
             # tufts: a few blades each, rooted just below the ragged edge, leaning up the slope
-            for _ in range(int(160 * len(sloped))):
+            for _ in range(int(f["tufts"] * len(sloped))):
                 px, py = rnd.uniform(0, p), rnd.uniform(0, p)
                 ds = {s: float(dists[s][int(py), int(px)]) for s in sloped}
                 side = min(ds, key=ds.get)
-                edge = band * (0.12 + 0.6 * ragged(x0 + px, y0 + py))
+                edge = edge_at(x0 + px, y0 + py)
                 if not (edge - 3 * SS < ds[side] < edge + 4 * SS):
                     continue
                 ux, uy = {"N": (0, 1), "S": (0, -1), "W": (1, 0), "E": (-1, 0)}[side]   # up the slope
