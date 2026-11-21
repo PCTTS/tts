@@ -1,0 +1,3522 @@
+{
+ "Abomasnow": {
+  "front": "figures/abomasnow.webp",
+  "back": "figures/abomasnow-back.webp",
+  "source": "abomasnow"
+ },
+ "Abomasnow Mega": {
+  "front": "figures/abomasnow-mega.webp",
+  "back": "figures/abomasnow-mega-back.webp",
+  "source": "abomasnow-mega"
+ },
+ "Absol": {
+  "front": "figures/absol.webp",
+  "back": "figures/absol-back.webp",
+  "source": "absol"
+ },
+ "Absol Mega": {
+  "front": "figures/absol-mega.webp",
+  "back": "figures/absol-mega-back.webp",
+  "source": "absol-mega"
+ },
+ "Absol Mega Z": {
+  "front": "figures/absol-mega-z.webp",
+  "back": "figures/absol-mega-z-back.webp",
+  "source": "absol-mega-z"
+ },
+ "Accelgor": {
+  "front": "figures/accelgor.webp",
+  "back": "figures/accelgor-back.webp",
+  "source": "accelgor"
+ },
+ "Aegislash Blade": {
+  "front": "figures/aegislash-blade.webp",
+  "back": "figures/aegislash-blade-back.webp",
+  "source": "aegislash-blade"
+ },
+ "Aegislash Shield": {
+  "front": "figures/aegislash-shield.webp",
+  "back": "figures/aegislash-shield-back.webp",
+  "source": "aegislash-shield"
+ },
+ "Aerodactyl": {
+  "front": "figures/aerodactyl.webp",
+  "back": "figures/aerodactyl-back.webp",
+  "source": "aerodactyl"
+ },
+ "Aerodactyl Mega": {
+  "front": "figures/aerodactyl-mega.webp",
+  "back": "figures/aerodactyl-mega-back.webp",
+  "source": "aerodactyl-mega"
+ },
+ "Aggron": {
+  "front": "figures/aggron.webp",
+  "back": "figures/aggron-back.webp",
+  "source": "aggron"
+ },
+ "Aggron Mega": {
+  "front": "figures/aggron-mega.webp",
+  "back": "figures/aggron-mega-back.webp",
+  "source": "aggron-mega"
+ },
+ "Alakazam": {
+  "front": "figures/alakazam.webp",
+  "back": "figures/alakazam-back.webp",
+  "source": "alakazam"
+ },
+ "Alakazam Mega": {
+  "front": "figures/alakazam-mega.webp",
+  "back": "figures/alakazam-mega-back.webp",
+  "source": "alakazam-mega"
+ },
+ "Alcremie": {
+  "front": "figures/alcremie.webp",
+  "back": "figures/alcremie-back.webp",
+  "source": "alcremie"
+ },
+ "Alomomola": {
+  "front": "figures/alomomola.webp",
+  "back": "figures/alomomola-back.webp",
+  "source": "alomomola"
+ },
+ "Altaria": {
+  "front": "figures/altaria.webp",
+  "back": "figures/altaria-back.webp",
+  "source": "altaria"
+ },
+ "Altaria Mega": {
+  "front": "figures/altaria-mega.webp",
+  "back": "figures/altaria-mega-back.webp",
+  "source": "altaria-mega"
+ },
+ "Ambipom": {
+  "front": "figures/ambipom.webp",
+  "back": "figures/ambipom-back.webp",
+  "source": "ambipom"
+ },
+ "Amoonguss": {
+  "front": "figures/amoonguss.webp",
+  "back": "figures/amoonguss-back.webp",
+  "source": "amoonguss"
+ },
+ "Ampharos": {
+  "front": "figures/ampharos.webp",
+  "back": "figures/ampharos-back.webp",
+  "source": "ampharos"
+ },
+ "Ampharos Mega": {
+  "front": "figures/ampharos-mega.webp",
+  "back": "figures/ampharos-mega-back.webp",
+  "source": "ampharos-mega"
+ },
+ "Annihilape": {
+  "front": "figures/annihilape.webp",
+  "back": "figures/annihilape-back.webp",
+  "source": "annihilape"
+ },
+ "Appletun": {
+  "front": "figures/appletun.webp",
+  "back": "figures/appletun-back.webp",
+  "source": "appletun"
+ },
+ "Araquanid": {
+  "front": "figures/araquanid.webp",
+  "back": "figures/araquanid-back.webp",
+  "source": "araquanid"
+ },
+ "Arbok": {
+  "front": "figures/arbok.webp",
+  "back": "figures/arbok-back.webp",
+  "source": "arbok"
+ },
+ "Arboliva": {
+  "front": "figures/arboliva.webp",
+  "back": "figures/arboliva-back.webp",
+  "source": "arboliva"
+ },
+ "Arcanine": {
+  "front": "figures/arcanine.webp",
+  "back": "figures/arcanine-back.webp",
+  "source": "arcanine"
+ },
+ "Arcanine Hisui": {
+  "front": "figures/arcanine-hisui.webp",
+  "back": "figures/arcanine-hisui-back.webp",
+  "source": "arcanine-hisui"
+ },
+ "Archaludon": {
+  "front": "figures/archaludon.webp",
+  "back": "figures/archaludon-back.webp",
+  "source": "archaludon"
+ },
+ "Archeops": {
+  "front": "figures/archeops.webp",
+  "back": "figures/archeops-back.webp",
+  "source": "archeops"
+ },
+ "Arctovish": {
+  "front": "figures/arctovish.webp",
+  "back": "figures/arctovish-back.webp",
+  "source": "arctovish"
+ },
+ "Arctozolt": {
+  "front": "figures/arctozolt.webp",
+  "back": "figures/arctozolt-back.webp",
+  "source": "arctozolt"
+ },
+ "Ariados": {
+  "front": "figures/ariados.webp",
+  "back": "figures/ariados-back.webp",
+  "source": "ariados"
+ },
+ "Armaldo": {
+  "front": "figures/armaldo.webp",
+  "back": "figures/armaldo-back.webp",
+  "source": "armaldo"
+ },
+ "Armarouge": {
+  "front": "figures/armarouge.webp",
+  "back": "figures/armarouge-back.webp",
+  "source": "armarouge"
+ },
+ "Aromatisse": {
+  "front": "figures/aromatisse.webp",
+  "back": "figures/aromatisse-back.webp",
+  "source": "aromatisse"
+ },
+ "Articuno": {
+  "front": "figures/articuno.webp",
+  "back": "figures/articuno-back.webp",
+  "source": "articuno"
+ },
+ "Articuno Galar": {
+  "front": "figures/articuno-galar.webp",
+  "back": "figures/articuno-galar-back.webp",
+  "source": "articuno-galar"
+ },
+ "Audino": {
+  "front": "figures/audino.webp",
+  "back": "figures/audino-back.webp",
+  "source": "audino"
+ },
+ "Audino Mega": {
+  "front": "figures/audino-mega.webp",
+  "back": "figures/audino-mega-back.webp",
+  "source": "audino-mega"
+ },
+ "Aurorus": {
+  "front": "figures/aurorus.webp",
+  "back": "figures/aurorus-back.webp",
+  "source": "aurorus"
+ },
+ "Avalugg": {
+  "front": "figures/avalugg.webp",
+  "back": "figures/avalugg-back.webp",
+  "source": "avalugg"
+ },
+ "Avalugg Hisui": {
+  "front": "figures/avalugg-hisui.webp",
+  "back": "figures/avalugg-hisui-back.webp",
+  "source": "avalugg-hisui"
+ },
+ "Azelf": {
+  "front": "figures/azelf.webp",
+  "back": "figures/azelf-back.webp",
+  "source": "azelf"
+ },
+ "Azumarill": {
+  "front": "figures/azumarill.webp",
+  "back": "figures/azumarill-back.webp",
+  "source": "azumarill"
+ },
+ "Banette": {
+  "front": "figures/banette.webp",
+  "back": "figures/banette-back.webp",
+  "source": "banette"
+ },
+ "Banette Mega": {
+  "front": "figures/banette-mega.webp",
+  "back": "figures/banette-mega-back.webp",
+  "source": "banette-mega"
+ },
+ "Barbaracle": {
+  "front": "figures/barbaracle.webp",
+  "back": "figures/barbaracle-back.webp",
+  "source": "barbaracle"
+ },
+ "Barbaracle Mega": {
+  "front": "figures/barbaracle-mega.webp",
+  "back": "figures/barbaracle-mega-back.webp",
+  "source": "barbaracle-mega"
+ },
+ "Barreskewda": {
+  "front": "figures/barreskewda.webp",
+  "back": "figures/barreskewda-back.webp",
+  "source": "barraskewda"
+ },
+ "Basculegion F": {
+  "front": "figures/basculegion-f.webp",
+  "back": "figures/basculegion-f-back.webp",
+  "source": "basculegion-female"
+ },
+ "Basculegion M": {
+  "front": "figures/basculegion-m.webp",
+  "back": "figures/basculegion-m-back.webp",
+  "source": "basculegion-male"
+ },
+ "Bastiodon": {
+  "front": "figures/bastiodon.webp",
+  "back": "figures/bastiodon-back.webp",
+  "source": "bastiodon"
+ },
+ "Baxcalibur": {
+  "front": "figures/baxcalibur.webp",
+  "back": "figures/baxcalibur-back.webp",
+  "source": "baxcalibur"
+ },
+ "Baxcalibur Mega": {
+  "front": "figures/baxcalibur-mega.webp",
+  "back": "figures/baxcalibur-mega-back.webp",
+  "source": "baxcalibur-mega"
+ },
+ "Beartic": {
+  "front": "figures/beartic.webp",
+  "back": "figures/beartic-back.webp",
+  "source": "beartic"
+ },
+ "Beautifly": {
+  "front": "figures/beautifly.webp",
+  "back": "figures/beautifly-back.webp",
+  "source": "beautifly"
+ },
+ "Beedrill": {
+  "front": "figures/beedrill.webp",
+  "back": "figures/beedrill-back.webp",
+  "source": "beedrill"
+ },
+ "Beedrill Mega": {
+  "front": "figures/beedrill-mega.webp",
+  "back": "figures/beedrill-mega-back.webp",
+  "source": "beedrill-mega"
+ },
+ "Beer": {
+  "front": "figures/beer.webp",
+  "back": "figures/beer-back.webp",
+  "source": "custom"
+ },
+ "Beheeyem": {
+  "front": "figures/beheeyem.webp",
+  "back": "figures/beheeyem-back.webp",
+  "source": "beheeyem"
+ },
+ "Bellibolt": {
+  "front": "figures/bellibolt.webp",
+  "back": "figures/bellibolt-back.webp",
+  "source": "bellibolt"
+ },
+ "Bellossom": {
+  "front": "figures/bellossom.webp",
+  "back": "figures/bellossom-back.webp",
+  "source": "bellossom"
+ },
+ "Bewear": {
+  "front": "figures/bewear.webp",
+  "back": "figures/bewear-back.webp",
+  "source": "bewear"
+ },
+ "Bibarel": {
+  "front": "figures/bibarel.webp",
+  "back": "figures/bibarel-back.webp",
+  "source": "bibarel"
+ },
+ "Blacephalon": {
+  "front": "figures/blacephalon.webp",
+  "back": "figures/blacephalon-back.webp",
+  "source": "blacephalon"
+ },
+ "Blastoise": {
+  "front": "figures/blastoise.webp",
+  "back": "figures/blastoise-back.webp",
+  "source": "blastoise"
+ },
+ "Blastoise Mega": {
+  "front": "figures/blastoise-mega.webp",
+  "back": "figures/blastoise-mega-back.webp",
+  "source": "blastoise-mega"
+ },
+ "Blaziken": {
+  "front": "figures/blaziken.webp",
+  "back": "figures/blaziken-back.webp",
+  "source": "blaziken"
+ },
+ "Blaziken Mega": {
+  "front": "figures/blaziken-mega.webp",
+  "back": "figures/blaziken-mega-back.webp",
+  "source": "blaziken-mega"
+ },
+ "Blissey": {
+  "front": "figures/blissey.webp",
+  "back": "figures/blissey-back.webp",
+  "source": "blissey"
+ },
+ "Boltund": {
+  "front": "figures/boltund.webp",
+  "back": "figures/boltund-back.webp",
+  "source": "boltund"
+ },
+ "Bombirdier": {
+  "front": "figures/bombirdier.webp",
+  "back": "figures/bombirdier-back.webp",
+  "source": "bombirdier"
+ },
+ "Bouffalant": {
+  "front": "figures/bouffalant.webp",
+  "back": "figures/bouffalant-back.webp",
+  "source": "bouffalant"
+ },
+ "Brambleghast": {
+  "front": "figures/brambleghast.webp",
+  "back": "figures/brambleghast-back.webp",
+  "source": "brambleghast"
+ },
+ "Braviary": {
+  "front": "figures/braviary.webp",
+  "back": "figures/braviary-back.webp",
+  "source": "braviary"
+ },
+ "Braviary Hisui": {
+  "front": "figures/braviary-hisui.webp",
+  "back": "figures/braviary-hisui-back.webp",
+  "source": "braviary-hisui"
+ },
+ "Breloom": {
+  "front": "figures/breloom.webp",
+  "back": "figures/breloom-back.webp",
+  "source": "breloom"
+ },
+ "Bronzong": {
+  "front": "figures/bronzong.webp",
+  "back": "figures/bronzong-back.webp",
+  "source": "bronzong"
+ },
+ "Brute Bonnet": {
+  "front": "figures/brute-bonnet.webp",
+  "back": "figures/brute-bonnet-back.webp",
+  "source": "brute-bonnet"
+ },
+ "Bruxish": {
+  "front": "figures/bruxish.webp",
+  "back": "figures/bruxish-back.webp",
+  "source": "bruxish"
+ },
+ "Butterfree": {
+  "front": "figures/butterfree.webp",
+  "back": "figures/butterfree-back.webp",
+  "source": "butterfree"
+ },
+ "Buzzwole": {
+  "front": "figures/buzzwole.webp",
+  "back": "figures/buzzwole-back.webp",
+  "source": "buzzwole"
+ },
+ "Cacturne": {
+  "front": "figures/cacturne.webp",
+  "back": "figures/cacturne-back.webp",
+  "source": "cacturne"
+ },
+ "Calyrex": {
+  "front": "figures/calyrex.webp",
+  "back": "figures/calyrex-back.webp",
+  "source": "calyrex"
+ },
+ "Camerupt": {
+  "front": "figures/camerupt.webp",
+  "back": "figures/camerupt-back.webp",
+  "source": "camerupt"
+ },
+ "Camerupt Mega": {
+  "front": "figures/camerupt-mega.webp",
+  "back": "figures/camerupt-mega-back.webp",
+  "source": "camerupt-mega"
+ },
+ "Carbink": {
+  "front": "figures/carbink.webp",
+  "back": "figures/carbink-back.webp",
+  "source": "carbink"
+ },
+ "Carnivine": {
+  "front": "figures/carnivine.webp",
+  "back": "figures/carnivine-back.webp",
+  "source": "carnivine"
+ },
+ "Carracosta": {
+  "front": "figures/carracosta.webp",
+  "back": "figures/carracosta-back.webp",
+  "source": "carracosta"
+ },
+ "Castform Rainy": {
+  "front": "figures/castform-rainy.webp",
+  "back": "figures/castform-rainy-back.webp",
+  "source": "castform-rainy"
+ },
+ "Castform Sandy": {
+  "front": "figures/castform-sandy.webp",
+  "back": "figures/castform-sandy-back.webp",
+  "source": "placeholder: Rock-tinted"
+ },
+ "Castform Snowy": {
+  "front": "figures/castform-snowy.webp",
+  "back": "figures/castform-snowy-back.webp",
+  "source": "castform-snowy"
+ },
+ "Castform Sunny": {
+  "front": "figures/castform-sunny.webp",
+  "back": "figures/castform-sunny-back.webp",
+  "source": "castform-sunny"
+ },
+ "Celebi": {
+  "front": "figures/celebi.webp",
+  "back": "figures/celebi-back.webp",
+  "source": "celebi"
+ },
+ "Celesteela": {
+  "front": "figures/celesteela.webp",
+  "back": "figures/celesteela-back.webp",
+  "source": "celesteela"
+ },
+ "Centiskorch": {
+  "front": "figures/centiskorch.webp",
+  "back": "figures/centiskorch-back.webp",
+  "source": "centiskorch"
+ },
+ "Ceruledge": {
+  "front": "figures/ceruledge.webp",
+  "back": "figures/ceruledge-back.webp",
+  "source": "ceruledge"
+ },
+ "Cetitan": {
+  "front": "figures/cetitan.webp",
+  "back": "figures/cetitan-back.webp",
+  "source": "cetitan"
+ },
+ "Chandelure": {
+  "front": "figures/chandelure.webp",
+  "back": "figures/chandelure-back.webp",
+  "source": "chandelure"
+ },
+ "Chandelure Mega": {
+  "front": "figures/chandelure-mega.webp",
+  "back": "figures/chandelure-mega-back.webp",
+  "source": "chandelure-mega"
+ },
+ "Charizard": {
+  "front": "figures/charizard.webp",
+  "back": "figures/charizard-back.webp",
+  "source": "charizard"
+ },
+ "Charizard X Mega": {
+  "front": "figures/charizard-x-mega.webp",
+  "back": "figures/charizard-x-mega-back.webp",
+  "source": "charizard-mega-x"
+ },
+ "Charizard Y Mega": {
+  "front": "figures/charizard-y-mega.webp",
+  "back": "figures/charizard-y-mega-back.webp",
+  "source": "charizard-mega-y"
+ },
+ "Chatot": {
+  "front": "figures/chatot.webp",
+  "back": "figures/chatot-back.webp",
+  "source": "chatot"
+ },
+ "Cherrim": {
+  "front": "figures/cherrim.webp",
+  "back": "figures/cherrim-back.webp",
+  "source": "cherrim"
+ },
+ "Chesnaught": {
+  "front": "figures/chesnaught.webp",
+  "back": "figures/chesnaught-back.webp",
+  "source": "chesnaught"
+ },
+ "Chesnaught Mega": {
+  "front": "figures/chesnaught-mega.webp",
+  "back": "figures/chesnaught-mega-back.webp",
+  "source": "chesnaught-mega"
+ },
+ "Chi-Yu": {
+  "front": "figures/chi-yu.webp",
+  "back": "figures/chi-yu-back.webp",
+  "source": "chi-yu"
+ },
+ "Chien-Pao": {
+  "front": "figures/chien-pao.webp",
+  "back": "figures/chien-pao-back.webp",
+  "source": "chien-pao"
+ },
+ "Chimecho": {
+  "front": "figures/chimecho.webp",
+  "back": "figures/chimecho-back.webp",
+  "source": "chimecho"
+ },
+ "Chimecho Mega": {
+  "front": "figures/chimecho-mega.webp",
+  "back": "figures/chimecho-mega-back.webp",
+  "source": "chimecho-mega"
+ },
+ "Cinccino": {
+  "front": "figures/cinccino.webp",
+  "back": "figures/cinccino-back.webp",
+  "source": "cinccino"
+ },
+ "Cinderace": {
+  "front": "figures/cinderace.webp",
+  "back": "figures/cinderace-back.webp",
+  "source": "cinderace"
+ },
+ "Clawitzer": {
+  "front": "figures/clawitzer.webp",
+  "back": "figures/clawitzer-back.webp",
+  "source": "clawitzer"
+ },
+ "Claydol": {
+  "front": "figures/claydol.webp",
+  "back": "figures/claydol-back.webp",
+  "source": "claydol"
+ },
+ "Clefable": {
+  "front": "figures/clefable.webp",
+  "back": "figures/clefable-back.webp",
+  "source": "clefable"
+ },
+ "Clefable Mega": {
+  "front": "figures/clefable-mega.webp",
+  "back": "figures/clefable-mega-back.webp",
+  "source": "clefable-mega"
+ },
+ "Clodsire": {
+  "front": "figures/clodsire.webp",
+  "back": "figures/clodsire-back.webp",
+  "source": "clodsire"
+ },
+ "Cloyster": {
+  "front": "figures/cloyster.webp",
+  "back": "figures/cloyster-back.webp",
+  "source": "cloyster"
+ },
+ "Coalossal": {
+  "front": "figures/coalossal.webp",
+  "back": "figures/coalossal-back.webp",
+  "source": "coalossal"
+ },
+ "Cobalion": {
+  "front": "figures/cobalion.webp",
+  "back": "figures/cobalion-back.webp",
+  "source": "cobalion"
+ },
+ "Cofagrigus": {
+  "front": "figures/cofagrigus.webp",
+  "back": "figures/cofagrigus-back.webp",
+  "source": "cofagrigus"
+ },
+ "Comfey": {
+  "front": "figures/comfey.webp",
+  "back": "figures/comfey-back.webp",
+  "source": "comfey"
+ },
+ "Conkeldurr": {
+  "front": "figures/conkeldurr.webp",
+  "back": "figures/conkeldurr-back.webp",
+  "source": "conkeldurr"
+ },
+ "Copperajah": {
+  "front": "figures/copperajah.webp",
+  "back": "figures/copperajah-back.webp",
+  "source": "copperajah"
+ },
+ "Corsola": {
+  "front": "figures/corsola.webp",
+  "back": "figures/corsola-back.webp",
+  "source": "corsola"
+ },
+ "Corsola Galar": {
+  "front": "figures/corsola-galar.webp",
+  "back": "figures/corsola-galar-back.webp",
+  "source": "corsola-galar"
+ },
+ "Corviknight": {
+  "front": "figures/corviknight.webp",
+  "back": "figures/corviknight-back.webp",
+  "source": "corviknight"
+ },
+ "Crabominable": {
+  "front": "figures/crabominable.webp",
+  "back": "figures/crabominable-back.webp",
+  "source": "crabominable"
+ },
+ "Crabominable Mega": {
+  "front": "figures/crabominable-mega.webp",
+  "back": "figures/crabominable-mega-back.webp",
+  "source": "crabominable-mega"
+ },
+ "Cradily": {
+  "front": "figures/cradily.webp",
+  "back": "figures/cradily-back.webp",
+  "source": "cradily"
+ },
+ "Cramorant": {
+  "front": "figures/cramorant.webp",
+  "back": "figures/cramorant-back.webp",
+  "source": "cramorant"
+ },
+ "Crawdaunt": {
+  "front": "figures/crawdaunt.webp",
+  "back": "figures/crawdaunt-back.webp",
+  "source": "crawdaunt"
+ },
+ "Cresselia": {
+  "front": "figures/cresselia.webp",
+  "back": "figures/cresselia-back.webp",
+  "source": "cresselia"
+ },
+ "Crobat": {
+  "front": "figures/crobat.webp",
+  "back": "figures/crobat-back.webp",
+  "source": "crobat"
+ },
+ "Crustle": {
+  "front": "figures/crustle.webp",
+  "back": "figures/crustle-back.webp",
+  "source": "crustle"
+ },
+ "Cryogonal": {
+  "front": "figures/cryogonal.webp",
+  "back": "figures/cryogonal-back.webp",
+  "source": "cryogonal"
+ },
+ "Cursola": {
+  "front": "figures/cursola.webp",
+  "back": "figures/cursola-back.webp",
+  "source": "cursola"
+ },
+ "Cyclizar": {
+  "front": "figures/cyclizar.webp",
+  "back": "figures/cyclizar-back.webp",
+  "source": "cyclizar"
+ },
+ "Dachsbun": {
+  "front": "figures/dachsbun.webp",
+  "back": "figures/dachsbun-back.webp",
+  "source": "dachsbun"
+ },
+ "Darkrai": {
+  "front": "figures/darkrai.webp",
+  "back": "figures/darkrai-back.webp",
+  "source": "darkrai"
+ },
+ "Darkrai Mega": {
+  "front": "figures/darkrai-mega.webp",
+  "back": "figures/darkrai-mega-back.webp",
+  "source": "darkrai-mega"
+ },
+ "Darmanitan": {
+  "front": "figures/darmanitan.webp",
+  "back": "figures/darmanitan-back.webp",
+  "source": "darmanitan-standard"
+ },
+ "Darmanitan Galar": {
+  "front": "figures/darmanitan-galar.webp",
+  "back": "figures/darmanitan-galar-back.webp",
+  "source": "darmanitan-galar-standard"
+ },
+ "Darmanitan Galar Zen": {
+  "front": "figures/darmanitan-galar-zen.webp",
+  "back": "figures/darmanitan-galar-zen-back.webp",
+  "source": "darmanitan-galar-zen"
+ },
+ "Darmanitan Zen": {
+  "front": "figures/darmanitan-zen.webp",
+  "back": "figures/darmanitan-zen-back.webp",
+  "source": "darmanitan-zen"
+ },
+ "Decidueye": {
+  "front": "figures/decidueye.webp",
+  "back": "figures/decidueye-back.webp",
+  "source": "decidueye"
+ },
+ "Decidueye Hisui": {
+  "front": "figures/decidueye-hisui.webp",
+  "back": "figures/decidueye-hisui-back.webp",
+  "source": "decidueye-hisui"
+ },
+ "Dedenne": {
+  "front": "figures/dedenne.webp",
+  "back": "figures/dedenne-back.webp",
+  "source": "dedenne"
+ },
+ "Delcatty": {
+  "front": "figures/delcatty.webp",
+  "back": "figures/delcatty-back.webp",
+  "source": "delcatty"
+ },
+ "Delibird": {
+  "front": "figures/delibird.webp",
+  "back": "figures/delibird-back.webp",
+  "source": "delibird"
+ },
+ "Delphox": {
+  "front": "figures/delphox.webp",
+  "back": "figures/delphox-back.webp",
+  "source": "delphox"
+ },
+ "Delphox Mega": {
+  "front": "figures/delphox-mega.webp",
+  "back": "figures/delphox-mega-back.webp",
+  "source": "delphox-mega"
+ },
+ "Dewgong": {
+  "front": "figures/dewgong.webp",
+  "back": "figures/dewgong-back.webp",
+  "source": "dewgong"
+ },
+ "Dhelmise": {
+  "front": "figures/dhelmise.webp",
+  "back": "figures/dhelmise-back.webp",
+  "source": "dhelmise"
+ },
+ "Diancie": {
+  "front": "figures/diancie.webp",
+  "back": "figures/diancie-back.webp",
+  "source": "diancie"
+ },
+ "Diancie Mega": {
+  "front": "figures/diancie-mega.webp",
+  "back": "figures/diancie-mega-back.webp",
+  "source": "diancie-mega"
+ },
+ "Diggersby": {
+  "front": "figures/diggersby.webp",
+  "back": "figures/diggersby-back.webp",
+  "source": "diggersby"
+ },
+ "Ditto": {
+  "front": "figures/ditto.webp",
+  "back": "figures/ditto-back.webp",
+  "source": "ditto"
+ },
+ "Dodrio": {
+  "front": "figures/dodrio.webp",
+  "back": "figures/dodrio-back.webp",
+  "source": "dodrio"
+ },
+ "Dondozo": {
+  "front": "figures/dondozo.webp",
+  "back": "figures/dondozo-back.webp",
+  "source": "dondozo"
+ },
+ "Donphan": {
+  "front": "figures/donphan.webp",
+  "back": "figures/donphan-back.webp",
+  "source": "donphan"
+ },
+ "Dracovish": {
+  "front": "figures/dracovish.webp",
+  "back": "figures/dracovish-back.webp",
+  "source": "dracovish"
+ },
+ "Dracozolt": {
+  "front": "figures/dracozolt.webp",
+  "back": "figures/dracozolt-back.webp",
+  "source": "dracozolt"
+ },
+ "Dragalge": {
+  "front": "figures/dragalge.webp",
+  "back": "figures/dragalge-back.webp",
+  "source": "dragalge"
+ },
+ "Dragalge Mega": {
+  "front": "figures/dragalge-mega.webp",
+  "back": "figures/dragalge-mega-back.webp",
+  "source": "dragalge-mega"
+ },
+ "Dragapult": {
+  "front": "figures/dragapult.webp",
+  "back": "figures/dragapult-back.webp",
+  "source": "dragapult"
+ },
+ "Dragonite": {
+  "front": "figures/dragonite.webp",
+  "back": "figures/dragonite-back.webp",
+  "source": "dragonite"
+ },
+ "Dragonite Mega": {
+  "front": "figures/dragonite-mega.webp",
+  "back": "figures/dragonite-mega-back.webp",
+  "source": "dragonite-mega"
+ },
+ "Drampa": {
+  "front": "figures/drampa.webp",
+  "back": "figures/drampa-back.webp",
+  "source": "drampa"
+ },
+ "Drampa Mega": {
+  "front": "figures/drampa-mega.webp",
+  "back": "figures/drampa-mega-back.webp",
+  "source": "drampa-mega"
+ },
+ "Drapion": {
+  "front": "figures/drapion.webp",
+  "back": "figures/drapion-back.webp",
+  "source": "drapion"
+ },
+ "Drednaw": {
+  "front": "figures/drednaw.webp",
+  "back": "figures/drednaw-back.webp",
+  "source": "drednaw"
+ },
+ "Drifblim": {
+  "front": "figures/drifblim.webp",
+  "back": "figures/drifblim-back.webp",
+  "source": "drifblim"
+ },
+ "Druddigon": {
+  "front": "figures/druddigon.webp",
+  "back": "figures/druddigon-back.webp",
+  "source": "druddigon"
+ },
+ "Dubwool": {
+  "front": "figures/dubwool.webp",
+  "back": "figures/dubwool-back.webp",
+  "source": "dubwool"
+ },
+ "Dudunsparce": {
+  "front": "figures/dudunsparce.webp",
+  "back": "figures/dudunsparce-back.webp",
+  "source": "dudunsparce-two-segment"
+ },
+ "Dugtrio": {
+  "front": "figures/dugtrio.webp",
+  "back": "figures/dugtrio-back.webp",
+  "source": "dugtrio"
+ },
+ "Dugtrio Alola": {
+  "front": "figures/dugtrio-alola.webp",
+  "back": "figures/dugtrio-alola-back.webp",
+  "source": "dugtrio-alola"
+ },
+ "Duraludon": {
+  "front": "figures/duraludon.webp",
+  "back": "figures/duraludon-back.webp",
+  "source": "duraludon"
+ },
+ "Durant": {
+  "front": "figures/durant.webp",
+  "back": "figures/durant-back.webp",
+  "source": "durant"
+ },
+ "Dusknoir": {
+  "front": "figures/dusknoir.webp",
+  "back": "figures/dusknoir-back.webp",
+  "source": "dusknoir"
+ },
+ "Dustox": {
+  "front": "figures/dustox.webp",
+  "back": "figures/dustox-back.webp",
+  "source": "dustox"
+ },
+ "Eelektross": {
+  "front": "figures/eelektross.webp",
+  "back": "figures/eelektross-back.webp",
+  "source": "eelektross"
+ },
+ "Eelektross Mega": {
+  "front": "figures/eelektross-mega.webp",
+  "back": "figures/eelektross-mega-back.webp",
+  "source": "eelektross-mega"
+ },
+ "Eiscue Ice": {
+  "front": "figures/eiscue-ice.webp",
+  "back": "figures/eiscue-ice-back.webp",
+  "source": "eiscue-ice"
+ },
+ "Eiscue Noice": {
+  "front": "figures/eiscue-noice.webp",
+  "back": "figures/eiscue-noice-back.webp",
+  "source": "eiscue-noice"
+ },
+ "Eldegoss": {
+  "front": "figures/eldegoss.webp",
+  "back": "figures/eldegoss-back.webp",
+  "source": "eldegoss"
+ },
+ "Electivire": {
+  "front": "figures/electivire.webp",
+  "back": "figures/electivire-back.webp",
+  "source": "electivire"
+ },
+ "Electrode": {
+  "front": "figures/electrode.webp",
+  "back": "figures/electrode-back.webp",
+  "source": "electrode"
+ },
+ "Electrode Hisui": {
+  "front": "figures/electrode-hisui.webp",
+  "back": "figures/electrode-hisui-back.webp",
+  "source": "electrode-hisui"
+ },
+ "Emboar": {
+  "front": "figures/emboar.webp",
+  "back": "figures/emboar-back.webp",
+  "source": "emboar"
+ },
+ "Emboar Mega": {
+  "front": "figures/emboar-mega.webp",
+  "back": "figures/emboar-mega-back.webp",
+  "source": "emboar-mega"
+ },
+ "Emolga": {
+  "front": "figures/emolga.webp",
+  "back": "figures/emolga-back.webp",
+  "source": "emolga"
+ },
+ "Empoleon": {
+  "front": "figures/empoleon.webp",
+  "back": "figures/empoleon-back.webp",
+  "source": "empoleon"
+ },
+ "Enamorus I": {
+  "front": "figures/enamorus-i.webp",
+  "back": "figures/enamorus-i-back.webp",
+  "source": "enamorus-incarnate"
+ },
+ "Enamorus T": {
+  "front": "figures/enamorus-t.webp",
+  "back": "figures/enamorus-t-back.webp",
+  "source": "enamorus-therian"
+ },
+ "Entei": {
+  "front": "figures/entei.webp",
+  "back": "figures/entei-back.webp",
+  "source": "entei"
+ },
+ "Escavalier": {
+  "front": "figures/escavalier.webp",
+  "back": "figures/escavalier-back.webp",
+  "source": "escavalier"
+ },
+ "Espathra": {
+  "front": "figures/espathra.webp",
+  "back": "figures/espathra-back.webp",
+  "source": "espathra"
+ },
+ "Espeon": {
+  "front": "figures/espeon.webp",
+  "back": "figures/espeon-back.webp",
+  "source": "espeon"
+ },
+ "Excadrill": {
+  "front": "figures/excadrill.webp",
+  "back": "figures/excadrill-back.webp",
+  "source": "excadrill"
+ },
+ "Excadrill Mega": {
+  "front": "figures/excadrill-mega.webp",
+  "back": "figures/excadrill-mega-back.webp",
+  "source": "excadrill-mega"
+ },
+ "Exeggutor": {
+  "front": "figures/exeggutor.webp",
+  "back": "figures/exeggutor-back.webp",
+  "source": "exeggutor"
+ },
+ "Exeggutor Alola": {
+  "front": "figures/exeggutor-alola.webp",
+  "back": "figures/exeggutor-alola-back.webp",
+  "source": "exeggutor-alola"
+ },
+ "Exploud": {
+  "front": "figures/exploud.webp",
+  "back": "figures/exploud-back.webp",
+  "source": "exploud"
+ },
+ "Falinks": {
+  "front": "figures/falinks.webp",
+  "back": "figures/falinks-back.webp",
+  "source": "falinks"
+ },
+ "Falinks Mega": {
+  "front": "figures/falinks-mega.webp",
+  "back": "figures/falinks-mega-back.webp",
+  "source": "falinks-mega"
+ },
+ "Farigiraf": {
+  "front": "figures/farigiraf.webp",
+  "back": "figures/farigiraf-back.webp",
+  "source": "farigiraf"
+ },
+ "Fearow": {
+  "front": "figures/fearow.webp",
+  "back": "figures/fearow-back.webp",
+  "source": "fearow"
+ },
+ "Feraligatr": {
+  "front": "figures/feraligatr.webp",
+  "back": "figures/feraligatr-back.webp",
+  "source": "feraligatr"
+ },
+ "Feraligatr Mega": {
+  "front": "figures/feraligatr-mega.webp",
+  "back": "figures/feraligatr-mega-back.webp",
+  "source": "feraligatr-mega"
+ },
+ "Ferrothorn": {
+  "front": "figures/ferrothorn.webp",
+  "back": "figures/ferrothorn-back.webp",
+  "source": "ferrothorn"
+ },
+ "Fezandipiti": {
+  "front": "figures/fezandipiti.webp",
+  "back": "figures/fezandipiti-back.webp",
+  "source": "fezandipiti"
+ },
+ "Flamigo": {
+  "front": "figures/flamigo.webp",
+  "back": "figures/flamigo-back.webp",
+  "source": "flamigo"
+ },
+ "Flapple": {
+  "front": "figures/flapple.webp",
+  "back": "figures/flapple-back.webp",
+  "source": "flapple"
+ },
+ "Flareon": {
+  "front": "figures/flareon.webp",
+  "back": "figures/flareon-back.webp",
+  "source": "flareon"
+ },
+ "Floatzel": {
+  "front": "figures/floatzel.webp",
+  "back": "figures/floatzel-back.webp",
+  "source": "floatzel"
+ },
+ "Floette Eternal": {
+  "front": "figures/floette-eternal.webp",
+  "back": "figures/floette-eternal-back.webp",
+  "source": "floette-eternal"
+ },
+ "Floette Mega": {
+  "front": "figures/floette-mega.webp",
+  "back": "figures/floette-mega-back.webp",
+  "source": "floette-mega"
+ },
+ "Florges": {
+  "front": "figures/florges.webp",
+  "back": "figures/florges-back.webp",
+  "source": "florges"
+ },
+ "Flutter Mane": {
+  "front": "figures/flutter-mane.webp",
+  "back": "figures/flutter-mane-back.webp",
+  "source": "flutter-mane"
+ },
+ "Flygon": {
+  "front": "figures/flygon.webp",
+  "back": "figures/flygon-back.webp",
+  "source": "flygon"
+ },
+ "Forretress": {
+  "front": "figures/forretress.webp",
+  "back": "figures/forretress-back.webp",
+  "source": "forretress"
+ },
+ "Froslass": {
+  "front": "figures/froslass.webp",
+  "back": "figures/froslass-back.webp",
+  "source": "froslass"
+ },
+ "Froslass Mega": {
+  "front": "figures/froslass-mega.webp",
+  "back": "figures/froslass-mega-back.webp",
+  "source": "froslass-mega"
+ },
+ "Frosmoth": {
+  "front": "figures/frosmoth.webp",
+  "back": "figures/frosmoth-back.webp",
+  "source": "frosmoth"
+ },
+ "Furfrou": {
+  "front": "figures/furfrou.webp",
+  "back": "figures/furfrou-back.webp",
+  "source": "furfrou"
+ },
+ "Furret": {
+  "front": "figures/furret.webp",
+  "back": "figures/furret-back.webp",
+  "source": "furret"
+ },
+ "Gallade": {
+  "front": "figures/gallade.webp",
+  "back": "figures/gallade-back.webp",
+  "source": "gallade"
+ },
+ "Gallade Mega": {
+  "front": "figures/gallade-mega.webp",
+  "back": "figures/gallade-mega-back.webp",
+  "source": "gallade-mega"
+ },
+ "Galvantula": {
+  "front": "figures/galvantula.webp",
+  "back": "figures/galvantula-back.webp",
+  "source": "galvantula"
+ },
+ "Garbodor": {
+  "front": "figures/garbodor.webp",
+  "back": "figures/garbodor-back.webp",
+  "source": "garbodor"
+ },
+ "Garchomp": {
+  "front": "figures/garchomp.webp",
+  "back": "figures/garchomp-back.webp",
+  "source": "garchomp"
+ },
+ "Garchomp Mega": {
+  "front": "figures/garchomp-mega.webp",
+  "back": "figures/garchomp-mega-back.webp",
+  "source": "garchomp-mega"
+ },
+ "Garchomp Mega Z": {
+  "front": "figures/garchomp-mega-z.webp",
+  "back": "figures/garchomp-mega-z-back.webp",
+  "source": "garchomp-mega-z"
+ },
+ "Gardevoir": {
+  "front": "figures/gardevoir.webp",
+  "back": "figures/gardevoir-back.webp",
+  "source": "gardevoir"
+ },
+ "Gardevoir Mega": {
+  "front": "figures/gardevoir-mega.webp",
+  "back": "figures/gardevoir-mega-back.webp",
+  "source": "gardevoir-mega"
+ },
+ "Garganacl": {
+  "front": "figures/garganacl.webp",
+  "back": "figures/garganacl-back.webp",
+  "source": "garganacl"
+ },
+ "Gastrodon": {
+  "front": "figures/gastrodon.webp",
+  "back": "figures/gastrodon-back.webp",
+  "source": "gastrodon"
+ },
+ "Genesect": {
+  "front": "figures/genesect.webp",
+  "back": "figures/genesect-back.webp",
+  "source": "genesect"
+ },
+ "Gengar": {
+  "front": "figures/gengar.webp",
+  "back": "figures/gengar-back.webp",
+  "source": "gengar"
+ },
+ "Gengar Mega": {
+  "front": "figures/gengar-mega.webp",
+  "back": "figures/gengar-mega-back.webp",
+  "source": "gengar-mega"
+ },
+ "Gholdengo": {
+  "front": "figures/gholdengo.webp",
+  "back": "figures/gholdengo-back.webp",
+  "source": "gholdengo"
+ },
+ "Gigalith": {
+  "front": "figures/gigalith.webp",
+  "back": "figures/gigalith-back.webp",
+  "source": "gigalith"
+ },
+ "Glaceon": {
+  "front": "figures/glaceon.webp",
+  "back": "figures/glaceon-back.webp",
+  "source": "glaceon"
+ },
+ "Glalie": {
+  "front": "figures/glalie.webp",
+  "back": "figures/glalie-back.webp",
+  "source": "glalie"
+ },
+ "Glalie Mega": {
+  "front": "figures/glalie-mega.webp",
+  "back": "figures/glalie-mega-back.webp",
+  "source": "glalie-mega"
+ },
+ "Glastrier": {
+  "front": "figures/glastrier.webp",
+  "back": "figures/glastrier-back.webp",
+  "source": "glastrier"
+ },
+ "Glimmora": {
+  "front": "figures/glimmora.webp",
+  "back": "figures/glimmora-back.webp",
+  "source": "glimmora"
+ },
+ "Glimmora Mega": {
+  "front": "figures/glimmora-mega.webp",
+  "back": "figures/glimmora-mega-back.webp",
+  "source": "glimmora-mega"
+ },
+ "Gliscor": {
+  "front": "figures/gliscor.webp",
+  "back": "figures/gliscor-back.webp",
+  "source": "gliscor"
+ },
+ "Gogoat": {
+  "front": "figures/gogoat.webp",
+  "back": "figures/gogoat-back.webp",
+  "source": "gogoat"
+ },
+ "Golduck": {
+  "front": "figures/golduck.webp",
+  "back": "figures/golduck-back.webp",
+  "source": "golduck"
+ },
+ "Golem": {
+  "front": "figures/golem.webp",
+  "back": "figures/golem-back.webp",
+  "source": "golem"
+ },
+ "Golem Alola": {
+  "front": "figures/golem-alola.webp",
+  "back": "figures/golem-alola-back.webp",
+  "source": "golem-alola"
+ },
+ "Golisopod": {
+  "front": "figures/golisopod.webp",
+  "back": "figures/golisopod-back.webp",
+  "source": "golisopod"
+ },
+ "Golisopod Mega": {
+  "front": "figures/golisopod-mega.webp",
+  "back": "figures/golisopod-mega-back.webp",
+  "source": "golisopod-mega"
+ },
+ "Golurk": {
+  "front": "figures/golurk.webp",
+  "back": "figures/golurk-back.webp",
+  "source": "golurk"
+ },
+ "Golurk Mega": {
+  "front": "figures/golurk-mega.webp",
+  "back": "figures/golurk-mega-back.webp",
+  "source": "golurk-mega"
+ },
+ "Goodra": {
+  "front": "figures/goodra.webp",
+  "back": "figures/goodra-back.webp",
+  "source": "goodra"
+ },
+ "Goodra Hisui": {
+  "front": "figures/goodra-hisui.webp",
+  "back": "figures/goodra-hisui-back.webp",
+  "source": "goodra-hisui"
+ },
+ "Gorebyss": {
+  "front": "figures/gorebyss.webp",
+  "back": "figures/gorebyss-back.webp",
+  "source": "gorebyss"
+ },
+ "Gothitelle": {
+  "front": "figures/gothitelle.webp",
+  "back": "figures/gothitelle-back.webp",
+  "source": "gothitelle"
+ },
+ "Gouging Fire": {
+  "front": "figures/gouging-fire.webp",
+  "back": "figures/gouging-fire-back.webp",
+  "source": "gouging-fire"
+ },
+ "Gourgeist": {
+  "front": "figures/gourgeist.webp",
+  "back": "figures/gourgeist-back.webp",
+  "source": "gourgeist-average"
+ },
+ "Gourgeist Large": {
+  "front": "figures/gourgeist-large.webp",
+  "back": "figures/gourgeist-large-back.webp",
+  "source": "gourgeist-large"
+ },
+ "Gourgeist Small": {
+  "front": "figures/gourgeist-small.webp",
+  "back": "figures/gourgeist-small-back.webp",
+  "source": "gourgeist-small"
+ },
+ "Gourgeist Super": {
+  "front": "figures/gourgeist-super.webp",
+  "back": "figures/gourgeist-super-back.webp",
+  "source": "gourgeist-super"
+ },
+ "Grafaiai": {
+  "front": "figures/grafaiai.webp",
+  "back": "figures/grafaiai-back.webp",
+  "source": "grafaiai"
+ },
+ "Granbull": {
+  "front": "figures/granbull.webp",
+  "back": "figures/granbull-back.webp",
+  "source": "granbull"
+ },
+ "Grapploct": {
+  "front": "figures/grapploct.webp",
+  "back": "figures/grapploct-back.webp",
+  "source": "grapploct"
+ },
+ "Great Tusk": {
+  "front": "figures/great-tusk.webp",
+  "back": "figures/great-tusk-back.webp",
+  "source": "great-tusk"
+ },
+ "Greedant": {
+  "front": "figures/greedant.webp",
+  "back": "figures/greedant-back.webp",
+  "source": "greedent"
+ },
+ "Greninja": {
+  "front": "figures/greninja.webp",
+  "back": "figures/greninja-back.webp",
+  "source": "greninja"
+ },
+ "Greninja Mega": {
+  "front": "figures/greninja-mega.webp",
+  "back": "figures/greninja-mega-back.webp",
+  "source": "greninja-mega"
+ },
+ "Grimmsnarl": {
+  "front": "figures/grimmsnarl.webp",
+  "back": "figures/grimmsnarl-back.webp",
+  "source": "grimmsnarl"
+ },
+ "Grumpig": {
+  "front": "figures/grumpig.webp",
+  "back": "figures/grumpig-back.webp",
+  "source": "grumpig"
+ },
+ "Gumshoos": {
+  "front": "figures/gumshoos.webp",
+  "back": "figures/gumshoos-back.webp",
+  "source": "gumshoos"
+ },
+ "Guzzlord": {
+  "front": "figures/guzzlord.webp",
+  "back": "figures/guzzlord-back.webp",
+  "source": "guzzlord"
+ },
+ "Gyarados": {
+  "front": "figures/gyarados.webp",
+  "back": "figures/gyarados-back.webp",
+  "source": "gyarados"
+ },
+ "Gyarados Mega": {
+  "front": "figures/gyarados-mega.webp",
+  "back": "figures/gyarados-mega-back.webp",
+  "source": "gyarados-mega"
+ },
+ "Hariyama": {
+  "front": "figures/hariyama.webp",
+  "back": "figures/hariyama-back.webp",
+  "source": "hariyama"
+ },
+ "Hatterene": {
+  "front": "figures/hatterene.webp",
+  "back": "figures/hatterene-back.webp",
+  "source": "hatterene"
+ },
+ "Hawlucha": {
+  "front": "figures/hawlucha.webp",
+  "back": "figures/hawlucha-back.webp",
+  "source": "hawlucha"
+ },
+ "Hawlucha Mega": {
+  "front": "figures/hawlucha-mega.webp",
+  "back": "figures/hawlucha-mega-back.webp",
+  "source": "hawlucha-mega"
+ },
+ "Haxorus": {
+  "front": "figures/haxorus.webp",
+  "back": "figures/haxorus-back.webp",
+  "source": "haxorus"
+ },
+ "Heatmor": {
+  "front": "figures/heatmor.webp",
+  "back": "figures/heatmor-back.webp",
+  "source": "heatmor"
+ },
+ "Heatran": {
+  "front": "figures/heatran.webp",
+  "back": "figures/heatran-back.webp",
+  "source": "heatran"
+ },
+ "Heatran Mega": {
+  "front": "figures/heatran-mega.webp",
+  "back": "figures/heatran-mega-back.webp",
+  "source": "heatran-mega"
+ },
+ "Heliolisk": {
+  "front": "figures/heliolisk.webp",
+  "back": "figures/heliolisk-back.webp",
+  "source": "heliolisk"
+ },
+ "Heracross": {
+  "front": "figures/heracross.webp",
+  "back": "figures/heracross-back.webp",
+  "source": "heracross"
+ },
+ "Heracross Mega": {
+  "front": "figures/heracross-mega.webp",
+  "back": "figures/heracross-mega-back.webp",
+  "source": "heracross-mega"
+ },
+ "Hippowdon": {
+  "front": "figures/hippowdon.webp",
+  "back": "figures/hippowdon-back.webp",
+  "source": "hippowdon"
+ },
+ "Hitmonchan": {
+  "front": "figures/hitmonchan.webp",
+  "back": "figures/hitmonchan-back.webp",
+  "source": "hitmonchan"
+ },
+ "Hitmonlee": {
+  "front": "figures/hitmonlee.webp",
+  "back": "figures/hitmonlee-back.webp",
+  "source": "hitmonlee"
+ },
+ "Hitmontop": {
+  "front": "figures/hitmontop.webp",
+  "back": "figures/hitmontop-back.webp",
+  "source": "hitmontop"
+ },
+ "Honchkrow": {
+  "front": "figures/honchkrow.webp",
+  "back": "figures/honchkrow-back.webp",
+  "source": "honchkrow"
+ },
+ "Hoopa Confined": {
+  "front": "figures/hoopa-confined.webp",
+  "back": "figures/hoopa-confined-back.webp",
+  "source": "hoopa"
+ },
+ "Houndoom": {
+  "front": "figures/houndoom.webp",
+  "back": "figures/houndoom-back.webp",
+  "source": "houndoom"
+ },
+ "Houndoom Mega": {
+  "front": "figures/houndoom-mega.webp",
+  "back": "figures/houndoom-mega-back.webp",
+  "source": "houndoom-mega"
+ },
+ "Houndstone": {
+  "front": "figures/houndstone.webp",
+  "back": "figures/houndstone-back.webp",
+  "source": "houndstone"
+ },
+ "Huntail": {
+  "front": "figures/huntail.webp",
+  "back": "figures/huntail-back.webp",
+  "source": "huntail"
+ },
+ "Hydrapple": {
+  "front": "figures/hydrapple.webp",
+  "back": "figures/hydrapple-back.webp",
+  "source": "hydrapple"
+ },
+ "Hydreigon": {
+  "front": "figures/hydreigon.webp",
+  "back": "figures/hydreigon-back.webp",
+  "source": "hydreigon"
+ },
+ "Hypno": {
+  "front": "figures/hypno.webp",
+  "back": "figures/hypno-back.webp",
+  "source": "hypno"
+ },
+ "Illumise": {
+  "front": "figures/illumise.webp",
+  "back": "figures/illumise-back.webp",
+  "source": "illumise"
+ },
+ "Incineroar": {
+  "front": "figures/incineroar.webp",
+  "back": "figures/incineroar-back.webp",
+  "source": "incineroar"
+ },
+ "Indeedee Female": {
+  "front": "figures/indeedee-female.webp",
+  "back": "figures/indeedee-female-back.webp",
+  "source": "indeedee-female"
+ },
+ "Indeedee Male": {
+  "front": "figures/indeedee-male.webp",
+  "back": "figures/indeedee-male-back.webp",
+  "source": "indeedee-male"
+ },
+ "Infernape": {
+  "front": "figures/infernape.webp",
+  "back": "figures/infernape-back.webp",
+  "source": "infernape"
+ },
+ "Inteleon": {
+  "front": "figures/inteleon.webp",
+  "back": "figures/inteleon-back.webp",
+  "source": "inteleon"
+ },
+ "Iron Boulder": {
+  "front": "figures/iron-boulder.webp",
+  "back": "figures/iron-boulder-back.webp",
+  "source": "iron-boulder"
+ },
+ "Iron Bundle": {
+  "front": "figures/iron-bundle.webp",
+  "back": "figures/iron-bundle-back.webp",
+  "source": "iron-bundle"
+ },
+ "Iron Crown": {
+  "front": "figures/iron-crown.webp",
+  "back": "figures/iron-crown-back.webp",
+  "source": "iron-crown"
+ },
+ "Iron Hands": {
+  "front": "figures/iron-hands.webp",
+  "back": "figures/iron-hands-back.webp",
+  "source": "iron-hands"
+ },
+ "Iron Jugulis": {
+  "front": "figures/iron-jugulis.webp",
+  "back": "figures/iron-jugulis-back.webp",
+  "source": "iron-jugulis"
+ },
+ "Iron Leaves": {
+  "front": "figures/iron-leaves.webp",
+  "back": "figures/iron-leaves-back.webp",
+  "source": "iron-leaves"
+ },
+ "Iron Moth": {
+  "front": "figures/iron-moth.webp",
+  "back": "figures/iron-moth-back.webp",
+  "source": "iron-moth"
+ },
+ "Iron Thorns": {
+  "front": "figures/iron-thorns.webp",
+  "back": "figures/iron-thorns-back.webp",
+  "source": "iron-thorns"
+ },
+ "Iron Treads": {
+  "front": "figures/iron-treads.webp",
+  "back": "figures/iron-treads-back.webp",
+  "source": "iron-treads"
+ },
+ "Iron Valiant": {
+  "front": "figures/iron-valiant.webp",
+  "back": "figures/iron-valiant-back.webp",
+  "source": "iron-valiant"
+ },
+ "Jellicent": {
+  "front": "figures/jellicent.webp",
+  "back": "figures/jellicent-back.webp",
+  "source": "jellicent-male"
+ },
+ "Jirachi": {
+  "front": "figures/jirachi.webp",
+  "back": "figures/jirachi-back.webp",
+  "source": "jirachi"
+ },
+ "Jolteon": {
+  "front": "figures/jolteon.webp",
+  "back": "figures/jolteon-back.webp",
+  "source": "jolteon"
+ },
+ "Jumpluff": {
+  "front": "figures/jumpluff.webp",
+  "back": "figures/jumpluff-back.webp",
+  "source": "jumpluff"
+ },
+ "Jynx": {
+  "front": "figures/jynx.webp",
+  "back": "figures/jynx-back.webp",
+  "source": "jynx"
+ },
+ "Kabutops": {
+  "front": "figures/kabutops.webp",
+  "back": "figures/kabutops-back.webp",
+  "source": "kabutops"
+ },
+ "Kangaskhan": {
+  "front": "figures/kangaskhan.webp",
+  "back": "figures/kangaskhan-back.webp",
+  "source": "kangaskhan"
+ },
+ "Kangaskhan Mega": {
+  "front": "figures/kangaskhan-mega.webp",
+  "back": "figures/kangaskhan-mega-back.webp",
+  "source": "kangaskhan-mega"
+ },
+ "Kartana": {
+  "front": "figures/kartana.webp",
+  "back": "figures/kartana-back.webp",
+  "source": "kartana"
+ },
+ "Kecleon": {
+  "front": "figures/kecleon.webp",
+  "back": "figures/kecleon-back.webp",
+  "source": "kecleon"
+ },
+ "Keldeo": {
+  "front": "figures/keldeo.webp",
+  "back": "figures/keldeo-back.webp",
+  "source": "keldeo-ordinary"
+ },
+ "Kilowattrel": {
+  "front": "figures/kilowattrel.webp",
+  "back": "figures/kilowattrel-back.webp",
+  "source": "kilowattrel"
+ },
+ "Kingambit": {
+  "front": "figures/kingambit.webp",
+  "back": "figures/kingambit-back.webp",
+  "source": "kingambit"
+ },
+ "Kingdra": {
+  "front": "figures/kingdra.webp",
+  "back": "figures/kingdra-back.webp",
+  "source": "kingdra"
+ },
+ "Kingler": {
+  "front": "figures/kingler.webp",
+  "back": "figures/kingler-back.webp",
+  "source": "kingler"
+ },
+ "Klawf": {
+  "front": "figures/klawf.webp",
+  "back": "figures/klawf-back.webp",
+  "source": "klawf"
+ },
+ "Kleavor": {
+  "front": "figures/kleavor.webp",
+  "back": "figures/kleavor-back.webp",
+  "source": "kleavor"
+ },
+ "Klefki": {
+  "front": "figures/klefki.webp",
+  "back": "figures/klefki-back.webp",
+  "source": "klefki"
+ },
+ "Klinklang": {
+  "front": "figures/klinklang.webp",
+  "back": "figures/klinklang-back.webp",
+  "source": "klinklang"
+ },
+ "Komala": {
+  "front": "figures/komala.webp",
+  "back": "figures/komala-back.webp",
+  "source": "komala"
+ },
+ "Kommo-O": {
+  "front": "figures/kommo-o.webp",
+  "back": "figures/kommo-o-back.webp",
+  "source": "kommo-o"
+ },
+ "Kricketune": {
+  "front": "figures/kricketune.webp",
+  "back": "figures/kricketune-back.webp",
+  "source": "kricketune"
+ },
+ "Krookodile": {
+  "front": "figures/krookodile.webp",
+  "back": "figures/krookodile-back.webp",
+  "source": "krookodile"
+ },
+ "Landorus I": {
+  "front": "figures/landorus-i.webp",
+  "back": "figures/landorus-i-back.webp",
+  "source": "landorus-incarnate"
+ },
+ "Landorus T": {
+  "front": "figures/landorus-t.webp",
+  "back": "figures/landorus-t-back.webp",
+  "source": "landorus-therian"
+ },
+ "Lanturn": {
+  "front": "figures/lanturn.webp",
+  "back": "figures/lanturn-back.webp",
+  "source": "lanturn"
+ },
+ "Lapras": {
+  "front": "figures/lapras.webp",
+  "back": "figures/lapras-back.webp",
+  "source": "lapras"
+ },
+ "Latias": {
+  "front": "figures/latias.webp",
+  "back": "figures/latias-back.webp",
+  "source": "latias"
+ },
+ "Latios": {
+  "front": "figures/latios.webp",
+  "back": "figures/latios-back.webp",
+  "source": "latios"
+ },
+ "Leafeon": {
+  "front": "figures/leafeon.webp",
+  "back": "figures/leafeon-back.webp",
+  "source": "leafeon"
+ },
+ "Leavanny": {
+  "front": "figures/leavanny.webp",
+  "back": "figures/leavanny-back.webp",
+  "source": "leavanny"
+ },
+ "Ledian": {
+  "front": "figures/ledian.webp",
+  "back": "figures/ledian-back.webp",
+  "source": "ledian"
+ },
+ "Lickilicky": {
+  "front": "figures/lickilicky.webp",
+  "back": "figures/lickilicky-back.webp",
+  "source": "lickilicky"
+ },
+ "Liepard": {
+  "front": "figures/liepard.webp",
+  "back": "figures/liepard-back.webp",
+  "source": "liepard"
+ },
+ "Lilligant": {
+  "front": "figures/lilligant.webp",
+  "back": "figures/lilligant-back.webp",
+  "source": "lilligant"
+ },
+ "Lilligant Hisui": {
+  "front": "figures/lilligant-hisui.webp",
+  "back": "figures/lilligant-hisui-back.webp",
+  "source": "lilligant-hisui"
+ },
+ "Linoone": {
+  "front": "figures/linoone.webp",
+  "back": "figures/linoone-back.webp",
+  "source": "linoone"
+ },
+ "Lokix": {
+  "front": "figures/lokix.webp",
+  "back": "figures/lokix-back.webp",
+  "source": "lokix"
+ },
+ "Lopunny": {
+  "front": "figures/lopunny.webp",
+  "back": "figures/lopunny-back.webp",
+  "source": "lopunny"
+ },
+ "Lopunny Mega": {
+  "front": "figures/lopunny-mega.webp",
+  "back": "figures/lopunny-mega-back.webp",
+  "source": "lopunny-mega"
+ },
+ "Lucario": {
+  "front": "figures/lucario.webp",
+  "back": "figures/lucario-back.webp",
+  "source": "lucario"
+ },
+ "Lucario Mega": {
+  "front": "figures/lucario-mega.webp",
+  "back": "figures/lucario-mega-back.webp",
+  "source": "lucario-mega"
+ },
+ "Lucario Mega Z": {
+  "front": "figures/lucario-mega-z.webp",
+  "back": "figures/lucario-mega-z-back.webp",
+  "source": "lucario-mega-z"
+ },
+ "Ludicolo": {
+  "front": "figures/ludicolo.webp",
+  "back": "figures/ludicolo-back.webp",
+  "source": "ludicolo"
+ },
+ "Lumineon": {
+  "front": "figures/lumineon.webp",
+  "back": "figures/lumineon-back.webp",
+  "source": "lumineon"
+ },
+ "Lunatone": {
+  "front": "figures/lunatone.webp",
+  "back": "figures/lunatone-back.webp",
+  "source": "lunatone"
+ },
+ "Lurantis": {
+  "front": "figures/lurantis.webp",
+  "back": "figures/lurantis-back.webp",
+  "source": "lurantis"
+ },
+ "Luvdisc": {
+  "front": "figures/luvdisc.webp",
+  "back": "figures/luvdisc-back.webp",
+  "source": "luvdisc"
+ },
+ "Luxray": {
+  "front": "figures/luxray.webp",
+  "back": "figures/luxray-back.webp",
+  "source": "luxray"
+ },
+ "Lycanroc Dusk": {
+  "front": "figures/lycanroc-dusk.webp",
+  "back": "figures/lycanroc-dusk-back.webp",
+  "source": "lycanroc-dusk"
+ },
+ "Lycanroc Midday": {
+  "front": "figures/lycanroc-midday.webp",
+  "back": "figures/lycanroc-midday-back.webp",
+  "source": "lycanroc-midday"
+ },
+ "Lycanroc Midnight": {
+  "front": "figures/lycanroc-midnight.webp",
+  "back": "figures/lycanroc-midnight-back.webp",
+  "source": "lycanroc-midnight"
+ },
+ "Mabostiff": {
+  "front": "figures/mabostiff.webp",
+  "back": "figures/mabostiff-back.webp",
+  "source": "mabosstiff"
+ },
+ "Machamp": {
+  "front": "figures/machamp.webp",
+  "back": "figures/machamp-back.webp",
+  "source": "machamp"
+ },
+ "Magcargo": {
+  "front": "figures/magcargo.webp",
+  "back": "figures/magcargo-back.webp",
+  "source": "magcargo"
+ },
+ "Magearna": {
+  "front": "figures/magearna.webp",
+  "back": "figures/magearna-back.webp",
+  "source": "magearna"
+ },
+ "Magearna Mega": {
+  "front": "figures/magearna-mega.webp",
+  "back": "figures/magearna-mega-back.webp",
+  "source": "magearna-mega"
+ },
+ "Magmortar": {
+  "front": "figures/magmortar.webp",
+  "back": "figures/magmortar-back.webp",
+  "source": "magmortar"
+ },
+ "Magnezone": {
+  "front": "figures/magnezone.webp",
+  "back": "figures/magnezone-back.webp",
+  "source": "magnezone"
+ },
+ "Malamar": {
+  "front": "figures/malamar.webp",
+  "back": "figures/malamar-back.webp",
+  "source": "malamar"
+ },
+ "Malamar Mega": {
+  "front": "figures/malamar-mega.webp",
+  "back": "figures/malamar-mega-back.webp",
+  "source": "malamar-mega"
+ },
+ "Mamoswine": {
+  "front": "figures/mamoswine.webp",
+  "back": "figures/mamoswine-back.webp",
+  "source": "mamoswine"
+ },
+ "Manaphy": {
+  "front": "figures/manaphy.webp",
+  "back": "figures/manaphy-back.webp",
+  "source": "manaphy"
+ },
+ "Mandibuzz": {
+  "front": "figures/mandibuzz.webp",
+  "back": "figures/mandibuzz-back.webp",
+  "source": "mandibuzz"
+ },
+ "Manectric": {
+  "front": "figures/manectric.webp",
+  "back": "figures/manectric-back.webp",
+  "source": "manectric"
+ },
+ "Manectric Mega": {
+  "front": "figures/manectric-mega.webp",
+  "back": "figures/manectric-mega-back.webp",
+  "source": "manectric-mega"
+ },
+ "Mantine": {
+  "front": "figures/mantine.webp",
+  "back": "figures/mantine-back.webp",
+  "source": "mantine"
+ },
+ "Maractus": {
+  "front": "figures/maractus.webp",
+  "back": "figures/maractus-back.webp",
+  "source": "maractus"
+ },
+ "Marowak": {
+  "front": "figures/marowak.webp",
+  "back": "figures/marowak-back.webp",
+  "source": "marowak"
+ },
+ "Marowak Alola": {
+  "front": "figures/marowak-alola.webp",
+  "back": "figures/marowak-alola-back.webp",
+  "source": "marowak-alola"
+ },
+ "Marshadow": {
+  "front": "figures/marshadow.webp",
+  "back": "figures/marshadow-back.webp",
+  "source": "marshadow"
+ },
+ "Masquerain": {
+  "front": "figures/masquerain.webp",
+  "back": "figures/masquerain-back.webp",
+  "source": "masquerain"
+ },
+ "Maushold": {
+  "front": "figures/maushold.webp",
+  "back": "figures/maushold-back.webp",
+  "source": "maushold-family-of-four"
+ },
+ "Mawile": {
+  "front": "figures/mawile.webp",
+  "back": "figures/mawile-back.webp",
+  "source": "mawile"
+ },
+ "Mawile Mega": {
+  "front": "figures/mawile-mega.webp",
+  "back": "figures/mawile-mega-back.webp",
+  "source": "mawile-mega"
+ },
+ "Medicham": {
+  "front": "figures/medicham.webp",
+  "back": "figures/medicham-back.webp",
+  "source": "medicham"
+ },
+ "Medicham Mega": {
+  "front": "figures/medicham-mega.webp",
+  "back": "figures/medicham-mega-back.webp",
+  "source": "medicham-mega"
+ },
+ "Meganium": {
+  "front": "figures/meganium.webp",
+  "back": "figures/meganium-back.webp",
+  "source": "meganium"
+ },
+ "Meganium Mega": {
+  "front": "figures/meganium-mega.webp",
+  "back": "figures/meganium-mega-back.webp",
+  "source": "meganium-mega"
+ },
+ "Melmetal": {
+  "front": "figures/melmetal.webp",
+  "back": "figures/melmetal-back.webp",
+  "source": "melmetal"
+ },
+ "Meloetta Aria": {
+  "front": "figures/meloetta-aria.webp",
+  "back": "figures/meloetta-aria-back.webp",
+  "source": "meloetta-aria"
+ },
+ "Meloetta Pirouette": {
+  "front": "figures/meloetta-pirouette.webp",
+  "back": "figures/meloetta-pirouette-back.webp",
+  "source": "meloetta-pirouette"
+ },
+ "Meowscarada": {
+  "front": "figures/meowscarada.webp",
+  "back": "figures/meowscarada-back.webp",
+  "source": "meowscarada"
+ },
+ "Meowstic Mega": {
+  "front": "figures/meowstic-mega.webp",
+  "back": "figures/meowstic-mega-back.webp",
+  "source": "meowstic-male-mega"
+ },
+ "Meowstic-F": {
+  "front": "figures/meowstic-f.webp",
+  "back": "figures/meowstic-f-back.webp",
+  "source": "meowstic-female"
+ },
+ "Meowstic-M": {
+  "front": "figures/meowstic-m.webp",
+  "back": "figures/meowstic-m-back.webp",
+  "source": "meowstic-male"
+ },
+ "Mesprit": {
+  "front": "figures/mesprit.webp",
+  "back": "figures/mesprit-back.webp",
+  "source": "mesprit"
+ },
+ "Metagross": {
+  "front": "figures/metagross.webp",
+  "back": "figures/metagross-back.webp",
+  "source": "metagross"
+ },
+ "Metagross Mega": {
+  "front": "figures/metagross-mega.webp",
+  "back": "figures/metagross-mega-back.webp",
+  "source": "metagross-mega"
+ },
+ "Mew": {
+  "front": "figures/mew.webp",
+  "back": "figures/mew-back.webp",
+  "source": "mew"
+ },
+ "Mienshao": {
+  "front": "figures/mienshao.webp",
+  "back": "figures/mienshao-back.webp",
+  "source": "mienshao"
+ },
+ "Mightyena": {
+  "front": "figures/mightyena.webp",
+  "back": "figures/mightyena-back.webp",
+  "source": "mightyena"
+ },
+ "Milotic": {
+  "front": "figures/milotic.webp",
+  "back": "figures/milotic-back.webp",
+  "source": "milotic"
+ },
+ "Miltank": {
+  "front": "figures/miltank.webp",
+  "back": "figures/miltank-back.webp",
+  "source": "miltank"
+ },
+ "Mimikyu": {
+  "front": "figures/mimikyu.webp",
+  "back": "figures/mimikyu-back.webp",
+  "source": "mimikyu-disguised"
+ },
+ "Minior Core": {
+  "front": "figures/minior-core.webp",
+  "back": "figures/minior-core-back.webp",
+  "source": "minior-red"
+ },
+ "Minior Meteor": {
+  "front": "figures/minior-meteor.webp",
+  "back": "figures/minior-meteor-back.webp",
+  "source": "minior-red-meteor"
+ },
+ "Minun": {
+  "front": "figures/minun.webp",
+  "back": "figures/minun-back.webp",
+  "source": "minun"
+ },
+ "Mismagius": {
+  "front": "figures/mismagius.webp",
+  "back": "figures/mismagius-back.webp",
+  "source": "mismagius"
+ },
+ "Moltres": {
+  "front": "figures/moltres.webp",
+  "back": "figures/moltres-back.webp",
+  "source": "moltres"
+ },
+ "Moltres Galar": {
+  "front": "figures/moltres-galar.webp",
+  "back": "figures/moltres-galar-back.webp",
+  "source": "moltres-galar"
+ },
+ "Morpeko Full Belly": {
+  "front": "figures/morpeko-full-belly.webp",
+  "back": "figures/morpeko-full-belly-back.webp",
+  "source": "morpeko-full-belly"
+ },
+ "Morpeko Hangry": {
+  "front": "figures/morpeko-hangry.webp",
+  "back": "figures/morpeko-hangry-back.webp",
+  "source": "morpeko-hangry"
+ },
+ "Mothim": {
+  "front": "figures/mothim.webp",
+  "back": "figures/mothim-back.webp",
+  "source": "mothim"
+ },
+ "Mr. Mime": {
+  "front": "figures/mr-mime.webp",
+  "back": "figures/mr-mime-back.webp",
+  "source": "mr-mime"
+ },
+ "Mr. Rime": {
+  "front": "figures/mr-rime.webp",
+  "back": "figures/mr-rime-back.webp",
+  "source": "mr-rime"
+ },
+ "Mudsdale": {
+  "front": "figures/mudsdale.webp",
+  "back": "figures/mudsdale-back.webp",
+  "source": "mudsdale"
+ },
+ "Muk": {
+  "front": "figures/muk.webp",
+  "back": "figures/muk-back.webp",
+  "source": "muk"
+ },
+ "Muk Alola": {
+  "front": "figures/muk-alola.webp",
+  "back": "figures/muk-alola-back.webp",
+  "source": "muk-alola"
+ },
+ "Munkidori": {
+  "front": "figures/munkidori.webp",
+  "back": "figures/munkidori-back.webp",
+  "source": "munkidori"
+ },
+ "Musharna": {
+  "front": "figures/musharna.webp",
+  "back": "figures/musharna-back.webp",
+  "source": "musharna"
+ },
+ "Naganadel": {
+  "front": "figures/naganadel.webp",
+  "back": "figures/naganadel-back.webp",
+  "source": "naganadel"
+ },
+ "Nidoking": {
+  "front": "figures/nidoking.webp",
+  "back": "figures/nidoking-back.webp",
+  "source": "nidoking"
+ },
+ "Nidoqueen": {
+  "front": "figures/nidoqueen.webp",
+  "back": "figures/nidoqueen-back.webp",
+  "source": "nidoqueen"
+ },
+ "Nihilego": {
+  "front": "figures/nihilego.webp",
+  "back": "figures/nihilego-back.webp",
+  "source": "nihilego"
+ },
+ "Ninetales": {
+  "front": "figures/ninetales.webp",
+  "back": "figures/ninetales-back.webp",
+  "source": "ninetales"
+ },
+ "Ninetales Alola": {
+  "front": "figures/ninetales-alola.webp",
+  "back": "figures/ninetales-alola-back.webp",
+  "source": "ninetales-alola"
+ },
+ "Ninjask": {
+  "front": "figures/ninjask.webp",
+  "back": "figures/ninjask-back.webp",
+  "source": "ninjask"
+ },
+ "Noctowl": {
+  "front": "figures/noctowl.webp",
+  "back": "figures/noctowl-back.webp",
+  "source": "noctowl"
+ },
+ "Noivern": {
+  "front": "figures/noivern.webp",
+  "back": "figures/noivern-back.webp",
+  "source": "noivern"
+ },
+ "Obstagoon": {
+  "front": "figures/obstagoon.webp",
+  "back": "figures/obstagoon-back.webp",
+  "source": "obstagoon"
+ },
+ "Octillery": {
+  "front": "figures/octillery.webp",
+  "back": "figures/octillery-back.webp",
+  "source": "octillery"
+ },
+ "Ogerpon": {
+  "front": "figures/ogerpon.webp",
+  "back": "figures/ogerpon-back.webp",
+  "source": "ogerpon"
+ },
+ "Oinkologne": {
+  "front": "figures/oinkologne.webp",
+  "back": "figures/oinkologne-back.webp",
+  "source": "oinkologne-male"
+ },
+ "Okidogi": {
+  "front": "figures/okidogi.webp",
+  "back": "figures/okidogi-back.webp",
+  "source": "okidogi"
+ },
+ "Omastar": {
+  "front": "figures/omastar.webp",
+  "back": "figures/omastar-back.webp",
+  "source": "omastar"
+ },
+ "Oranguru": {
+  "front": "figures/oranguru.webp",
+  "back": "figures/oranguru-back.webp",
+  "source": "oranguru"
+ },
+ "Orbeetle": {
+  "front": "figures/orbeetle.webp",
+  "back": "figures/orbeetle-back.webp",
+  "source": "orbeetle"
+ },
+ "Oricorio Baile": {
+  "front": "figures/oricorio-baile.webp",
+  "back": "figures/oricorio-baile-back.webp",
+  "source": "oricorio-baile"
+ },
+ "Oricorio Pa'u": {
+  "front": "figures/oricorio-pau.webp",
+  "back": "figures/oricorio-pau-back.webp",
+  "source": "oricorio-pau"
+ },
+ "Oricorio Pom-Pom": {
+  "front": "figures/oricorio-pom-pom.webp",
+  "back": "figures/oricorio-pom-pom-back.webp",
+  "source": "oricorio-pom-pom"
+ },
+ "Oricorio Sensu": {
+  "front": "figures/oricorio-sensu.webp",
+  "back": "figures/oricorio-sensu-back.webp",
+  "source": "oricorio-sensu"
+ },
+ "Orthworm": {
+  "front": "figures/orthworm.webp",
+  "back": "figures/orthworm-back.webp",
+  "source": "orthworm"
+ },
+ "Overqwil": {
+  "front": "figures/overqwil.webp",
+  "back": "figures/overqwil-back.webp",
+  "source": "overqwil"
+ },
+ "Pachirisu": {
+  "front": "figures/pachirisu.webp",
+  "back": "figures/pachirisu-back.webp",
+  "source": "pachirisu"
+ },
+ "Palafin Hero": {
+  "front": "figures/palafin-hero.webp",
+  "back": "figures/palafin-hero-back.webp",
+  "source": "palafin-hero"
+ },
+ "Palafin Zero": {
+  "front": "figures/palafin-zero.webp",
+  "back": "figures/palafin-zero-back.webp",
+  "source": "palafin-zero"
+ },
+ "Palossand": {
+  "front": "figures/palossand.webp",
+  "back": "figures/palossand-back.webp",
+  "source": "palossand"
+ },
+ "Pangoro": {
+  "front": "figures/pangoro.webp",
+  "back": "figures/pangoro-back.webp",
+  "source": "pangoro"
+ },
+ "Parasect": {
+  "front": "figures/parasect.webp",
+  "back": "figures/parasect-back.webp",
+  "source": "parasect"
+ },
+ "Passimian": {
+  "front": "figures/passimian.webp",
+  "back": "figures/passimian-back.webp",
+  "source": "passimian"
+ },
+ "Pawmot": {
+  "front": "figures/pawmot.webp",
+  "back": "figures/pawmot-back.webp",
+  "source": "pawmot"
+ },
+ "Pecharunt": {
+  "front": "figures/pecharunt.webp",
+  "back": "figures/pecharunt-back.webp",
+  "source": "pecharunt"
+ },
+ "Pelipper": {
+  "front": "figures/pelipper.webp",
+  "back": "figures/pelipper-back.webp",
+  "source": "pelipper"
+ },
+ "Perserker": {
+  "front": "figures/perserker.webp",
+  "back": "figures/perserker-back.webp",
+  "source": "perrserker"
+ },
+ "Persian": {
+  "front": "figures/persian.webp",
+  "back": "figures/persian-back.webp",
+  "source": "persian"
+ },
+ "Persian Alola": {
+  "front": "figures/persian-alola.webp",
+  "back": "figures/persian-alola-back.webp",
+  "source": "persian-alola"
+ },
+ "Pheromosa": {
+  "front": "figures/pheromosa.webp",
+  "back": "figures/pheromosa-back.webp",
+  "source": "pheromosa"
+ },
+ "Phione": {
+  "front": "figures/phione.webp",
+  "back": "figures/phione-back.webp",
+  "source": "phione"
+ },
+ "Pidgeot": {
+  "front": "figures/pidgeot.webp",
+  "back": "figures/pidgeot-back.webp",
+  "source": "pidgeot"
+ },
+ "Pidgeot Mega": {
+  "front": "figures/pidgeot-mega.webp",
+  "back": "figures/pidgeot-mega-back.webp",
+  "source": "pidgeot-mega"
+ },
+ "Pincurchin": {
+  "front": "figures/pincurchin.webp",
+  "back": "figures/pincurchin-back.webp",
+  "source": "pincurchin"
+ },
+ "Pinsir": {
+  "front": "figures/pinsir.webp",
+  "back": "figures/pinsir-back.webp",
+  "source": "pinsir"
+ },
+ "Pinsir Mega": {
+  "front": "figures/pinsir-mega.webp",
+  "back": "figures/pinsir-mega-back.webp",
+  "source": "pinsir-mega"
+ },
+ "Plusle": {
+  "front": "figures/plusle.webp",
+  "back": "figures/plusle-back.webp",
+  "source": "plusle"
+ },
+ "Politoed": {
+  "front": "figures/politoed.webp",
+  "back": "figures/politoed-back.webp",
+  "source": "politoed"
+ },
+ "Poliwrath": {
+  "front": "figures/poliwrath.webp",
+  "back": "figures/poliwrath-back.webp",
+  "source": "poliwrath"
+ },
+ "Polteageist": {
+  "front": "figures/polteageist.webp",
+  "back": "figures/polteageist-back.webp",
+  "source": "polteageist"
+ },
+ "Porygon-Z": {
+  "front": "figures/porygon-z.webp",
+  "back": "figures/porygon-z-back.webp",
+  "source": "porygon-z"
+ },
+ "Primarina": {
+  "front": "figures/primarina.webp",
+  "back": "figures/primarina-back.webp",
+  "source": "primarina"
+ },
+ "Primeape": {
+  "front": "figures/primeape.webp",
+  "back": "figures/primeape-back.webp",
+  "source": "primeape"
+ },
+ "Probopass": {
+  "front": "figures/probopass.webp",
+  "back": "figures/probopass-back.webp",
+  "source": "probopass"
+ },
+ "Purugly": {
+  "front": "figures/purugly.webp",
+  "back": "figures/purugly-back.webp",
+  "source": "purugly"
+ },
+ "Pyroar": {
+  "front": "figures/pyroar.webp",
+  "back": "figures/pyroar-back.webp",
+  "source": "pyroar-male"
+ },
+ "Pyroar Mega": {
+  "front": "figures/pyroar-mega.webp",
+  "back": "figures/pyroar-mega-back.webp",
+  "source": "pyroar-mega"
+ },
+ "Pyukumuku": {
+  "front": "figures/pyukumuku.webp",
+  "back": "figures/pyukumuku-back.webp",
+  "source": "pyukumuku"
+ },
+ "Quagsire": {
+  "front": "figures/quagsire.webp",
+  "back": "figures/quagsire-back.webp",
+  "source": "quagsire"
+ },
+ "Quaquaval": {
+  "front": "figures/quaquaval.webp",
+  "back": "figures/quaquaval-back.webp",
+  "source": "quaquaval"
+ },
+ "Qwilfish": {
+  "front": "figures/qwilfish.webp",
+  "back": "figures/qwilfish-back.webp",
+  "source": "qwilfish"
+ },
+ "Rabsca": {
+  "front": "figures/rabsca.webp",
+  "back": "figures/rabsca-back.webp",
+  "source": "rabsca"
+ },
+ "Raging Bolt": {
+  "front": "figures/raging-bolt.webp",
+  "back": "figures/raging-bolt-back.webp",
+  "source": "raging-bolt"
+ },
+ "Raichu": {
+  "front": "figures/raichu.webp",
+  "back": "figures/raichu-back.webp",
+  "source": "raichu"
+ },
+ "Raichu Alola": {
+  "front": "figures/raichu-alola.webp",
+  "back": "figures/raichu-alola-back.webp",
+  "source": "raichu-alola"
+ },
+ "Raichu Mega X": {
+  "front": "figures/raichu-mega-x.webp",
+  "back": "figures/raichu-mega-x-back.webp",
+  "source": "raichu-mega-x"
+ },
+ "Raichu Mega Y": {
+  "front": "figures/raichu-mega-y.webp",
+  "back": "figures/raichu-mega-y-back.webp",
+  "source": "raichu-mega-y"
+ },
+ "Raikou": {
+  "front": "figures/raikou.webp",
+  "back": "figures/raikou-back.webp",
+  "source": "raikou"
+ },
+ "Rampardos": {
+  "front": "figures/rampardos.webp",
+  "back": "figures/rampardos-back.webp",
+  "source": "rampardos"
+ },
+ "Rapidash": {
+  "front": "figures/rapidash.webp",
+  "back": "figures/rapidash-back.webp",
+  "source": "rapidash"
+ },
+ "Rapidash Galar": {
+  "front": "figures/rapidash-galar.webp",
+  "back": "figures/rapidash-galar-back.webp",
+  "source": "rapidash-galar"
+ },
+ "Raticate": {
+  "front": "figures/raticate.webp",
+  "back": "figures/raticate-back.webp",
+  "source": "raticate"
+ },
+ "Raticate Alola": {
+  "front": "figures/raticate-alola.webp",
+  "back": "figures/raticate-alola-back.webp",
+  "source": "raticate-alola"
+ },
+ "Regice": {
+  "front": "figures/regice.webp",
+  "back": "figures/regice-back.webp",
+  "source": "regice"
+ },
+ "Regidrago": {
+  "front": "figures/regidrago.webp",
+  "back": "figures/regidrago-back.webp",
+  "source": "regidrago"
+ },
+ "Regileki": {
+  "front": "figures/regileki.webp",
+  "back": "figures/regileki-back.webp",
+  "source": "regieleki"
+ },
+ "Regirock": {
+  "front": "figures/regirock.webp",
+  "back": "figures/regirock-back.webp",
+  "source": "regirock"
+ },
+ "Registeel": {
+  "front": "figures/registeel.webp",
+  "back": "figures/registeel-back.webp",
+  "source": "registeel"
+ },
+ "Relicanth": {
+  "front": "figures/relicanth.webp",
+  "back": "figures/relicanth-back.webp",
+  "source": "relicanth"
+ },
+ "Reuniclus": {
+  "front": "figures/reuniclus.webp",
+  "back": "figures/reuniclus-back.webp",
+  "source": "reuniclus"
+ },
+ "Revavroom": {
+  "front": "figures/revavroom.webp",
+  "back": "figures/revavroom-back.webp",
+  "source": "revavroom"
+ },
+ "Rhyperior": {
+  "front": "figures/rhyperior.webp",
+  "back": "figures/rhyperior-back.webp",
+  "source": "rhyperior"
+ },
+ "Ribombee": {
+  "front": "figures/ribombee.webp",
+  "back": "figures/ribombee-back.webp",
+  "source": "ribombee"
+ },
+ "Rillaboom": {
+  "front": "figures/rillaboom.webp",
+  "back": "figures/rillaboom-back.webp",
+  "source": "rillaboom"
+ },
+ "Roaring Moon": {
+  "front": "figures/roaring-moon.webp",
+  "back": "figures/roaring-moon-back.webp",
+  "source": "roaring-moon"
+ },
+ "Roserade": {
+  "front": "figures/roserade.webp",
+  "back": "figures/roserade-back.webp",
+  "source": "roserade"
+ },
+ "Rotom": {
+  "front": "figures/rotom.webp",
+  "back": "figures/rotom-back.webp",
+  "source": "rotom"
+ },
+ "Rotom Fan": {
+  "front": "figures/rotom-fan.webp",
+  "back": "figures/rotom-fan-back.webp",
+  "source": "rotom-fan"
+ },
+ "Rotom Frost": {
+  "front": "figures/rotom-frost.webp",
+  "back": "figures/rotom-frost-back.webp",
+  "source": "rotom-frost"
+ },
+ "Rotom Heat": {
+  "front": "figures/rotom-heat.webp",
+  "back": "figures/rotom-heat-back.webp",
+  "source": "rotom-heat"
+ },
+ "Rotom Mow": {
+  "front": "figures/rotom-mow.webp",
+  "back": "figures/rotom-mow-back.webp",
+  "source": "rotom-mow"
+ },
+ "Rotom Wash": {
+  "front": "figures/rotom-wash.webp",
+  "back": "figures/rotom-wash-back.webp",
+  "source": "rotom-wash"
+ },
+ "Runerigus": {
+  "front": "figures/runerigus.webp",
+  "back": "figures/runerigus-back.webp",
+  "source": "runerigus"
+ },
+ "Sableye": {
+  "front": "figures/sableye.webp",
+  "back": "figures/sableye-back.webp",
+  "source": "sableye"
+ },
+ "Sableye Mega": {
+  "front": "figures/sableye-mega.webp",
+  "back": "figures/sableye-mega-back.webp",
+  "source": "sableye-mega"
+ },
+ "Salamence": {
+  "front": "figures/salamence.webp",
+  "back": "figures/salamence-back.webp",
+  "source": "salamence"
+ },
+ "Salamence Mega": {
+  "front": "figures/salamence-mega.webp",
+  "back": "figures/salamence-mega-back.webp",
+  "source": "salamence-mega"
+ },
+ "Salazzle": {
+  "front": "figures/salazzle.webp",
+  "back": "figures/salazzle-back.webp",
+  "source": "salazzle"
+ },
+ "Samurott": {
+  "front": "figures/samurott.webp",
+  "back": "figures/samurott-back.webp",
+  "source": "samurott"
+ },
+ "Samurott Hisui": {
+  "front": "figures/samurott-hisui.webp",
+  "back": "figures/samurott-hisui-back.webp",
+  "source": "samurott-hisui"
+ },
+ "Sandaconda": {
+  "front": "figures/sandaconda.webp",
+  "back": "figures/sandaconda-back.webp",
+  "source": "sandaconda"
+ },
+ "Sandslash": {
+  "front": "figures/sandslash.webp",
+  "back": "figures/sandslash-back.webp",
+  "source": "sandslash"
+ },
+ "Sandslash Alola": {
+  "front": "figures/sandslash-alola.webp",
+  "back": "figures/sandslash-alola-back.webp",
+  "source": "sandslash-alola"
+ },
+ "Sandy Shocks": {
+  "front": "figures/sandy-shocks.webp",
+  "back": "figures/sandy-shocks-back.webp",
+  "source": "sandy-shocks"
+ },
+ "Sawk": {
+  "front": "figures/sawk.webp",
+  "back": "figures/sawk-back.webp",
+  "source": "sawk"
+ },
+ "Sawsbuck": {
+  "front": "figures/sawsbuck.webp",
+  "back": "figures/sawsbuck-back.webp",
+  "source": "sawsbuck"
+ },
+ "Sceptile": {
+  "front": "figures/sceptile.webp",
+  "back": "figures/sceptile-back.webp",
+  "source": "sceptile"
+ },
+ "Sceptile Mega": {
+  "front": "figures/sceptile-mega.webp",
+  "back": "figures/sceptile-mega-back.webp",
+  "source": "sceptile-mega"
+ },
+ "Scizor": {
+  "front": "figures/scizor.webp",
+  "back": "figures/scizor-back.webp",
+  "source": "scizor"
+ },
+ "Scizor Mega": {
+  "front": "figures/scizor-mega.webp",
+  "back": "figures/scizor-mega-back.webp",
+  "source": "scizor-mega"
+ },
+ "Scolipede": {
+  "front": "figures/scolipede.webp",
+  "back": "figures/scolipede-back.webp",
+  "source": "scolipede"
+ },
+ "Scolipede Mega": {
+  "front": "figures/scolipede-mega.webp",
+  "back": "figures/scolipede-mega-back.webp",
+  "source": "scolipede-mega"
+ },
+ "Scovillain": {
+  "front": "figures/scovillain.webp",
+  "back": "figures/scovillain-back.webp",
+  "source": "scovillain"
+ },
+ "Scovillain Mega": {
+  "front": "figures/scovillain-mega.webp",
+  "back": "figures/scovillain-mega-back.webp",
+  "source": "scovillain-mega"
+ },
+ "Scrafty": {
+  "front": "figures/scrafty.webp",
+  "back": "figures/scrafty-back.webp",
+  "source": "scrafty"
+ },
+ "Scrafty Mega": {
+  "front": "figures/scrafty-mega.webp",
+  "back": "figures/scrafty-mega-back.webp",
+  "source": "scrafty-mega"
+ },
+ "Scream Tail": {
+  "front": "figures/scream-tail.webp",
+  "back": "figures/scream-tail-back.webp",
+  "source": "scream-tail"
+ },
+ "Seaking": {
+  "front": "figures/seaking.webp",
+  "back": "figures/seaking-back.webp",
+  "source": "seaking"
+ },
+ "Seismitoad": {
+  "front": "figures/seismitoad.webp",
+  "back": "figures/seismitoad-back.webp",
+  "source": "seismitoad"
+ },
+ "Serperior": {
+  "front": "figures/serperior.webp",
+  "back": "figures/serperior-back.webp",
+  "source": "serperior"
+ },
+ "Seviper": {
+  "front": "figures/seviper.webp",
+  "back": "figures/seviper-back.webp",
+  "source": "seviper"
+ },
+ "Sharpedo": {
+  "front": "figures/sharpedo.webp",
+  "back": "figures/sharpedo-back.webp",
+  "source": "sharpedo"
+ },
+ "Sharpedo Mega": {
+  "front": "figures/sharpedo-mega.webp",
+  "back": "figures/sharpedo-mega-back.webp",
+  "source": "sharpedo-mega"
+ },
+ "Shaymin Land": {
+  "front": "figures/shaymin-land.webp",
+  "back": "figures/shaymin-land-back.webp",
+  "source": "shaymin-land"
+ },
+ "Shaymin Sky": {
+  "front": "figures/shaymin-sky.webp",
+  "back": "figures/shaymin-sky-back.webp",
+  "source": "shaymin-sky"
+ },
+ "Shiftry": {
+  "front": "figures/shiftry.webp",
+  "back": "figures/shiftry-back.webp",
+  "source": "shiftry"
+ },
+ "Shiinotic": {
+  "front": "figures/shiinotic.webp",
+  "back": "figures/shiinotic-back.webp",
+  "source": "shiinotic"
+ },
+ "Shuckle": {
+  "front": "figures/shuckle.webp",
+  "back": "figures/shuckle-back.webp",
+  "source": "shuckle"
+ },
+ "Sigilyph": {
+  "front": "figures/sigilyph.webp",
+  "back": "figures/sigilyph-back.webp",
+  "source": "sigilyph"
+ },
+ "Silvally": {
+  "front": "figures/silvally.webp",
+  "back": "figures/silvally-back.webp",
+  "source": "silvally"
+ },
+ "Simipour": {
+  "front": "figures/simipour.webp",
+  "back": "figures/simipour-back.webp",
+  "source": "simipour"
+ },
+ "Simisage": {
+  "front": "figures/simisage.webp",
+  "back": "figures/simisage-back.webp",
+  "source": "simisage"
+ },
+ "Simisear": {
+  "front": "figures/simisear.webp",
+  "back": "figures/simisear-back.webp",
+  "source": "simisear"
+ },
+ "Sinistcha": {
+  "front": "figures/sinistcha.webp",
+  "back": "figures/sinistcha-back.webp",
+  "source": "sinistcha"
+ },
+ "Sirfetch'd": {
+  "front": "figures/sirfetchd.webp",
+  "back": "figures/sirfetchd-back.webp",
+  "source": "sirfetchd"
+ },
+ "Skarmory": {
+  "front": "figures/skarmory.webp",
+  "back": "figures/skarmory-back.webp",
+  "source": "skarmory"
+ },
+ "Skarmory Mega": {
+  "front": "figures/skarmory-mega.webp",
+  "back": "figures/skarmory-mega-back.webp",
+  "source": "skarmory-mega"
+ },
+ "Skeledirge": {
+  "front": "figures/skeledirge.webp",
+  "back": "figures/skeledirge-back.webp",
+  "source": "skeledirge"
+ },
+ "Skuntank": {
+  "front": "figures/skuntank.webp",
+  "back": "figures/skuntank-back.webp",
+  "source": "skuntank"
+ },
+ "Slaking": {
+  "front": "figures/slaking.webp",
+  "back": "figures/slaking-back.webp",
+  "source": "slaking"
+ },
+ "Slitherwing": {
+  "front": "figures/slitherwing.webp",
+  "back": "figures/slitherwing-back.webp",
+  "source": "slither-wing"
+ },
+ "Slowbro": {
+  "front": "figures/slowbro.webp",
+  "back": "figures/slowbro-back.webp",
+  "source": "slowbro"
+ },
+ "Slowbro Galar": {
+  "front": "figures/slowbro-galar.webp",
+  "back": "figures/slowbro-galar-back.webp",
+  "source": "slowbro-galar"
+ },
+ "Slowbro Mega": {
+  "front": "figures/slowbro-mega.webp",
+  "back": "figures/slowbro-mega-back.webp",
+  "source": "slowbro-mega"
+ },
+ "Slowking": {
+  "front": "figures/slowking.webp",
+  "back": "figures/slowking-back.webp",
+  "source": "slowking"
+ },
+ "Slowking Galar": {
+  "front": "figures/slowking-galar.webp",
+  "back": "figures/slowking-galar-back.webp",
+  "source": "slowking-galar"
+ },
+ "Slurpuff": {
+  "front": "figures/slurpuff.webp",
+  "back": "figures/slurpuff-back.webp",
+  "source": "slurpuff"
+ },
+ "Sneasler": {
+  "front": "figures/sneasler.webp",
+  "back": "figures/sneasler-back.webp",
+  "source": "sneasler"
+ },
+ "Snorlax": {
+  "front": "figures/snorlax.webp",
+  "back": "figures/snorlax-back.webp",
+  "source": "snorlax"
+ },
+ "Solrock": {
+  "front": "figures/solrock.webp",
+  "back": "figures/solrock-back.webp",
+  "source": "solrock"
+ },
+ "Spectrier": {
+  "front": "figures/spectrier.webp",
+  "back": "figures/spectrier-back.webp",
+  "source": "spectrier"
+ },
+ "Spidops": {
+  "front": "figures/spidops.webp",
+  "back": "figures/spidops-back.webp",
+  "source": "spidops"
+ },
+ "Spinda": {
+  "front": "figures/spinda.webp",
+  "back": "figures/spinda-back.webp",
+  "source": "spinda"
+ },
+ "Spiritomb": {
+  "front": "figures/spiritomb.webp",
+  "back": "figures/spiritomb-back.webp",
+  "source": "spiritomb"
+ },
+ "Stakataka": {
+  "front": "figures/stakataka.webp",
+  "back": "figures/stakataka-back.webp",
+  "source": "stakataka"
+ },
+ "Staraptor": {
+  "front": "figures/staraptor.webp",
+  "back": "figures/staraptor-back.webp",
+  "source": "staraptor"
+ },
+ "Staraptor Mega": {
+  "front": "figures/staraptor-mega.webp",
+  "back": "figures/staraptor-mega-back.webp",
+  "source": "staraptor-mega"
+ },
+ "Starmie": {
+  "front": "figures/starmie.webp",
+  "back": "figures/starmie-back.webp",
+  "source": "starmie"
+ },
+ "Starmie Mega": {
+  "front": "figures/starmie-mega.webp",
+  "back": "figures/starmie-mega-back.webp",
+  "source": "starmie-mega"
+ },
+ "Steelix": {
+  "front": "figures/steelix.webp",
+  "back": "figures/steelix-back.webp",
+  "source": "steelix"
+ },
+ "Steelix Mega": {
+  "front": "figures/steelix-mega.webp",
+  "back": "figures/steelix-mega-back.webp",
+  "source": "steelix-mega"
+ },
+ "Stonjourner": {
+  "front": "figures/stonjourner.webp",
+  "back": "figures/stonjourner-back.webp",
+  "source": "stonjourner"
+ },
+ "Stoutland": {
+  "front": "figures/stoutland.webp",
+  "back": "figures/stoutland-back.webp",
+  "source": "stoutland"
+ },
+ "Stunfisk": {
+  "front": "figures/stunfisk.webp",
+  "back": "figures/stunfisk-back.webp",
+  "source": "stunfisk"
+ },
+ "Stunfisk Galar": {
+  "front": "figures/stunfisk-galar.webp",
+  "back": "figures/stunfisk-galar-back.webp",
+  "source": "stunfisk-galar"
+ },
+ "Sudowoodo": {
+  "front": "figures/sudowoodo.webp",
+  "back": "figures/sudowoodo-back.webp",
+  "source": "sudowoodo"
+ },
+ "Suicune": {
+  "front": "figures/suicune.webp",
+  "back": "figures/suicune-back.webp",
+  "source": "suicune"
+ },
+ "Sunflora": {
+  "front": "figures/sunflora.webp",
+  "back": "figures/sunflora-back.webp",
+  "source": "sunflora"
+ },
+ "Swampert": {
+  "front": "figures/swampert.webp",
+  "back": "figures/swampert-back.webp",
+  "source": "swampert"
+ },
+ "Swampert Mega": {
+  "front": "figures/swampert-mega.webp",
+  "back": "figures/swampert-mega-back.webp",
+  "source": "swampert-mega"
+ },
+ "Swanna": {
+  "front": "figures/swanna.webp",
+  "back": "figures/swanna-back.webp",
+  "source": "swanna"
+ },
+ "Swellow": {
+  "front": "figures/swellow.webp",
+  "back": "figures/swellow-back.webp",
+  "source": "swellow"
+ },
+ "Swoobat": {
+  "front": "figures/swoobat.webp",
+  "back": "figures/swoobat-back.webp",
+  "source": "swoobat"
+ },
+ "Sylveon": {
+  "front": "figures/sylveon.webp",
+  "back": "figures/sylveon-back.webp",
+  "source": "sylveon"
+ },
+ "Talonflame": {
+  "front": "figures/talonflame.webp",
+  "back": "figures/talonflame-back.webp",
+  "source": "talonflame"
+ },
+ "Tangrowth": {
+  "front": "figures/tangrowth.webp",
+  "back": "figures/tangrowth-back.webp",
+  "source": "tangrowth"
+ },
+ "Tapu Bulu": {
+  "front": "figures/tapu-bulu.webp",
+  "back": "figures/tapu-bulu-back.webp",
+  "source": "tapu-bulu"
+ },
+ "Tapu Fini": {
+  "front": "figures/tapu-fini.webp",
+  "back": "figures/tapu-fini-back.webp",
+  "source": "tapu-fini"
+ },
+ "Tapu Koko": {
+  "front": "figures/tapu-koko.webp",
+  "back": "figures/tapu-koko-back.webp",
+  "source": "tapu-koko"
+ },
+ "Tapu Lele": {
+  "front": "figures/tapu-lele.webp",
+  "back": "figures/tapu-lele-back.webp",
+  "source": "tapu-lele"
+ },
+ "Tatsugiri": {
+  "front": "figures/tatsugiri.webp",
+  "back": "figures/tatsugiri-back.webp",
+  "source": "tatsugiri-curly"
+ },
+ "Tatsugiri Mega": {
+  "front": "figures/tatsugiri-mega.webp",
+  "back": "figures/tatsugiri-mega-back.webp",
+  "source": "tatsugiri-curly-mega"
+ },
+ "Tauros": {
+  "front": "figures/tauros.webp",
+  "back": "figures/tauros-back.webp",
+  "source": "tauros"
+ },
+ "Tauros Aqua": {
+  "front": "figures/tauros-aqua.webp",
+  "back": "figures/tauros-aqua-back.webp",
+  "source": "tauros-paldea-aqua-breed"
+ },
+ "Tauros Blaze": {
+  "front": "figures/tauros-blaze.webp",
+  "back": "figures/tauros-blaze-back.webp",
+  "source": "tauros-paldea-blaze-breed"
+ },
+ "Tauros Combat": {
+  "front": "figures/tauros-combat.webp",
+  "back": "figures/tauros-combat-back.webp",
+  "source": "tauros-paldea-combat-breed"
+ },
+ "Tentacruel": {
+  "front": "figures/tentacruel.webp",
+  "back": "figures/tentacruel-back.webp",
+  "source": "tentacruel"
+ },
+ "Terrakion": {
+  "front": "figures/terrakion.webp",
+  "back": "figures/terrakion-back.webp",
+  "source": "terrakion"
+ },
+ "Thievul": {
+  "front": "figures/thievul.webp",
+  "back": "figures/thievul-back.webp",
+  "source": "thievul"
+ },
+ "Throh": {
+  "front": "figures/throh.webp",
+  "back": "figures/throh-back.webp",
+  "source": "throh"
+ },
+ "Thundurus I": {
+  "front": "figures/thundurus-i.webp",
+  "back": "figures/thundurus-i-back.webp",
+  "source": "thundurus-incarnate"
+ },
+ "Thundurus T": {
+  "front": "figures/thundurus-t.webp",
+  "back": "figures/thundurus-t-back.webp",
+  "source": "thundurus-therian"
+ },
+ "Ting-Lu": {
+  "front": "figures/ting-lu.webp",
+  "back": "figures/ting-lu-back.webp",
+  "source": "ting-lu"
+ },
+ "Tinkaton": {
+  "front": "figures/tinkaton.webp",
+  "back": "figures/tinkaton-back.webp",
+  "source": "tinkaton"
+ },
+ "Toedscruel": {
+  "front": "figures/toedscruel.webp",
+  "back": "figures/toedscruel-back.webp",
+  "source": "toedscruel"
+ },
+ "Togedemaru": {
+  "front": "figures/togedemaru.webp",
+  "back": "figures/togedemaru-back.webp",
+  "source": "togedemaru"
+ },
+ "Togekiss": {
+  "front": "figures/togekiss.webp",
+  "back": "figures/togekiss-back.webp",
+  "source": "togekiss"
+ },
+ "Torkoal": {
+  "front": "figures/torkoal.webp",
+  "back": "figures/torkoal-back.webp",
+  "source": "torkoal"
+ },
+ "Tornadus I": {
+  "front": "figures/tornadus-i.webp",
+  "back": "figures/tornadus-i-back.webp",
+  "source": "tornadus-incarnate"
+ },
+ "Tornadus T": {
+  "front": "figures/tornadus-t.webp",
+  "back": "figures/tornadus-t-back.webp",
+  "source": "tornadus-therian"
+ },
+ "Torterra": {
+  "front": "figures/torterra.webp",
+  "back": "figures/torterra-back.webp",
+  "source": "torterra"
+ },
+ "Toucannon": {
+  "front": "figures/toucannon.webp",
+  "back": "figures/toucannon-back.webp",
+  "source": "toucannon"
+ },
+ "Toxapex": {
+  "front": "figures/toxapex.webp",
+  "back": "figures/toxapex-back.webp",
+  "source": "toxapex"
+ },
+ "Toxicroak": {
+  "front": "figures/toxicroak.webp",
+  "back": "figures/toxicroak-back.webp",
+  "source": "toxicroak"
+ },
+ "Toxtricity": {
+  "front": "figures/toxtricity.webp",
+  "back": "figures/toxtricity-back.webp",
+  "source": "toxtricity-amped"
+ },
+ "Trevenant": {
+  "front": "figures/trevenant.webp",
+  "back": "figures/trevenant-back.webp",
+  "source": "trevenant"
+ },
+ "Tropius": {
+  "front": "figures/tropius.webp",
+  "back": "figures/tropius-back.webp",
+  "source": "tropius"
+ },
+ "Tsareena": {
+  "front": "figures/tsareena.webp",
+  "back": "figures/tsareena-back.webp",
+  "source": "tsareena"
+ },
+ "Turtonator": {
+  "front": "figures/turtonator.webp",
+  "back": "figures/turtonator-back.webp",
+  "source": "turtonator"
+ },
+ "Typhlosion": {
+  "front": "figures/typhlosion.webp",
+  "back": "figures/typhlosion-back.webp",
+  "source": "typhlosion"
+ },
+ "Typhlosion Hisui": {
+  "front": "figures/typhlosion-hisui.webp",
+  "back": "figures/typhlosion-hisui-back.webp",
+  "source": "typhlosion-hisui"
+ },
+ "Tyranitar": {
+  "front": "figures/tyranitar.webp",
+  "back": "figures/tyranitar-back.webp",
+  "source": "tyranitar"
+ },
+ "Tyranitar Mega": {
+  "front": "figures/tyranitar-mega.webp",
+  "back": "figures/tyranitar-mega-back.webp",
+  "source": "tyranitar-mega"
+ },
+ "Tyrantrum": {
+  "front": "figures/tyrantrum.webp",
+  "back": "figures/tyrantrum-back.webp",
+  "source": "tyrantrum"
+ },
+ "Umbreon": {
+  "front": "figures/umbreon.webp",
+  "back": "figures/umbreon-back.webp",
+  "source": "umbreon"
+ },
+ "Unfezant": {
+  "front": "figures/unfezant.webp",
+  "back": "figures/unfezant-back.webp",
+  "source": "unfezant"
+ },
+ "Unown": {
+  "front": "figures/unown.webp",
+  "back": "figures/unown-back.webp",
+  "source": "unown"
+ },
+ "Ursaluna": {
+  "front": "figures/ursaluna.webp",
+  "back": "figures/ursaluna-back.webp",
+  "source": "ursaluna"
+ },
+ "Ursaluna Bloodmoon": {
+  "front": "figures/ursaluna-bloodmoon.webp",
+  "back": "figures/ursaluna-bloodmoon-back.webp",
+  "source": "ursaluna-bloodmoon"
+ },
+ "Ursaring": {
+  "front": "figures/ursaring.webp",
+  "back": "figures/ursaring-back.webp",
+  "source": "ursaring"
+ },
+ "Urshifu Rapid Strike": {
+  "front": "figures/urshifu-rapid-strike.webp",
+  "back": "figures/urshifu-rapid-strike-back.webp",
+  "source": "urshifu-rapid-strike"
+ },
+ "Urshifu Single Strike": {
+  "front": "figures/urshifu-single-strike.webp",
+  "back": "figures/urshifu-single-strike-back.webp",
+  "source": "urshifu-single-strike"
+ },
+ "Uxie": {
+  "front": "figures/uxie.webp",
+  "back": "figures/uxie-back.webp",
+  "source": "uxie"
+ },
+ "Vanilluxe": {
+  "front": "figures/vanilluxe.webp",
+  "back": "figures/vanilluxe-back.webp",
+  "source": "vanilluxe"
+ },
+ "Vaporeon": {
+  "front": "figures/vaporeon.webp",
+  "back": "figures/vaporeon-back.webp",
+  "source": "vaporeon"
+ },
+ "Veluza": {
+  "front": "figures/veluza.webp",
+  "back": "figures/veluza-back.webp",
+  "source": "veluza"
+ },
+ "Venomoth": {
+  "front": "figures/venomoth.webp",
+  "back": "figures/venomoth-back.webp",
+  "source": "venomoth"
+ },
+ "Venusaur": {
+  "front": "figures/venusaur.webp",
+  "back": "figures/venusaur-back.webp",
+  "source": "venusaur"
+ },
+ "Venusaur Mega": {
+  "front": "figures/venusaur-mega.webp",
+  "back": "figures/venusaur-mega-back.webp",
+  "source": "venusaur-mega"
+ },
+ "Vespiquen": {
+  "front": "figures/vespiquen.webp",
+  "back": "figures/vespiquen-back.webp",
+  "source": "vespiquen"
+ },
+ "Victini": {
+  "front": "figures/victini.webp",
+  "back": "figures/victini-back.webp",
+  "source": "victini"
+ },
+ "Victreebel": {
+  "front": "figures/victreebel.webp",
+  "back": "figures/victreebel-back.webp",
+  "source": "victreebel"
+ },
+ "Victreebel Mega": {
+  "front": "figures/victreebel-mega.webp",
+  "back": "figures/victreebel-mega-back.webp",
+  "source": "victreebel-mega"
+ },
+ "Vikavolt": {
+  "front": "figures/vikavolt.webp",
+  "back": "figures/vikavolt-back.webp",
+  "source": "vikavolt"
+ },
+ "Vileplume": {
+  "front": "figures/vileplume.webp",
+  "back": "figures/vileplume-back.webp",
+  "source": "vileplume"
+ },
+ "Virizion": {
+  "front": "figures/virizion.webp",
+  "back": "figures/virizion-back.webp",
+  "source": "virizion"
+ },
+ "Vivillon": {
+  "front": "figures/vivillon.webp",
+  "back": "figures/vivillon-back.webp",
+  "source": "vivillon"
+ },
+ "Volbeat": {
+  "front": "figures/volbeat.webp",
+  "back": "figures/volbeat-back.webp",
+  "source": "volbeat"
+ },
+ "Volcanion": {
+  "front": "figures/volcanion.webp",
+  "back": "figures/volcanion-back.webp",
+  "source": "volcanion"
+ },
+ "Volcarona": {
+  "front": "figures/volcarona.webp",
+  "back": "figures/volcarona-back.webp",
+  "source": "volcarona"
+ },
+ "Wailord": {
+  "front": "figures/wailord.webp",
+  "back": "figures/wailord-back.webp",
+  "source": "wailord"
+ },
+ "Walking Wake": {
+  "front": "figures/walking-wake.webp",
+  "back": "figures/walking-wake-back.webp",
+  "source": "walking-wake"
+ },
+ "Walrein": {
+  "front": "figures/walrein.webp",
+  "back": "figures/walrein-back.webp",
+  "source": "walrein"
+ },
+ "Watchog": {
+  "front": "figures/watchog.webp",
+  "back": "figures/watchog-back.webp",
+  "source": "watchog"
+ },
+ "Weavile": {
+  "front": "figures/weavile.webp",
+  "back": "figures/weavile-back.webp",
+  "source": "weavile"
+ },
+ "Weezing": {
+  "front": "figures/weezing.webp",
+  "back": "figures/weezing-back.webp",
+  "source": "weezing"
+ },
+ "Weezing Galar": {
+  "front": "figures/weezing-galar.webp",
+  "back": "figures/weezing-galar-back.webp",
+  "source": "weezing-galar"
+ },
+ "Whimsicott": {
+  "front": "figures/whimsicott.webp",
+  "back": "figures/whimsicott-back.webp",
+  "source": "whimsicott"
+ },
+ "Whiscash": {
+  "front": "figures/whiscash.webp",
+  "back": "figures/whiscash-back.webp",
+  "source": "whiscash"
+ },
+ "Wigglytuff": {
+  "front": "figures/wigglytuff.webp",
+  "back": "figures/wigglytuff-back.webp",
+  "source": "wigglytuff"
+ },
+ "Wishiwashi": {
+  "front": "figures/wishiwashi.webp",
+  "back": "figures/wishiwashi-back.webp",
+  "source": "wishiwashi-solo"
+ },
+ "Wishiwashi (Single)": {
+  "front": "figures/wishiwashi-single.webp",
+  "back": "figures/wishiwashi-single-back.webp",
+  "source": "wishiwashi-solo"
+ },
+ "Wo-Chien": {
+  "front": "figures/wo-chien.webp",
+  "back": "figures/wo-chien-back.webp",
+  "source": "wo-chien"
+ },
+ "Wormadam Hidden": {
+  "front": "figures/wormadam-hidden.webp",
+  "back": "figures/wormadam-hidden-back.webp",
+  "source": "placeholder: Dark-tinted"
+ },
+ "Wormadam Mind": {
+  "front": "figures/wormadam-mind.webp",
+  "back": "figures/wormadam-mind-back.webp",
+  "source": "placeholder: Ghost-tinted"
+ },
+ "Wormadam Sand": {
+  "front": "figures/wormadam-sand.webp",
+  "back": "figures/wormadam-sand-back.webp",
+  "source": "wormadam-sandy"
+ },
+ "Wormadam Trash": {
+  "front": "figures/wormadam-trash.webp",
+  "back": "figures/wormadam-trash-back.webp",
+  "source": "wormadam-trash"
+ },
+ "Wugtrio": {
+  "front": "figures/wugtrio.webp",
+  "back": "figures/wugtrio-back.webp",
+  "source": "wugtrio"
+ },
+ "Wyrdeer": {
+  "front": "figures/wyrdeer.webp",
+  "back": "figures/wyrdeer-back.webp",
+  "source": "wyrdeer"
+ },
+ "Xatu": {
+  "front": "figures/xatu.webp",
+  "back": "figures/xatu-back.webp",
+  "source": "xatu"
+ },
+ "Xurkitree": {
+  "front": "figures/xurkitree.webp",
+  "back": "figures/xurkitree-back.webp",
+  "source": "xurkitree"
+ },
+ "Yanmega": {
+  "front": "figures/yanmega.webp",
+  "back": "figures/yanmega-back.webp",
+  "source": "yanmega"
+ },
+ "Zangoose": {
+  "front": "figures/zangoose.webp",
+  "back": "figures/zangoose-back.webp",
+  "source": "zangoose"
+ },
+ "Zapdos": {
+  "front": "figures/zapdos.webp",
+  "back": "figures/zapdos-back.webp",
+  "source": "zapdos"
+ },
+ "Zapdos Galar": {
+  "front": "figures/zapdos-galar.webp",
+  "back": "figures/zapdos-galar-back.webp",
+  "source": "zapdos-galar"
+ },
+ "Zarude": {
+  "front": "figures/zarude.webp",
+  "back": "figures/zarude-back.webp",
+  "source": "zarude"
+ },
+ "Zebstrika": {
+  "front": "figures/zebstrika.webp",
+  "back": "figures/zebstrika-back.webp",
+  "source": "zebstrika"
+ },
+ "Zeraora": {
+  "front": "figures/zeraora.webp",
+  "back": "figures/zeraora-back.webp",
+  "source": "zeraora"
+ },
+ "Zeraora Mega": {
+  "front": "figures/zeraora-mega.webp",
+  "back": "figures/zeraora-mega-back.webp",
+  "source": "zeraora-mega"
+ },
+ "Zoroark": {
+  "front": "figures/zoroark.webp",
+  "back": "figures/zoroark-back.webp",
+  "source": "zoroark"
+ },
+ "Zoroark Hisui": {
+  "front": "figures/zoroark-hisui.webp",
+  "back": "figures/zoroark-hisui-back.webp",
+  "source": "zoroark-hisui"
+ },
+ "Zygarde 10%": {
+  "front": "figures/zygarde-10.webp",
+  "back": "figures/zygarde-10-back.webp",
+  "source": "zygarde-10"
+ }
+}
