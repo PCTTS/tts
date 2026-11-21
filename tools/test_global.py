@@ -5,7 +5,7 @@ Checks: the script compiles; onLoad builds well-formed UI XML with unique ids; s
 the search panel's result rows get text; spawning creates a figure with the right images; the map list
 reads names from a fake map board. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
 """
-import json, sys, xml.etree.ElementTree as ET
+import json, re, sys, xml.etree.ElementTree as ET
 from pathlib import Path
 
 from lupa import LuaRuntime
@@ -76,6 +76,11 @@ def main():
     lua.execute(PRELUDE)
 
     src = (REPO / "lua" / "Global.lua").read_text(encoding="utf-8")
+    # TTS runs Lua 5.2 (MoonSharp); lupa runs 5.5, which also accepts newer syntax. Flag 5.3+ operators.
+    code = re.sub(r"--\[(=*)\[.*?\]\1\]|\[(=*)\[.*?\]\2\]", "", src, flags=re.S)   # long comments/strings
+    code = re.sub(r"--[^\n]*|\"(?:\\.|[^\"\\\n])*\"|'(?:\\.|[^'\\\n])*'", "", code)  # comments, strings
+    newer = [op for op in ("//", "<<", ">>", " & ", " | ", " ~ ") if op in code]
+    assert not newer, f"Lua 5.3+ operators TTS can't run: {newer}"
     res = g.load(src, "Global.lua")  # a function, or (nil, error message)
     fn = res[0] if isinstance(res, tuple) else res
     assert fn, f"syntax error: {res[1]}"
@@ -95,6 +100,8 @@ def main():
         root = ET.fromstring("<root>" + xml + "</root>")
         ids = [e.get("id") for e in root.iter() if e.get("id")]
         check(len(ids) == len(set(ids)), f"UI XML parses; {len(ids)} ids, all unique")
+        bar = next(e for e in root.iter() if e.get("id") == "toolbar")
+        check((bar.get("width"), bar.get("height")) == ("38", "76"), f"toolbar is 38 x 76 ({bar.get('width')} x {bar.get('height')})")
     except ET.ParseError as e:
         check(False, f"UI XML parses ({e})")
     check(len(list(calls.assets.values())) == 2, "two toolbar icons registered")

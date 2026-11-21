@@ -12,7 +12,14 @@ The last roster loaded is kept in the save, so the spawner still works if the si
 
 BASE_URL = "https://pctts.github.io/tts/"
 ROSTER_URL = BASE_URL .. "figures/index.json"
-ICONS = { pokeball = "ui/icons/pokeball-v2.png", map = "ui/icons/map-v2.png" }
+ICONS = { pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png" }
+-- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
+-- UI images it shrinks, so a much larger image looks jagged.
+BAR_ICON, BAR_MARGIN, BAR_GAP = 32, 3, 6
+TOOLS = {
+  { icon = "pokeball", tip = "Spawn a Pokémon", click = "toggleDex" },
+  { icon = "map", tip = "Choose the map", click = "toggleMaps" },
+}
 FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
@@ -179,9 +186,30 @@ end
 ----------------------------------------------------------------------------------------------------
 -- Interface: toolbar on the right, one panel per player colour (each visible only to that colour)
 ----------------------------------------------------------------------------------------------------
+local function barSize()
+  return BAR_ICON + 2 * BAR_MARGIN, #TOOLS * BAR_ICON + (#TOOLS - 1) * BAR_GAP + 2 * BAR_MARGIN
+end
+
+-- Each tool: an invisible button (hover highlight, click) with the icon on top, placed by hand so the
+-- border around the icons is exactly BAR_MARGIN (TTS pads icons inside buttons).
+local function toolbarXml()
+  local w, h = barSize()
+  local items = {}
+  for i, t in ipairs(TOOLS) do
+    local y = -(BAR_MARGIN + (i - 1) * (BAR_ICON + BAR_GAP))
+    local place = string.format('rectAlignment="UpperCenter" offsetXY="0 %d" width="%d" height="%d" tooltip="%s" onClick="%s"',
+      y, BAR_ICON, BAR_ICON, t.tip, t.click)
+    items[#items + 1] = '<Button class="bar" ' .. place .. '/>'
+    items[#items + 1] = string.format('<Image class="barIcon" image="%s" %s/>', t.icon, place)
+  end
+  return string.format('<Panel id="toolbar" rectAlignment="MiddleRight" width="%d" height="%d" color="#000000E6" '
+    .. 'outline="#303030" outlineSize="1 1">\n  %s\n</Panel>\n', w, h, table.concat(items, "\n  "))
+end
+
 local function panelXml(kind, c, title, height, body)
+  local w, h = barSize()
   return string.format([[
-<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" pivot="1 1" offsetXY="-52 46"
+<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" pivot="1 1" offsetXY="%d %d"
        width="290" height="%d"
        color="#141414F2" outline="#303030" outlineSize="1 1" padding="8 8 8 8" spacing="4"
        childForceExpandHeight="false" childForceExpandWidth="true">
@@ -192,7 +220,7 @@ local function panelXml(kind, c, title, height, body)
   %s
   <Panel flexibleHeight="1"/>
 </VerticalLayout>
-]], kind, c, c, height, title, body)
+]], kind, c, c, -(w + 4), math.floor(h / 2), height, title, body)  -- top edge level with the toolbar's
 end
 
 function buildUI()
@@ -202,7 +230,8 @@ function buildUI()
 
   local xml = { [[
 <Defaults>
-  <Button class="bar" colors="#00000000|#FFFFFF33|#FFFFFF66|#00000000" tooltipPosition="Left" preferredHeight="42" flexibleHeight="0"/>
+  <Button class="bar" colors="#00000000|#FFFFFF26|#FFFFFF4D|#00000000" tooltipPosition="Left"/>
+  <Image class="barIcon" raycastTarget="false" preserveAspect="true" tooltipPosition="Left"/>
   <Button class="row" fontSize="15" textAlignment="MiddleLeft" padding="10 0 0 0" textColor="#111111"
           colors="#E4E4E4|#B3D1FF|#8DB8F7|#E4E4E4" preferredHeight="28" flexibleHeight="0"/>
   <Button class="close" fontSize="14" textColor="#FFFFFF" colors="#2a2a2a|#c0392b|#962d22|#2a2a2a"/>
@@ -210,12 +239,7 @@ function buildUI()
   <Text class="hint" fontSize="12" color="#AAAAAA" alignment="MiddleLeft" preferredHeight="18" flexibleHeight="0"/>
   <InputField class="search" fontSize="16" preferredHeight="34" flexibleHeight="0" characterLimit="40"/>
 </Defaults>
-<VerticalLayout id="toolbar" rectAlignment="MiddleRight" width="48" height="92" padding="3 3 3 3" spacing="2"
-                color="#000000E6" outline="#303030" outlineSize="1 1" childForceExpandHeight="false">
-  <Button class="bar" icon="pokeball" tooltip="Spawn a Pokémon" onClick="toggleDex"/>
-  <Button class="bar" icon="map" tooltip="Choose the map" onClick="toggleMaps"/>
-</VerticalLayout>
-]] }
+]], toolbarXml() }
   for _, c in ipairs(COLORS) do
     local rows = {}
     rows[1] = string.format('<InputField id="dexIn_%s" class="search" placeholder="Type part of a name..." onValueChanged="dexSearch"/>', c)
