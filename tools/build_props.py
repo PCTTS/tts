@@ -1,7 +1,7 @@
 """Build the table props: the slanted team stand (pedestals on top, item/skill cards on the slope) and a pillar.
 
 Usage:  python -I tools/build_props.py
-Writes props/stand-v3.obj (with an HP sign above each pedestal; stand-v2 = without) (+ its solid collider
+Writes props/stand-v4.obj (a black HP sign floating above each pedestal; v3 = wooden signs on posts, v2 = none) (+ its solid collider
 props/stand-collider-v1.obj) with its dark wood texture
 props/stand-wood-v1.jpg, props/pillar-v2.obj with props/props-v1.jpg, and props/stand-v1.json (slot positions the
 TTS script uses: pedestals on top, two card slots per pedestal on the slope; the geometry is unchanged since v1).
@@ -42,14 +42,16 @@ WOOD_W, WOOD_H, WOOD_SEED = 4096, 2048, 7
 WOOD_BASE, WOOD_LIGHT, WOOD_DARK = (40, 20, 11), (80, 44, 27), (19, 9, 5)
 WOOD_GRAIN, WOOD_CONTRAST = 1.0, 1.25            # streak width (x the finest), streak strength
 WOOD_PAD = 0.1                                  # wood (in units) between neighbouring faces in the texture
-# HP signs (stand-v3): above each pedestal, a thin board on a post near the back edge of the stand top. Global.lua
-# shows the HP of the Pokemon on that pedestal on both faces (the stand's object UI); the solid board hides the
-# far face's label, so each side reads the right way round.
+# HP signs (stand-v4): a thin black board floating above each pedestal. Global.lua shows the HP of the Pokemon on
+# that pedestal on both faces (the stand's object UI); the solid board hides the far face's label, so each side
+# reads the right way round (it can't be see-through: the mirrored text behind would show). (stand-v3 had the
+# boards in wood on posts.) The black is a patch in a spare corner of the wood texture (stand-wood-v2).
 PEDESTAL_TOP = 0.25                     # the pedestals' height above the stand top (Global.lua PEDESTAL_TOP)
 SIGN_W, SIGN_H, SIGN_D = 1.7, 0.5, 0.04
 SIGN_Y = TOP_H + PEDESTAL_TOP + 2.55    # the board's centre: just above a standee's art
-SIGN_Z = -0.16                          # its middle, near the back edge of the top
-POST_W = 0.1
+SIGN_Z = -TOP_D / 2                     # over the middle of the pedestal
+BLACK_PATCH = (3968, 1920, 4096, 2048)  # wood texture pixels painted black (below every face's strip)
+BLACK = (14, 14, 14)
 PPU = WOOD_W / (LENGTH + 2 * WOOD_PAD)          # texture pixels per unit
 
 
@@ -115,13 +117,18 @@ def stand(signs=False):
         block = [(x, 0, zd), (x, yl, zd), (x, yl, ze), (x, 0, ze)]
         m.quad(block, [cap_uv(p) for p in block], (nx, 0, 0))
     if signs:
+        px, py = (BLACK_PATCH[0] + BLACK_PATCH[2]) / 2, (BLACK_PATCH[1] + BLACK_PATCH[3]) / 2
+        black = [(px / WOOD_W, 1 - py / WOOD_H)] * 4
         for i in range(SLOTS):
             cx = (i - (SLOTS - 1) / 2) * SLOT_W
-            base = 2 + i * 6.5
-            sy0 = SIGN_Y - SIGN_H / 2
-            wood_box(m, cx - POST_W / 2, cx + POST_W / 2, TOP_H, sy0, SIGN_Z - POST_W / 2, SIGN_Z + POST_W / 2, "y", (base, 18.5))
-            wood_box(m, cx - SIGN_W / 2, cx + SIGN_W / 2, sy0, SIGN_Y + SIGN_H / 2, SIGN_Z - SIGN_D / 2, SIGN_Z + SIGN_D / 2,
-                     "x", (base + 3.2, 18.5))
+            x0, x1, y0, y1 = cx - SIGN_W / 2, cx + SIGN_W / 2, SIGN_Y - SIGN_H / 2, SIGN_Y + SIGN_H / 2
+            z0, z1 = SIGN_Z - SIGN_D / 2, SIGN_Z + SIGN_D / 2
+            m.quad([(x0, y1, z0), (x1, y1, z0), (x1, y0, z0), (x0, y0, z0)], black, (0, 0, -1))
+            m.quad([(x0, y1, z1), (x1, y1, z1), (x1, y0, z1), (x0, y0, z1)], black, (0, 0, 1))
+            m.quad([(x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)], black, (0, 1, 0))
+            m.quad([(x0, y0, z0), (x1, y0, z0), (x1, y0, z1), (x0, y0, z1)], black, (0, -1, 0))
+            m.quad([(x0, y0, z0), (x0, y1, z0), (x0, y1, z1), (x0, y0, z1)], black, (-1, 0, 0))
+            m.quad([(x1, y0, z0), (x1, y1, z0), (x1, y1, z1), (x1, y0, z1)], black, (1, 0, 0))
     return m
 
 
@@ -235,7 +242,7 @@ def smooth_noise(rng, w, h, cells_w, cells_h):
     return np.asarray(Image.fromarray(cells, "L").resize((w, h), Image.BICUBIC), dtype=np.float32) / 127.5 - 1
 
 
-def wood_texture(w=WOOD_W, h=WOOD_H):
+def wood_texture(w=WOOD_W, h=WOOD_H, black=False):
     """Straight-grained dark wood, grain running left to right: fine streaks that drift in strength along the
     grain, broad lighter/darker bands, a few long distinct streaks, and a gentle wave. Seeded: rebuilds match."""
     rng = np.random.default_rng(WOOD_SEED)
@@ -259,7 +266,10 @@ def wood_texture(w=WOOD_W, h=WOOD_H):
     t = np.clip(np.sign(f) * np.abs(f) ** 1.3, -1, 1)[..., None]
     base, light, dark = (np.array(c, np.float32) for c in (WOOD_BASE, WOOD_LIGHT, WOOD_DARK))
     col = np.where(t > 0, base + (light - base) * t * 0.85, base + (dark - base) * -t * 0.9)
-    return Image.fromarray(np.clip(col, 0, 255).astype(np.uint8), "RGB")
+    img = Image.fromarray(np.clip(col, 0, 255).astype(np.uint8), "RGB")
+    if black:
+        ImageDraw.Draw(img).rectangle([BLACK_PATCH[0], BLACK_PATCH[1], BLACK_PATCH[2] - 1, BLACK_PATCH[3] - 1], fill=BLACK)
+    return img
 
 
 def slots():
@@ -281,9 +291,10 @@ def main():
     OUT.mkdir(exist_ok=True)
     files = {
         "stand-v2.obj": lambda p: stand().write(p),
-        "stand-v3.obj": lambda p: stand(signs=True).write(p),
+        "stand-v4.obj": lambda p: stand(signs=True).write(p),
         "stand-collider-v1.obj": lambda p: stand_collider().write(p),
         "stand-wood-v1.jpg": lambda p: wood_texture().save(p, quality=90),
+        "stand-wood-v2.jpg": lambda p: wood_texture(black=True).save(p, quality=90),
         "pillar-v2.obj": lambda p: pillar().write(p),
         "props-v1.jpg": lambda p: texture().save(p, quality=92),
     }

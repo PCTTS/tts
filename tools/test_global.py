@@ -64,7 +64,13 @@ local function stub(o)
 end
 -- team stands: near (south) at z = -26.4 facing the near player, far (north) turned 180 degrees
 local function makeStand(z, yaw)
-  local s = { tags = { "Stand" }, type = "Generic", locked = true }
+  local s = { tags = { "Stand" }, type = "Generic", locked = true, snaps = {} }
+  s.getSnapPoints = function() return s.snaps end
+  s.setSnapPoints = function(p) s.snaps = p end
+  s.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/props/stand-v4.obj" } end
+  s.setCustomObject = function(c) s.newMesh = c.mesh end
+  s.reload = function() s.reloaded = true end
+  s.UI = { setXml = function(x) s.uiXml = x end, getXml = function() return s.uiXml or "" end }
   s.getPosition = function() return Vector(0, 0.961, z) end
   s.getRotation = function() return Vector(0, yaw, 0) end
   s.positionToWorld = function(v)
@@ -200,7 +206,7 @@ def main():
     g.searchPick(player, "-1", "dexRes_White_1")
     spawned = calls.spawned[1]
     check(spawned is not None and spawned.data.Nickname == "Charizard" and spawned.data.Name == "Custom_Model"
-          and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v2.obj")
+          and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v1.obj")
           and spawned.data.CustomMesh.ColliderURL.endswith("models/standee-v1.obj")
           and spawned.data.CustomMesh.DiffuseURL.endswith("standees/v3/charizard.webp") and spawned.data.CustomMesh.TypeIndex == 1,
           "clicking row 1 spawns Charizard as a standee (art on an arrowed base)")
@@ -225,7 +231,7 @@ def main():
         getName = function() return "Garchomp" end,
         setColorTint = function(c) fig.tint = c end, setDescription = function(d) fig.desc = d end }
       setmetatable(fig, { __index = function(t, k) return rawget(t, k) end })
-      board_obj = { getLock = function() return true end }
+      board_obj = { getLock = function() return true end, hasTag = function() return false end }
     """)
     fig = g.fig
     player.broadcast = lambda *a: None
@@ -311,86 +317,74 @@ def main():
     g.listPick(player, "-1", f"itemsAll_{i}")
     check(len(calls.spawned) == n + 1 and calls.spawned[n + 1].data.Nickname == "Sitrus Berry", "clicking Sitrus Berry in the list spawns it")
 
-    # HP labels: a Pokemon gets "hp/max" over its head; typing sets or changes it, kept within 0..max
+    # HP signs: the stand's sign above a pedestal shows the HP of the Pokemon on it; typing sets or changes it
     lua.execute(r"""
-      hpFig = { memo = '{"pokemon":"Gengar"}', guid = "abc123", ui = { attrs = {} } }
+      local keep = {}   -- clear the Pokemon spawned by earlier checks (one is on pedestal 1)
+      for _, o in ipairs(objects) do if not (o.hasTag and o.hasTag("Pokemon")) then keep[#keep + 1] = o end end
+      objects = keep
+      southStand.guid = "s0uth1"
+      southStand.ui = {}
+      southStand.UI = { setXml = function(x) southStand.ui.xml = x end }
+      southStand.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/props/stand-v4.obj" } end
+      southStand.getSnapPoints = function() return { 1 } end
+      northStand.UI = { setXml = function() end }
+      hpFig = { memo = '{"pokemon":"Gengar"}', guid = "abc123", name = "Custom_Model", tags = { "Pokemon" } }
+      hpFig.pos = Vector(-17.625, 0.961 + 2.6 + 0.25, -28.0)                -- resting on White's first pedestal
+      hpFig.getPosition = function() return hpFig.pos end
+      hpFig.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/models/standee-v1.obj" } end
+      hpFig.UI = { getXml = function() return "" end, setXml = function() end }
       hpFig.hasTag = function(t) return t == "Pokemon" end
-      hpFig.getRotation = function() return Vector(0, 90, 0) end
-      hpFig.getPosition = function() return Vector(-17.625, 3.8, -28.0) end   -- on White's first pedestal
-      hpFig.UI = { setXml = function(x) hpFig.ui.xml = x end,
-                   setAttribute = function(id, k, v) hpFig.ui.attrs[id .. "." .. k] = v end }
-      getObjectFromGUID = function(g) if g == "abc123" then return hpFig end end
-      onObjectSpawn(hpFig)
+      objects[#objects + 1] = hpFig
+      getObjectFromGUID = function(g) if g == "s0uth1" then return southStand end end
+      refreshPedestals()
     """)
-    h = g.hpFig
-    gmax = json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Gengar"]["hp"]
-    check(json.loads(h.memo).get("hp") == gmax and f'id="hpIn_abc123_F"' in h.ui.xml and f'id="hpIn_abc123_B"' in h.ui.xml
-          and f'text="{gmax}"' in h.ui.xml and f"/{gmax}<" in h.ui.xml,
-          f"a Pokemon without HP gets full HP ({gmax}) and two labels, front and back")
-    try:
-        ET.fromstring("<root>" + h.ui.xml + "</root>")
-        check(True, "its label XML parses")
-    except ET.ParseError as e:
-        check(False, f"its label XML parses ({e})")
-    root_hp = ET.fromstring("<root>" + h.ui.xml + "</root>")
-    front = next(e for e in root_hp.iter() if e.get("id") == "hpF")
-    back = next(e for e in root_hp.iter() if e.get("id") == "hpB")
-    check((front.get("rotation"), front.get("position")) == ("-90 0 0", "0 -3 -255")
-          and (back.get("rotation"), back.get("position")) == ("90 0 180", "0 3 -255")
-          and not front.get("visibility") and not back.get("visibility"),
-          "one label on each face of the sign, facing out, seen by everyone (the plate hides the far one)")
+    h, gmax = g.hpFig, json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Gengar"]["hp"]
 
-    # a standee on the old model (no sign) is switched to the current one
-    lua.execute(r"""
-      oldFig = { memo = '{"pokemon":"Gengar"}', guid = "old111", name = "Custom_Model", reloaded = false }
-      oldFig.hasTag = function(t) return t == "Pokemon" end
-      oldFig.getPosition = function() return Vector(10.575, 3.8, -28.0) end
-      oldFig.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/models/standee-v1.obj" } end
-      oldFig.setCustomObject = function(c) oldFig.newMesh = c.mesh; oldFig.newCollider = c.collider end
-      oldFig.reload = function() oldFig.reloaded = true end
-      oldFig.UI = { setXml = function(x) oldFig.xml = x end }
-      showHp(oldFig)
-    """)
-    o = g.oldFig
-    check(o.reloaded and str(o.newMesh).endswith("models/standee-v2.obj") and str(o.newCollider).endswith("models/standee-v1.obj")
-          and o.xml is None, "a standee without the sign gets the new model and a collider without the sign (labels come on respawn)")
+    def sign():
+        root = ET.fromstring("<root>" + g.southStand.ui.xml + "</root>")
+        return {e.get("id"): e for e in root.iter() if e.get("id")}, [p for p in root if p.tag == "Panel"]
 
-    # the sign shows only on a pedestal: put down on the board, a Pokemon switches to the plain model, no labels
-    lua.execute(r"""
-      local function fig(id, mesh, pos)
-        local f = { memo = '{"pokemon":"Gengar","hp":100,"maxHp":230}', guid = id, name = "Custom_Model", reloaded = false }
-        f.hasTag = function(t) return t == "Pokemon" end
-        f.getPosition = function() return pos end
-        f.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/" .. mesh, collider = "https://pctts.github.io/tts/models/standee-v1.obj" } end
-        f.setCustomObject = function(c) f.newMesh = c.mesh end
-        f.reload = function() f.reloaded = true end
-        f.UI = { setXml = function(x) f.xml = x end }
-        return f
-      end
-      onBoardSigned = fig("b11111", "models/standee-v2.obj", Vector(0, 3.3, 0))
-      onBoardPlain = fig("b22222", "models/standee-v1.obj", Vector(3.2, 3.3, -3.2))
-      onObjectDrop("White", onBoardSigned)
-      onObjectDrop("White", onBoardPlain)
-    """)
-    a, b = g.onBoardSigned, g.onBoardPlain
-    check(a.reloaded and str(a.newMesh).endswith("models/standee-v1.obj") and not b.reloaded and b.xml == "",
-          "put down on the board, a Pokemon loses its HP sign (plain model, no labels)")
+    ids, panels = sign()
+    f1, b1 = ids["hpIn_s0uth1_1_F"], ids["hpIn_s0uth1_1_B"]
+    check(len(panels) == 12 and json.loads(h.memo).get("hp") == gmax and f1.get("text") == str(gmax)
+          and panels[0].get("active") == "true" and panels[2].get("active") == "false",
+          f"the stand's first sign shows the Gengar on its pedestal ({gmax}/{gmax}); empty pedestals' signs are blank")
+    check((panels[0].get("rotation"), panels[1].get("rotation")) == ("-90 0 0", "90 0 180")
+          and panels[0].get("position") == "-1762 -163 -540" and panels[1].get("position") == "-1762 -157 -540",
+          "a label on each face of the board above pedestal 1, facing out")
 
     def hp():
         return json.loads(h.memo)["hp"]
-    g.hpEdited(player, "-35", "hpIn_abc123_F")
-    check(hp() == gmax - 35 and h.ui.attrs["hpIn_abc123_B.text"] == str(gmax - 35)
+    g.hpEdited(player, "-35", "hpIn_s0uth1_1_F")
+    check(hp() == gmax - 35 and sign()[0]["hpIn_s0uth1_1_B"].get("text") == str(gmax - 35)
           and any(str(p) == f"Gengar: {gmax} → {gmax - 35} HP (-35)" for p in calls.printed.values()),
-          "typing -35 takes 35 HP, updates both labels and says so in chat")
-    g.hpEdited(player, "+500", "hpIn_abc123_B")
+          "typing -35 on the sign takes 35 HP from that Pokemon, updates both faces and says so in chat")
+    g.hpEdited(player, "+500", "hpIn_s0uth1_1_B")
     check(hp() == gmax, "+500 heals only up to the max")
-    g.hpEdited(player, "120/230", "hpIn_abc123_F")
+    g.hpEdited(player, "120/230", "hpIn_s0uth1_1_F")
     check(hp() == 120, "typing a number sets it (a trailing /max is ignored)")
-    g.hpEdited(player, "0", "hpIn_abc123_F")
-    check(hp() == 0 and h.ui.attrs["hpIn_abc123_F.textColor"] == "#FF6B6B"
+    g.hpEdited(player, "0", "hpIn_s0uth1_1_F")
+    check(hp() == 0 and sign()[0]["hpIn_s0uth1_1_F"].get("textColor") == "#FF6B6B"
           and any("Gengar fainted!" in str(p) for p in calls.printed.values()), "0 HP turns the number red and says it fainted")
-    g.hpEdited(player, "lots", "hpIn_abc123_F")
-    check(hp() == 0 and h.ui.attrs["hpIn_abc123_F.text"] == "0", "something that isn't a number changes nothing")
+    g.hpEdited(player, "lots", "hpIn_s0uth1_1_F")
+    check(hp() == 0 and sign()[0]["hpIn_s0uth1_1_F"].get("text") == "0", "something that isn't a number changes nothing")
+
+    lua.execute("hpFig.pos = Vector(0, 3.3, 0); refreshPedestals()")   # moved onto the board
+    check(sign()[1][0].get("active") == "false" and hp() == 0, "moved off the pedestal: the sign goes blank, the Pokemon keeps its HP")
+    lua.execute("hpFig.pos = Vector(-3.525, 0.961 + 2.6 + 0.25, -28.0); refreshPedestals()")   # onto pedestal 3
+    check(sign()[1][4].get("active") == "true" and sign()[0]["hpIn_s0uth1_3_F"].get("text") == "0",
+          "put on another pedestal, that pedestal's sign shows its HP")
+
+    # Pokemon on the old model with its own sign go back to the plain standee
+    lua.execute(r"""
+      oldFig = { memo = '{"pokemon":"Gengar"}', guid = "old111", name = "Custom_Model", reloaded = false }
+      oldFig.hasTag = function(t) return t == "Pokemon" end
+      oldFig.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/models/standee-v2.obj" } end
+      oldFig.setCustomObject = function(c) oldFig.newMesh = c.mesh end
+      oldFig.reload = function() oldFig.reloaded = true end
+      plainStandee(oldFig)
+    """)
+    check(g.oldFig.reloaded and str(g.oldFig.newMesh).endswith("models/standee-v1.obj"), "a standee with the old sign goes back to the plain model")
 
     # flags: a spawned flag gets the menu; Capture tints it to the player's colour, Make neutral resets it
     lua.execute(r"""

@@ -12,7 +12,7 @@ card on the slope under each. Which stand is yours depends on your seat colour (
               "Clear status" returns a Pokémon to normal.
   * Map:      pick which arena the board shows.
 Flags on the board: right-click > Capture tints a flag to your seat colour; "Make neutral" resets it.
-HP: each Pokémon shows "current/max" HP over its head; click the number and type 120 (set), -35 or +20.
+HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
 Chat:  !spawn garchomp   !item sitrus   !skill belief   spawn the best match (or list close alternatives).
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
@@ -82,10 +82,7 @@ end
 STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear status", color = "#9E9E9E" }
 STATUS_HINT = "Pick a status, then pick up a Pokémon."
 
-STANDEE_MESH = "models/standee-v2.obj"  -- a Pokémon: art on a round base with a facing arrow, HP sign above (build_standee.py)
--- Its collision shape: the model without the sign. TTS otherwise wraps the whole model, sign included, and that
--- shape in front of the HP labels takes the clicks meant for them.
-STANDEE_COLLIDER = "models/standee-v1.obj"
+STANDEE_MESH = "models/standee-v1.obj"  -- a Pokémon: art on a round base with a facing arrow (build_standee.py)
 FIGURE_SCALE = 1.5   -- ImageScalar for the old flat figurines (only used if the roster has no standees)
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
@@ -110,7 +107,6 @@ STAND = {
 }
 CARD_YAW = 270  -- cards lie landscape: turned a quarter so the name reads left-to-right for the stand's player
 PEDESTAL_TOP = 0.25  -- a pedestal's height above the stand top
-PEDESTAL_REACH = 1.5 -- a Pokémon this close (sideways) to a pedestal's centre counts as on it (shows its HP sign)
 COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
 
 catalog = {}         -- kind -> { index = name -> data, list = sorted search entries, keys = name -> deck id }
@@ -133,7 +129,7 @@ listNames, builtLists = {}, {}             -- names in each full list as built, 
 DATA = {
   { key = "roster", url = ROSTER_URL, use = function(t) setCatalog("dex", t, "downloaded") end },
   { key = "cards", url = CARDS_URL, use = function(t) setCards(t, "downloaded") end },
-  { key = "stats", url = STATS_URL, use = function(t) stats = t; refreshAllHp() end },
+  { key = "stats", url = STATS_URL, use = function(t) stats = t; refreshPedestals() end },
 }
 STATE_MARK, STATE_SEP = "PCTTS-STATE-1", "\n\30\n"   -- a raw \30 (record separator) can't appear in JSON text
 rawData, savedState = {}, ""
@@ -194,8 +190,12 @@ function onLoad(saved)
     end)
   end
   for _, obj in ipairs(getAllObjects()) do flagMenu(obj) end   -- context menus aren't saved with the game
-  refreshAllHp()
-  Wait.time(refreshAllHp, 2)   -- again once the objects have finished loading (their own saved UI can replace ours)
+  -- once the objects have finished loading (their own saved UI can replace ours): stands' signs, plain standees
+  Wait.time(function()
+    for _, obj in ipairs(getAllObjects()) do
+      if obj.hasTag("Stand") then setupStand(obj) elseif obj.hasTag("Pokemon") then plainStandee(obj) end
+    end
+  end, 2)
 end
 
 function onSave()
@@ -361,7 +361,7 @@ function spawnPokemon(name, color)
     data.Name = "Custom_Model"
     data.ColorDiffuse = { r = 1, g = 1, b = 1 }
     data.CustomMesh = { MeshURL = BASE_URL .. STANDEE_MESH, DiffuseURL = BASE_URL .. files.standee, NormalURL = "",
-      ColliderURL = BASE_URL .. STANDEE_COLLIDER, Convex = true, MaterialIndex = 3, TypeIndex = 1, CastShadows = true }  -- matte (cardboard): plastic glare washed out the base
+      ColliderURL = BASE_URL .. STANDEE_MESH, Convex = true, MaterialIndex = 3, TypeIndex = 1, CastShadows = true }  -- matte (cardboard): plastic glare washed out the base
   else
     -- an older roster without standees: the flat two-sided figurine
     pos = Vector(pos.x, pos.y + 1, pos.z)
@@ -798,6 +798,7 @@ function applyStatus(obj, key)
 end
 
 function onObjectPickUp(color, obj)
+  if obj.hasTag("Pokemon") then Wait.time(refreshPedestals, 0.3) end   -- lifted off its pedestal: its sign empties
   local key = armed[color]
   if not key or not isFigure(obj) then return end
   armed[color] = nil
@@ -847,91 +848,123 @@ end
 
 function onObjectSpawn(obj)
   flagMenu(obj)
-  showHp(obj)
+  if obj.hasTag("Stand") then
+    Wait.time(function() setupStand(obj) end, 0.5)
+  elseif obj.hasTag("Pokemon") then
+    plainStandee(obj)
+    Wait.time(refreshPedestals, 1.5)   -- once it has landed
+  end
 end
 
 ----------------------------------------------------------------------------------------------------
--- HP over each Pokémon's head: "Y/X" on a two-sided sign (a thin solid plate in the standee model, standee-v2),
--- one label on each face. TTS draws an object's UI in a fixed order regardless of which part is nearer, but solid
--- geometry hides UI behind it, so from the front you see the front label and from behind the back one, each the
--- right way round. The sign turns with the Pokémon.
+-- HP signs: each team stand (props/stand-v3.obj) has a sign board above each pedestal, showing "Y/X" for the
+-- Pokémon standing on that pedestal (blank when it's empty). One label on each face of the board: TTS draws an
+-- object's UI in a fixed order regardless of which part is nearer, but solid geometry hides UI behind it, so
+-- each side of the table reads its own label the right way round.
 -- Click the number and type 120 to set it, -35 to take damage or +20 to heal (kept between 0 and its max).
--- Current and max HP live in the figure's memo; the max comes from the sheet (data/pokemon.json).
+-- Current and max HP live in the Pokémon's memo (it keeps them when it moves); the max comes from the sheet.
 ----------------------------------------------------------------------------------------------------
-HP_HEIGHT = -255        -- object UI units (100 = one world unit; up is -z): the sign's centre (PLATE_Y in build_standee.py)
-HP_FACE = 3             -- how far each label sits from the plate's middle (the UI's +y is the object's +z, the back)
+STAND_MESH, STAND_TEX = "props/stand-v4.obj", "props/stand-wood-v2.jpg"   -- black signs floating above the pedestals
+SIGN = { y = 5.4, z = -1.6, face = 0.03 }   -- a sign's centre in the stand's frame (build_props.py SIGN_*)
 HP_COLOR, HP_FAINTED = "#FFFFFF", "#FF6B6B"
+PEDESTAL_REACH = 1.5 -- a Pokémon this close (sideways) to a pedestal's centre, and resting on it, counts as on it
 
 function maxHp(name)
   local s = stats[name]
   return s and tonumber(s.hp) and math.floor(tonumber(s.hp)) or nil
 end
 
--- One face's label (an input box under 50 high hides its text).
-local function hpLabelXml(guid, side, rotation, dy, hp, max)
-  return string.format([[
-<Panel id="hp%s" position="0 %d %d" rotation="%s" width="170" height="50" color="#000000C8">
-  <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" offsetXY="9 0" width="84" height="50"
-    fontSize="26" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
-    colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
-  <Text rectAlignment="MiddleRight" offsetXY="0 0" width="85" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
-</Panel>
-]], side, dy, HP_HEIGHT, rotation, guid, side, hp, hp > 0 and HP_COLOR or HP_FAINTED, max)
-end
-
-local function hpXml(obj, hp, max)
-  return hpLabelXml(obj.guid, "F", "-90 0 0", -HP_FACE, hp, max) .. hpLabelXml(obj.guid, "B", "90 0 180", HP_FACE, hp, max)
-end
-
--- Is this Pokémon standing on one of the team stands' pedestals?
-function onPedestal(obj)
-  local p = obj.getPosition()
-  for _, stand in ipairs(getAllObjects()) do
-    if stand.hasTag("Stand") then
-      for _, x in ipairs(STAND.x) do
-        if near(p, stand.positionToWorld(Vector(x, STAND.pedestal.y, STAND.pedestal.z)), PEDESTAL_REACH) then return true end
-      end
-    end
-  end
-  return false
-end
-
--- Give a Pokémon its HP sign, only while it's on a pedestal (or bring it up to date). On a pedestal it uses the
--- model with the sign, anywhere else the plain one; switching models reloads it, and it comes back through
--- onObjectSpawn. Its memo gets hp/maxHp if it had none.
-function showHp(obj)
-  if not (obj and obj.hasTag("Pokemon")) then return end
-  local shown = onPedestal(obj)
-  local custom = obj.name == "Custom_Model" and (obj.getCustomObject() or {}) or {}
-  local mesh, collider = custom.mesh or "", custom.collider or ""
-  local want = shown and STANDEE_MESH or STANDEE_COLLIDER   -- the collider model is the one without the sign
-  if mesh:find("models/standee-", 1, true) and not (mesh:find(want, 1, true) and collider:find(STANDEE_COLLIDER, 1, true)) then
-    obj.setCustomObject({ mesh = BASE_URL .. want, collider = BASE_URL .. STANDEE_COLLIDER })
-    obj.reload()
-    return
-  end
-  if not shown then
-    obj.UI.setXml("")
-    return
-  end
+-- A Pokémon's state with hp/maxHp filled in (and saved to its memo if they were missing or out of range).
+function hpState(obj)
   local st = figureState(obj)
   local max = maxHp(st.pokemon) or (st.maxHp and math.floor(st.maxHp))
-  if not max then return end
+  if not max then return st end
   local hp = math.max(0, math.min(max, math.floor(st.hp or max)))
   if st.hp ~= hp or st.maxHp ~= max then
     st.hp, st.maxHp = hp, max
     obj.memo = JSON.encode(st)
   end
-  obj.UI.setXml(hpXml(obj, hp, max))
+  return st
 end
 
-function refreshAllHp()
-  for _, obj in ipairs(getAllObjects()) do showHp(obj) end
+-- The Pokémon resting on a stand's pedestal (column 1..6), or nil.
+function pokemonOn(stand, col)
+  local top = stand.positionToWorld(Vector(STAND.x[col], STAND.pedestal.y + PEDESTAL_TOP, STAND.pedestal.z))
+  for _, obj in ipairs(getAllObjects()) do
+    if obj.hasTag("Pokemon") then
+      local p = obj.getPosition()
+      if near(p, top, PEDESTAL_REACH) and math.abs(p.y - top.y) < 1 then return obj end
+    end
+  end
 end
 
--- Put down on a pedestal: the sign appears; put down anywhere else: it goes.
+-- One face's label (an input box under 50 high hides its text). Object UI: 100 units = 1 world unit, x = x (not mirrored), the UI's
+-- +y is the object's +z and -z is up.
+local function signLabelXml(stand, col, side, rotation, z, st)
+  local hp, max = st and st.hp, st and st.maxHp
+  return string.format([[
+<Panel position="%d %d %d" rotation="%s" width="170" height="50" color="#000000C8" active="%s">
+  <InputField id="hpIn_%s_%d_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" offsetXY="9 0" width="84" height="50"
+    fontSize="26" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
+    colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
+  <Text rectAlignment="MiddleRight" width="85" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
+</Panel>
+]], math.floor(STAND.x[col] * 100 + 0.5), math.floor(z * 100 + 0.5), math.floor(-SIGN.y * 100 + 0.5), rotation,
+    hp and "true" or "false", stand.guid, col, side, hp or 0, (hp or 1) > 0 and HP_COLOR or HP_FAINTED, max or 0)
+end
+
+-- Rewrite a stand's signs from the Pokémon now on its pedestals.
+function refreshStand(stand)
+  local parts = {}
+  for col = 1, #STAND.x do
+    local mon = pokemonOn(stand, col)
+    local st = mon and hpState(mon)
+    if st and not st.maxHp then st = nil end
+    parts[#parts + 1] = signLabelXml(stand, col, "F", "-90 0 0", SIGN.z - SIGN.face, st)
+    parts[#parts + 1] = signLabelXml(stand, col, "B", "90 0 180", SIGN.z + SIGN.face, st)
+  end
+  stand.UI.setXml(table.concat(parts))
+end
+
+function refreshPedestals()
+  for _, obj in ipairs(getAllObjects()) do
+    if obj.hasTag("Stand") then refreshStand(obj) end
+  end
+end
+
+-- A stand gets the model with the signs (reloading it; it comes back through onObjectSpawn with its card snap
+-- points put back if the reload dropped them), then its labels.
+function setupStand(stand)
+  if not (stand and stand.hasTag("Stand")) then return end
+  local mesh = (stand.getCustomObject() or {}).mesh or ""
+  if mesh ~= "" and not mesh:find(STAND_MESH, 1, true) then
+    stand.setCustomObject({ mesh = BASE_URL .. STAND_MESH, diffuse = BASE_URL .. STAND_TEX })
+    stand.reload()
+    return
+  end
+  if #(stand.getSnapPoints() or {}) == 0 then stand.setSnapPoints(standSnapPoints()) end
+  refreshStand(stand)
+end
+
+-- Pokémon use the plain standee (no sign of their own) and no labels of their own.
+function plainStandee(obj)
+  local custom = obj.name == "Custom_Model" and (obj.getCustomObject() or {}) or {}
+  local mesh = custom.mesh or ""
+  if mesh:find("models/standee-", 1, true) and not mesh:find(STANDEE_MESH, 1, true) then
+    obj.setCustomObject({ mesh = BASE_URL .. STANDEE_MESH, collider = BASE_URL .. STANDEE_MESH })
+    obj.reload()
+  elseif (obj.UI.getXml() or "") ~= "" then
+    obj.UI.setXml("")
+  end
+end
+
+-- Pokémon put down, picked up or removed: the signs follow (after it has settled or left).
 function onObjectDrop(_, obj)
-  showHp(obj)
+  if obj.hasTag("Pokemon") then Wait.time(refreshPedestals, 0.5) end
+end
+
+function onObjectDestroy(obj)
+  if obj.hasTag("Pokemon") then Wait.frames(refreshPedestals, 2) end
 end
 
 -- What a typed entry makes the HP: "120" sets it, "-35" / "+20" change it; nil if it isn't a number.
@@ -944,27 +977,28 @@ function parseHp(text, current, max)
   return math.max(0, math.min(max, v))
 end
 
+-- A sign's number was edited ("hpIn_<stand guid>_<column>_<side>"): change the HP of the Pokémon on it.
 function hpEdited(player, value, id)
-  local guid = id:match("^hpIn_(%w+)_%a$")
-  local obj = guid and getObjectFromGUID(guid)
-  if not obj then return end
-  local st = figureState(obj)
-  if not st.maxHp then return end
-  local old = math.floor(st.hp or st.maxHp)
-  local new = parseHp(value, old, st.maxHp)
-  if new and new ~= old then
-    st.hp = new
-    obj.memo = JSON.encode(st)
-    local name = st.pokemon ~= "" and st.pokemon or "That Pokémon"
-    local change = new - old
-    printToAll(string.format("%s: %d → %d HP (%s%d)%s", name, old, new, change > 0 and "+" or "", change,
-      new == 0 and (". " .. name .. " fainted!") or ""), new == 0 and { 1, 0.45, 0.45 } or { 0.85, 0.85, 0.85 })
+  local guid, col = id:match("^hpIn_(%w+)_(%d+)_%a$")
+  local stand = guid and getObjectFromGUID(guid)
+  if not stand then return end
+  local mon = pokemonOn(stand, tonumber(col))
+  if mon then
+    local st = hpState(mon)
+    if st.maxHp then
+      local old = st.hp
+      local new = parseHp(value, old, st.maxHp)
+      if new and new ~= old then
+        st.hp = new
+        mon.memo = JSON.encode(st)
+        local name = st.pokemon ~= "" and st.pokemon or "That Pokémon"
+        local change = new - old
+        printToAll(string.format("%s: %d → %d HP (%s%d)%s", name, old, new, change > 0 and "+" or "", change,
+          new == 0 and (". " .. name .. " fainted!") or ""), new == 0 and { 1, 0.45, 0.45 } or { 0.85, 0.85, 0.85 })
+      end
+    end
   end
-  local shown = math.floor(st.hp or st.maxHp)
-  for _, side in ipairs({ "F", "B" }) do   -- show the result (or put back the number if the entry wasn't one)
-    obj.UI.setAttribute("hpIn_" .. guid .. "_" .. side, "text", tostring(shown))
-    obj.UI.setAttribute("hpIn_" .. guid .. "_" .. side, "textColor", shown > 0 and HP_COLOR or HP_FAINTED)
-  end
+  refreshStand(stand)   -- shows the result, or puts back the number if the entry wasn't one
 end
 
 ----------------------------------------------------------------------------------------------------
