@@ -1,17 +1,22 @@
-"""Build card images for items and warrior skills from the spreadsheet (original card design: the name only,
-landscape, all in the kind's colour with a small icon; the effect text goes in the card's hover description).
+"""Build card images for items and warrior skills from the spreadsheet (original card design).
+
+Front (design "Y2"): landscape, in the kind's colour (items green, warrior skills red). A darker band on the left
+with diagonal stripes and the white icon, a thin white divider, then the name in white (Bahnschrift Bold) over a
+hairline triangle grid that fades in toward the right edge. Every card uses the same name size: the largest at
+which every name fits in at most two lines. The effect text is not printed; it is the card's hover description.
+Back: the kind's colour with stripes and a large icon.
 
 Usage:  python -I tools/build_cards.py <spreadsheet.xlsx>     (sheets "items" and "warriorSkills")
 Writes cards/items/<name>-<hash>.jpg, cards/skills/<name>-<hash>.jpg, the two card backs, and
-cards/index.json (kind -> name -> card file + text). The hash comes from the card's content, so a card
-whose text changes gets a new file name (TTS caches images by their link) — and unchanged cards keep theirs.
-Old card files that the index no longer uses are deleted. Uses every CPU core.
+cards/index.json (kind -> name -> card file + text). The hash covers everything drawn on the card (design,
+text, name size), so a card that looks different gets a new file name (TTS caches images by their link) and
+unchanged cards keep theirs. Old card files that the index no longer uses are deleted. Uses every CPU core.
 """
-import hashlib, json, os, re, sys
+import hashlib, json, math, os, sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import draw_icons  # noqa: E402
@@ -19,54 +24,58 @@ from build_figures import file_name  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "cards"
-DESIGN = "4"            # bump to rebuild every card after a design change (4: one colour per kind, icon top-left)
+DESIGN = "5"            # front design version (5 = "Y2"); bump to rebuild every front after a change
+BACK_DESIGN = "4"       # back design version (unchanged since design 4)
 W, H, SS = 600, 840, 2  # card image size (portrait, as TTS maps it), supersampling
-CREAM, INK, MUTED = (247, 241, 228), (38, 32, 26), (120, 108, 94)
-ONE_LINE_MIN = 70       # names go on one line across the card unless that would make the text smaller than this
+LW, LH = H, W           # the design is drawn landscape (840 x 600) and turned onto the portrait card
 CORE = {"items": "#2E8B57", "skills": "#B83A30"}  # each kind's single colour, front and back (green, red)
-LABEL = {"items": "Item", "skills": "Warrior skill"}
 ICON = {"items": "item", "skills": "skill"}
+BAND = 200                         # right edge of the icon band (landscape design units)
+NAME_X, NAME_W = 232, LW - 290     # where the name sits, and how wide a line may be
+TRI_SIZE, TRI_LINE, TRI_TONE = 48, 1.0, 1.10   # triangle grid: side, line width, brightness vs the card colour
+FADE_FROM, FADE_TO = 380, 740      # the grid is invisible left of FADE_FROM and full strength right of FADE_TO
 
 
 def hex_rgb(h):
     return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
 
 
-def font(size, names):
-    for n in names:
-        for d in (Path("C:/Windows/Fonts"), Path("/usr/share/fonts/truetype/msttcorefonts"), Path("/Library/Fonts")):
-            if (d / n).exists():
-                return ImageFont.truetype(str(d / n), size)
+def shade(c, k):
+    return tuple(max(0, min(255, round(v * k))) for v in c)
+
+
+def name_font(size):
+    """Bahnschrift Bold (a variable font); Arial Bold elsewhere."""
+    path = Path("C:/Windows/Fonts/bahnschrift.ttf")
+    if path.exists():
+        f = ImageFont.truetype(str(path), size)
+        f.set_variation_by_name("Bold")
+        return f
+    for d in (Path("/usr/share/fonts/truetype/msttcorefonts"), Path("/Library/Fonts")):
+        if (d / "arialbd.ttf").exists():
+            return ImageFont.truetype(str(d / "arialbd.ttf"), size)
     return ImageFont.load_default(size)
 
 
-BOLD, REGULAR, SEMI = ("segoeuib.ttf", "arialbd.ttf"), ("segoeui.ttf", "arial.ttf"), ("seguisb.ttf", "arialbd.ttf")
-
-
 def wrap(text, f, width):
-    lines = []
-    for para in text.split("\n"):
-        line = ""
-        for word in para.split():
-            trial = (line + " " + word).strip()
-            if f.getlength(trial) <= width or not line:
-                line = trial
-            else:
-                lines.append(line)
-                line = word
-        lines.append(line)
-    return lines
+    lines, line = [], ""
+    for word in text.split():
+        trial = (line + " " + word).strip()
+        if f.getlength(trial) <= width or not line:
+            line = trial
+        else:
+            lines.append(line)
+            line = word
+    return lines + [line]
 
 
-def fit_text(text, names, width, height, start, smallest, spacing=1.25):
-    """Largest font size (from start down) whose wrapped text fits the box (no line wider than it)."""
-    for size in range(start, smallest - 1, -1):
-        f = font(size * SS, names)
-        lines = wrap(text, f, width * SS)
-        if len(lines) * size * spacing <= height and all(f.getlength(l) <= width * SS for l in lines):
-            return f, lines, size
-    f = font(smallest * SS, names)
-    return f, wrap(text, f, width * SS), smallest
+def standard_name_size(names):
+    """The largest name size (design px) at which every name fits in at most two lines of NAME_W."""
+    for size in range(120, 30, -2):
+        f = name_font(size * SS)
+        if all(len(ls := wrap(n, f, NAME_W * SS)) <= 2 and all(f.getlength(l) <= NAME_W * SS for l in ls) for n in names):
+            return size
+    return 30
 
 
 def landscape_to_card(img):
@@ -75,31 +84,69 @@ def landscape_to_card(img):
     return img.rotate(90, expand=True)
 
 
-def draw_face(kind, card):
-    """The whole face in the kind's core colour: small icon top-left, the name big across the card."""
-    s, w, h = SS, H, W  # landscape: H wide, W tall
+def P(*v):
+    return [x * SS for x in v]
+
+
+def stripes(size, colour, spacing=46, width=10):
+    layer = Image.new("RGBA", size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    for i in range(-LH, LW, spacing):
+        d.line(P(i, LH, i + LH, 0), fill=colour, width=width * SS)
+    return layer
+
+
+def triangle_grid(size, colour):
+    layer = Image.new("RGBA", size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    h = TRI_SIZE * math.sqrt(3) / 2
+    for j in range(-1, int(LH / h) + 2):
+        for i in range(-1, int(LW / TRI_SIZE) + 3):
+            x0, y0 = i * TRI_SIZE + (TRI_SIZE / 2 if j % 2 else 0), j * h
+            d.polygon(P(x0, y0 + h, x0 + TRI_SIZE / 2, y0, x0 + TRI_SIZE, y0 + h), outline=colour, width=max(1, round(TRI_LINE * SS)))
+    fade = Image.new("L", size, 0)
+    ramp = Image.linear_gradient("L").rotate(90, expand=True)          # dark on the left -> light on the right
+    fade.paste(ramp.resize(((FADE_TO - FADE_FROM) * SS, size[1])), (FADE_FROM * SS, 0))
+    fade.paste(255, (FADE_TO * SS, 0, size[0], size[1]))
+    layer.putalpha(ImageChops.multiply(layer.getchannel("A"), fade))
+    return layer
+
+
+def overlay(img, mask, layer):
+    img.paste(layer.convert("RGB"), (0, 0), ImageChops.multiply(layer.getchannel("A"), mask))
+
+
+def draw_face(kind, card, size):
     col = hex_rgb(CORE[kind])
-    img = Image.new("RGB", (w * s, h * s), tuple(round(v * 0.72) for v in col))
+    img = Image.new("RGB", (LW * SS, LH * SS), shade(col, 0.6))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([18 * s, 18 * s, (w - 18) * s, (h - 18) * s], radius=20 * s, fill=col)
-    d.rounded_rectangle([40 * s, 40 * s, (w - 40) * s, (h - 40) * s], radius=14 * s, outline=(255, 255, 255), width=3 * s)
-    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], 64 * s, 4))
-    img.paste(icon, (58 * s, 56 * s), icon)
-    # one line across the card if it can be big enough; otherwise wrap
-    name_font, lines, size = fit_text(card["name"], BOLD, w - 140, 150, 150, 40, spacing=1.08)
-    if len(lines) > 1 or size < ONE_LINE_MIN:
-        name_font, lines, size = fit_text(card["name"], BOLD, w - 140, h - 200, 150, 40, spacing=1.08)
-    y = (h / 2 + 18) * s - (len(lines) - 1) * size * 1.08 * s / 2
+    d.rounded_rectangle(P(18, 18, LW - 18, LH - 18), radius=22 * SS, fill=col)
+    body = Image.new("L", img.size, 0)
+    ImageDraw.Draw(body).rounded_rectangle(P(18, 18, LW - 18, LH - 18), radius=22 * SS, fill=255)
+    band = Image.new("L", img.size, 0)
+    ImageDraw.Draw(band).rounded_rectangle(P(18, 18, BAND, LH - 18), radius=22 * SS, fill=255)
+    ImageDraw.Draw(band).rectangle(P(BAND - 40, 18, BAND, LH - 18), fill=255)
+    main = ImageChops.subtract(body, band)
+    img.paste(shade(col, 0.7), (0, 0), band)
+    overlay(img, band, stripes(img.size, shade(col, 0.8) + (255,)))
+    overlay(img, main, triangle_grid(img.size, shade(col, TRI_TONE) + (255,)))
+    d.line(P(BAND, 40, BAND, LH - 40), fill=(255, 255, 255), width=3 * SS)
+    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], 110 * SS, 4))
+    img.paste(icon, (round((18 + BAND) / 2 - 55) * SS, 60 * SS), icon)
+    f = name_font(size * SS)
+    lines = wrap(card["name"], f, NAME_W * SS)
+    step = size * 1.12 * SS
+    y = LH / 2 * SS - (len(lines) - 1) * step / 2
     for line in lines:
-        d.text((w / 2 * s, y), line, font=name_font, fill=(255, 255, 255), anchor="mm")
-        y += size * 1.08 * s
-    return landscape_to_card(img.resize((w, h), Image.LANCZOS))
+        d.text((NAME_X * SS, y), line, font=f, fill=(255, 255, 255), anchor="lm")
+        y += step
+    return landscape_to_card(img.resize((LW, LH), Image.LANCZOS))
 
 
 def draw_back(kind):
-    s, w, h = SS, H, W
+    s, w, h = SS, LW, LH
     col = hex_rgb(CORE[kind])
-    img = Image.new("RGB", (w * s, h * s), tuple(round(v * 0.72) for v in col))
+    img = Image.new("RGB", (w * s, h * s), shade(col, 0.72))
     d = ImageDraw.Draw(img)
     d.rounded_rectangle([18 * s, 18 * s, (w - 18) * s, (h - 18) * s], radius=20 * s, fill=col)
     for i in range(-h, w, 46):  # faint diagonal stripes
@@ -115,29 +162,26 @@ def read_sheet(path):
     wb = openpyxl.load_workbook(path, read_only=True)
     cards = {"items": [], "skills": []}
     for r in list(wb["items"].iter_rows(min_row=2, values_only=True)):
-        if not r or not r[0]:
-            continue
-        mega = None
-        if r[2] and "Mega Stone" in str(r[2]) and r[6]:
-            mega = f"Mega form: {r[6]}" + (f"  ·  lasts {int(r[4])} turns" if isinstance(r[4], (int, float)) else "")
-        cards["items"].append({"name": str(r[0]).strip(), "class": r[1], "group": r[2], "effect": str(r[3] or "").strip(), "mega": mega})
+        if r and r[0]:
+            cards["items"].append({"name": str(r[0]).strip(), "class": r[1], "group": r[2], "effect": str(r[3] or "").strip()})
     for r in list(wb["warriorSkills"].iter_rows(min_row=2, values_only=True)):
         if r and r[0]:
             cards["skills"].append({"name": str(r[0]).strip(), "class": r[1], "group": r[2], "effect": str(r[3] or "").strip()})
     return cards
 
 
-def card_path(kind, card):
-    h = hashlib.sha1(json.dumps([DESIGN, card], sort_keys=True, default=str).encode()).hexdigest()[:8]
+def card_path(kind, card, size):
+    drawn = [DESIGN, kind, card["name"], size]   # everything that appears on the front
+    h = hashlib.sha1(json.dumps(drawn).encode()).hexdigest()[:8]
     return f"cards/{kind}/{file_name(card['name'])}-{h}.jpg"
 
 
 def render_job(job):
-    kind, card, rel = job
+    kind, card, rel, size = job
     path = REPO / rel
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
-        draw_face(kind, card).save(path, quality=93)
+        draw_face(kind, card, size).save(path, quality=93)
         return 1
     return 0
 
@@ -146,14 +190,15 @@ def main(argv):
     if not argv:
         sys.exit(__doc__)
     cards = read_sheet(argv[0])
+    size = standard_name_size([c["name"] for lst in cards.values() for c in lst])
     index, jobs = {"backs": {}}, []
     for kind, lst in cards.items():
         index[kind] = {}
         for card in lst:
-            rel = card_path(kind, card)
+            rel = card_path(kind, card, size)
             index[kind][card["name"]] = {"face": rel, "class": card["class"], "group": card["group"], "effect": card["effect"]}
-            jobs.append((kind, card, rel))
-        back = f"cards/back-{kind}-v{DESIGN}.jpg"
+            jobs.append((kind, card, rel, size))
+        back = f"cards/back-{kind}-v{BACK_DESIGN}.jpg"
         if not (REPO / back).exists():
             (REPO / back).parent.mkdir(parents=True, exist_ok=True)
             draw_back(kind).save(REPO / back, quality=93)
@@ -165,7 +210,7 @@ def main(argv):
     for p in stale:
         p.unlink()
     (OUT / "index.json").write_text(json.dumps(index, indent=1, ensure_ascii=False, sort_keys=True), encoding="utf-8")
-    print(f"{len(jobs)} cards ({made} new, {len(stale)} removed) + backs + cards/index.json")
+    print(f"{len(jobs)} cards, name size {size}px ({made} new, {len(stale)} removed) + backs + cards/index.json")
 
 
 if __name__ == "__main__":
