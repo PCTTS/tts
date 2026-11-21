@@ -1,0 +1,54 @@
+{
+  "name": "Viperia",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the old map image (maps/viperia.jpg), 16 wide by 15 deep: a jungle floor split up by vine-covered walls two levels tall (nothing crosses them), purple poison pools, small water wells, trap doors in numbered pairs and three flags.",
+  "grid": [
+    "....P#.22.#.2.2.",
+    "P2.2P.....#W.PP.",
+    "..P...Pa.....PP.",
+    "PPP..#P..W#.....",
+    "#..###..######..",
+    "W....#..Pd#.cP..",
+    "..PPb#.PP....F..",
+    "b.PP.#FPP......P",
+    "..F.......#W..PP",
+    ".........d###..#",
+    "#..####..##W...c",
+    "..PPW#WPP.#.PPP.",
+    "..P....PP....P..",
+    ".1P1..1..1..1.1.",
+    ".....#.a..#....."
+  ],
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. sink = the surface sits this many world units lower than its level (a look only: the pools count as ground level). solid = nothing can stand on or cross it (no snap point). marker = something on the tile (painted, or a 3D piece with piece: true). Trap doors are numbered by pair (two of each).",
+  "legend": {
+    ".": { "level": 0, "surface": "floor" },
+    "#": { "level": 2, "surface": "wall", "solid": true },
+    "P": { "level": 0, "surface": "poison", "sink": 0.1 },
+    "W": { "level": 0, "surface": "floor", "marker": "well" },
+    "F": { "level": 0, "surface": "floor", "marker": "flag", "paint": false, "piece": true },
+    "1": { "level": 0, "surface": "floor", "marker": "spawn1" },
+    "2": { "level": 0, "surface": "floor", "marker": "spawn2" },
+    "a": { "level": 0, "surface": "floor", "marker": "trapdoor1" },
+    "b": { "level": 0, "surface": "floor", "marker": "trapdoor2" },
+    "c": { "level": 0, "surface": "floor", "marker": "trapdoor3" },
+    "d": { "level": 0, "surface": "floor", "marker": "trapdoor4" }
+  },
+  "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/jungle-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py: jungle floor, purple poison sludge, mossy stone wall tops, vine-covered wall faces.",
+  "textures": {
+    "floor": { "images": ["textures/jungle1.png", "textures/jungle2.png"], "span": 1, "vary": true },
+    "poison": { "image": "textures/poison.png", "span": 2, "vary": true },
+    "wall": { "image": "textures/vine-top.png", "span": 1, "vary": true },
+    "walls": { "image": "textures/vine-wall.png", "outer": true }
+  },
+  "palette": {
+    "floor": "#4A3A28",
+    "poison": "#7E3C96",
+    "wall": "#5C5C52",
+    "cliff": "#46463E",
+    "base": "#2E2A20",
+    "fall": "#D2392C"
+  }
+}

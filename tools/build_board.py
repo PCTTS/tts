@@ -419,6 +419,31 @@ def draw_marker(o, marker, x0, y0, p):
         o.rectangle([cx - 4 * u, cy - 40 * u, cx + 3 * u, cy + 36 * u], fill=ink)
         o.polygon([(cx + 3 * u, cy - 40 * u), (cx + 44 * u, cy - 26 * u), (cx + 3 * u, cy - 10 * u)],
                   fill=(246, 246, 240, 255), outline=ink)
+    elif marker == "well":   # a small round pond with a stone rim
+        r_out, r_in = 50 * u, 41 * u
+        o.ellipse([cx - r_out, cy - r_out, cx + r_out, cy + r_out], fill=(118, 114, 104, 255), outline=(62, 58, 52, 255),
+                  width=round(2 * u))
+        for k in range(12):   # rim stones
+            ang = k * math.pi / 6
+            o.line([(cx + r_in * math.cos(ang), cy + r_in * math.sin(ang)),
+                    (cx + r_out * math.cos(ang), cy + r_out * math.sin(ang))], fill=(70, 66, 58, 255), width=round(2 * u))
+        o.ellipse([cx - r_in, cy - r_in, cx + r_in, cy + r_in], fill=(40, 96, 150, 255), outline=(30, 52, 70, 255),
+                  width=round(3 * u))
+        o.ellipse([cx - r_in * 0.8, cy - r_in * 0.8, cx + r_in * 0.6, cy + r_in * 0.6], fill=(62, 132, 186, 255))
+        for k, (dx, dy, rr) in enumerate(((-12, -10, 9), (8, 6, 13), (-4, 14, 6))):   # ripples
+            o.arc([cx + (dx - rr) * u, cy + (dy - rr) * u, cx + (dx + rr) * u, cy + (dy + rr) * u], 200, 340,
+                  fill=(190, 225, 245, 200), width=round(2 * u))
+    elif marker.startswith("trapdoor"):   # a wooden hatch with its pair's number
+        h = 40 * u
+        wood, dark_wood = (128, 92, 56, 255), (70, 48, 28, 255)
+        o.rectangle([cx - h, cy - h, cx + h, cy + h], fill=wood, outline=dark_wood, width=round(4 * u))
+        for k in (-20, 0, 20):   # plank gaps
+            o.line([(cx - h, cy + k * u), (cx + h, cy + k * u)], fill=dark_wood, width=round(2 * u))
+        for sx in (-1, 1):       # hinges
+            o.rectangle([cx + sx * 22 * u - 6 * u, cy - h - 3 * u, cx + sx * 22 * u + 6 * u, cy - h + 12 * u],
+                        fill=(58, 58, 62, 255))
+        o.text((cx, cy + 2 * u), marker[len("trapdoor"):], font=font(round(40 * u)), fill=(246, 232, 200, 255),
+               anchor="mm", stroke_width=round(3 * u), stroke_fill=dark_wood)
     elif marker.startswith("bell"):
         gold, deep = (226, 178, 60, 255), (150, 105, 30, 255)
         o.ellipse([cx - 26 * u, cy - 44 * u, cx + 26 * u, cy - 6 * u], fill=gold, outline=ink, width=round(3 * u))

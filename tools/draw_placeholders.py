@@ -11,6 +11,11 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/ingis/textures/basalt-wall.png          cliffs: basalt columns standing side by side, seamless left-right
   arenas/ingis/textures/lava.png                 lava: glowing orange with dark crust plates
   misc/volcano-placeholder-v1.jpg                table image around a volcanic arena: dark rock, faint glowing cracks
+  arenas/viperia/textures/jungle1.png, jungle2.png  jungle floor: dark soil, moss, fallen leaves
+  arenas/viperia/textures/poison.png             poison pools: purple sludge with bubbles
+  arenas/viperia/textures/vine-top.png           wall tops: mossy stone under leaves
+  arenas/viperia/textures/vine-wall.png          wall sides: stone blocks with vines hanging down, seamless left-right
+  misc/jungle-placeholder-v1.jpg                 table image around a jungle arena: dense leaves
 """
 from pathlib import Path
 
@@ -222,8 +227,131 @@ def volcano_table():
     return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
 
 
+LEAF_GREENS = [(46, 92, 38), (62, 118, 44), (88, 138, 52), (38, 74, 34), (112, 150, 60)]
+LEAF_BROWNS = [(96, 70, 40), (124, 92, 48), (78, 56, 34), (140, 110, 58)]
+
+
+def leaf(d, x, y, length, angle, col, vein=True):
+    """A pointed leaf: an almond outline along `angle`, with a darker midrib."""
+    ca, sa = np.cos(angle), np.sin(angle)
+    pts = []
+    for t in np.linspace(0, 1, 9):
+        w = np.sin(np.pi * t) * length * 0.32
+        pts.append((t * length, w))
+    pts += [(t, -w) for t, w in reversed(pts[1:-1])]
+    poly = [(x + px * ca - py * sa, y + px * sa + py * ca) for px, py in pts]
+    d.polygon(poly, fill=col)
+    if vein:
+        d.line([(x, y), (x + length * ca, y + length * sa)], fill=tuple(max(0, v - 30) for v in col[:3]) + (col[3],), width=1)
+
+
+def jungle_floor(seed):
+    """Dark soil with moss patches and fallen leaves (mostly brown, some green)."""
+    rng = np.random.default_rng(seed)
+    soil = mix((58, 44, 30), (82, 64, 42), fbm(N, N, rng, 4))
+    moss = np.clip((fbm(N, N, rng, 3) - 0.5) * 3.0, 0, 1)
+    img = soil + (mix((48, 78, 34), (82, 112, 48), fbm(N, N, rng, 12, 3)) - soil) * (0.85 * moss)[..., None]
+    img *= (1 + rng.normal(0, 0.05, (N, N, 1))).astype(np.float32)
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(140):
+        col = (LEAF_BROWNS if rng.random() < 0.7 else LEAF_GREENS)[rng.integers(0, 4)]
+        leaf(d, rng.random() * N, rng.random() * N, rng.uniform(14, 30), rng.random() * 6.3,
+             col + (int(rng.uniform(170, 235)),))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def poison():
+    """Purple sludge: swirls of violet, scattered bubbles with highlights."""
+    rng = np.random.default_rng(91)
+    t = fbm(N, N, rng, 3, 5)
+    swirl = 0.5 + 0.5 * np.sin((t * 5 + fbm(N, N, rng, 2) * 3) * 2 * np.pi)
+    img = mix((74, 30, 96), (150, 70, 170), 0.6 * swirl + 0.4 * t)
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(70):
+        x, y, r = rng.random() * N, rng.random() * N, rng.uniform(3, 12)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(170, 96, 196, 170), outline=(60, 20, 80, 200), width=2)
+        d.ellipse([x - r * 0.5, y - r * 0.6, x - r * 0.1, y - r * 0.2], fill=(235, 200, 245, 190))   # highlight
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
+
+
+def stone_blocks(h, w, rng, rows, base=(92, 90, 80)):
+    """Grey-green stone blocks in staggered courses (seamless left-right)."""
+    img = mix(tuple(v - 18 for v in base), base, fbm(h, w, rng, 6, 4, wrap_x=True))
+    ch = h / rows
+    for i in range(rows):
+        y = int(i * ch)
+        img[y:y + 3] *= 0.5                                           # mortar between courses
+        n = rng.integers(2, 4)
+        off = rng.random() * w
+        for k in range(n):
+            x = int((off + k * w / n) % w)
+            img[y:int(y + ch), max(0, x - 1):x + 2] *= 0.55           # joints within a course
+        img[y:int(y + ch)] *= rng.uniform(0.85, 1.08)
+    return img
+
+
+def vine_top():
+    """Mossy stone wall top under a scatter of leaves."""
+    rng = np.random.default_rng(93)
+    img = stone_blocks(N, N, rng, 4)
+    moss = np.clip((fbm(N, N, rng, 4) - 0.35) * 2.2, 0, 1)
+    img = img + (mix((44, 84, 34), (86, 124, 52), fbm(N, N, rng, 10, 3)) - img) * (0.9 * moss)[..., None]
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(170):
+        col = LEAF_GREENS[rng.integers(0, 5)]
+        leaf(d, rng.random() * N, rng.random() * N, rng.uniform(16, 34), rng.random() * 6.3, col + (230,))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def vine_wall():
+    """Wall faces: stone courses with vines hanging from the top, leaves along them (seamless left-right)."""
+    rng = np.random.default_rng(95)
+    h, w = 1024, N
+    img = stone_blocks(h, w, rng, 8)
+    img *= np.linspace(1.0, 0.75, h, dtype=np.float32)[:, None, None]       # darker toward the bottom
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(24):                                                     # vines: wavy strands from the top
+        x, length = rng.random() * w, rng.uniform(0.35, 0.95) * h
+        pts, y = [], 0.0
+        ph = rng.random() * 6.3
+        while y < length:
+            pts.append((x + 10 * np.sin(y / 60 + ph), y))
+            y += 8
+        for dx in (-w, 0, w):                                               # drawn three times: seamless
+            d.line([(px + dx, py) for px, py in pts], fill=(40, 76, 30, 255), width=8)
+            for px, py in pts[::3]:
+                side = 1 if rng.random() < 0.5 else -1
+                leaf(d, px + dx, py, rng.uniform(22, 40), np.pi / 2 + side * rng.uniform(0.5, 1.3),
+                     LEAF_GREENS[rng.integers(0, 5)] + (245,))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def jungle_table():
+    """Around a jungle arena: dense overlapping leaves, dark beneath."""
+    rng = np.random.default_rng(97)
+    h, w = 1211, 2048
+    out = to_img(mix((16, 30, 14), (30, 52, 24), fbm(h, w, rng, 5, 4))).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(2600):
+        col = LEAF_GREENS[rng.integers(0, 5)]
+        k = rng.uniform(0.55, 1.0)
+        leaf(d, rng.random() * w, rng.random() * h, rng.uniform(40, 110), rng.random() * 6.3,
+             tuple(int(v * k) for v in col) + (235,))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.8))
+
+
 def main():
     files = {
+        "arenas/viperia/textures/jungle1.png": lambda p: jungle_floor(101).save(p),
+        "arenas/viperia/textures/jungle2.png": lambda p: jungle_floor(102).save(p),
+        "arenas/viperia/textures/poison.png": lambda p: poison().save(p),
+        "arenas/viperia/textures/vine-top.png": lambda p: vine_top().save(p),
+        "arenas/viperia/textures/vine-wall.png": lambda p: vine_wall().save(p),
+        "misc/jungle-placeholder-v1.jpg": lambda p: jungle_table().save(p, quality=90),
         "arenas/ingis/textures/sand1.png": lambda p: sand(81).save(p),
         "arenas/ingis/textures/sand2.png": lambda p: sand(82).save(p),
         "arenas/ingis/textures/basalt-top.png": lambda p: basalt_top().save(p),

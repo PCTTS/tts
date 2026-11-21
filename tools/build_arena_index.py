@@ -3,7 +3,7 @@
 Usage:  python -I tools/build_arena_index.py
 For each arenas/<folder>/map.json with a "board" entry ({"mesh", "texture", "geometry"}: the published board
 files, from tools/build_board.py), the index has the arena's board files, its table image, a snap point over
-every tile (at the tile's top, position only: players set a Pokemon's facing themselves) and its 3D pieces
+every tile except "solid" ones (walls) (at the tile's top, position only: players set a Pokemon's facing themselves) and its 3D pieces
 (legend entries with "piece": true, placed as tools/place_pieces.py does). Positions are in the board's frame
 (the board sits on the table with no rotation). Global.lua downloads the index when the game loads.
 """
@@ -27,7 +27,7 @@ def arena_entry(folder):
     for r, row in enumerate(data["grid"]):
         for c, ch in enumerate(row):
             tile = data["legend"][ch]
-            if tile.get("void"):
+            if tile.get("void") or tile.get("solid"):   # nothing stands on solid tiles (walls)
                 continue
             top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0) + SNAP_LIFT
             snaps.append([round((c + 0.5 - C / 2) * T, 4), round(top, 4), round((R / 2 - r - 0.5) * T, 4)])

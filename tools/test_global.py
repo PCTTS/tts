@@ -220,7 +220,8 @@ def main():
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Illusio", False), ("Ingis", False), ("Pugilis", True)], f"map list shows Illusio, Ingis and Pugilis, Pugilis on the table ({got})")
+    check(got == [("Illusio", False), ("Ingis", False), ("Pugilis", True), ("Viperia", False)],
+          f"map list shows Illusio, Ingis, Pugilis and Viperia, Pugilis on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
           and calls.attrs["mapRes_White_3.text"] == "Pugilis   (on the board)",
@@ -276,6 +277,20 @@ def main():
     high = [p for p in idx["snaps"] if abs(p[1] - (0.415 + 0.968 + 0.02)) < 0.01]
     check(len(idx["snaps"]) == 256 and len(lava) == 44 and len(high) == 52,
           f"a snap point on all 256 tiles: 52 on the ridge, 44 on the (slightly sunken) lava ({len(high)}, {len(lava)})")
+
+    # Viperia: 16 x 15, its 3 flags, no snap points on the walls, the jungle table
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", "mapRes_White_4")
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    vmap = json.loads((REPO / "arenas" / "viperia" / "map.json").read_text(encoding="utf-8"))
+    walls = sum(row.count("#") for row in vmap["grid"])
+    vidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Viperia"]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/viperia/board-v1.obj")
+          and kinds.count("Flag") == 3 and len(kinds) == 4 and len(vidx["snaps"]) == 16 * 15 - walls
+          and str(calls.tableURL).endswith("misc/jungle-placeholder-v1.jpg"),
+          f"picking Viperia: its board, 3 flags, snap points on all {16 * 15 - walls} tiles but the {walls} walls, the jungle table")
 
     # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
     lua.execute(r"""
