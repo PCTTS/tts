@@ -1,10 +1,10 @@
 --[[ PCTTS_MOD — Global script for the Pokemon Conquest tabletop mod.
 Source: https://github.com/PCTTS/tts (lua/Global.lua). Edit there, not in TTS.
 
-Toolbar (right edge of the screen), one panel open at a time, each player gets their own:
+Toolbar (right edge, a third of the way down the screen), one panel open at a time, each player gets their own:
   * Pokéball: search the roster, click a result and that figure goes on your next free pedestal.
-  * Potion:   search the item cards, click one and it goes in the next free item slot on your stand.
-  * Swords:   search the warrior skill cards, click one and it goes in the next free skill slot.
+  * Potion:   scroll through (or search) the item cards, click one and it goes in the next free item slot.
+  * Swords:   scroll through (or search) the warrior skill cards, click one and it goes in the next free skill slot.
 Team stands (tagged "Stand") sit on the two long sides: six pedestals on top, an item card and a warrior skill
 card on the slope under each. Which stand is yours depends on your seat colour (SEAT_SIDE).
   * Swirl:    pick a status, then pick up a Pokémon to give it that status (it's tinted in the status's
@@ -34,12 +34,19 @@ TOOLS = {
   { kind = "status", icon = "status", tip = "Give a status" },
   { kind = "maps", icon = "map", tip = "Choose the map" },
 }
+-- The toolbar and its panels sit in a frame covering the top two-thirds of the screen, the toolbar at the frame's
+-- middle: a third of the way down the screen at any resolution. A panel's top stays level with the toolbar's.
+HUD_HEIGHT = "66.667%"
 -- Searchable catalogues behind the search panels.
 SEARCH_KINDS = { "dex", "items", "skills" }
+-- Panels that also list every name to scroll through (shown while the search box is empty), LIST_ROWS rows tall.
+LIST_KINDS = { items = true, skills = true }
+LIST_ROWS = 10
 CATALOGS = {
   dex = { title = "Spawn a Pokémon", noun = "Pokémon", hint = "Click a result to put it on your next free pedestal." },
-  items = { title = "Item cards", noun = "item", hint = "Click a result to put the card on your stand.", deckBase = 1000, tag = "Item" },
-  skills = { title = "Warrior skill cards", noun = "warrior skill", hint = "Click a result to put the card on your stand.",
+  items = { title = "Item cards", noun = "item", hint = "Click a card to place it, or type to search.",
+    deckBase = 1000, tag = "Item" },
+  skills = { title = "Warrior skill cards", noun = "warrior skill", hint = "Click a card to place it, or type to search.",
     deckBase = 3000, tag = "WarriorSkill" },
 }
 ROSTER_URL = BASE_URL .. "figures/index.json"
@@ -98,6 +105,9 @@ roster = catalog.dex.index
 cardBacks = {}       -- kind -> back image path
 openPanel, searchHits, mapRows, spawnCount = {}, {}, {}, {}
 armed = {}           -- [colour] = status key waiting for that player to pick up a Pokémon
+queries = {}         -- [colour .. kind] = what that player last typed in that search box
+listViewers = { items = {}, skills = {} }  -- [kind][colour] = true while that player sees the full list
+listNames, builtLists = {}, {}             -- names in each full list as built, and a signature of them
 
 ----------------------------------------------------------------------------------------------------
 -- Save / load
@@ -151,6 +161,14 @@ function setCatalog(kind, index, from)
   catalog[kind] = { index = index, list = list, keys = keys }
   if kind == "dex" then roster = index end
   log(CATALOGS[kind].title .. ": " .. #list .. " (" .. from .. ")")
+  -- the scrolling lists are part of the UI: rebuild it if this catalogue's names changed since it was built
+  if LIST_KINDS[kind] and builtLists[kind] and builtLists[kind] ~= listSignature(kind) then buildUI() end
+end
+
+function listSignature(kind)
+  local names = {}
+  for i, e in ipairs(catalog[kind].list) do names[i] = e.name end
+  return table.concat(names, "\n")
 end
 
 function setCards(data, from)
@@ -379,12 +397,26 @@ local function toolbarXml()
     .. 'outline="#303030" outlineSize="1 1">\n  %s\n</Panel>\n', w, h, table.concat(items, "\n  "))
 end
 
-local function panelXml(kind, c, title, height, body)
+PANEL_W, PANEL_PAD = 290, 8
+LIST_TOP = 100  -- a search panel's first result row, below its top: padding, title, search box, hint and gaps
+LIST_BAR = 20   -- room at a full list's right for its scrollbar, which lies over the list
+LIST_HBAR = 20  -- TTS always gives a scroll list a sideways scrollbar along its bottom, even with nothing to scroll:
+                -- the list is this much taller and a strip in the panel's colour covers the bar
+
+-- Panels hang from a "dock": an empty box the toolbar's height, just left of it. Each panel is anchored to the
+-- dock's top-right corner (rectAlignment UpperRight), so it grows downward and its top stays level with the
+-- toolbar's whatever its height. (A panel centred on the toolbar with pivot "1 1" jumped when its height changed:
+-- TTS re-applies the alignment's own pivot.)
+local function dockXml()
   local w, h = barSize()
+  return string.format('<Panel id="dock" rectAlignment="MiddleRight" offsetXY="%d 0" width="%d" height="%d" '
+    .. 'color="#00000000" raycastTarget="false">\n', -(w + 4), PANEL_W, h)
+end
+
+local function panelXml(kind, c, title, height, body)
   return string.format([[
-<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" pivot="1 1" offsetXY="%d %d"
-       width="290" height="%d"
-       color="#141414F2" outline="#303030" outlineSize="1 1" padding="8 8 8 8" spacing="4"
+<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="UpperRight" width="%d" height="%d"
+       color="#141414F2" outline="#303030" outlineSize="1 1" padding="%d %d %d %d" spacing="4"
        childForceExpandHeight="false" childForceExpandWidth="true">
   <HorizontalLayout preferredHeight="28" flexibleHeight="0" childForceExpandWidth="false" spacing="4">
     <Text class="title" flexibleWidth="1">%s</Text>
@@ -393,13 +425,46 @@ local function panelXml(kind, c, title, height, body)
   %s
   <Panel flexibleHeight="1"/>
 </VerticalLayout>
-]], kind, c, c, -(w + 4), math.floor(h / 2), height, title, body)  -- top edge level with the toolbar's
+]], kind, c, c, PANEL_W, height, PANEL_PAD, PANEL_PAD, PANEL_PAD, PANEL_PAD, title, body)
+end
+
+local function xmlText(s)
+  return (s:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;"):gsub('"', "&quot;"))
+end
+
+-- Every name of a card kind in one scrolling list, built once and shown (via its visibility) to the players
+-- whose panel for that kind is open with an empty search box. It sits where those panels' result rows go.
+local function listXml(kind)
+  local names, rows = {}, {}
+  for i, e in ipairs(catalog[kind].list) do
+    names[i] = e.name
+    rows[i] = string.format('<Button id="%sAll_%d" class="row" onClick="listPick" text="%s"/>', kind, i, xmlText(e.name))
+  end
+  listNames[kind], builtLists[kind] = names, listSignature(kind)
+  local height = LIST_ROWS * ROW_STEP - 4 + LIST_HBAR
+  return string.format([[
+<VerticalScrollView id="%sList" active="false" rectAlignment="UpperRight" offsetXY="%d %d" width="%d" height="%d"
+       color="#00000000" scrollSensitivity="%d" movementType="Clamped" horizontal="false" vertical="true"
+       horizontalScrollbarVisibility="AutoHide" verticalScrollbarVisibility="AutoHide"
+       scrollbarBackgroundColor="#00000060" scrollbarColors="#5A5A5A|#7A7A7A|#9A9A9A|#5A5A5A">
+  <VerticalLayout id="%sListBody" height="%d" spacing="4" padding="0 %d 0 0"
+       childForceExpandHeight="false" childForceExpandWidth="true">
+  %s
+  </VerticalLayout>
+</VerticalScrollView>
+<Panel id="%sListCover" active="false" rectAlignment="UpperRight" offsetXY="%d %d" width="%d" height="%d"
+       color="#181818"/>  <!-- the panel's colour as it shows on screen -->
+]], kind, -PANEL_PAD, -LIST_TOP, PANEL_W - 2 * PANEL_PAD, height, ROW_STEP * 2,
+    kind, math.max(1, #rows * ROW_STEP - 4), LIST_BAR, table.concat(rows, "\n  "),
+    kind, -PANEL_PAD + 1, -(LIST_TOP + height - LIST_HBAR), PANEL_W - 2 * PANEL_PAD + 2, LIST_HBAR)
 end
 
 function buildUI()
   local assets = {}
   for name, path in pairs(ICONS) do assets[#assets + 1] = { name = name, url = BASE_URL .. path } end
   UI.setCustomAssets(assets)
+  openPanel, armed, queries = {}, {}, {}
+  listViewers = { items = {}, skills = {} }
 
   local xml = { [[
 <Defaults>
@@ -412,7 +477,8 @@ function buildUI()
   <Text class="hint" fontSize="12" color="#AAAAAA" alignment="MiddleLeft" preferredHeight="18" flexibleHeight="0"/>
   <InputField class="search" fontSize="16" preferredHeight="34" flexibleHeight="0" characterLimit="40"/>
 </Defaults>
-]], toolbarXml() }
+]], string.format('<Panel id="hud" rectAlignment="UpperRight" width="100%%" height="%s" color="#00000000" raycastTarget="false">\n',
+    HUD_HEIGHT), toolbarXml(), dockXml() }
   for _, c in ipairs(COLORS) do
     for _, kind in ipairs(SEARCH_KINDS) do
       local cat = CATALOGS[kind]
@@ -423,7 +489,7 @@ function buildUI()
       for i = 1, RESULTS do
         rows[#rows + 1] = string.format('<Button id="%sRes_%s_%d" class="row" active="false" onClick="searchPick" text=" "/>', kind, c, i)
       end
-      xml[#xml + 1] = panelXml(kind, c, cat.title, SEARCH_BASE, table.concat(rows, "\n  "))
+      xml[#xml + 1] = panelXml(kind, c, cat.title, panelHeight(kind, 0), table.concat(rows, "\n  "))
     end
 
     local rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the board.</Text>', c) }
@@ -432,19 +498,50 @@ function buildUI()
     end
     xml[#xml + 1] = panelXml("maps", c, "Choose the map", MAPS_BASE, table.concat(rows, "\n  "))
 
+    -- statuses: a square in the status's colour, then the row (the clear row gets an empty square's space)
     rows = { string.format('<Text id="statusMsg_%s" class="hint">%s</Text>', c, STATUS_HINT) }
     for _, s in ipairs(STATUS_ROWS) do
-      rows[#rows + 1] = string.format('<Button id="statusRes_%s_%s" class="row" onClick="statusPick" text="%s" colors="%s"/>',
-        c, s.key, s.label, statusRowColors(s.color, false))
+      local swatch = s.key == "clear" and "#00000000" or s.color
+      rows[#rows + 1] = string.format('<HorizontalLayout preferredHeight="28" flexibleHeight="0" spacing="6" childForceExpandWidth="false">'
+        .. '<Panel id="statusSwatch_%s_%s" preferredWidth="28" flexibleWidth="0" color="%s"/>'
+        .. '<Button id="statusRes_%s_%s" class="row" flexibleWidth="1" onClick="statusPick" text="%s" colors="%s"/></HorizontalLayout>',
+        c, s.key, swatch, c, s.key, s.label, statusRowColors(s.color, false))
     end
     xml[#xml + 1] = panelXml("status", c, "Give a status", MAPS_BASE + #STATUS_ROWS * ROW_STEP, table.concat(rows, "\n  "))
   end
+  for _, kind in ipairs(SEARCH_KINDS) do
+    if LIST_KINDS[kind] then xml[#xml + 1] = listXml(kind) end   -- after the panels, so drawn on top of them
+  end
+  xml[#xml + 1] = "</Panel>\n</Panel>\n"   -- closes the dock, then the frame
   UI.setXml(table.concat(xml))
+end
+
+-- A search panel's height with n result rows. Panels with a full list stay one size: the list's.
+function panelHeight(kind, n)
+  if LIST_KINDS[kind] then return SEARCH_BASE + LIST_ROWS * ROW_STEP + LIST_HBAR end
+  return SEARCH_BASE + n * ROW_STEP
+end
+
+-- Show or hide a card kind's full list for one player (it's one list, made visible to each player who needs it).
+function setListShown(c, kind, on)
+  if not LIST_KINDS[kind] or (listViewers[kind][c] or false) == on then return end
+  listViewers[kind][c] = on or nil
+  local viewers = {}
+  for _, col in ipairs(COLORS) do
+    if listViewers[kind][col] then viewers[#viewers + 1] = col end
+  end
+  for _, id in ipairs({ kind .. "List", kind .. "ListCover" }) do
+    if #viewers > 0 then UI.setAttribute(id, "visibility", table.concat(viewers, "|")) end
+    UI.setAttribute(id, "active", #viewers > 0 and "true" or "false")
+  end
 end
 
 local function show(c, kind)
   for _, t in ipairs(TOOLS) do
     UI.setAttribute(t.kind .. "_" .. c, "active", (t.kind == kind) and "true" or "false")
+  end
+  for lk in pairs(LIST_KINDS) do   -- the full list shows while its panel is open and nothing is typed
+    setListShown(c, lk, lk == kind and (queries[c .. lk] or "") == "")
   end
   openPanel[c] = kind
   if kind ~= "status" and armed[c] then  -- closing the status panel cancels a waiting status
@@ -468,6 +565,8 @@ end
 
 function searchChanged(player, value, id)
   local c, kind = player.color, id:match("^(%a+)In_")
+  value = value or ""
+  queries[c .. kind] = value
   local names, hits = search(kind, value, RESULTS)
   searchHits[c] = { kind = kind, names = names }
   for i = 1, RESULTS do
@@ -478,9 +577,10 @@ function searchChanged(player, value, id)
     end
     UI.setAttribute(rid, "active", names[i] and "true" or "false")
   end
-  UI.setAttribute(kind .. "_" .. c, "height", SEARCH_BASE + #names * ROW_STEP)
+  UI.setAttribute(kind .. "_" .. c, "height", panelHeight(kind, #names))
+  setListShown(c, kind, value == "" and openPanel[c] == kind)
   local msg
-  if (value or "") == "" then
+  if value == "" then
     msg = CATALOGS[kind].hint
   elseif #names == 0 then
     msg = "No " .. CATALOGS[kind].noun .. " matches \"" .. value .. "\"."
@@ -492,14 +592,23 @@ function searchChanged(player, value, id)
   UI.setValue(kind .. "Msg_" .. c, msg)
 end
 
+local function placed(kind, c, name)
+  if name and spawnFrom(kind, name, c) then
+    UI.setValue(kind .. "Msg_" .. c, "Placed " .. name .. ".")
+  end
+end
+
 function searchPick(player, _, id)
   local c = player.color
   local kind, i = id:match("^(%a+)Res_%a+_(%d+)$")
   local hits = searchHits[c]
-  local name = hits and hits.kind == kind and hits.names[tonumber(i)]
-  if name and spawnFrom(kind, name, c) then
-    UI.setValue(kind .. "Msg_" .. c, "Placed " .. name .. ".")
-  end
+  placed(kind, c, hits and hits.kind == kind and hits.names[tonumber(i)])
+end
+
+-- A row of a full list ("itemsAll_12"): the 12th name of the list as it was built.
+function listPick(player, _, id)
+  local kind, i = id:match("^(%a+)All_(%d+)$")
+  placed(kind, player.color, listNames[kind] and listNames[kind][tonumber(i)])
 end
 
 function refreshMaps(c)

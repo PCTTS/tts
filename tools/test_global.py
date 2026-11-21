@@ -3,8 +3,9 @@
 Usage:  python -I tools/test_global.py
 Checks: the script compiles; onLoad builds well-formed UI XML with unique ids; search finds the right names;
 the search panel's result rows get text; spawning creates a figure (or a card in the player's hand) with the
-right images; the map list reads names from a fake map board; statuses arm, stack, replace and clear; a flag gets
-its Capture menu and takes the capturing player's colour. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
+right images; the map list reads names from a fake map board; statuses arm, stack, replace and clear; the
+toolbar's frame, status colour squares and full card lists (who sees them, picking from them); a flag gets its
+Capture menu and takes the capturing player's colour. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
 """
 import json, re, sys, xml.etree.ElementTree as ET
 from pathlib import Path
@@ -150,6 +151,24 @@ def main():
         check(len(ids) == len(set(ids)), f"UI XML parses; {len(ids)} ids, all unique")
         bar = next(e for e in root.iter() if e.get("id") == "toolbar")
         check((bar.get("width"), bar.get("height")) == ("38", "190"), f"toolbar is 38 x 190 ({bar.get('width')} x {bar.get('height')})")
+        hud = next(e for e in root.iter() if e.get("id") == "hud")
+        check(hud.get("rectAlignment") == "UpperRight" and hud.get("height") == "66.667%" and bar in list(hud),
+              "the toolbar sits in a frame over the top two-thirds of the screen (so a third of the way down)")
+        dock = next(e for e in root.iter() if e.get("id") == "dock")
+        panels = [e for e in dock if (e.get("id") or "").endswith("_White")]
+        check(len(panels) == 5 and all(e.get("rectAlignment") == "UpperRight" and not e.get("pivot") for e in panels)
+              and dock.get("height") == "190" and dock in list(hud),
+              "White's five panels hang from the top of a dock the toolbar's height (so their top stays put)")
+        lists = {k: next(e for e in root.iter() if e.get("id") == k + "List") for k in ("items", "skills")}
+        counts = {k: len([b for b in v.iter("Button")]) for k, v in lists.items()}
+        check(counts == {"items": 246, "skills": 67}, f"scrolling lists hold every item and warrior skill ({counts})")
+        body = next(e for e in root.iter() if e.get("id") == "skillsListBody")
+        cover = next((e for e in root.iter() if e.get("id") == "skillsListCover"), None)
+        check(cover is not None and cover.get("height") == "20", "each list has a cover strip over its sideways scrollbar")
+        check((body.get("height"), body.get("padding")) == (str(67 * 32 - 4), "0 20 0 0"),
+              f"a list's body is as tall as its rows, with room for the scrollbar ({body.get('height')}, {body.get('padding')})")
+        sw = next(e for e in root.iter() if e.get("id") == "statusSwatch_White_burn")
+        check(sw.get("color") == "#EE8130", "each status row has a full-colour square (Burned: #EE8130)")
     except ET.ParseError as e:
         check(False, f"UI XML parses ({e})")
     check(len(list(calls.assets.values())) == 5, "five toolbar icons registered")
@@ -259,6 +278,29 @@ def main():
           "12 card snap points per stand, lifted off the slope, snapping rotation")
     g.spawnPokemon("Gengar", "Grey")
     check(abs(calls.spawned[n + 5].position.x - (-35)) < 0.01, "a spectator's Pokemon appears in the left strip")
+
+    # full lists: shown to whoever has the panel open with an empty search box, hidden while typing or closed
+    green = lua.table_from({"color": "Green"})
+    g.toolClick(player, "-1", "tool_items")     # (it was open: this closes it)
+    g.searchChanged(player, "", "itemsIn_White")
+    g.toolClick(player, "-1", "tool_items")
+    check(calls.attrs["itemsList.active"] == "true" and calls.attrs["itemsList.visibility"] == "White",
+          "opening the item panel shows White the full item list")
+    g.toolClick(green, "-1", "tool_items")
+    check(calls.attrs["itemsList.visibility"] == "White|Green" and calls.attrs["itemsListCover.visibility"] == "White|Green",
+          "Green opening it too adds Green to the list's viewers (and its cover's)")
+    g.searchChanged(player, "sitrus", "itemsIn_White")
+    check(calls.attrs["itemsList.visibility"] == "Green" and calls.attrs["itemsRes_White_1.active"] == "true",
+          "typing hides the list for White only, and shows White's search results")
+    check(calls.attrs["items_White.height"] == 108 + 10 * 32 + 20, f"the item panel keeps its full size while typing ({calls.attrs['items_White.height']})")
+    g.searchChanged(player, "", "itemsIn_White")
+    check(calls.attrs["itemsList.visibility"] == "White|Green", "clearing the search box brings the list back")
+    g.closePanel(green); g.closePanel(player)
+    check(calls.attrs["itemsList.active"] == "false" and calls.attrs["itemsListCover.active"] == "false", "closing both panels hides the list")
+    i = list(g.listNames["items"].values()).index("Sitrus Berry") + 1
+    n = len(calls.spawned)
+    g.listPick(player, "-1", f"itemsAll_{i}")
+    check(len(calls.spawned) == n + 1 and calls.spawned[n + 1].data.Nickname == "Sitrus Berry", "clicking Sitrus Berry in the list spawns it")
 
     # flags: a spawned flag gets the menu; Capture tints it to the player's colour, Make neutral resets it
     lua.execute(r"""
