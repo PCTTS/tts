@@ -10,7 +10,7 @@ card on the slope under each. Which stand is yours depends on your seat colour (
   * Swirl:    pick a status, then pick up a Pokémon to give it that status (it's tinted in the status's
               type colour). One main status at a time; Confused and Flinched can stack on top.
               "Clear status" returns a Pokémon to normal.
-  * Map:      pick which arena the board shows.
+  * Map:      pick which arena goes on the table (3D boards from arenas/index.json, with snap points and pieces).
 Flags on the board: right-click > Capture tints a flag to your seat colour; "Make neutral" resets it.
 HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
 Chat:  !spawn garchomp   !item sitrus   !skill belief   spawn the best match (or list close alternatives).
@@ -53,6 +53,7 @@ CATALOGS = {
 ROSTER_URL = BASE_URL .. "figures/index.json"
 CARDS_URL = BASE_URL .. "cards/index.json"
 STATS_URL = BASE_URL .. "data/pokemon.json"   -- every Pokémon's stats from the sheet (tools/build_stats.py)
+ARENAS_URL = BASE_URL .. "arenas/index.json"   -- the map picker's arenas (tools/build_arena_index.py)
 
 -- Type colours, the same as the damage calculator sheets' type cells (their conditional formatting).
 TYPE_COLORS = {
@@ -114,6 +115,7 @@ for _, k in ipairs(SEARCH_KINDS) do catalog[k] = { index = {}, list = {}, keys =
 roster = catalog.dex.index
 cardBacks = {}       -- kind -> back image path
 stats = {}           -- Pokémon name -> { hp, atk, def, spd, rng, types } (data/pokemon.json)
+arenas = {}          -- arena name -> { mesh, texture, table, snaps, pieces } (arenas/index.json)
 openPanel, searchHits, mapRows, spawnCount = {}, {}, {}, {}
 armed = {}           -- [colour] = status key waiting for that player to pick up a Pokémon
 queries = {}         -- [colour .. kind] = what that player last typed in that search box
@@ -130,6 +132,7 @@ DATA = {
   { key = "roster", url = ROSTER_URL, use = function(t) setCatalog("dex", t, "downloaded") end },
   { key = "cards", url = CARDS_URL, use = function(t) setCards(t, "downloaded") end },
   { key = "stats", url = STATS_URL, use = function(t) stats = t; refreshPedestals() end },
+  { key = "arenas", url = ARENAS_URL, use = function(t) arenas = t end },
 }
 STATE_MARK, STATE_SEP = "PCTTS-STATE-1", "\n\30\n"   -- a raw \30 (record separator) can't appear in JSON text
 rawData, savedState = {}, ""
@@ -412,34 +415,70 @@ function spawnFrom(kind, name, color)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Maps (for now: the states of the locked map board; later the data-driven map system)
+-- Maps: the arenas in arenas/index.json (tools/build_arena_index.py), each a 3D board (tag "Board3D") with a
+-- snap point over every tile (position only), its pieces (flags…) and the table image around it.
 ----------------------------------------------------------------------------------------------------
-local function titleCase(s)
-  return (s:gsub("%-", " "):gsub("(%a)(%w*)", function(a, b) return a:upper() .. b end))
-end
+BOARD_SPOT = { 0.01, 0.961, -0.01 }   -- where a board sits: on the table, no rotation
+BOARD_SHADER = { SpecularColor = { r = 1, g = 1, b = 1 }, SpecularIntensity = 0, SpecularSharpness = 2, FresnelStrength = 0 }
 
-function findMapBoard()
+function currentBoard()
   for _, o in ipairs(getAllObjects()) do
-    local states = o.getStates()
-    if states and #states > 0 and (o.getCustomObject() or {}).image then return o end
+    if o.hasTag("Board3D") then return o end
   end
 end
 
--- { {id=stateId, name="Pugilis", current=true}, ... } sorted by name
+-- { {name="Pugilis", current=true}, ... } sorted by name
 function mapList()
-  local board = findMapBoard()
-  if not board then return {} end
-  local data, list = board.getData(), {}
-  local function add(id, image, current)
-    local file = (image or ""):match("/maps/([%w%-]+)%.%a+$")
-    list[#list + 1] = { id = id, name = file and titleCase(file) or ("Map " .. id), current = current }
-  end
-  add(board.getStateId(), data.CustomImage and data.CustomImage.ImageURL, true)
-  for id, st in pairs(data.States or {}) do
-    add(tonumber(id), st.CustomImage and st.CustomImage.ImageURL, false)
+  local board, list = currentBoard(), {}
+  for name in pairs(arenas) do
+    list[#list + 1] = { name = name, current = board ~= nil and board.getName() == name }
   end
   table.sort(list, function(a, b) return a.name < b.name end)
   return list
+end
+
+-- Put an arena on the table: the old board and its pieces go, the new board comes with its snap points and
+-- pieces, and the table gets the arena's image.
+function loadArena(name)
+  local a = arenas[name]
+  if not a then return false end
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Board3D") or o.hasTag("ArenaPiece") then o.destruct() end
+  end
+  local snaps = {}
+  for i, p in ipairs(a.snaps) do
+    snaps[i] = { position = { p[1], p[2], p[3] }, rotation = { 0, 0, 0 }, rotation_snap = false }
+  end
+  local spot = Vector(BOARD_SPOT[1], BOARD_SPOT[2], BOARD_SPOT[3])
+  spawnObjectData({
+    data = {
+      Name = "Custom_Model", Nickname = name, Tags = { "Board3D" }, Locked = true,
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      CustomMesh = { MeshURL = BASE_URL .. a.mesh, DiffuseURL = BASE_URL .. a.texture, NormalURL = "",
+        ColliderURL = BASE_URL .. a.mesh, Convex = false, MaterialIndex = 3, TypeIndex = 0, CastShadows = true,
+        CustomShader = BOARD_SHADER },
+    },
+    position = spot, rotation = { 0, 0, 0 },
+    callback_function = function(board) board.setSnapPoints(snaps) end,
+  })
+  for _, p in ipairs(a.pieces or {}) do
+    local data = {
+      Name = "Custom_Model", Nickname = p.name, Description = p.desc or "", Tags = { p.kind, "ArenaPiece" },
+      Locked = true, ColorDiffuse = { r = 1, g = 1, b = 1 }, Memo = "",
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      CustomMesh = { MeshURL = BASE_URL .. p.mesh, DiffuseURL = BASE_URL .. p.diffuse, NormalURL = "",
+        ColliderURL = BASE_URL .. p.collider, Convex = p.convex, MaterialIndex = p.material, TypeIndex = 0,
+        CastShadows = true },
+    }
+    if p.kind == "Flag" then   -- neutral; onObjectSpawn gives it the Capture menu
+      data.ColorDiffuse, data.Description = FLAG_NEUTRAL, flagDescription(nil)
+    end
+    spawnObjectData({ data = data, position = spot + Vector(p.pos[1], p.pos[2], p.pos[3]), rotation = { 0, p.yaw, 0 } })
+  end
+  if a.table and a.table ~= "" and Tables.getCustomURL() ~= BASE_URL .. a.table then
+    Tables.setCustomURL(BASE_URL .. a.table)
+  end
+  return true
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -560,7 +599,7 @@ function buildUI()
       xml[#xml + 1] = panelXml(kind, c, cat.title, panelHeight(kind, 0), table.concat(rows, "\n  "))
     end
 
-    local rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the board.</Text>', c) }
+    local rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the table.</Text>', c) }
     for i = 1, MAX_MAPS do
       rows[#rows + 1] = string.format('<Button id="mapRes_%s_%d" class="row" active="false" onClick="mapPick" text=" "/>', c, i)
     end
@@ -692,16 +731,15 @@ function refreshMaps(c)
     UI.setAttribute(id, "active", m and "true" or "false")
   end
   UI.setAttribute("maps_" .. c, "height", MAPS_BASE + math.min(#list, MAX_MAPS) * ROW_STEP)
-  UI.setValue("mapMsg_" .. c, #list > 0 and "Click a map to put it on the board." or "No map board found on the table.")
+  UI.setValue("mapMsg_" .. c, #list > 0 and "Click a map to put it on the table." or "The map list hasn't downloaded yet.")
 end
 
 function mapPick(player, _, id)
   local c = player.color
   local m = mapRows[c] and mapRows[c][tonumber(id:match("_(%d+)$"))]
-  local board = findMapBoard()
-  if not (m and board) or m.current then return end
-  board.setState(m.id)
-  printToAll(player.steam_name .. " put " .. m.name .. " on the board.", { 0.8, 0.9, 1 })
+  if not m or m.current then return end
+  if not loadArena(m.name) then return end
+  printToAll((player.steam_name or c) .. " put " .. m.name .. " on the table.", { 0.8, 0.9, 1 })
   Wait.frames(function()
     for _, other in ipairs(COLORS) do
       if openPanel[other] == "maps" then refreshMaps(other) end

@@ -3,7 +3,7 @@
 Usage:  python -I tools/test_global.py
 Checks: the script compiles; onLoad builds well-formed UI XML with unique ids; search finds the right names;
 the search panel's result rows get text; spawning creates a figure (or a card in the player's hand) with the
-right images; the map list reads names from a fake map board; statuses arm, stack, replace and clear; the
+right images; the map picker lists the arenas and puts a board with its flags on the table; statuses arm, stack, replace and clear; the
 toolbar's frame, status colour squares and full card lists (who sees them, picking from them); a flag gets its
 Capture menu and takes the capturing player's colour. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
 """
@@ -38,7 +38,8 @@ UI = {
 }
 WebRequest = { get = function(url, cb)
   local text = ROSTER_JSON
-  if url:find("cards/", 1, true) then text = CARDS_JSON elseif url:find("data/pokemon", 1, true) then text = STATS_JSON end
+  if url:find("cards/", 1, true) then text = CARDS_JSON elseif url:find("data/pokemon", 1, true) then text = STATS_JSON
+  elseif url:find("arenas/index", 1, true) then text = ARENAS_JSON end
   cb({ is_error = false, text = text })
 end }
 JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t) return py_json_encode(t) end }
@@ -58,6 +59,9 @@ local function stub(o)
   o.getStates = o.getStates or function() return nil end            -- every real TTS object has these
   o.getCustomObject = o.getCustomObject or function() return {} end
   o.getRotation = o.getRotation or function() return Vector(0, 0, 0) end
+  o.destruct = o.destruct or function() o.destroyed = true end
+  o.clearContextMenu = o.clearContextMenu or function() end
+  o.addContextMenuItem = o.addContextMenuItem or function() end
   o.UI = o.UI or { setXml = function() end, setAttribute = function() end }
   objects[#objects + 1] = o
   return o
@@ -91,21 +95,17 @@ function spawnObjectData(t)
     getPosition = function() return t.position end })
 end
 
--- a fake map board with three states
-local states = {
-  ["2"] = { CustomImage = { ImageURL = "https://pctts.github.io/tts/maps/fontaine.jpg" } },
-  ["3"] = { CustomImage = { ImageURL = "https://example.com/uc?id=abc" } },
-}
-board = {
-  type = "Figurine", locked = true, getPosition = function() return Vector(0, -30, 0) end,
-  getStates = function() return { {}, {} } end,
-  getCustomObject = function() return { image = "https://pctts.github.io/tts/maps/terrera-mountain.jpg" } end,
-  getData = function() return { CustomImage = { ImageURL = "https://pctts.github.io/tts/maps/terrera-mountain.jpg" }, States = states } end,
-  getStateId = function() return 1 end,
-  setState = function(id) calls.state = id end,
-}
+-- the 3D board on the table (Pugilis)
+board = { type = "Generic", locked = true, tags = { "Board3D" }, getName = function() return "Pugilis" end,
+  getPosition = function() return Vector(0.01, 0.961, -0.01) end }
 stub(board)
-function getAllObjects() return objects end
+Tables = { getCustomURL = function() return calls.tableURL or "https://example.com/old-table.jpg" end,
+  setCustomURL = function(u) calls.tableURL = u end }
+function getAllObjects()
+  local live = {}
+  for _, o in ipairs(objects) do if not o.destroyed then live[#live + 1] = o end end
+  return live
+end
 """
 
 
@@ -133,6 +133,7 @@ def main():
     g.ROSTER_JSON = (REPO / "figures" / "index.json").read_text(encoding="utf-8")
     g.CARDS_JSON = (REPO / "cards" / "index.json").read_text(encoding="utf-8")
     g.STATS_JSON = (REPO / "data" / "pokemon.json").read_text(encoding="utf-8")
+    g.ARENAS_JSON = (REPO / "arenas" / "index.json").read_text(encoding="utf-8")
     lua.execute(PRELUDE)
 
     src = (REPO / "lua" / "Global.lua").read_text(encoding="utf-8")
@@ -216,13 +217,27 @@ def main():
     check(abs(spawned.position.x - (-17.625)) < 0.01 and abs(spawned.position.z - (-28.0)) < 0.01,
           f"White's Pokemon goes on the first pedestal of the near stand ({spawned.position.x:.2f}, {spawned.position.z:.2f})")
 
-    # maps
-    lst = g.mapList()
-    got = [(m.name, bool(m.current)) for m in lst.values()]
-    check(got == [("Fontaine", False), ("Map 3", False), ("Terrera Mountain", True)], f"map list -> {got}")
+    # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
+    got = [(m.name, bool(m.current)) for m in g.mapList().values()]
+    check(got == [("Pugilis", True)], f"map list shows Pugilis, on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
-    check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false",
+    check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
+          and calls.attrs["mapRes_White_1.text"] == "Pugilis   (on the board)",
           "map button opens the map panel (and closes the search panel)")
+    n = len(calls.spawned)
+    g.mapPick(player, "-1", "mapRes_White_1")
+    check(len(calls.spawned) == n, "picking the arena that's already on the table does nothing")
+    lua.execute("board.destroyed = true")
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", "mapRes_White_1")
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    brd = new[0].data if new else None
+    flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
+    check(brd is not None and brd.Nickname == "Pugilis" and brd.Tags[1] == "Board3D" and brd.Locked
+          and brd.CustomMesh.MeshURL.endswith("arenas/pugilis/board-v14.obj") and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
+          and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v17.jpg") and not brd.CustomMesh.Convex,
+          "picking Pugilis puts its 3D board on the table (its own mesh as collider)")
+    check(len(flags) == 4 and str(calls.tableURL).endswith("misc/table-placeholder-v1.jpg"), "with its 4 flags and its table image")
 
     # statuses: arm one, pick up a figure, check tint/description/memo; toggles and clearing
     lua.execute(r"""
