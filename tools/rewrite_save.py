@@ -52,6 +52,7 @@ def main(argv):
         urls = sorted({base + p for p in url_map.values()})
         with ThreadPoolExecutor(16) as pool:
             dead = [u for u, ok in zip(urls, pool.map(live, urls)) if not ok]
+        dead = [u for u in dead if not live(u)]  # retry one at a time: bursts can briefly fail
         if dead:
             print(f"{len(dead)} of {len(urls)} links are not live yet, nothing written. First few:")
             print("\n".join(dead[:10]))
