@@ -83,6 +83,9 @@ STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear status", color =
 STATUS_HINT = "Pick a status, then pick up a Pokémon."
 
 STANDEE_MESH = "models/standee-v2.obj"  -- a Pokémon: art on a round base with a facing arrow, HP sign above (build_standee.py)
+-- Its collision shape: the model without the sign. TTS otherwise wraps the whole model, sign included, and that
+-- shape in front of the HP labels takes the clicks meant for them.
+STANDEE_COLLIDER = "models/standee-v1.obj"
 FIGURE_SCALE = 1.5   -- ImageScalar for the old flat figurines (only used if the roster has no standees)
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
@@ -357,7 +360,7 @@ function spawnPokemon(name, color)
     data.Name = "Custom_Model"
     data.ColorDiffuse = { r = 1, g = 1, b = 1 }
     data.CustomMesh = { MeshURL = BASE_URL .. STANDEE_MESH, DiffuseURL = BASE_URL .. files.standee, NormalURL = "",
-      ColliderURL = "", Convex = true, MaterialIndex = 3, TypeIndex = 1, CastShadows = true }  -- matte (cardboard): plastic glare washed out the base
+      ColliderURL = BASE_URL .. STANDEE_COLLIDER, Convex = true, MaterialIndex = 3, TypeIndex = 1, CastShadows = true }  -- matte (cardboard): plastic glare washed out the base
   else
     -- an older roster without standees: the flat two-sided figurine
     pos = Vector(pos.x, pos.y + 1, pos.z)
@@ -867,10 +870,10 @@ end
 local function hpLabelXml(guid, side, rotation, dy, hp, max)
   return string.format([[
 <Panel id="hp%s" position="0 %d %d" rotation="%s" width="170" height="50" color="#000000C8">
-  <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" width="84" height="50"
+  <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" offsetXY="9 0" width="84" height="50"
     fontSize="26" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
     colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
-  <Text rectAlignment="MiddleRight" offsetXY="-9 0" width="84" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
+  <Text rectAlignment="MiddleRight" offsetXY="0 0" width="85" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
 </Panel>
 ]], side, dy, HP_HEIGHT, rotation, guid, side, hp, hp > 0 and HP_COLOR or HP_FAINTED, max)
 end
@@ -883,9 +886,11 @@ end
 -- the old model (no sign) is switched to the current one first; it comes back through onObjectSpawn.
 function showHp(obj)
   if not (obj and obj.hasTag("Pokemon")) then return end
-  local mesh = obj.name == "Custom_Model" and (obj.getCustomObject() or {}).mesh or ""
-  if mesh:find("models/standee-", 1, true) and not mesh:find(STANDEE_MESH, 1, true) then
-    obj.setCustomObject({ mesh = BASE_URL .. STANDEE_MESH })
+  local custom = obj.name == "Custom_Model" and (obj.getCustomObject() or {}) or {}
+  local mesh, collider = custom.mesh or "", custom.collider or ""
+  if mesh:find("models/standee-", 1, true)
+      and not (mesh:find(STANDEE_MESH, 1, true) and collider:find(STANDEE_COLLIDER, 1, true)) then
+    obj.setCustomObject({ mesh = BASE_URL .. STANDEE_MESH, collider = BASE_URL .. STANDEE_COLLIDER })
     obj.reload()
     return
   end

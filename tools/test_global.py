@@ -201,6 +201,7 @@ def main():
     spawned = calls.spawned[1]
     check(spawned is not None and spawned.data.Nickname == "Charizard" and spawned.data.Name == "Custom_Model"
           and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v2.obj")
+          and spawned.data.CustomMesh.ColliderURL.endswith("models/standee-v1.obj")
           and spawned.data.CustomMesh.DiffuseURL.endswith("standees/v3/charizard.webp") and spawned.data.CustomMesh.TypeIndex == 1,
           "clicking row 1 spawns Charizard as a standee (art on an arrowed base)")
     memo = json.loads(spawned.data.Memo)
@@ -343,14 +344,14 @@ def main():
       oldFig = { memo = '{"pokemon":"Gengar"}', guid = "old111", name = "Custom_Model", reloaded = false }
       oldFig.hasTag = function(t) return t == "Pokemon" end
       oldFig.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/models/standee-v1.obj" } end
-      oldFig.setCustomObject = function(c) oldFig.newMesh = c.mesh end
+      oldFig.setCustomObject = function(c) oldFig.newMesh = c.mesh; oldFig.newCollider = c.collider end
       oldFig.reload = function() oldFig.reloaded = true end
       oldFig.UI = { setXml = function(x) oldFig.xml = x end }
       showHp(oldFig)
     """)
     o = g.oldFig
-    check(o.reloaded and str(o.newMesh).endswith("models/standee-v2.obj") and o.xml is None,
-          "a standee without the sign gets the new model (its labels come when it respawns)")
+    check(o.reloaded and str(o.newMesh).endswith("models/standee-v2.obj") and str(o.newCollider).endswith("models/standee-v1.obj")
+          and o.xml is None, "a standee without the sign gets the new model and a collider without the sign (labels come on respawn)")
 
     def hp():
         return json.loads(h.memo)["hp"]
