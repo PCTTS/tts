@@ -26,6 +26,7 @@ ICONS = {
   pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png", status = "ui/icons/status-v3.png",
   item = "ui/icons/item-v3.png", skill = "ui/icons/skill-v3.png", ability = "ui/icons/ability-v3.png",
 }
+PIECE_ICONS = { die = "ui/icons/die-v3.png", updown = "ui/icons/updown-v3.png" }   -- buttons on arena pieces
 -- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
 -- UI images it shrinks, so a much larger image looks jagged.
 BAR_ICON, BAR_MARGIN, BAR_GAP = 32, 3, 6
@@ -199,11 +200,19 @@ function onLoad(saved)
       if d.key == "cards" then buildUI() end   -- once, as soon as the card lists can go in it
     end)
   end
-  for _, obj in ipairs(getAllObjects()) do flagMenu(obj) end   -- context menus aren't saved with the game
-  -- once the objects have finished loading (their own saved UI can replace ours): stands' signs, plain standees
+  math.randomseed(os.time())
+  for _, obj in ipairs(getAllObjects()) do pieceSetup(obj) end   -- context menus aren't saved with the game
+  -- once the objects have finished loading (their own saved UI can replace ours): stands' signs, plain standees,
+  -- the buttons on portals and bridges
   Wait.time(function()
     for _, obj in ipairs(getAllObjects()) do
-      if obj.hasTag("Stand") then setupStand(obj) elseif obj.hasTag("Pokemon") then plainStandee(obj) end
+      if obj.hasTag("Stand") then
+        setupStand(obj)
+      elseif obj.hasTag("Pokemon") then
+        plainStandee(obj)
+      elseif obj.hasTag("Portal") or obj.hasTag("Bridge") then
+        pieceSetup(obj)
+      end
     end
   end, 2)
 end
@@ -446,10 +455,11 @@ function mapList()
 end
 
 -- Put an arena on the table: the old board and its pieces go, the new board comes with its snap points and
--- pieces, and the table gets the arena's image.
-function loadArena(name)
-  local a = arenas[name]
+-- pieces, and the table gets the arena's image. (entry and base: a preview from local files, tools only.)
+function loadArena(name, entry, base)
+  local a = entry or arenas[name]
   if not a then return false end
+  base = base or BASE_URL
   for _, o in ipairs(getAllObjects()) do
     if o.hasTag("Board3D") or o.hasTag("ArenaPiece") then o.destruct() end
   end
@@ -462,31 +472,43 @@ function loadArena(name)
     data = {
       Name = "Custom_Model", Nickname = name, Tags = { "Board3D" }, Locked = true,
       Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
-      CustomMesh = { MeshURL = BASE_URL .. a.mesh, DiffuseURL = BASE_URL .. a.texture, NormalURL = "",
-        ColliderURL = BASE_URL .. a.mesh, Convex = false, MaterialIndex = 3, TypeIndex = 0, CastShadows = true,
+      CustomMesh = { MeshURL = base .. a.mesh, DiffuseURL = base .. a.texture, NormalURL = "",
+        ColliderURL = base .. a.mesh, Convex = false, MaterialIndex = 3, TypeIndex = 0, CastShadows = true,
         CustomShader = BOARD_SHADER },
     },
     position = spot, rotation = { 0, 0, 0 },
     callback_function = function(board) board.setSnapPoints(snaps) end,
   })
-  for _, p in ipairs(a.pieces or {}) do
-    local data = {
-      Name = "Custom_Model", Nickname = p.name, Description = p.desc or "", Tags = { p.kind, "ArenaPiece" },
-      Locked = true, ColorDiffuse = { r = 1, g = 1, b = 1 }, Memo = "",
-      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
-      CustomMesh = { MeshURL = BASE_URL .. p.mesh, DiffuseURL = BASE_URL .. p.diffuse, NormalURL = "",
-        ColliderURL = BASE_URL .. p.collider, Convex = p.convex, MaterialIndex = p.material, TypeIndex = 0,
-        CastShadows = true },
-    }
-    if p.kind == "Flag" then   -- neutral; onObjectSpawn gives it the Capture menu
-      data.ColorDiffuse, data.Description = FLAG_NEUTRAL, flagDescription(nil)
-    end
-    spawnObjectData({ data = data, position = spot + Vector(p.pos[1], p.pos[2], p.pos[3]), rotation = { 0, p.yaw, 0 } })
-  end
-  if a.table and a.table ~= "" and Tables.getCustomURL() ~= BASE_URL .. a.table then
-    Tables.setCustomURL(BASE_URL .. a.table)
+  for _, p in ipairs(a.pieces or {}) do spawnArenaPiece(p, spot, base) end
+  if a.table and a.table ~= "" and Tables.getCustomURL() ~= base .. a.table then
+    Tables.setCustomURL(base .. a.table)
   end
   return true
+end
+
+-- One arena piece from the index (pos: in the board's frame; origin: where the board sits), locked.
+-- Flags start neutral, portals in their starting pair's colour, bridges dropped (closed); pieceSetup gives
+-- them their buttons and menus.
+function spawnArenaPiece(p, origin, base)
+  local data = {
+    Name = "Custom_Model", Nickname = p.name, Description = p.desc or "", Tags = { p.kind, "ArenaPiece" },
+    Locked = true, ColorDiffuse = { r = 1, g = 1, b = 1 }, Memo = "",
+    Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+    CustomMesh = { MeshURL = base .. p.mesh, DiffuseURL = base .. p.diffuse, NormalURL = "",
+      ColliderURL = base .. p.collider, Convex = p.convex, MaterialIndex = p.material, TypeIndex = 0,
+      CastShadows = true },
+  }
+  local pos = origin + Vector(p.pos[1], p.pos[2], p.pos[3])
+  if p.kind == "Flag" then
+    data.ColorDiffuse, data.Description = FLAG_NEUTRAL, flagDescription(nil)
+  elseif p.kind == "Portal" then
+    data.ColorDiffuse, data.Memo = portalTint(p.pair or 1), JSON.encode({ pair = p.pair or 1 })
+  elseif p.kind == "Bridge" then
+    data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, tile = p.tile or BOARD_TILE })
+    pos = Vector(pos.x, pos.y - BRIDGE_DROP, pos.z)
+  end
+  return spawnObjectData({ data = data, position = pos, rotation = { 0, p.yaw, 0 },
+    callback_function = function(obj) pieceSetup(obj) end })
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -892,8 +914,188 @@ function flagMenu(obj)
   obj.addContextMenuItem("Make neutral", function(color) setFlagHolder(obj, nil, color) end)
 end
 
-function onObjectSpawn(obj)
+local function playerName(color)
+  return (color and Player[color] and Player[color].steam_name) or color or "Someone"
+end
+
+local function piecesTagged(tag)
+  local list = {}
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag(tag) then list[#list + 1] = o end
+  end
+  table.sort(list, function(a, b) return a.guid < b.guid end)
+  return list
+end
+
+local function memoTable(obj)
+  local ok, t = pcall(JSON.decode, obj.memo or "")
+  return (ok and type(t) == "table") and t or {}
+end
+
+-- A clear button lying on a piece (object UI: 100 units = 1 world unit, canvas y = the object's z, -z = up),
+-- with an icon that reads the same from either side of the table.
+local function pieceButtonXml(id, x, z, y, onClick, tip, icon)
+  return string.format([[
+<Button id="%s" position="%d %d %d" width="56" height="56" onClick="Global/%s" tooltip="%s" tooltipPosition="Above"
+  colors="#00000040|#FFFFFF66|#FFFFFF99|#00000040"/>
+<Image image="%s" position="%d %d %d" width="46" height="46" raycastTarget="false" color="#FFFFFFE0" preserveAspect="true"/>
+]], id, math.floor(x * 100 + 0.5), math.floor(z * 100 + 0.5), math.floor(-y * 100 + 0.5), onClick, tip,
+    icon, math.floor(x * 100 + 0.5), math.floor(z * 100 + 0.5), math.floor(-y * 100 - 0.5))
+end
+
+----------------------------------------------------------------------------------------------------
+-- Portals (Illusio): round tiles in pairs, each pair one colour. The die on any portal shuffles them: every
+-- portal gets a new partner at random (any two can end up paired) and the colours show the new pairs.
+----------------------------------------------------------------------------------------------------
+PORTAL_COLORS = { { name = "magenta", hex = "#E94FF0" }, { name = "cyan", hex = "#2BD3F2" }, { name = "gold", hex = "#FFC22E" } }
+PORTAL_BUTTON = { x = 0.74, z = -0.74, y = 0.06 }   -- off the middle, where a Pokémon's base doesn't cover it
+
+function portalTint(pair)
+  local r, g, b = hexRGB(PORTAL_COLORS[pair].hex)
+  return { r = r, g = g, b = b }
+end
+
+function setPortalPair(obj, pair)
+  obj.memo = JSON.encode({ pair = pair })
+  obj.setColorTint(portalTint(pair))
+  obj.setDescription("A " .. PORTAL_COLORS[pair].name .. " portal. A Pokémon that ends its turn here comes out next to "
+    .. "the other " .. PORTAL_COLORS[pair].name .. " portal (unless a Pokémon is on it). Click the die to shuffle "
+    .. "the portals.")
+end
+
+function shufflePortals(color)
+  local portals = piecesTagged("Portal")
+  if #portals < 2 then return end
+  local order = {}
+  for i = 1, #portals do order[i] = i end
+  for i = #order, 2, -1 do
+    local j = math.random(i)
+    order[i], order[j] = order[j], order[i]
+  end
+  for k, i in ipairs(order) do setPortalPair(portals[i], math.floor((k + 1) / 2)) end
+  printToAll(playerName(color) .. " shuffled the portals.", { 0.85, 0.7, 1 })
+end
+
+function portalClicked(player)
+  shufflePortals(player and player.color)
+end
+
+----------------------------------------------------------------------------------------------------
+-- Rope bridges (Illusio): flat plank decks over the sky between islands, carrying their own snap points. Up =
+-- level with the islands (crossable); dropped = hanging below them (closed). They start dropped. The arrows on
+-- any bridge raise them all, or drop them all, except that a bridge with a Pokémon on it stays up (the rules:
+-- it doesn't close until the next time they all do). Right-click a bridge to raise or drop just that one.
+-- Its memo: { up, y = its height when up, tiles, tile }.
+----------------------------------------------------------------------------------------------------
+BOARD_TILE = 3.24875
+BRIDGE_DROP = 1.6
+BRIDGE_BUTTON = { z = 1.0, y = 0.02 }   -- beside the middle of the deck, clear of a Pokémon's base
+
+function bridgeState(obj)
+  local st = memoTable(obj)
+  st.tiles, st.tile = st.tiles or 1, st.tile or BOARD_TILE
+  return st
+end
+
+function bridgeSnaps(st)
+  local snaps = {}
+  for i = 1, st.tiles do
+    snaps[i] = { position = { (i - (st.tiles + 1) / 2) * st.tile, 0.02, 0 }, rotation = { 0, 0, 0 }, rotation_snap = false }
+  end
+  return snaps
+end
+
+-- The Pokémon standing on a bridge, or nil.
+function pokemonOnBridge(bridge)
+  local st = bridgeState(bridge)
+  local half = st.tiles * st.tile / 2
+  for _, obj in ipairs(getAllObjects()) do
+    if obj.hasTag("Pokemon") then
+      local p = bridge.positionToLocal(obj.getPosition())
+      if math.abs(p.x) <= half + 0.2 and math.abs(p.z) <= 1.6 and p.y > -0.5 and p.y < 3 then return obj end
+    end
+  end
+end
+
+function bridgeDescription(up)
+  return (up and "Up: Pokémon can cross it." or "Dropped: closed.") .. " The bridges go up or down together every "
+    .. "second turn: click the arrows on any bridge. One with a Pokémon on it stays up until the next time. "
+    .. "Right-click it to raise or drop just this one."
+end
+
+function setBridgeUp(obj, up)
+  local st = bridgeState(obj)
+  if (st.up and true or false) == up then return false end
+  st.up = up
+  obj.memo = JSON.encode(st)
+  local p = obj.getPosition()
+  if st.y then obj.setPositionSmooth(Vector(p.x, up and st.y or st.y - BRIDGE_DROP, p.z), false, false) end
+  obj.setDescription(bridgeDescription(up))
+  return true
+end
+
+-- Raise them all if any is down; otherwise drop them all except the ones with a Pokémon on them.
+function toggleBridges(color)
+  local bridges, anyDown = piecesTagged("Bridge"), false
+  for _, b in ipairs(bridges) do
+    if not bridgeState(b).up then anyDown = true end
+  end
+  if #bridges == 0 then return end
+  if anyDown then
+    for _, b in ipairs(bridges) do setBridgeUp(b, true) end
+    printToAll(playerName(color) .. " raised the bridges.", { 0.9, 0.8, 0.6 })
+    return
+  end
+  local stay = {}
+  for _, b in ipairs(bridges) do
+    local mon = pokemonOnBridge(b)
+    if mon then stay[#stay + 1] = figureState(mon).pokemon else setBridgeUp(b, false) end
+  end
+  local msg = playerName(color) .. " dropped the bridges."
+  if #stay == 1 then
+    msg = msg .. " The one under " .. stay[1] .. " stays up."
+  elseif #stay > 1 then
+    msg = msg .. " The ones under " .. table.concat(stay, ", ") .. " stay up."
+  end
+  printToAll(msg, { 0.9, 0.8, 0.6 })
+end
+
+function bridgeClicked(player)
+  toggleBridges(player and player.color)
+end
+
+-- Buttons, menus and snap points for an arena piece (after it spawns, and again on load: none of it is reliably
+-- kept by a save).
+function pieceSetup(obj)
+  if not obj then return end
   flagMenu(obj)
+  if obj.hasTag("Portal") then
+    local pair = memoTable(obj).pair or 1
+    setPortalPair(obj, PORTAL_COLORS[pair] and pair or 1)
+    obj.UI.setCustomAssets({ { name = "die", url = BASE_URL .. PIECE_ICONS.die } })
+    obj.UI.setXml(pieceButtonXml("portalDie", PORTAL_BUTTON.x, PORTAL_BUTTON.z, PORTAL_BUTTON.y, "portalClicked",
+      "Shuffle the portals", "die"))
+    obj.clearContextMenu()
+    obj.addContextMenuItem("Shuffle portals", function(color) shufflePortals(color) end)
+  elseif obj.hasTag("Bridge") then
+    local st = bridgeState(obj)
+    if #(obj.getSnapPoints() or {}) ~= st.tiles then obj.setSnapPoints(bridgeSnaps(st)) end
+    obj.setDescription(bridgeDescription(st.up))
+    obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
+    obj.UI.setXml(pieceButtonXml("bridgeArrows", 0, BRIDGE_BUTTON.z, BRIDGE_BUTTON.y, "bridgeClicked",
+      "Raise or drop the bridges", "updown"))
+    obj.clearContextMenu()
+    obj.addContextMenuItem("Raise this bridge", function(color)
+      if setBridgeUp(obj, true) then printToAll(playerName(color) .. " raised a bridge.", { 0.9, 0.8, 0.6 }) end
+    end)
+    obj.addContextMenuItem("Drop this bridge", function(color)
+      if setBridgeUp(obj, false) then printToAll(playerName(color) .. " dropped a bridge.", { 0.9, 0.8, 0.6 }) end
+    end)
+  end
+end
+
+function onObjectSpawn(obj)
+  pieceSetup(obj)
   if obj.hasTag("Stand") then
     Wait.time(function() setupStand(obj) end, 0.5)
   elseif obj.hasTag("Pokemon") then

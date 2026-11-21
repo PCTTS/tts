@@ -1,0 +1,54 @@
+{
+  "name": "Illusio",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the old map image (maps/illusio.jpg): four home islands (two per player) joined to the centre island by one-tile land strips, rope bridges over the sky between them, and the raised high ground in the middle.",
+  "grid": [
+    "######.F.#######",
+    "######.22.######",
+    "#####.a2...#####",
+    "#####......#####",
+    "######B#.#B#####",
+    "##..##B#.#B#...#",
+    "#.a.##.c.F.B....",
+    ".22....XX.##..1F",
+    "F2..##.XX....11.",
+    "....B.F.c.##.b.#",
+    "#...#B#.#B##..##",
+    "#####B#.#B######",
+    "#####......#####",
+    "#####...1b.#####",
+    "######.11.######",
+    "#######.F.######"
+  ],
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. marker = something on the tile (painted on the board, and for flags/portals a 3D piece). paint: false = don't paint the marker. piece: true = also put a 3D piece there (flags, portals; pair = the portal pair it starts in). bridge: true = a rope bridge over the sky (no board there; a 3D bridge piece spans the run of bridge tiles between two islands).",
+  "legend": {
+    "#": { "void": true },
+    "B": { "void": true, "bridge": true },
+    ".": { "level": 0, "surface": "floor" },
+    "X": { "level": 1, "surface": "high" },
+    "1": { "level": 0, "surface": "floor", "marker": "spawn1" },
+    "2": { "level": 0, "surface": "floor", "marker": "spawn2" },
+    "F": { "level": 0, "surface": "floor", "marker": "flag", "paint": false, "piece": true },
+    "a": { "level": 0, "surface": "floor", "marker": "portal", "pair": 2, "paint": false, "piece": true },
+    "b": { "level": 0, "surface": "floor", "marker": "portal", "pair": 1, "paint": false, "piece": true },
+    "c": { "level": 0, "surface": "floor", "marker": "portal", "pair": 3, "paint": false, "piece": true }
+  },
+  "_float": "Floating islands: the whole board is lifted this many world units (at tile 3.24875) above the table, island edges drop a short cliff, and below that the rock tapers down to points (deepest under the middle of each island).",
+  "float": { "lift": 2.9, "cliff": 0.45, "depth": 1.25, "power": 1.15, "max": 2.6 },
+  "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/sky-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py (grass on the islands, pale stone on the high ground, rock on the cliffs and undersides).",
+  "textures": {
+    "floor": { "images": ["textures/grass1.png", "textures/grass2.png"], "span": 1, "vary": true },
+    "high": { "image": "textures/stone.png", "span": 1, "vary": true },
+    "walls": { "image": "textures/rock.png", "outer": true }
+  },
+  "palette": {
+    "floor": "#6FA34A",
+    "high": "#B9B2C9",
+    "cliff": "#6E6372",
+    "base": "#4A4250",
+    "fall": "#D2392C"
+  }
+}

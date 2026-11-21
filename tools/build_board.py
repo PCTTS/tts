@@ -9,10 +9,16 @@ Writes <out>/board-<tag>.obj and <out>/board-<tag>.jpg (defaults: the arena's fo
 World layout (TTS units): the grid is centred on x = z = 0, row 0 is the far side (+z), the model's underside
 is y = 0. Tiles outside the arena ("void") get no geometry, so the board has the arena's real outline.
 TTS mirrors OBJ files on X when it loads them, so x is written negated.
+
+Floating islands (map.json "float": {lift, cliff, depth, power, max}, world units): everything is lifted `lift`
+above the table; where land meets the sky its edge drops `cliff`, and below that the rock hangs down, deeper the
+farther a point is from the island's edge (depth * distance-in-tiles ^ power, at most `max`), so each island
+tapers to rough points underneath. No geometry under the sky tiles.
 """
 import json, math, random, sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageStat
 
 TILE = 2.35       # world units per tile (matches the old snap grid); --tile changes it
@@ -52,6 +58,8 @@ class Arena:
         if bad or any(len(row) != self.C for row in self.grid):
             sys.exit(f"map.json: rows must all be {self.C} wide and use only legend characters (unknown: {bad})")
         self.max_level = max(t.get("level", 0) for t in self.legend.values() if not t.get("void"))
+        self.float = self.data.get("float")
+        self.lift = self.float.get("lift", 0.0) if self.float else 0.0
 
     def tile(self, r, c):
         if 0 <= r < self.R and 0 <= c < self.C:
@@ -59,8 +67,20 @@ class Arena:
             return None if t.get("void") else t
         return None
 
+    def floor0(self):
+        """Top of level 0 above the model's underside."""
+        return FLOOR0 + self.lift
+
     def top(self, t):
-        return FLOOR0 + t.get("level", 0) * LEVEL_H
+        return self.floor0() + t.get("level", 0) * LEVEL_H
+
+    def y_span(self):
+        """The model's full height (the highest tile top)."""
+        return self.floor0() + self.max_level * LEVEL_H
+
+    def rim(self):
+        """Floating islands: how high the cliff at an island's edge reaches down to (the underside starts there)."""
+        return self.floor0() - self.float.get("cliff", 0.45)
 
     def away_from_pit(self, r, c):
         """The grid direction (dr, dc) pointing away from this tile's lower neighbours, or None if it has none."""
@@ -173,13 +193,14 @@ def draw_texture(a):
     if wall_spec:
         # one tile's worth of texture per slice, stretched so it looks the same scale on a wall as on a tile:
         # the strip spans the board's full height range, a slice one tile's width
-        span = FLOOR0 + a.max_level * LEVEL_H
-        tall = round(STRIP * SS * TILE / span)
+        tall = round(STRIP * SS * TILE / a.y_span())
         choices = texture_choices(a, wall_spec, "walls", p, tall)
         rnd = random.Random(f"{a.data.get('name')}/walls")
         first = 0 if wall_spec.get("outer") else a.C // 2   # "outer": the board's outer edge uses it too
         for i in range(first, a.C):
-            img.paste(rnd.choice(rnd.choice(choices)).crop((0, 0, p, STRIP * SS)), (i * p, y0))
+            piece = rnd.choice(rnd.choice(choices))
+            for k in range(0, STRIP * SS, tall):   # a tall board needs more than one copy down the strip
+                img.paste(piece.crop((0, 0, p, min(tall, STRIP * SS - k))), (i * p, y0 + k))
     # fine grain everywhere
     noise = Image.effect_noise((W, H), 9).convert("RGB")
     img = ImageChops.add(img, noise, 1.0, -128)
@@ -302,6 +323,23 @@ class Mesh:
         self.f[-2] = tuple((vi, ti, ni) for vi, ti in self.f[-2])
         self.f[-1] = tuple((vi, ti, ni) for vi, ti in self.f[-1])
 
+    def tri(self, corners, uvs, down=True):
+        """A flat triangle (TTS world space), facing down (or up), its normal from its corners."""
+        p = [(-x, y, z) for x, y, z in corners]          # as written: x mirrored
+        e1 = [p[1][i] - p[0][i] for i in range(3)]
+        e2 = [p[2][i] - p[0][i] for i in range(3)]
+        n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]]
+        order = [0, 1, 2]
+        if (n[1] > 0) == down:                           # wound the wrong way: flip it
+            order, n = [0, 2, 1], [-v for v in n]
+        ln = math.sqrt(sum(v * v for v in n)) or 1.0
+        base_v, base_t = len(self.v), len(self.vt)
+        self.v += [p[i] for i in order]
+        self.vt += [uvs[i] for i in order]
+        self.vn.append(tuple(v / ln for v in n))
+        ni = len(self.vn)
+        self.f.append(tuple((base_v + k + 1, base_t + k + 1, ni) for k in range(3)))
+
     def write(self, path):
         lines = ["# PCTTS board, made by tools/build_board.py"]
         lines += [f"v {x:.4f} {y:.4f} {z:.4f}" for x, y, z in self.v]
@@ -313,7 +351,7 @@ class Mesh:
 
 def build_mesh(a):
     W, H = a.C * PX, a.R * PX + STRIP
-    y_span = FLOOR0 + a.max_level * LEVEL_H
+    y_span = a.y_span()
     m = Mesh()
 
     def x(c):
@@ -336,11 +374,12 @@ def build_mesh(a):
             v0, v1 = 1 - (r * PX + 1) / H, 1 - ((r + 1) * PX - 1) / H
             m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
                    [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
-            bu = (0.5, 1 - (H - 2) / H)
-            m.quad([(x0, 0, z0), (x1, 0, z0), (x1, 0, z1), (x0, 0, z1)], [bu] * 4, (0, -1, 0))
+            if not a.float:   # floating islands get their rocky underside instead (below)
+                bu = (0.5, 1 - (H - 2) / H)
+                m.quad([(x0, 0, z0), (x1, 0, z0), (x1, 0, z1), (x0, 0, z1)], [bu] * 4, (0, -1, 0))
             for side, (dr, dc, normal) in DIRS.items():
                 nb = a.tile(r + dr, c + dc)
-                low = a.top(nb) if nb else 0.0
+                low = a.top(nb) if nb else (a.rim() if a.float else 0.0)
                 if low >= top:
                     continue
                 if side == "N":
@@ -356,7 +395,51 @@ def build_mesh(a):
                 us = (((r * 5 + c * 3 + len(side)) % half) + (half if nb else 0)) * PX
                 m.quad([(ax, top, az), (bx, top, bz), (bx, low, bz), (ax, low, az)],
                        [wall_uv(us, top), wall_uv(us + PX - 1, top), wall_uv(us + PX - 1, low), wall_uv(us, low)], normal)
+    if a.float:
+        underside(a, m, wall_uv)
     return m
+
+
+def underside(a, m, wall_uv, S=4):
+    """Floating islands: the rock under every land tile, as a surface on a grid S x finer than the tiles. A point
+    on an island's edge sits at the rim (where the cliff ends, so it meets the walls); farther in it hangs lower,
+    with some rough jitter. Textured with the wall strip's rock (its layers follow the height)."""
+    f = a.float
+    rim = a.rim()
+    land = np.array([[a.tile(r, c) is not None for c in range(a.C)] for r in range(a.R)])
+    segs = []                                          # tile edges between land and anything else, in tile units
+    for r in range(a.R):
+        for c in range(a.C):
+            if not land[r, c]:
+                continue
+            for dr, dc, seg in ((-1, 0, (c, r, c + 1, r)), (1, 0, (c, r + 1, c + 1, r + 1)),
+                                (0, -1, (c, r, c, r + 1)), (0, 1, (c + 1, r, c + 1, r + 1))):
+                rr, cc = r + dr, c + dc
+                if not (0 <= rr < a.R and 0 <= cc < a.C and land[rr, cc]):
+                    segs.append(seg)
+    X, Y = np.meshgrid(np.arange(a.C * S + 1) / S, np.arange(a.R * S + 1) / S)   # X = column, Y = row (tiles)
+    dist = np.full(X.shape, np.inf)
+    for x0, y0, x1, y1 in segs:
+        px, py = np.clip(X, min(x0, x1), max(x0, x1)), np.clip(Y, min(y0, y1), max(y0, y1))
+        dist = np.minimum(dist, np.hypot(X - px, Y - py))
+    rng = np.random.default_rng(sum(map(ord, a.data.get("name", ""))))
+    inner = np.minimum(1.0, dist * 2)                  # 0 on the edge (no jitter there, so it meets the walls)
+    depth = np.minimum(f.get("max", 2.6), f.get("depth", 1.25) * dist ** f.get("power", 1.15))
+    Yw = rim - depth - np.abs(rng.normal(0, 0.14, X.shape)) * inner
+    Xj = X + rng.uniform(-0.3, 0.3, X.shape) / S * (dist > 1e-6)
+    Zj = Y + rng.uniform(-0.3, 0.3, X.shape) / S * (dist > 1e-6)
+
+    def vert(j, i):
+        x, z, y = (Xj[j, i] - a.C / 2) * TILE, (a.R / 2 - Zj[j, i]) * TILE, float(Yw[j, i])
+        return (x, y, z), wall_uv(X[j, i] * PX, y)
+
+    for j in range(a.R * S):
+        for i in range(a.C * S):
+            if not land[j // S, i // S]:
+                continue
+            q = [vert(j, i), vert(j, i + 1), vert(j + 1, i + 1), vert(j + 1, i)]
+            for tri in ((q[0], q[1], q[2]), (q[0], q[2], q[3])):
+                m.tri([p for p, _ in tri], [uv for _, uv in tri])
 
 
 def main(argv):
@@ -376,7 +459,7 @@ def main(argv):
     draw_texture(a).save(out / f"board-{tag}.jpg", quality=95)
     levels = [[(a.tile(r, c) or {}).get("level", -1) for c in range(a.C)] for r in range(a.R)]
     info = {"name": a.data["name"], "rows": a.R, "cols": a.C, "tile": TILE, "level_height": LEVEL_H,
-            "floor0": FLOOR0, "levels": levels}
+            "floor0": a.floor0(), "levels": levels}
     (out / f"board-{tag}.json").write_text(json.dumps(info), encoding="utf-8")
     print(f"{a.data['name']}: {a.R}x{a.C} tiles, {len(mesh.f)} triangles -> {out / f'board-{tag}'}.obj/.jpg/.json")
 

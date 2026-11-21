@@ -32,8 +32,8 @@ def arena_entry(folder):
             top = info["floor0"] + tile.get("level", 0) * info["level_height"] + SNAP_LIFT
             snaps.append([round((c + 0.5 - C / 2) * T, 4), round(top, 4), round((R / 2 - r - 0.5) * T, 4)])
     name, items = pieces(folder, info)
-    out_pieces = [{"kind": p["kind"], "name": p["name"], "desc": p["desc"], "yaw": round(p["yaw"], 2),
-                   "pos": [round(v, 4) for v in p["pos"]], **p["model"]} for p in items]
+    out_pieces = [{**{k: v for k, v in p.items() if k != "model"}, "yaw": round(p["yaw"], 2),
+                   "pos": [round(v, 4) for v in p["pos"]], **p["model"]} for p in items]   # (+ pair, tiles, tile)
     return name, {"mesh": f"{rel}/{board['mesh']}", "texture": f"{rel}/{board['texture']}",
                   "table": data.get("table", ""), "snaps": snaps, "pieces": out_pieces}
 

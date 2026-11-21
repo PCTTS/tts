@@ -1,4 +1,4 @@
-"""Put an arena's 3D pieces (flags, optionally bells) on its marker tiles in the open TTS game.
+"""Put an arena's 3D pieces (flags, portals, bridges, optionally bells) on its marker tiles in the open TTS game.
 
 Usage:  python -I tools/place_pieces.py arenas/<name> [--board board-vN.json] [--local [folder]]
 --local loads the models from this repo (or from a folder holding a copy of props/) instead of the PCTTS site: a
@@ -13,7 +13,13 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
   bell-attack / bell-defense: a bronze bell ("ATK bell" / "DEF bell") hanging over the middle of the tile in a
         wooden stand whose posts stand on its sides, facing away from the pit (like the painted symbol).
         Pugilis keeps its bells as painted symbols only.
-Models come from tools/build_pieces.py. TTS only keeps the result in memory: save the game afterwards.
+  portal: a round tile lying on the tile, in its starting pair's colour ("pair" in the legend); a die on it
+        shuffles every portal's pair (Global.lua).
+  bridge tiles (legend "bridge": true, sky with no board): each run of them between two islands is one rope
+        bridge, 1 or 2 tiles long, carrying its own snap points; it starts dropped (closed) and the arrows on it
+        raise or drop all the bridges (Global.lua).
+Models come from tools/build_pieces.py. Global.lua's spawnArenaPiece spawns them, as the map picker does. TTS only
+keeps the result in memory: save the game afterwards.
 """
 import json, math, re, sys
 from pathlib import Path
@@ -32,7 +38,43 @@ FLAG = {"mesh": "props/flag-v2.obj", "diffuse": "props/flag-v2.jpg", "collider":
         "convex": False, "material": 3}
 STAND = {"mesh": "props/bellstand-v1.obj", "diffuse": "props/stand-wood-v1.jpg", "collider": "props/bellstand-v1.obj",
          "convex": False, "material": 1}
+PORTAL = {"mesh": "props/portal-v1.obj", "diffuse": "props/portal-v1.jpg", "collider": "props/portal-v1.obj",
+          "convex": True, "material": 3}
+BRIDGES = {n: {"mesh": f"props/bridge{n}-v1.obj", "diffuse": "props/bridge-v1.jpg",
+               "collider": f"props/bridge-collider{n}-v1.obj", "convex": True, "material": 1} for n in (1, 2)}
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
+
+
+def bridges(data, grid, info):
+    """One bridge per run of bridge tiles: [(tiles, (cx, top, cz), yaw)]. A run lies along a row or a column with an
+    island tile at each end (a single tile: islands on two opposite sides); the deck is level with those islands."""
+    R, C, T = info["rows"], info["cols"], info["tile"]
+    cells = {(r, c) for r, row in enumerate(data["grid"]) for c, ch in enumerate(row) if data["legend"][ch].get("bridge")}
+    out, seen = [], set()
+    for start in sorted(cells):
+        if start in seen:
+            continue
+        run, todo = [], [start]
+        seen.add(start)
+        while todo:
+            r, c = todo.pop()
+            run.append((r, c))
+            for n in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)):
+                if n in cells and n not in seen:
+                    seen.add(n)
+                    todo.append(n)
+        rows, cols = sorted({r for r, _ in run}), sorted({c for _, c in run})
+        r0, c0 = rows[0], cols[0]
+        along_x = len(rows) == 1 and (len(cols) > 1 or (grid.tile(r0, c0 - 1) and grid.tile(r0, c0 + 1)))
+        ends = [(r0, cols[0] - 1), (r0, cols[-1] + 1)] if along_x else [(rows[0] - 1, c0), (rows[-1] + 1, c0)]
+        lands = [grid.tile(*e) for e in ends]
+        if len(rows) > 1 and len(cols) > 1 or not all(lands) or len(run) not in BRIDGES:
+            sys.exit(f"bridge tiles {sorted(run)}: a bridge must be 1 or 2 tiles in a line with an island at each end")
+        top = info["floor0"] + lands[0].get("level", 0) * info["level_height"]
+        cx = sum((c + 0.5 - C / 2) * T for _, c in run) / len(run)
+        cz = sum((R / 2 - r - 0.5) * T for r, _ in run) / len(run)
+        out.append((len(run), (cx, top, cz), 0 if along_x else 90))
+    return out
 
 
 def board_json(arena, name=None):
@@ -51,11 +93,14 @@ def pieces(arena, info):
         for c, ch in enumerate(row):
             tile = data["legend"].get(ch, {})
             marker = tile.get("marker", "")
-            if tile.get("void") or not tile.get("piece") or not (marker in BELLS or marker == "flag"):
+            if tile.get("void") or not tile.get("piece") or not (marker in BELLS or marker in ("flag", "portal")):
                 continue
             cx, cz = (c + 0.5 - C / 2) * T, (R / 2 - r - 0.5) * T
             top = info["floor0"] + tile["level"] * info["level_height"]
-            if marker in BELLS:
+            if marker == "portal":
+                out.append({"kind": "Portal", "name": "Portal", "model": PORTAL, "pos": [cx, top, cz], "yaw": 0,
+                            "desc": "", "pair": tile.get("pair", 1)})
+            elif marker in BELLS:
                 name, stat = BELLS[marker]
                 desc = (f"Attack this bell to give all your Pokemon the {stat} bonus until the end of the turn. "
                         "Each bell can only be rung once per turn.")
@@ -70,6 +115,9 @@ def pieces(arena, info):
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
                 yaw = math.degrees(math.atan2(-sz, sx))      # TTS yaw that turns the model's +x toward (sx, sz)
                 out.append({"kind": "Flag", "name": "Flag", "model": FLAG, "pos": pos, "yaw": yaw % 360, "desc": ""})
+    for tiles, pos, yaw in bridges(data, grid, info):
+        out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[tiles], "pos": list(pos), "yaw": yaw,
+                    "desc": "", "tiles": tiles, "tile": round(T, 5)})
     return data["name"], out
 
 
@@ -84,22 +132,9 @@ local removed = 0
 for _, o in ipairs(getAllObjects()) do
   if o.hasTag("ArenaPiece") then o.destruct(); removed = removed + 1 end
 end
-local yaw = board.getRotation().y
 for _, p in ipairs(list) do
-  local m = p.model
-  local data = {
-    Name = "Custom_Model", Nickname = p.name, Description = p.desc, Tags = { p.kind, "ArenaPiece" },
-    Locked = true, ColorDiffuse = { r = 1, g = 1, b = 1 }, Memo = "",
-    Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
-    CustomMesh = { MeshURL = %(base)s .. m.mesh, DiffuseURL = %(base)s .. m.diffuse, NormalURL = "",
-      ColliderURL = %(base)s .. m.collider, Convex = m.convex, MaterialIndex = m.material, TypeIndex = 0,
-      CastShadows = true },
-  }
-  if p.kind == "Flag" then   -- neutral; Global's onObjectSpawn gives it the Capture menu
-    data.ColorDiffuse, data.Description = FLAG_NEUTRAL, flagDescription(nil)
-  end
-  spawnObjectData({ data = data, position = board.positionToWorld(Vector(p.pos[1], p.pos[2], p.pos[3])),
-    rotation = { 0, yaw + p.yaw, 0 } })
+  for k, v in pairs(p.model) do p[k] = v end   -- the index's flat form
+  spawnArenaPiece(p, board.getPosition(), %(base)s)   -- Global.lua (boards are never turned)
 end
 return "removed " .. removed .. ", placed " .. #list .. " on " .. arena .. " (" .. board.guid .. ")"
 """

@@ -1,4 +1,4 @@
-"""Build the arena pieces: a golden-bronze bell hanging in a wooden stand, and a capturable flag.
+"""Build the arena pieces: a golden-bronze bell hanging in a wooden stand, a capturable flag, a portal and rope bridges.
 
 Usage:  python -I tools/build_pieces.py
 Writes (only files that are missing: bump a version when what a file holds changes, TTS caches by link):
@@ -6,7 +6,14 @@ Writes (only files that are missing: bump a version when what a file holds chang
   (superseded, kept for older saves: v1 a church bell with a loop, v2 a rocket-nozzle bell)
   props/bellstand-v1.obj  (textured with props/stand-wood-v1.jpg, from build_props.py; also its own collider)
   props/flag-v2.obj, props/flag-v2.jpg, props/flag-collider-v2.obj  (v1: a waving cloth on a foot, superseded)
+  props/portal-v1.obj, props/portal-v1.jpg  (also its own collider)
+  props/bridge1-v1.obj, props/bridge2-v1.obj, props/bridge-v1.jpg, props/bridge-collider1-v1.obj, -collider2-
 tools/place_pieces.py puts them on an arena's marker tiles.
+
+Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
+the tile top.
+Bridge: a flat plank deck spanning 1 or 2 tiles of sky between two islands (along x), rope along both long edges.
+Its own frame: y = 0 is the deck's top (level with the islands when the bridge is up), centred.
 
 Bell: the board's bell icon turned around its axis: a dome, a straight flaring skirt, a darker rim band and a ball
 clapper hanging in the open mouth; hollow and dark inside. Its own frame: y = 0 is the bottom of the rim, centred on
@@ -62,6 +69,11 @@ POLE_R, POLE_H = 0.05, 3.3
 FLAG_L, FLAG_H = 1.5, 1.1                # how far the triangle sticks out, and its height at the rod
 FLAG_WHITE = (246, 246, 243)
 POLE_DARK = (50, 38, 28)
+
+# --- portal and bridges (sized for the boards' tile, 3.24875) ----------------------------------------
+BOARD_TILE = 3.24875
+PORTAL_R, PORTAL_H = 1.3, 0.05           # radius, thickness (it lies on the tile; a Pokemon stands on it)
+BRIDGE_W, BRIDGE_D = 2.7, 0.22           # deck width (across) and thickness
 
 
 def norm(v):
@@ -234,6 +246,108 @@ def flag_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
 
 
+# ------------------------------------------------------------------------------------------------ portal
+PORTAL_TEX = 512                          # top: the disc in a 448 px circle at the left; side band at the right
+
+
+def portal():
+    m = PieceMesh()
+    seg, c, rad = 64, 224, 220           # texture: disc centre and radius (px)
+    ring = [(math.cos(2 * math.pi * k / seg), math.sin(2 * math.pi * k / seg)) for k in range(seg + 1)]
+    up = (0.0, 1.0, 0.0)
+    for k in range(seg):
+        (ca, sa), (cb, sb) = ring[k], ring[k + 1]
+        tex = lambda x, z: ((c + rad * x) / PORTAL_TEX, 1 - (c - rad * z) / PORTAL_TEX)
+        corners = [(0, PORTAL_H, 0), (0, PORTAL_H, 0), (PORTAL_R * cb, PORTAL_H, PORTAL_R * sb), (PORTAL_R * ca, PORTAL_H, PORTAL_R * sa)]
+        m.face4(corners, [tex(0, 0), tex(0, 0), tex(cb, sb), tex(ca, sa)], [up] * 4)
+        side = [(PORTAL_R * ca, 0, PORTAL_R * sa), (PORTAL_R * cb, 0, PORTAL_R * sb),
+                (PORTAL_R * cb, PORTAL_H, PORTAL_R * sb), (PORTAL_R * ca, PORTAL_H, PORTAL_R * sa)]
+        u = lambda f: (464 + 32 * f) / PORTAL_TEX
+        m.face4(side, [(u(0), 0.1), (u(1), 0.1), (u(1), 0.9), (u(0), 0.9)], [(ca, 0, sa), (cb, 0, sb), (cb, 0, sb), (ca, 0, sa)])
+    return m
+
+
+def portal_texture():
+    """A pale swirl (the tint gives it its pair's colour): bright centre, three spiral arms, a darker rim ring."""
+    s, c, rad = PORTAL_TEX, 224, 220
+    yy, xx = np.mgrid[0:s, 0:s].astype(np.float32)
+    dx, dy = xx - c, yy - c
+    r = np.sqrt(dx * dx + dy * dy) / rad
+    ang = np.arctan2(dy, dx)
+    arms = 0.5 + 0.5 * np.cos(3 * ang + 9.0 * np.sqrt(np.clip(r, 0, 1)))
+    v = 0.58 + 0.30 * arms * np.clip(1.1 - r, 0, 1) + 0.35 * np.clip(1 - r / 0.35, 0, 1) ** 2
+    v = np.where(r > 0.9, 0.42, v)                                    # rim ring
+    v = np.where((r > 0.86) & (r <= 0.9), 0.95, v)                    # thin bright line inside the rim
+    img = np.repeat(np.clip(v, 0, 1)[..., None] * 255, 3, axis=2)
+    img[:, 448:] = 110                                                # side band: darker
+    return Image.fromarray(img.astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(1.0))
+
+
+# ------------------------------------------------------------------------------------------------ bridges
+BRIDGE_TW, BRIDGE_TH = 1024, 512          # texture: a 2-tile deck across 0..896 px (u), sides/ends below
+
+
+def bridge(tiles):
+    """A plank deck `tiles` long (along x), its top at y = 0."""
+    m = PieceMesh()
+    L, w, d = tiles * BOARD_TILE, BRIDGE_W / 2, BRIDGE_D
+    deck_u = lambda x: 448 * (x / BOARD_TILE + tiles / 2) / BRIDGE_TW   # 448 px per tile from the left
+    deck_v = lambda z: 1 - (8 + (w - z) / BRIDGE_W * 304) / BRIDGE_TH
+    m.face4([(-L / 2, 0, -w), (L / 2, 0, -w), (L / 2, 0, w), (-L / 2, 0, w)],
+            [(deck_u(-L / 2), deck_v(-w)), (deck_u(L / 2), deck_v(-w)), (deck_u(L / 2), deck_v(w)), (deck_u(-L / 2), deck_v(w))],
+            [(0, 1, 0)] * 4)
+    side = lambda a, b: [(a / BRIDGE_TW, 1 - 340 / BRIDGE_TH), (b / BRIDGE_TW, 1 - 340 / BRIDGE_TH),
+                         (b / BRIDGE_TW, 1 - 400 / BRIDGE_TH), (a / BRIDGE_TW, 1 - 400 / BRIDGE_TH)]
+    for sz in (-1, 1):                                                 # long sides (rope band painted on them)
+        z = sz * w
+        m.face4([(-L / 2, 0, z), (L / 2, 0, z), (L / 2, -d, z), (-L / 2, -d, z)], side(8, 8 + 448 * tiles), [(0, 0, sz)] * 4)
+    for sx in (-1, 1):                                                 # ends
+        x = sx * L / 2
+        m.face4([(x, 0, -w), (x, 0, w), (x, -d, w), (x, -d, -w)], side(920, 1010), [(sx, 0, 0)] * 4)
+    m.flat([(-L / 2, -d, -w), (L / 2, -d, -w), (L / 2, -d, w), (-L / 2, -d, w)], (950 / BRIDGE_TW, 1 - 440 / BRIDGE_TH), (0, -1, 0))
+    return m
+
+
+def bridge_collider(tiles):
+    m = PieceMesh()
+    L = tiles * BOARD_TILE
+    box(m, -L / 2, L / 2, -BRIDGE_D, 0, -BRIDGE_W / 2, BRIDGE_W / 2)
+    return m
+
+
+def bridge_texture():
+    """Planks across the deck (two tiles' worth, 448 px a tile), a rope along each long edge; below: the deck's
+    side (planks' ends and the rope), its ends and underside."""
+    rng = np.random.default_rng(23)
+    img = np.zeros((BRIDGE_TH, BRIDGE_TW, 3), np.float32)
+    img[:, :] = (92, 66, 42)
+    deck_h, top = 304, 8
+    x = 0
+    while x < 896:                                                     # planks: 56 px wide with dark gaps
+        wdt = 56
+        tone = np.array((150, 112, 72), np.float32) * rng.uniform(0.85, 1.1)
+        grain = 1 + 0.08 * np.sin(np.arange(deck_h)[:, None] / rng.uniform(3, 7) + rng.uniform(0, 6)) \
+            + rng.normal(0, 0.03, (deck_h, 1))
+        img[top:top + deck_h, x:x + wdt] = tone * grain[..., None] * np.ones((1, wdt, 1))
+        img[top:top + deck_h, x + wdt - 4:x + wdt] = (52, 36, 22)                         # gap
+        for ny in (top + 30, top + deck_h - 30):                                           # nails
+            img[ny - 3:ny + 3, x + 24:x + 30] = (60, 60, 62)
+        x += wdt
+    for ry in (top + 4, top + deck_h - 22):                                                # ropes along the edges
+        img[ry:ry + 18, :896] = (186, 160, 112)
+        for k in range(0, 896, 12):                                                        # twist
+            img[ry:ry + 18, k:k + 4] *= 0.75
+    img[340:400, :896] = (126, 92, 58)                                                     # side: plank ends
+    for k in range(0, 896, 56):
+        img[340:400, k:k + 3] = (52, 36, 22)
+    img[340:356, :896] = (186, 160, 112)                                                   # rope on the side
+    img[340:356, ::12] *= 0.75
+    img[340:400, 912:1016] = (120, 88, 56)                                                 # ends
+    img[420:470, 912:1016] = (70, 50, 32)                                                  # underside
+    img *= (1 + rng.normal(0, 0.03, (BRIDGE_TH, BRIDGE_TW, 1))).astype(np.float32)
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.7))
+
+
 # ------------------------------------------------------------------------------------------------ bell stand
 def prism(m, quad, z0, z1, grain, base):
     """A wooden member: a 4-corner outline in the x-y plane, from z0 to z1, textured with the team stands' wood
@@ -297,6 +411,13 @@ def main():
         "flag-v2.obj": lambda p: flag().write(p),
         "flag-v2.jpg": lambda p: flag_texture().save(p, quality=92),
         "flag-collider-v2.obj": lambda p: flag_collider().write(p),
+        "portal-v1.obj": lambda p: portal().write(p),
+        "portal-v1.jpg": lambda p: portal_texture().save(p, quality=92),
+        "bridge1-v1.obj": lambda p: bridge(1).write(p),
+        "bridge2-v1.obj": lambda p: bridge(2).write(p),
+        "bridge-collider1-v1.obj": lambda p: bridge_collider(1).write(p),
+        "bridge-collider2-v1.obj": lambda p: bridge_collider(2).write(p),
+        "bridge-v1.jpg": lambda p: bridge_texture().save(p, quality=92),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

@@ -219,17 +219,17 @@ def main():
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Pugilis", True)], f"map list shows Pugilis, on the table ({got})")
+    check(got == [("Illusio", False), ("Pugilis", True)], f"map list shows Illusio and Pugilis, Pugilis on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
-          and calls.attrs["mapRes_White_1.text"] == "Pugilis   (on the board)",
+          and calls.attrs["mapRes_White_2.text"] == "Pugilis   (on the board)",
           "map button opens the map panel (and closes the search panel)")
     n = len(calls.spawned)
-    g.mapPick(player, "-1", "mapRes_White_1")
+    g.mapPick(player, "-1", "mapRes_White_2")
     check(len(calls.spawned) == n, "picking the arena that's already on the table does nothing")
     lua.execute("board.destroyed = true")
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_1")
+    g.mapPick(player, "-1", "mapRes_White_2")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     brd = new[0].data if new else None
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
@@ -238,6 +238,107 @@ def main():
           and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v17.jpg") and not brd.CustomMesh.Convex,
           "picking Pugilis puts its 3D board on the table (its own mesh as collider)")
     check(len(flags) == 4 and str(calls.tableURL).endswith("misc/table-placeholder-v1.jpg"), "with its 4 flags and its table image")
+
+    # Illusio: floating islands with 6 flags, 6 portals in their starting colours, 6 bridges that start dropped
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", "mapRes_White_1")
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v1.obj")
+          and kinds.count("Flag") == 6 and kinds.count("Portal") == 6 and kinds.count("Bridge") == 6
+          and str(calls.tableURL).endswith("misc/sky-placeholder-v1.jpg"),
+          "picking Illusio: its board, 6 flags, 6 portals, 6 bridges and the sky under the table")
+    portals = [s for s in new if s.data.Tags[1] == "Portal"]
+    pairs = sorted(json.loads(p.data.Memo)["pair"] for p in portals)
+    tints = {json.loads(p.data.Memo)["pair"]: round(p.data.ColorDiffuse.g, 3) for p in portals}
+    check(pairs == [1, 1, 2, 2, 3, 3] and len(set(tints.values())) == 3, "the portals start in three pairs, one colour each")
+    br = [s for s in new if s.data.Tags[1] == "Bridge"]
+    st = [json.loads(b.data.Memo) for b in br]
+    check(all(not s["up"] and abs(b.position.y - (s["y"] - 1.6)) < 1e-6 and abs(s["y"] - (0.961 + 3.3147)) < 0.01
+              for b, s in zip(br, st)) and sorted(s["tiles"] for s in st) == [1, 1, 2, 2, 2, 2],
+          "the bridges (two 1-tile, four 2-tile) start dropped 1.6 below the islands")
+
+    # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
+    lua.execute(r"""
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end   -- the stand-ins above
+      testBridges = {}
+      for i = 1, 3 do
+        local b = { tags = { "Bridge", "ArenaPiece" }, guid = "br" .. i, menu = {}, snaps = {}, ui = {} }
+        b.hasTag = function(t) return t == "Bridge" or t == "ArenaPiece" end
+        b.memo = JSON.encode({ up = false, y = 4.276, tiles = (i == 1) and 1 or 2, tile = 3.24875 })
+        b.pos = Vector(i * 10, 4.276 - 1.6, 0)
+        b.getPosition = function() return b.pos end
+        b.setPositionSmooth = function(p) b.pos = p end
+        b.positionToLocal = function(v) return Vector(v.x - b.pos.x, v.y - b.pos.y, v.z - b.pos.z) end
+        b.getSnapPoints = function() return b.snaps end
+        b.setSnapPoints = function(s) b.snaps = s end
+        b.setDescription = function(d) b.desc = d end
+        b.clearContextMenu = function() b.menu = {} end
+        b.addContextMenuItem = function(label, fn) b.menu[#b.menu + 1] = { label = label, fn = fn } end
+        b.UI = { setXml = function(x) b.ui.xml = x end, setCustomAssets = function(a) b.ui.assets = a end }
+        testBridges[i] = b
+        objects[#objects + 1] = b
+        onObjectSpawn(b)
+      end
+    """)
+    tb = g.testBridges
+    b2 = tb[2]
+    check(len(list(b2.snaps.values())) == 2 and abs(b2.snaps[1].position[1] + 3.24875 / 2) < 1e-6 and not b2.snaps[1].rotation_snap
+          and len(list(tb[1].snaps.values())) == 1, "a bridge gets a snap point on each of its tiles (position only)")
+    check('onClick="Global/bridgeClicked"' in str(b2.ui.xml) and b2.ui.assets[1].url.endswith("ui/icons/updown-v3.png")
+          and [b2.menu[i].label for i in (1, 2)] == ["Raise this bridge", "Drop this bridge"],
+          "it gets the clear arrows button and the right-click menu")
+    g.bridgeClicked(player)
+    check(all(abs(b.pos.y - 4.276) < 1e-6 and json.loads(b.memo)["up"] for b in tb.values())
+          and any(str(p) == "WhitePlayer raised the bridges." for p in calls.printed.values()),
+          "clicking the arrows raises every bridge, and says so")
+    lua.execute(r"""
+      onBridge = { tags = { "Pokemon" }, memo = '{"pokemon":"Pikachu"}', getName = function() return "Pikachu" end }
+      onBridge.hasTag = function(t) return t == "Pokemon" end
+      onBridge.getPosition = function() return Vector(20 + 1.6, 4.276 + 0.1, 0.3) end
+      objects[#objects + 1] = onBridge
+    """)
+    g.bridgeClicked(player)
+    check(abs(tb[1].pos.y - (4.276 - 1.6)) < 1e-6 and abs(tb[2].pos.y - 4.276) < 1e-6 and abs(tb[3].pos.y - (4.276 - 1.6)) < 1e-6
+          and any(str(p) == "WhitePlayer dropped the bridges. The one under Pikachu stays up." for p in calls.printed.values()),
+          "clicking again drops them, except the one Pikachu is standing on")
+    g.bridgeClicked(player)
+    check(all(json.loads(b.memo)["up"] for b in tb.values()), "the next click raises them all again")
+    tb[3].menu[2].fn("Red")
+    check(abs(tb[3].pos.y - (4.276 - 1.6)) < 1e-6 and abs(tb[1].pos.y - 4.276) < 1e-6
+          and any(str(p) == "RedPlayer dropped a bridge." for p in calls.printed.values()), "right-click > Drop this bridge drops just that one")
+
+    # portals: the die gives every portal a new partner at random (three pairs, each its own colour)
+    lua.execute(r"""
+      testPortals = {}
+      for i = 1, 6 do
+        local p = { tags = { "Portal", "ArenaPiece" }, guid = "pt" .. i, menu = {}, ui = {} }
+        p.hasTag = function(t) return t == "Portal" or t == "ArenaPiece" end
+        p.memo = JSON.encode({ pair = math.floor((i + 1) / 2) })
+        p.setColorTint = function(c) p.tint = c end
+        p.setDescription = function(d) p.desc = d end
+        p.clearContextMenu = function() p.menu = {} end
+        p.addContextMenuItem = function(label, fn) p.menu[#p.menu + 1] = { label = label, fn = fn } end
+        p.UI = { setXml = function(x) p.ui.xml = x end, setCustomAssets = function(a) p.ui.assets = a end }
+        testPortals[i] = p
+        objects[#objects + 1] = p
+        onObjectSpawn(p)
+      end
+    """)
+    tp = g.testPortals
+    check('onClick="Global/portalClicked"' in str(tp[1].ui.xml) and tp[1].ui.assets[1].url.endswith("ui/icons/die-v3.png")
+          and "magenta portal" in str(tp[1].desc) and tp[1].menu[1].label == "Shuffle portals",
+          "a portal gets its colour, the clear die button and a Shuffle menu")
+    seen, ok = set(), True
+    for _ in range(30):
+        g.portalClicked(player)
+        pr = [json.loads(p.memo)["pair"] for p in tp.values()]
+        ok = ok and sorted(pr) == [1, 1, 2, 2, 3, 3] and all(
+            (p.tint.r, p.tint.g, p.tint.b) == tuple(g.portalTint(json.loads(p.memo)["pair"])[k] for k in "rgb") for p in tp.values())
+        seen.add(frozenset(frozenset(i for i, x in enumerate(pr) if x == k) for k in (1, 2, 3)))
+    check(ok and len(seen) > 3 and any(str(p) == "WhitePlayer shuffled the portals." for p in calls.printed.values()),
+          f"the die re-pairs all six at random: always three colour pairs ({len(seen)} different pairings in 30 shuffles)")
 
     # statuses: arm one, pick up a figure, check tint/description/memo; toggles and clearing
     lua.execute(r"""
