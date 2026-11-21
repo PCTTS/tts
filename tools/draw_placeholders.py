@@ -6,6 +6,11 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/illusio/textures/stone.png              the raised high ground: pale lavender stone
   arenas/illusio/textures/rock.png               cliffs and the islands' undersides: layered rock, seamless left-right
   misc/sky-placeholder-v1.jpg                    table image under floating islands: sky and soft clouds
+  arenas/ingis/textures/sand1.png, sand2.png     low ground: dark volcanic sand
+  arenas/ingis/textures/basalt-top.png           high ground: hexagonal basalt column tops, seamless both ways
+  arenas/ingis/textures/basalt-wall.png          cliffs: basalt columns standing side by side, seamless left-right
+  arenas/ingis/textures/lava.png                 lava: glowing orange with dark crust plates
+  misc/volcano-placeholder-v1.jpg                table image around a volcanic arena: dark rock, faint glowing cracks
 """
 from pathlib import Path
 
@@ -114,8 +119,117 @@ def sky():
     return to_img(img)
 
 
+def sand(seed):
+    """Dark volcanic sand: fine grains, a few pale and glassy-black specks, faint wind ripples."""
+    rng = np.random.default_rng(seed)
+    base = mix((58, 52, 49), (84, 76, 70), fbm(N, N, rng, 3))
+    rows = np.arange(N, dtype=np.float32)[:, None]
+    ripple = 0.5 + 0.5 * np.sin((rows / N * 22 + fbm(N, N, rng, 2) * 3) * 2 * np.pi)
+    img = base * (0.95 + 0.06 * ripple)[..., None]
+    img *= (1 + rng.normal(0, 0.07, (N, N, 1))).astype(np.float32)            # grains
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(900):
+        x, y = rng.random() * N, rng.random() * N
+        r = rng.uniform(0.6, 1.6)
+        col = (150, 138, 126, 150) if rng.random() < 0.5 else (20, 18, 18, 170)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=col)
+    return out.filter(ImageFilter.GaussianBlur(0.35))
+
+
+def cells(h, w, centres, period):
+    """Nearest and second-nearest distances to the centres, wrapping at `period` (px, py) — seamless both ways."""
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    px, py = period
+    xx, yy = xx * px / w, yy * py / h
+    d1 = np.full((h, w), np.inf, np.float32)
+    d2 = np.full((h, w), np.inf, np.float32)
+    idx = np.zeros((h, w), np.int32)
+    for i, (cx, cy) in enumerate(centres):
+        dx = (xx - cx + px / 2) % px - px / 2
+        dy = (yy - cy + py / 2) % py - py / 2
+        d = np.sqrt(dx * dx + dy * dy)
+        closer = d < d1
+        d2 = np.where(closer, d1, np.minimum(d2, d))
+        idx = np.where(closer, i, idx)
+        d1 = np.where(closer, d, d1)
+    return d1, d2, idx
+
+
+def basalt_top():
+    """Hexagonal column tops (14 across, 16 rows: tiles seamlessly), each its own shade, dark joints between."""
+    rng = np.random.default_rng(61)
+    s = 1.0
+    w = np.sqrt(3) * s
+    nx, ny = 14, 16
+    centres = [((i + 0.5 * (j % 2)) * w, j * 1.5 * s) for j in range(ny) for i in range(nx)]
+    centres = [(x + rng.normal(0, 0.05), y + rng.normal(0, 0.05)) for x, y in centres]
+    d1, d2, idx = cells(1024, 1024, centres, (nx * w, ny * 1.5 * s))
+    shade = rng.uniform(0.82, 1.12, len(centres))[idx]
+    img = mix((62, 62, 66), (84, 84, 88), fbm(1024, 1024, rng, 6, 4))
+    img *= shade[..., None]
+    joint = np.clip((d2 - d1) / 0.09, 0, 1)                       # 0 on a joint
+    img *= (0.45 + 0.55 * joint)[..., None]
+    img *= (1 + rng.normal(0, 0.04, (1024, 1024, 1))).astype(np.float32)
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def basalt_wall():
+    """Basalt columns side by side (seamless left-right): each a light-to-dark facet shade with cracks across."""
+    rng = np.random.default_rng(67)
+    h, w = 1024, N
+    img = np.zeros((h, w, 3), np.float32)
+    edges = np.cumsum(rng.uniform(0.7, 1.3, 7))
+    edges = np.round(np.concatenate([[0], edges / edges[-1]]) * w).astype(int)       # 7 columns across
+    tex = fbm(h, w, rng, 8, 3, wrap_x=True)
+    for a, b in zip(edges, edges[1:]):
+        t = np.linspace(0, 1, b - a, dtype=np.float32)[None, :]
+        facet = np.where(t < 0.45, 0.78 + 0.3 * t / 0.45, 1.08 - 0.25 * (t - 0.45) / 0.55)   # two faces of a column
+        tone = rng.uniform(0.88, 1.1)
+        img[:, a:b] = (np.array((70, 70, 74), np.float32) * tone)[None, None, :] * facet[..., None]
+        img[:, max(a - 1, 0):a + 2] *= 0.45                                               # joint between columns
+        y = 0
+        while y < h:                                                                      # cracks across
+            y += int(rng.uniform(90, 260))
+            if y < h:
+                img[y:y + 3, a:b] *= 0.55
+    img *= (0.9 + 0.2 * tex)[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def lava():
+    """Glowing lava with dark crust plates: hot between the plates, cooling toward their middles."""
+    rng = np.random.default_rng(71)
+    pts = [(rng.random() * 10, rng.random() * 10) for _ in range(38)]
+    d1, d2, idx = cells(N, N, pts, (10, 10))
+    gap = np.clip((d2 - d1) / 0.6, 0, 1)                          # 0 at the seams between plates
+    crust = np.clip((gap - 0.25) / 0.5, 0, 1) * rng.uniform(0.3, 1.0, len(pts))[idx]
+    hot = mix((255, 214, 96), (236, 92, 20), np.clip(gap * 2.2, 0, 1))
+    img = mix(hot, (54, 26, 18), crust)
+    img = img + (np.array((255, 120, 30), np.float32) - img) * (0.25 * fbm(N, N, rng, 5))[..., None] * (1 - crust)[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
+
+
+def volcano_table():
+    """Around a volcanic arena: dark rock with a few faint glowing cracks."""
+    rng = np.random.default_rng(9)
+    h, w = 1211, 2048
+    img = mix((26, 22, 22), (58, 50, 48), fbm(h, w, rng, 6, 6))
+    pts = [(rng.random() * 30, rng.random() * 18) for _ in range(160)]
+    d1, d2, _ = cells(h, w, pts, (30, 18))
+    crack = np.clip(1 - (d2 - d1) / 0.12, 0, 1) ** 2 * (fbm(h, w, rng, 4, 3) > 0.52)
+    img = img + (np.array((230, 90, 20), np.float32) - img) * (0.75 * crack)[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
+
+
 def main():
     files = {
+        "arenas/ingis/textures/sand1.png": lambda p: sand(81).save(p),
+        "arenas/ingis/textures/sand2.png": lambda p: sand(82).save(p),
+        "arenas/ingis/textures/basalt-top.png": lambda p: basalt_top().save(p),
+        "arenas/ingis/textures/basalt-wall.png": lambda p: basalt_wall().save(p),
+        "arenas/ingis/textures/lava.png": lambda p: lava().save(p),
+        "misc/volcano-placeholder-v1.jpg": lambda p: volcano_table().save(p, quality=90),
         "arenas/illusio/textures/grass1.png": lambda p: grass(1).save(p),
         "arenas/illusio/textures/grass2.png": lambda p: grass(2).save(p),
         "arenas/illusio/textures/stone.png": lambda p: stone().save(p),

@@ -29,7 +29,7 @@ def arena_entry(folder):
             tile = data["legend"][ch]
             if tile.get("void"):
                 continue
-            top = info["floor0"] + tile.get("level", 0) * info["level_height"] + SNAP_LIFT
+            top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0) + SNAP_LIFT
             snaps.append([round((c + 0.5 - C / 2) * T, 4), round(top, 4), round((R / 2 - r - 0.5) * T, 4)])
     name, items = pieces(folder, info)
     out_pieces = [{**{k: v for k, v in p.items() if k != "model"}, "yaw": round(p["yaw"], 2),

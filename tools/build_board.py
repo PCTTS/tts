@@ -72,7 +72,8 @@ class Arena:
         return FLOOR0 + self.lift
 
     def top(self, t):
-        return self.floor0() + t.get("level", 0) * LEVEL_H
+        """A tile's surface height ("sink" lowers the look only: rules-wise it stays at its level)."""
+        return self.floor0() + t.get("level", 0) * LEVEL_H - t.get("sink", 0.0)
 
     def y_span(self):
         """The model's full height (the highest tile top)."""
@@ -246,6 +247,8 @@ def draw_texture(a):
                     o.line([(x0 + band - i, y0t), (x0 + band - i, y0t + p)], fill=(30, 18, 8, alpha))
                 if "E" in sloped:
                     o.line([(x0 + p - band + i, y0t), (x0 + p - band + i, y0t + p)], fill=(30, 18, 8, alpha))
+    if a.data.get("coords"):
+        draw_coords(over, a, p)
     for r, c, side in a.data.get("edges", {}).get("fall", []):
         x0, y0t, w = c * p, r * p, 11 * SS
         box = {"N": [x0, y0t, x0 + p, y0t + w], "S": [x0, y0t + p - w, x0 + p, y0t + p],
@@ -257,6 +260,28 @@ def draw_texture(a):
 
 
 FRINGE = {"reach": 0.42, "wobble": 0.3, "rough": 1.0, "tufts": 160}   # defaults (board v3's look)
+
+
+def draw_coords(over, a, p):
+    """Coordinates 1..C and 1..R in the board's edge tiles, as player 1 reads them (x from their left along their
+    edge, y up the left side), and the same numbers upside down on player 2's two edges."""
+    f = font(round(p * 0.15))
+    size = round(p * 0.28)
+
+    def label(text, cx, cy, flip):
+        layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text((size / 2, size / 2), text, font=f, fill=(236, 226, 208, 190), anchor="mm",
+                                   stroke_width=max(1, round(p * 0.012)), stroke_fill=(0, 0, 0, 150))
+        if flip:
+            layer = layer.rotate(180)
+        over.alpha_composite(layer, (round(cx - size / 2), round(cy - size / 2)))
+
+    for c in range(a.C):
+        label(str(c + 1), c * p + p / 2, (a.R - 1) * p + p * 0.85, False)     # player 1's edge
+        label(str(c + 1), c * p + p / 2, p * 0.15, True)                      # player 2's edge
+    for r in range(a.R):
+        label(str(a.R - r), p * 0.15, r * p + p / 2, False)                   # player 1's left
+        label(str(a.R - r), (a.C - 1) * p + p * 0.85, r * p + p / 2, True)    # player 2's left
 
 
 def grass_fringe(a, img, layers, p):

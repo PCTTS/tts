@@ -8,12 +8,15 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/flag-v2.obj, props/flag-v2.jpg, props/flag-collider-v2.obj  (v1: a waving cloth on a foot, superseded)
   props/portal-v1.obj, props/portal-v1.jpg  (also its own collider)
   props/bridge1-v1.obj, props/bridge2-v1.obj, props/bridge-v1.jpg, props/bridge-collider1-v1.obj, -collider2-
+  props/zoneframe2-v1.obj, props/zoneframe-v1.jpg  (also its own collider)
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
 the tile top.
 Bridge: a flat plank deck spanning 1 or 2 tiles of sky between two islands (along x), rope along both long edges.
 Its own frame: y = 0 is the deck's top (level with the islands when the bridge is up), centred.
+Zone frame: a thin flat square ring just inside a 2x2 capture zone's border, white so a tint gives it the colour
+of the player holding the zone. Its own frame: y = 0 is the tile top, centred on the zone.
 
 Bell: the board's bell icon turned around its axis: a dome, a straight flaring skirt, a darker rim band and a ball
 clapper hanging in the open mouth; hollow and dark inside. Its own frame: y = 0 is the bottom of the rim, centred on
@@ -74,6 +77,7 @@ POLE_DARK = (50, 38, 28)
 BOARD_TILE = 3.24875
 PORTAL_R, PORTAL_H = 1.3, 0.05           # radius, thickness (it lies on the tile; a Pokemon stands on it)
 BRIDGE_W, BRIDGE_D = 2.7, 0.22           # deck width (across) and thickness
+ZONE_W, ZONE_H, ZONE_INSET = 0.16, 0.035, 0.05   # zone frame: band width, thickness, gap inside the zone's border
 
 
 def norm(v):
@@ -348,6 +352,23 @@ def bridge_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.7))
 
 
+# ------------------------------------------------------------------------------------------------ zone frame
+def zone_frame(tiles=2):
+    """A square ring `tiles` tiles across, centred, lying on y = 0."""
+    m = PieceMesh()
+    o = tiles * BOARD_TILE / 2 - ZONE_INSET
+    i = o - ZONE_W
+    for x0, x1, z0, z1 in ((-o, o, i, o), (-o, o, -o, -i), (i, o, -i, i), (-o, -i, -i, i)):
+        box(m, x0, x1, 0, ZONE_H, z0, z1)
+    return m
+
+
+def zone_texture():
+    rng = np.random.default_rng(29)
+    img = np.full((64, 64, 3), 244, np.float32) + rng.normal(0, 2.0, (64, 64, 1)).astype(np.float32)
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+
+
 # ------------------------------------------------------------------------------------------------ bell stand
 def prism(m, quad, z0, z1, grain, base):
     """A wooden member: a 4-corner outline in the x-y plane, from z0 to z1, textured with the team stands' wood
@@ -418,6 +439,8 @@ def main():
         "bridge-collider1-v1.obj": lambda p: bridge_collider(1).write(p),
         "bridge-collider2-v1.obj": lambda p: bridge_collider(2).write(p),
         "bridge-v1.jpg": lambda p: bridge_texture().save(p, quality=92),
+        "zoneframe2-v1.obj": lambda p: zone_frame(2).write(p),
+        "zoneframe-v1.jpg": lambda p: zone_texture().save(p, quality=92),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

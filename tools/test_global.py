@@ -214,22 +214,23 @@ def main():
     memo = json.loads(spawned.data.Memo)
     want = json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Charizard"]["hp"]
     check(memo.get("hp") == want and memo.get("maxHp") == want, f"it starts at full HP ({memo})")
+    check(memo.get("owner") == "White", "it belongs to White (who spawned it)")
     check(abs(spawned.position.x - (-17.625)) < 0.01 and abs(spawned.position.z - (-28.0)) < 0.01,
           f"White's Pokemon goes on the first pedestal of the near stand ({spawned.position.x:.2f}, {spawned.position.z:.2f})")
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Illusio", False), ("Pugilis", True)], f"map list shows Illusio and Pugilis, Pugilis on the table ({got})")
+    check(got == [("Illusio", False), ("Ingis", False), ("Pugilis", True)], f"map list shows Illusio, Ingis and Pugilis, Pugilis on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
-          and calls.attrs["mapRes_White_2.text"] == "Pugilis   (on the board)",
+          and calls.attrs["mapRes_White_3.text"] == "Pugilis   (on the board)",
           "map button opens the map panel (and closes the search panel)")
     n = len(calls.spawned)
-    g.mapPick(player, "-1", "mapRes_White_2")
+    g.mapPick(player, "-1", "mapRes_White_3")
     check(len(calls.spawned) == n, "picking the arena that's already on the table does nothing")
     lua.execute("board.destroyed = true")
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_2")
+    g.mapPick(player, "-1", "mapRes_White_3")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     brd = new[0].data if new else None
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
@@ -258,6 +259,23 @@ def main():
     check(all(not s["up"] and abs(b.position.y - (s["y"] - 1.6)) < 1e-6 and abs(s["y"] - (0.961 + 3.3147)) < 0.01
               for b, s in zip(br, st)) and sorted(s["tiles"] for s in st) == [1, 1, 2, 2, 2, 2],
           "the bridges (two 1-tile, four 2-tile) start dropped 1.6 below the islands")
+
+    # Ingis: its board with the rock coordinates, three capture zone frames (neutral), the volcanic table
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", "mapRes_White_2")
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    zones = [s for s in new if s.data.Tags[1] == "Zone"]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/ingis/board-v1.obj")
+          and len(zones) == 3 and len(kinds) == 4 and all(abs(z.data.ColorDiffuse.r - 0.6) < 1e-6 for z in zones)
+          and str(calls.tableURL).endswith("misc/volcano-placeholder-v1.jpg"),
+          "picking Ingis: its board, 3 neutral capture zone frames and the volcanic table")
+    idx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Ingis"]
+    lava = [p for p in idx["snaps"] if abs(p[1] - (0.415 - 0.1 + 0.02)) < 0.01]
+    high = [p for p in idx["snaps"] if abs(p[1] - (0.415 + 0.968 + 0.02)) < 0.01]
+    check(len(idx["snaps"]) == 256 and len(lava) == 44 and len(high) == 52,
+          f"a snap point on all 256 tiles: 52 on the ridge, 44 on the (slightly sunken) lava ({len(high)}, {len(lava)})")
 
     # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
     lua.execute(r"""
@@ -533,6 +551,51 @@ def main():
     check(f.memo == "Blue" and f.tint.b == 1, "Blue can take it over")
     f.menu[2].fn("Blue")
     check(f.memo == "" and f.tint.r == 0.6 and f.desc.startswith("Neutral."), "Make neutral resets it")
+
+    # capture zones: the frame takes the colour of whoever has more (not fainted) Pokemon in it; ties are neutral.
+    # A Pokemon without an owner belongs to the first seated player to put it down.
+    lua.execute(r"""
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") or o.hasTag("Pokemon") then o.destroyed = true end end
+      zoneObj = { tags = { "Zone", "ArenaPiece" }, guid = "zn1", memo = JSON.encode({ tiles = 2, tile = 3.24875 }) }
+      zoneObj.hasTag = function(t) return t == "Zone" or t == "ArenaPiece" end
+      zoneObj.pos = Vector(0, 1.38, 0)
+      zoneObj.positionToLocal = function(v) return Vector(v.x - zoneObj.pos.x, v.y - zoneObj.pos.y, v.z - zoneObj.pos.z) end
+      zoneObj.setColorTint = function(c) zoneObj.tint = c end
+      zoneObj.setDescription = function(d) zoneObj.desc = d end
+      objects[#objects + 1] = zoneObj
+      function zoneMon(name, owner, x, z, hp)
+        local m = { tags = { "Pokemon" }, pos = Vector(x, 1.4, z) }
+        m.memo = JSON.encode({ pokemon = name, owner = owner, hp = hp or 100, maxHp = 100 })
+        m.hasTag = function(t) return t == "Pokemon" end
+        m.getPosition = function() return m.pos end
+        m.getName = function() return name end
+        m.UI = { getXml = function() return "" end, setXml = function() end }
+        objects[#objects + 1] = m
+        return m
+      end
+      onObjectSpawn(zoneObj)
+    """)
+    z = g.zoneObj
+    check(z.desc.startswith("Capture zone.") and abs(z.tint.r - 0.6) < 1e-6, "an empty zone's frame is neutral")
+    g.zoneMon("Gengar", "Red", -1.6, 1.6); g.zoneMon("Onix", "Red", 1.6, -1.6); b = g.zoneMon("Absol", "Blue", 1.6, 1.6)
+    g.zoneMon("Eevee", "Blue", 5.0, 0)   # outside the zone
+    g.refreshZones()
+    check(z.tint.r > 0.8 and z.tint.b < 0.2 and json.loads(z.memo).get("holder") == "Red"
+          and any(str(p) == "RedPlayer holds a capture zone." for p in calls.printed.values()),
+          "two Red Pokemon to one Blue: the frame turns red (and chat says so)")
+    lua.execute('zoneMon("Pidgey", "Blue", -1.6, -1.6); refreshZones()')
+    check(abs(z.tint.r - 0.6) < 1e-6 and json.loads(z.memo).get("holder") is None, "two each: a tie, back to neutral")
+    lua.execute('zoneMon("Rattata", "Blue", 0.5, 0.5, 0); refreshZones()')
+    check(abs(z.tint.r - 0.6) < 1e-6, "a fainted Pokemon (0 HP) doesn't count")
+    lua.execute('zoneMon("Zubat", "Blue", -0.5, 0.5); refreshZones()')
+    check(z.tint.b == 1 and json.loads(z.memo).get("holder") == "Blue", "three Blue to two Red: blue")
+    lua.execute(r"""
+      stray = zoneMon("Mew", nil, 9, 9)
+      onObjectDrop("Green", stray)
+      onObjectDrop("Red", stray)
+      onObjectDrop("Grey", zoneMon("Ditto", nil, 9, 9))
+    """)
+    check(json.loads(g.stray.memo).get("owner") == "Green", "an ownerless Pokemon belongs to the first seated player to put it down")
 
     # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them.
     # TTS's Lua (MoonSharp) fails "pattern too complex" on patterns over text this size (real Lua doesn't), so the

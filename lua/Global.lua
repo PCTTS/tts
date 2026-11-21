@@ -210,7 +210,7 @@ function onLoad(saved)
         setupStand(obj)
       elseif obj.hasTag("Pokemon") then
         plainStandee(obj)
-      elseif obj.hasTag("Portal") or obj.hasTag("Bridge") then
+      elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") then
         pieceSetup(obj)
       end
     end
@@ -373,7 +373,7 @@ function spawnPokemon(name, color)
     Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
     Nickname = name,
     Tags = { "Pokemon" },
-    Memo = JSON.encode({ pokemon = name, hp = maxHp(name), maxHp = maxHp(name) }),
+    Memo = JSON.encode({ pokemon = name, hp = maxHp(name), maxHp = maxHp(name), owner = teamColor(color) }),
   }
   if files.standee then
     -- the standee: the art on a round base whose arrow points the way the Pokémon faces (the art's left);
@@ -503,6 +503,8 @@ function spawnArenaPiece(p, origin, base)
     data.ColorDiffuse, data.Description = FLAG_NEUTRAL, flagDescription(nil)
   elseif p.kind == "Portal" then
     data.ColorDiffuse, data.Memo = portalTint(p.pair or 1), JSON.encode({ pair = p.pair or 1 })
+  elseif p.kind == "Zone" then
+    data.ColorDiffuse, data.Memo = FLAG_NEUTRAL, JSON.encode({ tiles = p.tiles or 2, tile = p.tile or BOARD_TILE })
   elseif p.kind == "Bridge" then
     data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, tile = p.tile or BOARD_TILE })
     pos = Vector(pos.x, pos.y - BRIDGE_DROP, pos.z)
@@ -866,7 +868,10 @@ function applyStatus(obj, key)
 end
 
 function onObjectPickUp(color, obj)
-  if obj.hasTag("Pokemon") then Wait.time(refreshPedestals, 0.3) end   -- lifted off its pedestal: its sign empties
+  if obj.hasTag("Pokemon") then   -- lifted off its pedestal or out of a zone: the sign empties, the zone recounts
+    Wait.time(refreshPedestals, 0.3)
+    Wait.time(refreshZones, 0.3)
+  end
   local key = armed[color]
   if not key or not isFigure(obj) then return end
   armed[color] = nil
@@ -1064,6 +1069,73 @@ function bridgeClicked(player)
   toggleBridges(player and player.color)
 end
 
+----------------------------------------------------------------------------------------------------
+-- Capture zones (Ingis): a frame around each zone takes the colour of the player with more Pokémon inside it
+-- (fainted ones don't count); a tie or an empty zone is neutral. It updates whenever a Pokémon is put down,
+-- picked up, removed or faints, so at the end of a turn it shows who captures the zone.
+-- A Pokémon belongs to the player whose toolbar spawned it, or else the first seated player to put it down
+-- (its memo's owner).
+----------------------------------------------------------------------------------------------------
+ZONE_DESC = "Capture zone. At the end of each turn the player with more Pokémon in it captures it (a tie: neither). "
+  .. "The frame shows who that is right now."
+
+-- The team a seat colour plays for (nil for spectators and the game master).
+function teamColor(color)
+  if not color or color == "Grey" or color == "Black" then return nil end
+  for _, c in ipairs(COLORS) do
+    if c == color then return color end
+  end
+end
+
+-- Give an ownerless Pokémon to the seated player putting it down.
+function claimPokemon(obj, color)
+  local team = teamColor(color)
+  if not team then return end
+  local st = figureState(obj)
+  if st.owner then return end
+  st.owner = team
+  obj.memo = JSON.encode(st)
+end
+
+-- The owner with the most Pokémon (not fainted) inside a zone, or nil on a tie / none.
+function zoneLeader(zone)
+  local st = memoTable(zone)
+  local half = (st.tiles or 2) * (st.tile or BOARD_TILE) / 2
+  local counts = {}
+  for _, obj in ipairs(getAllObjects()) do
+    if obj.hasTag("Pokemon") then
+      local p = zone.positionToLocal(obj.getPosition())
+      if math.abs(p.x) < half and math.abs(p.z) < half and p.y > -0.5 and p.y < 3 then
+        local f = figureState(obj)
+        if f.owner and (f.hp == nil or f.hp > 0) then counts[f.owner] = (counts[f.owner] or 0) + 1 end
+      end
+    end
+  end
+  local best, n, tie = nil, 0, false
+  for owner, k in pairs(counts) do
+    if k > n then best, n, tie = owner, k, false elseif k == n then tie = true end
+  end
+  if tie then return nil end
+  return best
+end
+
+function refreshZones()
+  for _, zone in ipairs(piecesTagged("Zone")) do
+    local st = memoTable(zone)
+    local leader = zoneLeader(zone)
+    if leader ~= st.holder then
+      st.holder = leader
+      zone.memo = JSON.encode(st)
+      if leader then
+        printToAll(playerName(leader) .. " holds a capture zone.", Color.fromString(leader))
+      else
+        printToAll("A capture zone is held by no one.", { 0.9, 0.9, 0.9 })
+      end
+    end
+    zone.setColorTint(leader and Color.fromString(leader) or FLAG_NEUTRAL)
+  end
+end
+
 -- Buttons, menus and snap points for an arena piece (after it spawns, and again on load: none of it is reliably
 -- kept by a save).
 function pieceSetup(obj)
@@ -1077,6 +1149,9 @@ function pieceSetup(obj)
       "Shuffle the portals", "die"))
     obj.clearContextMenu()
     obj.addContextMenuItem("Shuffle portals", function(color) shufflePortals(color) end)
+  elseif obj.hasTag("Zone") then
+    obj.setDescription(ZONE_DESC)
+    Wait.frames(refreshZones, 1)
   elseif obj.hasTag("Bridge") then
     local st = bridgeState(obj)
     if #(obj.getSnapPoints() or {}) ~= st.tiles then obj.setSnapPoints(bridgeSnaps(st)) end
@@ -1207,12 +1282,19 @@ function plainStandee(obj)
 end
 
 -- Pokémon put down, picked up or removed: the signs follow (after it has settled or left).
-function onObjectDrop(_, obj)
-  if obj.hasTag("Pokemon") then Wait.time(refreshPedestals, 0.5) end
+function onObjectDrop(color, obj)
+  if obj.hasTag("Pokemon") then
+    claimPokemon(obj, color)
+    Wait.time(refreshPedestals, 0.5)
+    Wait.time(refreshZones, 0.5)
+  end
 end
 
 function onObjectDestroy(obj)
-  if obj.hasTag("Pokemon") then Wait.frames(refreshPedestals, 2) end
+  if obj.hasTag("Pokemon") then
+    Wait.frames(refreshPedestals, 2)
+    Wait.frames(refreshZones, 2)
+  end
 end
 
 -- What a typed entry makes the HP: "120" sets it, "-35" / "+20" change it; nil if it isn't a number.
@@ -1247,6 +1329,7 @@ function hpEdited(player, value, id)
     end
   end
   refreshStand(stand)   -- shows the result, or puts back the number if the entry wasn't one
+  refreshZones()        -- a fainted Pokémon no longer holds a zone
 end
 
 ----------------------------------------------------------------------------------------------------

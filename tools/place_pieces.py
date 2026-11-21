@@ -15,6 +15,8 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
         Pugilis keeps its bells as painted symbols only.
   portal: a round tile lying on the tile, in its starting pair's colour ("pair" in the legend); a die on it
         shuffles every portal's pair (Global.lua).
+  zone (capture zone tiles): a frame around each square group of them (2x2), which takes the colour of the player
+        with more Pokemon inside (Global.lua).
   bridge tiles (legend "bridge": true, sky with no board): each run of them between two islands is one rope
         bridge, 1 or 2 tiles long, carrying its own snap points; it starts dropped (closed) and the arrows on it
         raise or drop all the bridges (Global.lua).
@@ -42,7 +44,39 @@ PORTAL = {"mesh": "props/portal-v1.obj", "diffuse": "props/portal-v1.jpg", "coll
           "convex": True, "material": 3}
 BRIDGES = {n: {"mesh": f"props/bridge{n}-v1.obj", "diffuse": "props/bridge-v1.jpg",
                "collider": f"props/bridge-collider{n}-v1.obj", "convex": True, "material": 1} for n in (1, 2)}
+ZONES = {2: {"mesh": "props/zoneframe2-v1.obj", "diffuse": "props/zoneframe-v1.jpg", "collider": "props/zoneframe2-v1.obj",
+             "convex": False, "material": 3}}
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
+
+
+def zones(data, info):
+    """One frame per square group of capture zone tiles: [(size, (cx, top, cz))]."""
+    R, C, T = info["rows"], info["cols"], info["tile"]
+    cells = {(r, c) for r, row in enumerate(data["grid"]) for c, ch in enumerate(row)
+             if data["legend"][ch].get("marker") == "zone" and data["legend"][ch].get("piece")}
+    out, seen = [], set()
+    for start in sorted(cells):
+        if start in seen:
+            continue
+        group, todo = [], [start]
+        seen.add(start)
+        while todo:
+            r, c = todo.pop()
+            group.append((r, c))
+            for n in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)):
+                if n in cells and n not in seen:
+                    seen.add(n)
+                    todo.append(n)
+        rows, cols = sorted({r for r, _ in group}), sorted({c for _, c in group})
+        size = len(rows)
+        if len(cols) != size or len(group) != size * size or size not in ZONES:
+            sys.exit(f"capture zone tiles {sorted(group)}: only square 2x2 zones have a frame")
+        tile = data["legend"][data["grid"][rows[0]][cols[0]]]
+        top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0)
+        cx = sum((c + 0.5 - C / 2) * T for _, c in group) / len(group)
+        cz = sum((R / 2 - r - 0.5) * T for r, _ in group) / len(group)
+        out.append((size, (cx, top, cz)))
+    return out
 
 
 def bridges(data, grid, info):
@@ -96,7 +130,7 @@ def pieces(arena, info):
             if tile.get("void") or not tile.get("piece") or not (marker in BELLS or marker in ("flag", "portal")):
                 continue
             cx, cz = (c + 0.5 - C / 2) * T, (R / 2 - r - 0.5) * T
-            top = info["floor0"] + tile["level"] * info["level_height"]
+            top = info["floor0"] + tile["level"] * info["level_height"] - tile.get("sink", 0.0)
             if marker == "portal":
                 out.append({"kind": "Portal", "name": "Portal", "model": PORTAL, "pos": [cx, top, cz], "yaw": 0,
                             "desc": "", "pair": tile.get("pair", 1)})
@@ -115,6 +149,9 @@ def pieces(arena, info):
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
                 yaw = math.degrees(math.atan2(-sz, sx))      # TTS yaw that turns the model's +x toward (sx, sz)
                 out.append({"kind": "Flag", "name": "Flag", "model": FLAG, "pos": pos, "yaw": yaw % 360, "desc": ""})
+    for size, pos in zones(data, info):
+        out.append({"kind": "Zone", "name": "Capture zone", "model": ZONES[size], "pos": list(pos), "yaw": 0,
+                    "desc": "", "tiles": size, "tile": round(T, 5)})
     for tiles, pos, yaw in bridges(data, grid, info):
         out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[tiles], "pos": list(pos), "yaw": yaw,
                     "desc": "", "tiles": tiles, "tile": round(T, 5)})

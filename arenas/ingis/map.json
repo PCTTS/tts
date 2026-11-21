@@ -1,0 +1,52 @@
+{
+  "name": "Ingis",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the old map image (maps/ingis.jpg): a basalt ridge (one level up) running corner to corner with the three capture zones on it, lava pools on the volcanic sand around it. Rock coordinates: x = column 1-16 from player 1's left, y = row 1-16 from player 1's side.",
+  "grid": [
+    "................",
+    ".LLLL......222..",
+    ".L^^^^........2.",
+    ".L^ZZ^.L...LL.2.",
+    ".L^ZZ^LL..LLL.2.",
+    "..^^^^^L..LL....",
+    "....L^^^^^......",
+    "...LLL^ZZ^......",
+    "......^ZZ^LLL...",
+    "......^^^^^L....",
+    "....LL..L^^^^^..",
+    ".1.LLL..LL^ZZ^L.",
+    ".1.LL...L.^ZZ^L.",
+    ".1........^^^^L.",
+    "..111......LLLL.",
+    "................"
+  ],
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. sink = the surface sits this many world units lower than its level (a look only: lava counts as the ground's level). marker = something on the tile (painted, or a 3D piece with piece: true). zone: capture zone tiles; each 2x2 group gets a frame piece that takes the colour of the player with more Pokemon in it.",
+  "legend": {
+    ".": { "level": 0, "surface": "floor" },
+    "^": { "level": 1, "surface": "high" },
+    "Z": { "level": 1, "surface": "high", "marker": "zone", "paint": false, "piece": true },
+    "L": { "level": 0, "surface": "lava", "sink": 0.1 },
+    "1": { "level": 0, "surface": "floor", "marker": "spawn1" },
+    "2": { "level": 0, "surface": "floor", "marker": "spawn2" }
+  },
+  "_coords": "Paint the rock coordinates 1-16 along the board's edges (player 1's x and y; upside down on player 2's sides).",
+  "coords": true,
+  "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/volcano-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py: volcanic sand on the ground, hexagonal basalt column tops on the ridge, basalt columns on every cliff, glowing lava.",
+  "textures": {
+    "floor": { "images": ["textures/sand1.png", "textures/sand2.png"], "span": 1, "vary": true },
+    "high": { "image": "textures/basalt-top.png", "span": 4 },
+    "lava": { "image": "textures/lava.png", "span": 2, "vary": true },
+    "walls": { "image": "textures/basalt-wall.png", "outer": true }
+  },
+  "palette": {
+    "floor": "#4B4440",
+    "high": "#4A4A4E",
+    "lava": "#F07A1E",
+    "cliff": "#46464A",
+    "base": "#2E2A28",
+    "fall": "#D2392C"
+  }
+}
