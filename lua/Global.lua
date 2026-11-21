@@ -144,9 +144,15 @@ end
 local function readSavedState(saved)
   local texts = {}
   if saved and saved:sub(1, #STATE_MARK) == STATE_MARK then
-    for part in (saved .. STATE_SEP):gmatch("(.-)" .. STATE_SEP) do
-      local key, text = part:match("^(%a+)=(.*)$")
-      if key and text ~= "" then texts[key] = text end
+    -- split with plain find/sub: TTS's Lua gives up on patterns over text this size ("pattern too complex")
+    local pos = #STATE_MARK + 1
+    while pos <= #saved do
+      local s, e = saved:find(STATE_SEP, pos, true)
+      local part = saved:sub(pos, (s or #saved + 1) - 1)
+      local eq = part:find("=", 1, true)
+      if eq and eq > 1 and eq < #part then texts[part:sub(1, eq - 1)] = part:sub(eq + 1) end
+      if not s then break end
+      pos = e + 1
     end
   elseif saved and saved:sub(1, 1) == "{" then   -- an older save: decoded tables (slow, but only once)
     local ok, old = pcall(JSON.decode, saved)
@@ -156,7 +162,11 @@ local function readSavedState(saved)
 end
 
 function onLoad(saved)
-  local texts = readSavedState(saved)
+  local ok, texts = pcall(readSavedState, saved)
+  if not ok then   -- a bad saved copy must never stop the load: the downloads still come in
+    log("Couldn't read the saved copies (" .. tostring(texts) .. "); downloading fresh ones.")
+    texts = {}
+  end
   for key, text in pairs(texts) do
     if key ~= "legacy" then rememberData(key, text) end
   end

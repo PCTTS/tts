@@ -392,7 +392,12 @@ def main():
     f.menu[2].fn("Blue")
     check(f.memo == "" and f.tint.r == 0.6 and f.desc.startswith("Neutral."), "Make neutral resets it")
 
-    # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them
+    # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them.
+    # TTS's Lua (MoonSharp) fails "pattern too complex" on patterns over text this size (real Lua doesn't), so the
+    # reader of the saved text must not use patterns at all.
+    reader = re.search(r"local function readSavedState\(saved\)(.*?)\nend\n", src, re.S).group(1)
+    check(not re.search(r"g?match\(|gsub\(|:find\([^)]*\)(?<!true\))", reader.split("elseif")[0]),
+          "the saved-text reader splits with plain find/sub (no Lua patterns on 280 KB of text)")
     saved = g.onSave()
     check(saved.startswith("PCTTS-STATE-1") and len(saved) > 100000 and '"Charizard"' in saved,
           f"the save holds the downloaded roster, cards and stats as text ({len(saved) // 1024} KB)")
