@@ -334,11 +334,15 @@ def main():
     spin = next(e for e in root_hp.iter() if e.get("id") == "hpSpin")
     front = next(e for e in root_hp.iter() if e.get("id") == "hpF")
     back = next(e for e in root_hp.iter() if e.get("id") == "hpB")
-    check(spin.get("rotation") == "0 0 90" and "White" in front.get("visibility") and "Grey" in front.get("visibility")
+    spin_b = next(e for e in root_hp.iter() if e.get("id") == "hpSpinB")
+    check(spin.get("rotation") == "0 0 90" and spin_b.get("rotation") == "0 0 270"
+          and "White" in front.get("visibility") and "Grey" in front.get("visibility")
           and "Green" in back.get("visibility") and "White" not in back.get("visibility"),
-          "the labels turn with the figure's yaw (90) and each side of the table sees only its own")
+          "the labels turn with the figure's yaw (90), back to back, and each side of the table sees only its own")
+    check(front.get("rotation") == back.get("rotation") == "-40 0 0", "both labels lean back toward the sky (never mirrored from above)")
     g.onObjectRotate(h, 180)
-    check(h.ui.attrs["hpSpin.rotation"] == "0 0 180", "turning the figure turns the labels back to face the sides")
+    check(h.ui.attrs["hpSpin.rotation"] == "0 0 180" and h.ui.attrs["hpSpinB.rotation"] == "0 0 360",
+          "turning the figure turns the labels back to face the sides")
 
     def hp():
         return json.loads(h.memo)["hp"]

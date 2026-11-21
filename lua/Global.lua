@@ -842,6 +842,7 @@ end
 -- Current and max HP live in the figure's memo; the max comes from the sheet (data/pokemon.json).
 ----------------------------------------------------------------------------------------------------
 HP_HEIGHT = -255        -- object UI units (100 = one world unit; up is -z): just above a standee's art
+HP_LEAN = "-40 0 0"     -- a label's tilt: "-90 0 0" stands it up facing the player, "-40 0 0" leans it back 50 degrees
 HP_COLOR, HP_FAINTED = "#FFFFFF", "#FF6B6B"
 
 function maxHp(name)
@@ -874,11 +875,18 @@ end
 
 -- The labels hang from a "spinner" turned by the figure's own yaw, so they keep facing the two long sides of the
 -- table whichever way the Pokémon faces (an input box under 50 high hides its text).
+local function spinXml(id, yaw)
+  return string.format('<Panel id="%s" position="0 0 %d" rotation="0 0 %d" width="10" height="10" color="#00000000">\n',
+    id, HP_HEIGHT, yaw)
+end
+
+-- Each label is leaned back toward the sky (HP_LEAN), so from anywhere above the table you see its front:
+-- from the ends of the table it reads turned on its side, but never mirrored. The far side's label is the
+-- same label on a second spinner turned 180 degrees.
 local function hpXml(obj, hp, max)
-  return string.format('<Panel id="hpSpin" position="0 0 %d" rotation="0 0 %d" width="10" height="10" color="#00000000">\n',
-      HP_HEIGHT, math.floor(obj.getRotation().y + 0.5))
-    .. hpLabelXml(obj.guid, "F", "-90 0 0", seatsOn("south", { "Grey", "Black" }), hp, max)
-    .. hpLabelXml(obj.guid, "B", "90 0 0", seatsOn("north"), hp, max)
+  local yaw = math.floor(obj.getRotation().y + 0.5)
+  return spinXml("hpSpin", yaw) .. hpLabelXml(obj.guid, "F", HP_LEAN, seatsOn("south", { "Grey", "Black" }), hp, max)
+    .. "</Panel>\n" .. spinXml("hpSpinB", yaw + 180) .. hpLabelXml(obj.guid, "B", HP_LEAN, seatsOn("north"), hp, max)
     .. "</Panel>\n"
 end
 
@@ -899,7 +907,9 @@ end
 -- Keep a Pokémon's labels facing the table's sides after it's turned or put down.
 function turnHp(obj, yaw)
   if obj and obj.hasTag("Pokemon") then
-    obj.UI.setAttribute("hpSpin", "rotation", "0 0 " .. math.floor((yaw or obj.getRotation().y) + 0.5))
+    local y = math.floor((yaw or obj.getRotation().y) + 0.5)
+    obj.UI.setAttribute("hpSpin", "rotation", "0 0 " .. y)
+    obj.UI.setAttribute("hpSpinB", "rotation", "0 0 " .. (y + 180))
   end
 end
 
