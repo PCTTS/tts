@@ -1,8 +1,10 @@
 """Build a 3D board for an arena from its map data: an OBJ model (every tile a block at its level) and its texture.
 
-Usage:  python -I tools/build_board.py arenas/<name> [--out DIR] [--tag TAG]
+Usage:  python -I tools/build_board.py arenas/<name> [--out DIR] [--tag TAG] [--tile SIZE]
 Writes <out>/board-<tag>.obj and <out>/board-<tag>.jpg (defaults: the arena's folder, tag "v1"), plus
 <out>/board-<tag>.json describing the geometry (tile size, levels) for the TTS script.
+
+--tile sets the tile size in world units (default 2.35); level heights and the base scale with it.
 
 World layout (TTS units): the grid is centred on x = z = 0, row 0 is the far side (+z), the model's underside
 is y = 0. Tiles outside the arena ("void") get no geometry, so the board has the arena's real outline.
@@ -13,9 +15,9 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
-TILE = 2.35       # world units per tile (matches the old snap grid)
-LEVEL_H = 0.7     # height of one level step
-FLOOR0 = 0.3      # top of level 0 above the board's underside
+TILE = 2.35       # world units per tile (matches the old snap grid); --tile changes it
+LEVEL_H = 0.7     # height of one level step at TILE 2.35 (scales with the tile size)
+FLOOR0 = 0.3      # top of level 0 above the board's underside at TILE 2.35 (scales too)
 PX = 128          # texture pixels per tile
 SS = 2            # supersampling for the texture art
 STRIP = 256       # texture rows under the tile area, used for the walls
@@ -253,6 +255,10 @@ def main(argv):
     folder = Path(argv[0])
     out = Path(argv[argv.index("--out") + 1]) if "--out" in argv else folder
     tag = argv[argv.index("--tag") + 1] if "--tag" in argv else "v1"
+    if "--tile" in argv:
+        global TILE, LEVEL_H, FLOOR0
+        k = float(argv[argv.index("--tile") + 1]) / TILE
+        TILE, LEVEL_H, FLOOR0 = TILE * k, LEVEL_H * k, FLOOR0 * k
     out.mkdir(parents=True, exist_ok=True)
     a = Arena(folder)
     mesh = build_mesh(a)
