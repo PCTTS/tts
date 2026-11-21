@@ -105,7 +105,23 @@ def sparkle(d):
     d.polygon([(x * K, y * K) for x, y in star(102, 24, 20, 6)], fill=255)
 
 
-SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords, "ability": sparkle}
+def die(d):
+    """Shuffle the portals: a die showing five (the same from either side of the table)."""
+    d.rounded_rectangle(P(10, 10, 118, 118), radius=20 * K, outline=255, width=round(STROKE * K))
+    for x, y in ((38, 38), (90, 38), (64, 64), (38, 90), (90, 90)):
+        d.ellipse(P(x - 10, y - 10, x + 10, y + 10), fill=255)
+
+
+def updown(d):
+    """Raise / drop the bridges: an up arrow beside a down arrow (the same from either side of the table)."""
+    for x, sy in ((40, 1), (88, -1)):
+        tip, base = 64 - 52 * sy, 64 + 52 * sy
+        d.line(P(x, base, x, tip + 22 * sy), fill=255, width=round(STROKE * K))
+        d.polygon(P(x, tip, x - 22, tip + 30 * sy, x + 22, tip + 30 * sy), fill=255)
+
+
+SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords, "ability": sparkle,
+          "die": die, "updown": updown}
 
 
 def render(shape, size=N, ss=SS):
@@ -124,8 +140,12 @@ def white(mask):
 
 
 if __name__ == "__main__":
+    import sys
     OUT.mkdir(parents=True, exist_ok=True)
+    only = sys.argv[1:]   # icon names to draw (default: all of them)
     for name, shape in SHAPES.items():
+        if only and name not in only:
+            continue
         path = OUT / f"{name}-{VERSION}.png"
         white(render(shape)).save(path)
         print("wrote", path.relative_to(OUT.parent.parent))
