@@ -1,8 +1,11 @@
 """Build the table props: the slanted team stand (pedestals on top, item/skill cards on the slope) and a pillar.
 
 Usage:  python -I tools/build_props.py
-Writes props/stand-v1.obj (+ its solid collider props/stand-collider-v1.obj), props/pillar-v2.obj, props/props-v1.jpg (shared texture) and props/stand-v1.json
-(slot positions the TTS script uses: pedestals on top, two card slots per pedestal on the slope).
+Writes props/stand-v2.obj (+ its solid collider props/stand-collider-v1.obj) with its dark wood texture
+props/stand-wood-v1.jpg, props/pillar-v2.obj with props/props-v1.jpg, and props/stand-v1.json (slot positions the
+TTS script uses: pedestals on top, two card slots per pedestal on the slope; the geometry is unchanged since v1).
+Published files are only written when missing: bump a file's version when what it holds changes (TTS caches by
+link). stand-v1.obj (the light stand on props-v1.jpg) stays published for saves made before the wood.
 
 Stand, in its own frame (as placed on the near/south trim): the back face (toward the board) is z = 0 and the
 stand extends toward -z (toward the player); y = 0 is the table top. Cross-section: a flat top for the
@@ -12,6 +15,7 @@ The far/north stand is the same model turned 180 degrees.
 import json, math, sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageChops, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -31,6 +35,13 @@ PILLAR_H, SEG = 2.6, 96          # pillar height (level with the stand top), seg
 TEX_W, TEX_H = 1024, 256         # texture: four 256px regions
 REGIONS = {"top": 0, "slope": 1, "side": 2, "pillar": 3}
 COLOURS = {"top": "#CDB38A", "slope": "#BFA27A", "side": "#8E6C48", "pillar": "#B39572"}
+# The stand's dark wood, made to look like the custom table's frame (our own texture, not TTS's file). Every face
+# gets wood at the same scale, grain along the stand's length: the faces are laid out as strips across the texture.
+WOOD_W, WOOD_H, WOOD_SEED = 4096, 2048, 7
+WOOD_BASE, WOOD_LIGHT, WOOD_DARK = (40, 20, 11), (80, 44, 27), (19, 9, 5)
+WOOD_GRAIN, WOOD_CONTRAST = 1.0, 1.25            # streak width (x the finest), streak strength
+WOOD_PAD = 0.1                                  # wood (in units) between neighbouring faces in the texture
+PPU = WOOD_W / (LENGTH + 2 * WOOD_PAD)          # texture pixels per unit
 
 
 def region_uv(name, fu, fv):
@@ -43,6 +54,31 @@ def face(m, name, corners, normal):
     m.quad(corners, [region_uv(name, 0, 0), region_uv(name, 1, 0), region_uv(name, 1, 1), region_uv(name, 0, 1)], normal)
 
 
+def wood_rows():
+    """Where each stand face's strip starts in the wood texture (units from the top), in layout order."""
+    sizes = [("top", TOP_D), ("slope", math.hypot(RUN, TOP_H - LOW_H)), ("back", TOP_H), ("front", LOW_H + LIP_H),
+             ("lip_in", LIP_H), ("lip_top", LIP_W), ("cap", TOP_H)]
+    rows, v = {}, WOOD_PAD
+    for name, size in sizes:
+        rows[name] = v
+        v += size + WOOD_PAD
+    assert v * PPU <= WOOD_H, "the stand's faces don't fit in the wood texture"
+    return rows
+
+
+ROWS = wood_rows()
+
+
+def wood_uv(row, a, b):
+    """a units along the grain, b units across it, within a face's strip -> texture UV."""
+    return ((WOOD_PAD + a) * PPU / WOOD_W, 1 - (ROWS[row] + b) * PPU / WOOD_H)
+
+
+def wood_face(m, row, corners, normal, width):
+    """A face along the whole stand: corners 0-1 are one long edge, 2-3 the other, `width` units apart."""
+    m.quad(corners, [wood_uv(row, 0, 0), wood_uv(row, LENGTH, 0), wood_uv(row, LENGTH, width), wood_uv(row, 0, width)], normal)
+
+
 def stand():
     m = StandeeMesh()
     x0, x1 = -LENGTH / 2, LENGTH / 2
@@ -52,20 +88,23 @@ def stand():
     slope_n = (0, RUN, -(TOP_H - LOW_H))
     ln = math.hypot(slope_n[1], slope_n[2])
     slope_n = (0, slope_n[1] / ln, slope_n[2] / ln)
-    face(m, "top", [(x0, TOP_H, 0), (x1, TOP_H, 0), (x1, TOP_H, zc), (x0, TOP_H, zc)], (0, 1, 0))
-    face(m, "slope", [(x0, TOP_H, zc), (x1, TOP_H, zc), (x1, LOW_H, zd), (x0, LOW_H, zd)], slope_n)
-    face(m, "side", [(x0, LOW_H, zd), (x1, LOW_H, zd), (x1, yl, zd), (x0, yl, zd)], (0, 0, 1))       # lip, inner
-    face(m, "top", [(x0, yl, zd), (x1, yl, zd), (x1, yl, ze), (x0, yl, ze)], (0, 1, 0))              # lip, top
-    face(m, "side", [(x0, yl, ze), (x1, yl, ze), (x1, 0, ze), (x0, 0, ze)], (0, 0, -1))              # front
-    face(m, "side", [(x0, 0, 0), (x1, 0, 0), (x1, TOP_H, 0), (x0, TOP_H, 0)], (0, 0, 1))             # back
-    face(m, "side", [(x0, 0, ze), (x1, 0, ze), (x1, 0, 0), (x0, 0, 0)], (0, -1, 0))                  # bottom
-    # end caps: the main body (a convex pentagon, as a fan) plus the lip block
+    wood_face(m, "top", [(x0, TOP_H, 0), (x1, TOP_H, 0), (x1, TOP_H, zc), (x0, TOP_H, zc)], (0, 1, 0), TOP_D)
+    wood_face(m, "slope", [(x0, TOP_H, zc), (x1, TOP_H, zc), (x1, LOW_H, zd), (x0, LOW_H, zd)], slope_n, math.hypot(RUN, TOP_H - LOW_H))
+    wood_face(m, "lip_in", [(x0, yl, zd), (x1, yl, zd), (x1, LOW_H, zd), (x0, LOW_H, zd)], (0, 0, 1), LIP_H)
+    wood_face(m, "lip_top", [(x0, yl, zd), (x1, yl, zd), (x1, yl, ze), (x0, yl, ze)], (0, 1, 0), LIP_W)
+    wood_face(m, "front", [(x0, yl, ze), (x1, yl, ze), (x1, 0, ze), (x0, 0, ze)], (0, 0, -1), yl)
+    wood_face(m, "back", [(x0, TOP_H, 0), (x1, TOP_H, 0), (x1, 0, 0), (x0, 0, 0)], (0, 0, 1), TOP_H)
+    wood_face(m, "top", [(x0, 0, ze), (x1, 0, ze), (x1, 0, 0), (x0, 0, 0)], (0, -1, 0), TOP_D)  # bottom (never seen)
+    # end caps: the main body (a convex pentagon, as a fan) plus the lip block; grain runs front to back
+    def cap_uv(p):
+        return wood_uv("cap", -p[2], TOP_H - p[1])
     for x, nx in ((x0, -1), (x1, 1)):
         body = [(x, 0, 0), (x, TOP_H, 0), (x, TOP_H, zc), (x, LOW_H, zd), (x, 0, zd)]
         for a, b in ((1, 2), (2, 3), (3, 4)):
-            uv = [region_uv("side", 0.5, 0.5)] * 3
-            m.tri([body[0], body[a], body[b]], uv, (nx, 0, 0))
-        face(m, "side", [(x, 0, zd), (x, yl, zd), (x, yl, ze), (x, 0, ze)], (nx, 0, 0))
+            tri = [body[0], body[a], body[b]]
+            m.tri(tri, [cap_uv(p) for p in tri], (nx, 0, 0))
+        block = [(x, 0, zd), (x, yl, zd), (x, yl, ze), (x, 0, ze)]
+        m.quad(block, [cap_uv(p) for p in block], (nx, 0, 0))
     return m
 
 
@@ -149,6 +188,39 @@ def texture():
     return ImageChops.add(img, Image.effect_noise((TEX_W, TEX_H), 8).convert("RGB"), 1.0, -128)
 
 
+def smooth_noise(rng, w, h, cells_w, cells_h):
+    """Random values on a (cells_w x cells_h) grid, smoothly stretched to w x h; roughly -1..1."""
+    cells = (rng.random((max(2, cells_h), max(2, cells_w))) * 255).astype(np.uint8)
+    return np.asarray(Image.fromarray(cells, "L").resize((w, h), Image.BICUBIC), dtype=np.float32) / 127.5 - 1
+
+
+def wood_texture(w=WOOD_W, h=WOOD_H):
+    """Straight-grained dark wood, grain running left to right: fine streaks that drift in strength along the
+    grain, broad lighter/darker bands, a few long distinct streaks, and a gentle wave. Seeded: rebuilds match."""
+    rng = np.random.default_rng(WOOD_SEED)
+    pad = 64 * 2
+    hh = h + 2 * pad                                   # room for the wave
+    g = WOOD_GRAIN
+
+    def across(n):                                     # noise cells across the grain for n-px streaks
+        return max(2, round(hh / (n * g)))
+    field = (smooth_noise(rng, w, hh, w // 300, across(3)) * 0.42 + smooth_noise(rng, w, hh, w // 120, across(6)) * 0.22
+             + smooth_noise(rng, w, hh, w // 25, across(2)) * 0.08 + smooth_noise(rng, w, hh, w // 800, across(24)) * 0.38)
+    y = np.arange(hh, dtype=np.float32)[:, None]
+    for _ in range(round(hh / (45 * g))):
+        centre, width = rng.uniform(0, hh), rng.uniform(0.8, 2.2) * g
+        sign = 1 if rng.random() < 0.6 else -1
+        strength = np.clip(smooth_noise(rng, w, 1, max(2, w // 900), 1)[0] + 0.3, 0, None) * rng.uniform(0.4, 0.9)
+        field += sign * np.exp(-((y - centre) / width) ** 2) * strength[None, :]
+    wave = (smooth_noise(rng, w, 1, w // 500, 1)[0] * 5 + smooth_noise(rng, w, 1, w // 120, 1)[0] * 1.5) * g
+    rows = np.clip((np.arange(h)[:, None] + pad + wave[None, :]).round().astype(int), 0, hh - 1)
+    f = field[rows, np.arange(w)[None, :]] * WOOD_CONTRAST
+    t = np.clip(np.sign(f) * np.abs(f) ** 1.3, -1, 1)[..., None]
+    base, light, dark = (np.array(c, np.float32) for c in (WOOD_BASE, WOOD_LIGHT, WOOD_DARK))
+    col = np.where(t > 0, base + (light - base) * t * 0.85, base + (dark - base) * -t * 0.9)
+    return Image.fromarray(np.clip(col, 0, 255).astype(np.uint8), "RGB")
+
+
 def slots():
     """Slot positions in the stand's frame. Card rotation is (0, yaw, tilt): the card is turned a quarter so it
     lies landscape, then tilted to the slope (see Global.lua for the yaw)."""
@@ -166,10 +238,17 @@ def slots():
 
 def main():
     OUT.mkdir(exist_ok=True)
-    stand().write(OUT / "stand-v1.obj")
-    stand_collider().write(OUT / "stand-collider-v1.obj")
-    pillar().write(OUT / "pillar-v2.obj")
-    texture().save(OUT / "props-v1.jpg", quality=92)
+    files = {
+        "stand-v2.obj": lambda p: stand().write(p),
+        "stand-collider-v1.obj": lambda p: stand_collider().write(p),
+        "stand-wood-v1.jpg": lambda p: wood_texture().save(p, quality=90),
+        "pillar-v2.obj": lambda p: pillar().write(p),
+        "props-v1.jpg": lambda p: texture().save(p, quality=92),
+    }
+    for name, make in files.items():
+        if not (OUT / name).exists():
+            make(OUT / name)
+            print("wrote props/" + name)
     info = slots()
     (OUT / "stand-v1.json").write_text(json.dumps(info, indent=1), encoding="utf-8")
     print(json.dumps(info))
