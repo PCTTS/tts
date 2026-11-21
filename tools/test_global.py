@@ -267,7 +267,7 @@ def main():
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/ingis/board-v1.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/ingis/board-v2.obj")
           and len(zones) == 3 and len(kinds) == 4 and all(abs(z.data.ColorDiffuse.r - 0.6) < 1e-6 for z in zones)
           and str(calls.tableURL).endswith("misc/volcano-placeholder-v1.jpg"),
           "picking Ingis: its board, 3 neutral capture zone frames and the volcanic table")

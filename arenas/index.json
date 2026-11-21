@@ -835,8 +835,8 @@
   ]
  },
  "Ingis": {
-  "mesh": "arenas/ingis/board-v1.obj",
-  "texture": "arenas/ingis/board-v1.jpg",
+  "mesh": "arenas/ingis/board-v2.obj",
+  "texture": "arenas/ingis/board-v2.jpg",
   "table": "misc/volcano-placeholder-v1.jpg",
   "snaps": [
    [

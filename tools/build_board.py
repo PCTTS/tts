@@ -75,6 +75,10 @@ class Arena:
         """A tile's surface height ("sink" lowers the look only: rules-wise it stays at its level)."""
         return self.floor0() + t.get("level", 0) * LEVEL_H - t.get("sink", 0.0)
 
+    def level_top(self, t):
+        """The height of a tile's level (ignoring "sink")."""
+        return self.floor0() + t.get("level", 0) * LEVEL_H
+
     def y_span(self):
         """The model's full height (the highest tile top)."""
         return self.floor0() + self.max_level * LEVEL_H
@@ -247,6 +251,25 @@ def draw_texture(a):
                     o.line([(x0 + band - i, y0t), (x0 + band - i, y0t + p)], fill=(30, 18, 8, alpha))
                 if "E" in sloped:
                     o.line([(x0 + p - band + i, y0t), (x0 + p - band + i, y0t + p)], fill=(30, 18, 8, alpha))
+    for r in range(a.R):   # inner corners: the same darkening around the corner point
+        for c in range(a.C):
+            inner = inner_corners(a, r, c) if a.tile(r, c) else {}
+            if not inner:
+                continue
+            band = a.tile(r, c)["slant"] / TILE * p
+            for corner in inner:
+                cx = c * p + (p if corner[1] == "E" else 0)
+                cy = r * p + (0 if corner[0] == "N" else p)
+                bx0, by0 = int(cx - (band if corner[1] == "E" else 0)), int(cy - (0 if corner[0] == "N" else band))
+                size = int(math.ceil(band))
+                yy, xx = np.mgrid[by0:by0 + size, bx0:bx0 + size].astype(np.float32) + 0.5
+                t = np.clip(1 - np.hypot(xx - cx, yy - cy) / band, 0, 1)
+                alpha = np.round(70 * t ** 1.5).astype(np.uint8)
+                region = np.array(over.crop((bx0, by0, bx0 + size, by0 + size)))
+                on = alpha > 0
+                region[on] = np.concatenate([np.broadcast_to(np.array([30, 18, 8], np.uint8), (int(on.sum()), 3)),
+                                             alpha[on][:, None]], axis=1)
+                over.paste(Image.fromarray(region, "RGBA"), (bx0, by0))
     if a.data.get("coords"):
         draw_coords(over, a, p)
     for r, c, side in a.data.get("edges", {}).get("fall", []):
@@ -320,6 +343,8 @@ def grass_fringe(a, img, layers, p):
             yy, xx = np.mgrid[0:p, 0:p].astype(np.float32) + 0.5
             dists = {"N": yy, "S": p - yy, "W": xx, "E": p - xx}
             d = np.minimum.reduce([dists[s] for s in sloped])
+            for corner in inner_corners(a, r, c):   # and around inner corners
+                d = np.minimum(d, np.hypot(xx - (p if corner[1] == "E" else 0), yy - (0 if corner[0] == "N" else p)))
             reach = edge_at(x0 + xx, y0 + yy)
             soft = min(3 * SS, max(1.0, 0.5 * float(reach.mean())))   # a thin fringe gets a crisper edge
             alpha = np.clip((reach - d) / soft + 0.5, 0, 1)[..., None]
@@ -482,12 +507,16 @@ def build_mesh(a):
             u0, u1 = (c * PX + 1) / W, ((c + 1) * PX - 1) / W
             v0, v1 = 1 - (r * PX + 1) / H, 1 - ((r + 1) * PX - 1) / H
             sloped = slopes(a, r, c)
-            if not sloped:
+            inner = inner_corners(a, r, c)
+
+            def tuv(px, pz):   # the tile's texture seen from above, so the slopes show its edge band
+                return u0 + (px - x0) / (x1 - x0) * (u1 - u0), v0 + (z0 - pz) / (z0 - z1) * (v1 - v0)
+            if not sloped and not inner:
                 m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
                        [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
+            elif inner:   # a finer surface: straight slopes along low sides, a rounded dip into each inner corner
+                slope_surface(m, t, top, (x0, x1, z0, z1), sloped, inner, tuv)
             else:   # the top shrinks in on those sides; each slope runs from its edge down to the tile's edge
-                def tuv(px, pz):   # the tile's texture seen from above, so the slopes show its edge band
-                    return u0 + (px - x0) / (x1 - x0) * (u1 - u0), v0 + (z0 - pz) / (z0 - z1) * (v1 - v0)
                 w = {s: (t["slant"] if s in sloped else 0.0) for s in DIRS}
                 tx0, tx1, tz0, tz1 = x0 + w["W"], x1 - w["E"], z0 - w["N"], z1 + w["S"]
                 corners = [(tx0, tz0), (tx1, tz0), (tx1, tz1), (tx0, tz1)]
@@ -509,7 +538,8 @@ def build_mesh(a):
             for side, (dr, dc, normal) in DIRS.items():
                 nb = a.tile(r + dr, c + dc)
                 low = a.top(nb) if nb else (a.rim() if a.float else 0.0)
-                if low >= top or side in sloped:
+                wall_top = sloped.get(side, top)   # under a slope: the step from its bottom down to a sunken neighbour
+                if low >= wall_top:
                     continue
                 if side == "N":
                     edge = [(x0, z0), (x1, z0)]
@@ -522,41 +552,86 @@ def build_mesh(a):
                 (ax, az), (bx, bz) = edge
                 half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
                 us = (((r * 5 + c * 3 + len(side)) % half) + (half if nb else 0)) * PX
-                m.quad([(ax, top, az), (bx, top, bz), (bx, low, bz), (ax, low, az)],
-                       [wall_uv(us, top), wall_uv(us + PX - 1, top), wall_uv(us + PX - 1, low), wall_uv(us, low)], normal)
+                m.quad([(ax, wall_top, az), (bx, wall_top, bz), (bx, low, bz), (ax, low, az)],
+                       [wall_uv(us, wall_top), wall_uv(us + PX - 1, wall_top), wall_uv(us + PX - 1, low), wall_uv(us, low)],
+                       normal)
     if a.float:
         underside(a, m, wall_uv)
     return m
 
 
 def slopes(a, r, c):
-    """A tile with "slant": w slopes down to lower land on its sides instead of a wall: {side: the neighbour's top}.
-    The slope sits inside the tile (the top shrinks by w on that side), so its neighbours stay flat. Supported
-    shapes: a raised area whose tiles all share the same slant, without inner (concave) corners and not next to
-    the sky; anything else stops the build rather than leave holes."""
+    """A tile with "slant": w slopes down to lower land on its sides instead of a wall: {side: the bottom of the
+    slope}, which is the neighbour's level (a sunken neighbour, like lava, gets a short wall below that). The slope
+    sits inside the tile (the top shrinks by w on that side), so its neighbours stay flat. Inner corners (a lower
+    diagonal neighbour, both sides beside it at this tile's level) dip down too: see inner_corners(). Supported:
+    raised areas whose tiles all share the same slant, one level step, not next to the sky (else the build stops)."""
     t = a.tile(r, c)
     w = t.get("slant", 0)
     if not w:
         return {}
-    top, out = a.top(t), {}
+    level, out = t.get("level", 0), {}
     for side, (dr, dc, _) in DIRS.items():
         nb = a.tile(r + dr, c + dc)
         where = f"slanted tile row {r} col {c}"
         if nb is None:
             sys.exit(f"{where}: slopes next to the sky aren't supported")
-        if a.top(nb) < top:
-            out[side] = a.top(nb)
-        elif a.top(nb) == top and nb.get("slant", 0) != w:
-            sys.exit(f"{where}: neighbours at the same height need the same slant")
-    lows = set(out.values())
-    if len(lows) > 1:
-        sys.exit(f"slanted tile row {r} col {c}: all its lower neighbours must be the same height")
+        if nb.get("level", 0) < level:
+            out[side] = a.level_top(nb)
+        elif nb.get("level", 0) == level and nb.get("slant", 0) != w:
+            sys.exit(f"{where}: neighbours at the same level need the same slant")
+    if len(set(out.values()) | set(inner_corners(a, r, c).values())) > 1:
+        sys.exit(f"slanted tile row {r} col {c}: all its lower neighbours must be one level")
+    return out
+
+
+def inner_corners(a, r, c):
+    """A slanted tile's inner (concave) corners: {"NE"/"NW"/"SE"/"SW": the bottom of the dip}, where the diagonal
+    neighbour is lower but both sides beside it are not."""
+    t = a.tile(r, c)
+    if not (t and t.get("slant")):
+        return {}
+    level, out = t.get("level", 0), {}
     for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
         diag = a.tile(r + dr, c + dc)
-        sides = ("N" if dr < 0 else "S", "W" if dc < 0 else "E")
-        if diag and a.top(diag) < top and not any(s in out for s in sides):
-            sys.exit(f"slanted tile row {r} col {c}: inner (concave) corners aren't supported")
+        beside = (a.tile(r + dr, c), a.tile(r, c + dc))
+        if diag and diag.get("level", 0) < level and all(b and b.get("level", 0) >= level for b in beside):
+            out[("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")] = a.level_top(diag)
     return out
+
+
+def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4):
+    """A slanted tile as a grid of triangles: the height at a point is the lowest that any of its low features
+    allows: straight slopes inward from each low side, a round dip (a quarter cone) around each inner corner, each
+    reaching the top `slant` in. The grid has lines `steps` apart across each slope band, so a hip crease or the
+    top of a slope falls on grid lines; each cell is split along whichever diagonal follows the surface better."""
+    x0, x1, z0, z1 = box
+    w = t["slant"]
+    corner_pts = {"NW": (x0, z0), "NE": (x1, z0), "SW": (x0, z1), "SE": (x1, z1)}
+
+    def height(px, pz):
+        h = top
+        for side, base in sloped.items():
+            d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
+            h = min(h, top - (top - base) * max(0.0, 1 - d / w))
+        for corner, base in inner.items():
+            cx, cz = corner_pts[corner]
+            h = min(h, top - (top - base) * max(0.0, 1 - math.hypot(px - cx, pz - cz) / w))
+        return h
+
+    xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
+    zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
+                reverse=True)
+    for i in range(len(xs) - 1):
+        for j in range(len(zs) - 1):
+            pts = [(xs[i], zs[j]), (xs[i + 1], zs[j]), (xs[i + 1], zs[j + 1]), (xs[i], zs[j + 1])]
+            v = [(px, height(px, pz), pz) for px, pz in pts]
+            mid = height((xs[i] + xs[i + 1]) / 2, (zs[j] + zs[j + 1]) / 2)
+            a_err = abs((v[0][1] + v[2][1]) / 2 - mid)   # split along 0-2, or along 1-3
+            b_err = abs((v[1][1] + v[3][1]) / 2 - mid)
+            tris = ((0, 1, 2), (0, 2, 3)) if a_err <= b_err else ((0, 1, 3), (1, 2, 3))
+            for tri in tris:
+                m.tri([v[k] for k in tri], [tuv(v[k][0], v[k][2]) for k in tri], down=False)
 
 
 def underside(a, m, wall_uv, S=4):
