@@ -47,7 +47,7 @@
     "floor": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "span": 1, "vary": true },
     "pit": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "span": 1, "vary": true, "match": true },
     "stairs": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "span": 1, "vary": true, "match": true },
-    "walls": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "vary": true, "match": "stairs" }
+    "walls": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "vary": true, "match": "pit" }
   },
   "palette": {
     "floor": "#D9BC8E",
