@@ -42,12 +42,12 @@
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/table-placeholder-v1.jpg",
-  "_textures": "Image textures for surfaces (paths relative to this folder; images = pick one at random per copy). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour (or a named palette entry). walls = the inner walls (where ground drops inside the board).",
+  "_textures": "Image textures for surfaces (paths relative to this folder; images = pick one at random per copy). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour (or a named palette entry). walls = the inner walls (where ground drops inside the board); outer = the board's outer edge too.",
   "textures": {
     "floor": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "span": 1, "vary": true },
     "pit": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "span": 1, "vary": true, "match": true },
     "stairs": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "span": 1, "vary": true, "match": true },
-    "walls": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "vary": true, "match": "pit" }
+    "walls": { "images": ["textures/dirt2.png", "textures/dirt5.png"], "vary": true, "match": "pit", "outer": true }
   },
   "palette": {
     "floor": "#D9BC8E",

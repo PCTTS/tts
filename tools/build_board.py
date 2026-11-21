@@ -148,7 +148,8 @@ def draw_texture(a):
                     base = a.palette[surface]
                     d.rectangle([box[0], box[1], box[2] - 1, box[3] - 1], fill=shade(base, rnd.uniform(0.96, 1.04)))
     # wall strip, below the tiles. Left half: rock with horizontal strata, darker toward the bottom (outer walls).
-    # Right half: the "walls" texture, if the map has one (inner walls); otherwise rock too.
+    # Right half: the "walls" texture, if the map has one (inner walls); otherwise rock too. With "outer": true
+    # in the walls texture, the left half (the board's outer edge) gets it as well.
     y0 = a.R * p
     for y in range(STRIP * SS):
         k = 0.78 + 0.22 * (1 - y / (STRIP * SS))
@@ -164,7 +165,8 @@ def draw_texture(a):
         tall = round(STRIP * SS * TILE / span)
         choices = texture_choices(a, wall_spec, "walls", p, tall)
         rnd = random.Random(f"{a.data.get('name')}/walls")
-        for i in range(a.C // 2, a.C):
+        first = 0 if wall_spec.get("outer") else a.C // 2   # "outer": the board's outer edge uses it too
+        for i in range(first, a.C):
             img.paste(rnd.choice(rnd.choice(choices)).crop((0, 0, p, STRIP * SS)), (i * p, y0))
     # fine grain everywhere
     noise = Image.effect_noise((W, H), 9).convert("RGB")
