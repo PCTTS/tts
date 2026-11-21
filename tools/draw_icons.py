@@ -64,6 +64,26 @@ def folded_map():
     save(m, "map")
 
 
+def swirl():
+    """Status effects: a dizzy spiral."""
+    import math
+    m, d = new_mask()
+    turns, r0, r1 = 2.2, 4, 56
+    steps = 400
+    pts = []
+    for i in range(steps + 1):
+        t = i / steps
+        a = t * turns * 2 * math.pi
+        r = r0 + (r1 - r0) * t
+        pts += [(64 + r * math.cos(a)) * K, (64 + r * math.sin(a)) * K]
+    d.line(pts, fill=255, width=round((STROKE - 1) * K), joint="curve")
+    end = pts[-2:]  # round the outer tip
+    rr = (STROKE - 1) * K / 2
+    d.ellipse([end[0] - rr, end[1] - rr, end[0] + rr, end[1] + rr], fill=255)
+    save(m, "status")
+
+
 if __name__ == "__main__":
     pokeball()
     folded_map()
+    swirl()
