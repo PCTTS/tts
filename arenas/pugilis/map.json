@@ -40,6 +40,8 @@
       [6, 8, "N"], [6, 9, "N"]
     ]
   },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/table-placeholder-v1.jpg",
   "palette": {
     "floor": "#D9BC8E",
     "pit": "#A9845A",

@@ -2,8 +2,8 @@
 
 Usage:  python -I tools/test_global.py
 Checks: the script compiles; onLoad builds well-formed UI XML with unique ids; search finds the right names;
-the search panel's result rows get text; spawning creates a figure with the right images; the map list
-reads names from a fake map board. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
+the search panel's result rows get text; spawning creates a figure (or a card in the player's hand) with the
+right images; the map list reads names from a fake map board; statuses arm, stack, replace and clear. (TTS's own Lua, MoonSharp, has quirks real Lua doesn't — still test in TTS.)
 """
 import json, re, sys, xml.etree.ElementTree as ET
 from pathlib import Path
@@ -34,7 +34,9 @@ UI = {
   getAttribute = function(id, k) return calls.attrs[id .. "." .. k] end,
   setValue = function(id, v) calls.values[id] = v end,
 }
-WebRequest = { get = function(url, cb) calls.url = url; cb({ is_error = false, text = ROSTER_JSON }) end }
+WebRequest = { get = function(url, cb)
+  cb({ is_error = false, text = url:find("cards/", 1, true) and CARDS_JSON or ROSTER_JSON })
+end }
 JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t) return py_json_encode(t) end }
 function print(s) calls.printed[#calls.printed + 1] = s end
 function printToAll(s) calls.printed[#calls.printed + 1] = s end
@@ -83,6 +85,7 @@ def main():
     g.py_json_decode = lambda s: to_lua(json.loads(s)) if s else None
     g.py_json_encode = lambda t: json.dumps(from_lua(t))
     g.ROSTER_JSON = (REPO / "figures" / "index.json").read_text(encoding="utf-8")
+    g.CARDS_JSON = (REPO / "cards" / "index.json").read_text(encoding="utf-8")
     lua.execute(PRELUDE)
 
     src = (REPO / "lua" / "Global.lua").read_text(encoding="utf-8")
@@ -111,11 +114,14 @@ def main():
         ids = [e.get("id") for e in root.iter() if e.get("id")]
         check(len(ids) == len(set(ids)), f"UI XML parses; {len(ids)} ids, all unique")
         bar = next(e for e in root.iter() if e.get("id") == "toolbar")
-        check((bar.get("width"), bar.get("height")) == ("38", "114"), f"toolbar is 38 x 114 ({bar.get('width')} x {bar.get('height')})")
+        check((bar.get("width"), bar.get("height")) == ("38", "190"), f"toolbar is 38 x 190 ({bar.get('width')} x {bar.get('height')})")
     except ET.ParseError as e:
         check(False, f"UI XML parses ({e})")
-    check(len(list(calls.assets.values())) == 3, "three toolbar icons registered")
-    check(any("roster: 704" in str(p) for p in calls.printed.values()), "roster downloaded (704 names)")
+    check(len(list(calls.assets.values())) == 5, "five toolbar icons registered")
+    printed = [str(p) for p in calls.printed.values()]
+    check(any("Pokémon: 704" in p for p in printed), "roster downloaded (704 names)")
+    check(any("Item cards: 246" in p for p in printed) and any("Warrior skill cards: 67" in p for p in printed),
+          "cards downloaded (246 items, 67 warrior skills)")
 
     # search
     names, _ = g.searchRoster("gard", 8)
@@ -126,13 +132,13 @@ def main():
 
     # panel rows get text
     player = lua.table_from({"color": "White"})
-    g.dexSearch(player, "char")
+    g.searchChanged(player, "char", "dexIn_White")
     check(calls.attrs["dexRes_White_1.text"] == "Charizard" and calls.attrs["dexRes_White_1.active"] == "true",
           "search panel row 1 shows 'Charizard'")
     check(calls.attrs["dexRes_White_8.active"] == "false", "unused rows hidden")
 
     # spawning
-    g.dexPick(player, "-1", "dexRes_White_1")
+    g.searchPick(player, "-1", "dexRes_White_1")
     spawned = calls.spawned[1]
     check(spawned is not None and spawned.data.Nickname == "Charizard"
           and spawned.data.CustomImage.ImageURL.endswith("figures/charizard.webp")
@@ -144,7 +150,7 @@ def main():
     lst = g.mapList()
     got = [(m.name, bool(m.current)) for m in lst.values()]
     check(got == [("Fontaine", False), ("Map 3", False), ("Terrera Mountain", True)], f"map list -> {got}")
-    g.toggleMaps(player)
+    g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false",
           "map button opens the map panel (and closes the search panel)")
 
@@ -159,7 +165,7 @@ def main():
     """)
     fig = g.fig
     player.broadcast = lambda *a: None
-    g.toggleStatus(player)
+    g.toolClick(player, "-1", "toolIcon_status")
     check(calls.attrs["status_White.active"] == "true", "swirl button opens the status panel")
     g.statusPick(player, "-1", "statusRes_White_burn")
     check(g.armed["White"] == "burn", "picking Burned arms it")
@@ -174,9 +180,32 @@ def main():
     g.statusPick(player, "-1", "statusRes_White_paralysis"); g.onObjectPickUp("White", fig)
     check(fig.desc == "Status: Paralyzed, Confused", "a new main status replaces the old one")
     g.statusPick(player, "-1", "statusRes_White_clear"); g.onObjectPickUp("White", fig)
-    check(fig.desc == "" and fig.tint.r == 1 and fig.tint.b == 1, "Clear all removes statuses and tint")
-    g.statusPick(player, "-1", "statusRes_White_drowsy"); g.toggleDex(player)
+    check(fig.desc == "" and fig.tint.r == 1 and fig.tint.b == 1, "Clear status returns it to normal (no statuses, no tint)")
+    check(any("is back to normal" in str(p) for p in calls.printed.values()), "clearing says it's back to normal")
+    g.statusPick(player, "-1", "statusRes_White_drowsy"); g.toolClick(player, "-1", "tool_dex")
     check(g.armed["White"] is None, "switching panels cancels a waiting status")
+
+    # cards: search items and skills, click a result -> a one-card custom deck dropped into the player's hand
+    g.toolClick(player, "-1", "tool_items")
+    check(calls.attrs["items_White.active"] == "true" and calls.attrs["dex_White.active"] == "false", "potion icon opens item search")
+    g.searchChanged(player, "sitrus", "itemsIn_White")
+    check(calls.attrs["itemsRes_White_1.text"] == "Sitrus Berry", "'sitrus' finds Sitrus Berry")
+    n = len(calls.spawned)
+    g.searchPick(player, "-1", "itemsRes_White_1")
+    card = calls.spawned[n + 1]
+    deck = card.data.CustomDeck if card else None
+    entry = deck and next(iter(deck.values()))
+    check(card is not None and card.data.Name == "CardCustom" and card.data.Nickname == "Sitrus Berry"
+          and "/cards/items/sitrus-berry-" in entry.FaceURL and entry.BackURL.endswith("cards/back-items-v1.jpg")
+          and card.data.CardID == int(next(iter(deck.keys()))) * 100, "clicking it spawns the Sitrus Berry card")
+    check(abs(card.position.x - 9.5) < 0.01 and abs(card.position.z - (-28.6)) < 0.01, "the card drops into White's hand")
+    check("1/2 hp" in card.data.Description, "the card's description is its effect")
+    g.searchChanged(player, "belief", "skillsIn_White")
+    g.searchPick(player, "-1", "skillsRes_White_1")
+    check(calls.spawned[n + 2].data.Nickname == "Belief" and calls.spawned[n + 2].data.Tags[1] == "WarriorSkill",
+          "warrior skill search spawns the Belief card")
+    g.searchPick(player, "-1", "itemsRes_White_1")
+    check(len(calls.spawned) == n + 2, "a stale click on the other panel's rows does nothing")
 
     print("\nall checks passed" if not failures else f"\n{len(failures)} check(s) failed")
     sys.exit(1 if failures else 0)

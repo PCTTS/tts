@@ -3,26 +3,45 @@ Source: https://github.com/PCTTS/tts (lua/Global.lua). Edit there, not in TTS.
 
 Toolbar (right edge of the screen), one panel open at a time, each player gets their own:
   * Pokéball: search the roster, click a result and that figure appears in front of your seat.
-  * Map:      pick which arena the board shows.
+  * Potion:   search the item cards, click one and it goes into your hand.
+  * Swords:   search the warrior skill cards, click one and it goes into your hand.
   * Swirl:    pick a status, then pick up a Pokémon to give it that status (it's tinted in the status's
               type colour). One main status at a time; Confused and Flinched can stack on top.
-Chat:  !spawn garchomp   spawns the best match (and lists close alternatives if unsure).
+              "Clear status" returns a Pokémon to normal.
+  * Map:      pick which arena the board shows.
+Chat:  !spawn garchomp   !item sitrus   !skill belief   spawn the best match (or list close alternatives).
 
-The roster comes from figures/index.json on the PCTTS site, so new Pokemon appear without editing the mod.
-The last roster loaded is kept in the save, so the spawner still works if the site can't be reached.
+The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
+game loads, so new Pokémon and changed cards appear without editing the mod. The last copies are kept in the
+save, so everything still works if the site can't be reached.
 --]]
 
 BASE_URL = "https://pctts.github.io/tts/"
-ROSTER_URL = BASE_URL .. "figures/index.json"
-ICONS = { pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png", status = "ui/icons/status-v3.png" }
+ICONS = {
+  pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png", status = "ui/icons/status-v3.png",
+  item = "ui/icons/item-v3.png", skill = "ui/icons/skill-v3.png",
+}
 -- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
 -- UI images it shrinks, so a much larger image looks jagged.
 BAR_ICON, BAR_MARGIN, BAR_GAP = 32, 3, 6
 TOOLS = {
-  { icon = "pokeball", tip = "Spawn a Pokémon", click = "toggleDex" },
-  { icon = "map", tip = "Choose the map", click = "toggleMaps" },
-  { icon = "status", tip = "Give a status", click = "toggleStatus" },
+  { kind = "dex", icon = "pokeball", tip = "Spawn a Pokémon" },
+  { kind = "items", icon = "item", tip = "Item cards" },
+  { kind = "skills", icon = "skill", tip = "Warrior skill cards" },
+  { kind = "status", icon = "status", tip = "Give a status" },
+  { kind = "maps", icon = "map", tip = "Choose the map" },
 }
+-- Searchable catalogues behind the search panels.
+SEARCH_KINDS = { "dex", "items", "skills" }
+CATALOGS = {
+  dex = { title = "Spawn a Pokémon", noun = "Pokémon", hint = "Click a result to place it in front of you." },
+  items = { title = "Item cards", noun = "item", hint = "Click a result to put the card in your hand.", deckBase = 1000, tag = "Item" },
+  skills = { title = "Warrior skill cards", noun = "warrior skill", hint = "Click a result to put the card in your hand.",
+    deckBase = 3000, tag = "WarriorSkill" },
+}
+ROSTER_URL = BASE_URL .. "figures/index.json"
+CARDS_URL = BASE_URL .. "cards/index.json"
+
 -- Statuses from the rules, each tinted with its type's colour. `strength` = how far the figure's tint moves
 -- from white toward that colour (default STATUS_TINT). Volatile ones can stack on a main status.
 STATUS_TINT = 0.6
@@ -41,20 +60,25 @@ for _, s in ipairs(STATUSES) do
   STATUS_BY_KEY[s.key] = s
   STATUS_ROWS[#STATUS_ROWS + 1] = s
 end
-STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear all statuses", color = "#9E9E9E" }
+STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear status", color = "#9E9E9E" }
+STATUS_HINT = "Pick a status, then pick up a Pokémon."
+
 FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
 MAX_MAPS = 16        -- rows in the map panel
 ROW_TEXT = "#111111" -- result rows: dark text on light grey (TTS can reset text colour when a row's text changes)
 ROW_STEP = 32        -- height of one result row plus spacing
-DEX_BASE = 108       -- search panel height with no results (title, search box, hint)
+SEARCH_BASE = 108    -- search panel height with no results (title, search box, hint)
 MAPS_BASE = 70       -- map panel height with no rows (title, hint)
+NO_SEAT_SPOT = { -35, 3, 0 }  -- where things appear for players without a seat: the strip left of the board
 COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
 
-roster = {}          -- name -> { front = "...", back = "..." } (paths relative to BASE_URL)
-rosterList = {}      -- sorted { name, key, words } for searching
-openPanel, dexHits, mapRows, spawnCount = {}, {}, {}, {}
+catalog = {}         -- kind -> { index = name -> data, list = sorted search entries, keys = name -> deck id }
+for _, k in ipairs(SEARCH_KINDS) do catalog[k] = { index = {}, list = {}, keys = {} } end
+roster = catalog.dex.index
+cardBacks = {}       -- kind -> back image path
+openPanel, searchHits, mapRows, spawnCount = {}, {}, {}, {}
 armed = {}           -- [colour] = status key waiting for that player to pick up a Pokémon
 
 ----------------------------------------------------------------------------------------------------
@@ -62,56 +86,67 @@ armed = {}           -- [colour] = status key waiting for that player to pick up
 ----------------------------------------------------------------------------------------------------
 function onLoad(saved)
   local state = (saved and saved ~= "") and JSON.decode(saved) or {}
-  if state.roster then setRoster(state.roster, "saved copy") end
+  if state.roster then setCatalog("dex", state.roster, "saved copy") end
+  if state.cards then setCards(state.cards, "saved copy") end
   buildUI()
-  fetchRoster()
+  fetchJSON(ROSTER_URL, "roster", function(index) setCatalog("dex", index, "downloaded") end)
+  fetchJSON(CARDS_URL, "cards", function(index) setCards(index, "downloaded") end)
 end
 
 function onSave()
-  return JSON.encode({ roster = roster })
+  return JSON.encode({ roster = catalog.dex.index, cards = savedCards })
 end
 
 function log(msg)
   print("[PCTTS] " .. msg)
 end
 
+function fetchJSON(url, what, onData)
+  WebRequest.get(url, function(req)
+    if req.is_error or not req.text or req.text == "" then
+      log("Couldn't download the " .. what .. " (" .. tostring(req.error) .. "); using the saved copy.")
+      return
+    end
+    local ok, data = pcall(JSON.decode, req.text)
+    if ok and type(data) == "table" and next(data) then onData(data) end
+  end)
+end
+
 ----------------------------------------------------------------------------------------------------
--- Roster and search
+-- Catalogues and search
 ----------------------------------------------------------------------------------------------------
 local function norm(s)
   s = s:lower():gsub("é", "e"):gsub("♀", "f"):gsub("♂", "m")
   return (s:gsub("[^%w]", ""))
 end
 
-function setRoster(index, from)
-  local list = {}
+function setCatalog(kind, index, from)
+  local list, keys = {}, {}
   for name in pairs(index) do
     local words = {}
     for w in name:gmatch("[^%s%-%(%)]+") do words[#words + 1] = norm(w) end
     list[#list + 1] = { name = name, key = norm(name), words = words }
   end
   table.sort(list, function(a, b) return a.name < b.name end)
-  roster, rosterList = index, list
-  log("Pokémon roster: " .. #list .. " (" .. from .. ")")
+  for i, e in ipairs(list) do keys[e.name] = (CATALOGS[kind].deckBase or 0) + i end
+  catalog[kind] = { index = index, list = list, keys = keys }
+  if kind == "dex" then roster = index end
+  log(CATALOGS[kind].title .. ": " .. #list .. " (" .. from .. ")")
 end
 
-function fetchRoster()
-  WebRequest.get(ROSTER_URL, function(req)
-    if req.is_error or not req.text or req.text == "" then
-      log("Couldn't download the roster (" .. tostring(req.error) .. "); using the saved copy.")
-      return
-    end
-    local ok, index = pcall(JSON.decode, req.text)
-    if ok and type(index) == "table" and next(index) then setRoster(index, "downloaded") end
-  end)
+function setCards(data, from)
+  savedCards = data
+  cardBacks = data.backs or {}
+  if data.items then setCatalog("items", data.items, from) end
+  if data.skills then setCatalog("skills", data.skills, from) end
 end
 
 -- Best matches for a typed query: whole-name prefix first, then a word prefix, then anywhere; shorter names first.
-function searchRoster(query, limit)
+function search(kind, query, limit)
   local q = norm(query or "")
   if q == "" then return {}, {} end
   local hits = {}
-  for _, e in ipairs(rosterList) do
+  for _, e in ipairs(catalog[kind].list) do
     local score = false  -- must be initialised: TTS's Lua (MoonSharp) can leave a bare `local x` holding a stale value
     if e.key:sub(1, #q) == q then
       score = 0
@@ -134,6 +169,10 @@ function searchRoster(query, limit)
   return names, hits
 end
 
+function searchRoster(query, limit)
+  return search("dex", query, limit)
+end
+
 ----------------------------------------------------------------------------------------------------
 -- Spawning
 ----------------------------------------------------------------------------------------------------
@@ -149,7 +188,16 @@ local function spawnSpot(color)
     local pos = hand.position + fwd * 5 + right * (slot * 2.6)
     return Vector(pos.x, 4, pos.z), Vector(0, hand.rotation.y + FRONT_YAW, 0)
   end
-  return Vector(slot * 2.6, 4, 0), Vector(0, FRONT_YAW, 0)  -- no seat (spectator): middle of the table
+  return Vector(NO_SEAT_SPOT[1], 4, NO_SEAT_SPOT[3] + slot * 2.6), Vector(0, FRONT_YAW, 0)
+end
+
+-- Just above the player's hand zone, so a card drops into their hand (hidden from other players).
+local function handSpot(color)
+  local ok, hand = pcall(function() return Player[color].getHandTransform() end)
+  if ok and hand then
+    return Vector(hand.position.x, hand.position.y + 1.5, hand.position.z), Vector(0, hand.rotation.y + 180, 0)
+  end
+  return Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3]), Vector(0, 180, 0)
 end
 
 function spawnPokemon(name, color)
@@ -173,6 +221,35 @@ function spawnPokemon(name, color)
     position = pos,
     rotation = rot,
   })
+end
+
+-- A single card (its own one-card deck sheet), named after the item/skill, with the effect as its description.
+function spawnCard(kind, name, color)
+  local card, key = catalog[kind].index[name], catalog[kind].keys[name]
+  if not (card and key and cardBacks[kind]) then return nil end
+  local deck = {}
+  deck[tostring(key)] = { FaceURL = BASE_URL .. card.face, BackURL = BASE_URL .. cardBacks[kind], NumWidth = 1, NumHeight = 1,
+    BackIsHidden = true, UniqueBack = false, Type = 0 }
+  local pos, rot = handSpot(color or "Grey")
+  return spawnObjectData({
+    data = {
+      Name = "CardCustom",
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      Nickname = name,
+      Description = card.effect or "",
+      Tags = { CATALOGS[kind].tag },
+      CardID = key * 100,
+      CustomDeck = deck,
+      Hands = true,
+    },
+    position = pos,
+    rotation = rot,
+  })
+end
+
+function spawnFrom(kind, name, color)
+  if kind == "dex" then return spawnPokemon(name, color) end
+  return spawnCard(kind, name, color)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -220,10 +297,10 @@ local function toolbarXml()
   local items = {}
   for i, t in ipairs(TOOLS) do
     local y = -(BAR_MARGIN + (i - 1) * (BAR_ICON + BAR_GAP))
-    local place = string.format('rectAlignment="UpperCenter" offsetXY="0 %d" width="%d" height="%d" tooltip="%s" onClick="%s"',
-      y, BAR_ICON, BAR_ICON, t.tip, t.click)
-    items[#items + 1] = '<Button class="bar" ' .. place .. '/>'
-    items[#items + 1] = string.format('<Image class="barIcon" image="%s" %s/>', t.icon, place)
+    local place = string.format('rectAlignment="UpperCenter" offsetXY="0 %d" width="%d" height="%d" tooltip="%s" onClick="toolClick"',
+      y, BAR_ICON, BAR_ICON, t.tip)
+    items[#items + 1] = string.format('<Button id="tool_%s" class="bar" %s/>', t.kind, place)
+    items[#items + 1] = string.format('<Image id="toolIcon_%s" class="barIcon" image="%s" %s/>', t.kind, t.icon, place)
   end
   return string.format('<Panel id="toolbar" rectAlignment="MiddleRight" width="%d" height="%d" color="#000000E6" '
     .. 'outline="#303030" outlineSize="1 1">\n  %s\n</Panel>\n', w, h, table.concat(items, "\n  "))
@@ -264,15 +341,19 @@ function buildUI()
 </Defaults>
 ]], toolbarXml() }
   for _, c in ipairs(COLORS) do
-    local rows = {}
-    rows[1] = string.format('<InputField id="dexIn_%s" class="search" placeholder="Type part of a name..." onValueChanged="dexSearch"/>', c)
-    rows[2] = string.format('<Text id="dexMsg_%s" class="hint">Click a result to place it in front of you.</Text>', c)
-    for i = 1, RESULTS do
-      rows[#rows + 1] = string.format('<Button id="dexRes_%s_%d" class="row" active="false" onClick="dexPick" text=" "/>', c, i)
+    for _, kind in ipairs(SEARCH_KINDS) do
+      local cat = CATALOGS[kind]
+      local rows = {
+        string.format('<InputField id="%sIn_%s" class="search" placeholder="Type part of a name..." onValueChanged="searchChanged"/>', kind, c),
+        string.format('<Text id="%sMsg_%s" class="hint">%s</Text>', kind, c, cat.hint),
+      }
+      for i = 1, RESULTS do
+        rows[#rows + 1] = string.format('<Button id="%sRes_%s_%d" class="row" active="false" onClick="searchPick" text=" "/>', kind, c, i)
+      end
+      xml[#xml + 1] = panelXml(kind, c, cat.title, SEARCH_BASE, table.concat(rows, "\n  "))
     end
-    xml[#xml + 1] = panelXml("dex", c, "Spawn a Pokémon", DEX_BASE, table.concat(rows, "\n  "))
 
-    rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the board.</Text>', c) }
+    local rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the board.</Text>', c) }
     for i = 1, MAX_MAPS do
       rows[#rows + 1] = string.format('<Button id="mapRes_%s_%d" class="row" active="false" onClick="mapPick" text=" "/>', c, i)
     end
@@ -289,8 +370,8 @@ function buildUI()
 end
 
 local function show(c, kind)
-  for _, k in ipairs({ "dex", "maps", "status" }) do
-    UI.setAttribute(k .. "_" .. c, "active", (k == kind) and "true" or "false")
+  for _, t in ipairs(TOOLS) do
+    UI.setAttribute(t.kind .. "_" .. c, "active", (t.kind == kind) and "true" or "false")
   end
   openPanel[c] = kind
   if kind ~= "status" and armed[c] then  -- closing the status panel cancels a waiting status
@@ -303,48 +384,49 @@ function closePanel(player)
   show(player.color, nil)
 end
 
-function toggleDex(player)
-  local c = player.color
-  show(c, openPanel[c] ~= "dex" and "dex" or nil)
+-- Every toolbar icon calls this; the element id says which tool ("tool_items", "toolIcon_items", ...).
+function toolClick(player, _, id)
+  local c, kind = player.color, id:match("^tool%a*_(%a+)$")
+  if openPanel[c] == kind then return show(c, nil) end
+  if kind == "maps" then refreshMaps(c) end
+  show(c, kind)
+  if kind == "status" then refreshStatus(c) end
 end
 
-function toggleMaps(player)
-  local c = player.color
-  if openPanel[c] == "maps" then return show(c, nil) end
-  refreshMaps(c)
-  show(c, "maps")
-end
-
-function dexSearch(player, value)
-  local c = player.color
-  local names, hits = searchRoster(value, RESULTS)
-  dexHits[c] = names
+function searchChanged(player, value, id)
+  local c, kind = player.color, id:match("^(%a+)In_")
+  local names, hits = search(kind, value, RESULTS)
+  searchHits[c] = { kind = kind, names = names }
   for i = 1, RESULTS do
-    local id = "dexRes_" .. c .. "_" .. i
+    local rid = kind .. "Res_" .. c .. "_" .. i
     if names[i] then
-      UI.setAttribute(id, "text", names[i])
-      UI.setAttribute(id, "textColor", ROW_TEXT)
+      UI.setAttribute(rid, "text", names[i])
+      UI.setAttribute(rid, "textColor", ROW_TEXT)
     end
-    UI.setAttribute(id, "active", names[i] and "true" or "false")
+    UI.setAttribute(rid, "active", names[i] and "true" or "false")
   end
-  UI.setAttribute("dex_" .. c, "height", DEX_BASE + #names * ROW_STEP)
+  UI.setAttribute(kind .. "_" .. c, "height", SEARCH_BASE + #names * ROW_STEP)
   local msg
   if (value or "") == "" then
-    msg = "Click a result to place it in front of you."
+    msg = CATALOGS[kind].hint
   elseif #names == 0 then
-    msg = "No Pokémon matches \"" .. value .. "\"."
+    msg = "No " .. CATALOGS[kind].noun .. " matches \"" .. value .. "\"."
   elseif #hits > RESULTS then
     msg = #hits .. " matches, showing the best " .. RESULTS .. "."
   else
     msg = #hits .. (#hits == 1 and " match." or " matches.")
   end
-  UI.setValue("dexMsg_" .. c, msg)
+  UI.setValue(kind .. "Msg_" .. c, msg)
 end
 
-function dexPick(player, _, id)
+function searchPick(player, _, id)
   local c = player.color
-  local name = dexHits[c] and dexHits[c][tonumber(id:match("_(%d+)$"))]
-  if name and spawnPokemon(name, c) then UI.setValue("dexMsg_" .. c, "Placed " .. name .. ".") end
+  local kind, i = id:match("^(%a+)Res_%a+_(%d+)$")
+  local hits = searchHits[c]
+  local name = hits and hits.kind == kind and hits.names[tonumber(i)]
+  if name and spawnFrom(kind, name, c) then
+    UI.setValue(kind .. "Msg_" .. c, (kind == "dex" and "Placed " or "Added to your hand: ") .. name .. ".")
+  end
 end
 
 function refreshMaps(c)
@@ -380,8 +462,6 @@ end
 ----------------------------------------------------------------------------------------------------
 -- Statuses: pick one in the panel, then pick up a Pokémon. Stored in the figure's memo, shown as a tint.
 ----------------------------------------------------------------------------------------------------
-STATUS_HINT = "Pick a status, then pick up a Pokémon."
-
 local function hexRGB(hex)
   return tonumber(hex:sub(2, 3), 16) / 255, tonumber(hex:sub(4, 5), 16) / 255, tonumber(hex:sub(6, 7), 16) / 255
 end
@@ -404,13 +484,6 @@ function statusRowColors(hex, isArmed)
     mixHex("#F0F0F0", hex, 0.3) }, "|")
 end
 
-function toggleStatus(player)
-  local c = player.color
-  if openPanel[c] == "status" then return show(c, nil) end
-  show(c, "status")
-  refreshStatus(c)
-end
-
 function refreshStatus(c)
   for _, s in ipairs(STATUS_ROWS) do
     UI.setAttribute("statusRes_" .. c .. "_" .. s.key, "colors", statusRowColors(s.color, armed[c] == s.key))
@@ -424,7 +497,7 @@ function statusPick(player, _, id)
   armed[c] = (armed[c] ~= key) and key or nil
   refreshStatus(c)
   if armed[c] then
-    local what = key == "clear" and "clear its statuses" or ("make it " .. STATUS_BY_KEY[key].label:lower())
+    local what = key == "clear" and "return it to normal" or ("make it " .. STATUS_BY_KEY[key].label:lower())
     player.broadcast("Pick up a Pokémon to " .. what .. ".", { 0.9, 0.9, 0.9 })
   end
 end
@@ -469,7 +542,7 @@ function applyStatus(obj, key)
   end
   obj.memo = JSON.encode(st)
   paintFigure(obj, st)
-  local msg = key == "clear" and (name .. " has no status now.")
+  local msg = key == "clear" and (name .. " is back to normal.")
     or (name .. (now and " is now " or " is no longer ") .. def.label:lower() .. ".")
   printToAll(msg, { 0.95, 0.88, 0.75 })
 end
@@ -483,16 +556,19 @@ function onObjectPickUp(color, obj)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Chat command
+-- Chat commands: !spawn <pokemon>, !item <item>, !skill <warrior skill>
 ----------------------------------------------------------------------------------------------------
+CHAT_KINDS = { spawn = "dex", item = "items", skill = "skills" }
+
 function onChat(message, player)
-  local query = message:match("^!spawn%s+(.+)$")
-  if not query then return true end
-  local names, hits = searchRoster(query, 5)
+  local cmd, query = message:match("^!(%a+)%s+(.+)$")
+  local kind = cmd and CHAT_KINDS[cmd:lower()]
+  if not kind then return true end
+  local names, hits = search(kind, query, 5)
   if #names == 0 then
-    player.broadcast("No Pokémon matches \"" .. query .. "\".", { 1, 0.5, 0.5 })
+    player.broadcast("No " .. CATALOGS[kind].noun .. " matches \"" .. query .. "\".", { 1, 0.5, 0.5 })
   elseif hits[1].exact or #hits == 1 or hits[1].score < (hits[2] and hits[2].score or 3) then
-    spawnPokemon(names[1], player.color)
+    spawnFrom(kind, names[1], player.color)
   else
     player.broadcast("Which one? " .. table.concat(names, ", "), { 1, 1, 0.6 })
   end
