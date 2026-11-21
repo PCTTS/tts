@@ -167,7 +167,7 @@ def main():
     check(g.armed["White"] == "burn", "picking up a locked object (the board) doesn't use it")
     g.onObjectPickUp("White", fig)
     tint = fig.tint
-    check(g.armed["White"] is None and tint.r > 0.95 and tint.b < 0.65, f"pick-up applies it: orange tint ({tint.r:.2f}, {tint.g:.2f}, {tint.b:.2f})")
+    check(g.armed["White"] is None and tint.r > 0.9 and tint.b < 0.5, f"pick-up applies it: orange tint ({tint.r:.2f}, {tint.g:.2f}, {tint.b:.2f})")
     check(fig.desc == "Status: Burned" and '"burn"' in fig.memo, f"description and memo record it ({fig.desc})")
     g.statusPick(player, "-1", "statusRes_White_confused"); g.onObjectPickUp("White", fig)
     check(fig.desc == "Status: Burned, Confused", "Confused stacks on Burned")

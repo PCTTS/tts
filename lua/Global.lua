@@ -25,14 +25,14 @@ TOOLS = {
 }
 -- Statuses from the rules, each tinted with its type's colour. `strength` = how far the figure's tint moves
 -- from white toward that colour (default STATUS_TINT). Volatile ones can stack on a main status.
-STATUS_TINT = 0.5
+STATUS_TINT = 0.6
 STATUSES = {
-  { key = "burn", label = "Burned", type = "Fire", color = "#EE8130" },
-  { key = "paralysis", label = "Paralyzed", type = "Electric", color = "#F7D02C" },
+  { key = "burn", label = "Burned", type = "Fire", color = "#EE8130", strength = 0.75 },
+  { key = "paralysis", label = "Paralyzed", type = "Electric", color = "#F7D02C", strength = 0.75 },
   { key = "poison", label = "Poisoned", type = "Poison", color = "#A33EA1" },
-  { key = "toxic", label = "Badly poisoned", type = "Poison", color = "#A33EA1", strength = 0.75 },
-  { key = "frostbite", label = "Frostbitten", type = "Ice", color = "#96D9D6" },
-  { key = "drowsy", label = "Drowsy", type = "Normal", color = "#A8A77A", strength = 0.8 },
+  { key = "toxic", label = "Badly poisoned", type = "Poison", color = "#A33EA1", strength = 0.8 },
+  { key = "frostbite", label = "Frostbitten", type = "Ice", color = "#96D9D6", strength = 0.9 },
+  { key = "drowsy", label = "Drowsy", type = "Normal", color = "#A8A77A", strength = 0.85 },
   { key = "confused", label = "Confused", type = "Psychic", color = "#F95587", volatile = true },
   { key = "flinched", label = "Flinched", type = "Dark", color = "#705746", volatile = true },
 }
