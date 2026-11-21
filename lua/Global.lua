@@ -1,24 +1,27 @@
 --[[ PCTTS_MOD — Global script for the Pokemon Conquest tabletop mod.
 Source: https://github.com/PCTTS/tts (lua/Global.lua). Edit there, not in TTS.
 
-Pokemon spawner
-  * "Pokémon" button (left edge) opens a search panel for the player who clicks it; each player has their own.
-  * Type part of a name, click a result: that figure appears in front of your seat.
-  * Chat:  !spawn garchomp   spawns the best match (and lists close alternatives if unsure).
+Toolbar (right edge of the screen), one panel open at a time, each player gets their own:
+  * Pokéball: search the roster, click a result and that figure appears in front of your seat.
+  * Map:      pick which arena the board shows.
+Chat:  !spawn garchomp   spawns the best match (and lists close alternatives if unsure).
+
 The roster comes from figures/index.json on the PCTTS site, so new Pokemon appear without editing the mod.
 The last roster loaded is kept in the save, so the spawner still works if the site can't be reached.
 --]]
 
 BASE_URL = "https://pctts.github.io/tts/"
 ROSTER_URL = BASE_URL .. "figures/index.json"
+ICONS = { pokeball = "ui/icons/pokeball.png", map = "ui/icons/map.png" }
 FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
+MAX_MAPS = 16        -- rows in the map panel
 COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
 
 roster = {}          -- name -> { front = "...", back = "..." } (paths relative to BASE_URL)
 rosterList = {}      -- sorted { name, key, words } for searching
-dexOpen, dexHits, spawnCount = {}, {}, {}
+openPanel, dexHits, mapRows, spawnCount = {}, {}, {}, {}
 
 ----------------------------------------------------------------------------------------------------
 -- Save / load
@@ -34,8 +37,12 @@ function onSave()
   return JSON.encode({ roster = roster })
 end
 
+function log(msg)
+  print("[PCTTS] " .. msg)
+end
+
 ----------------------------------------------------------------------------------------------------
--- Roster
+-- Roster and search
 ----------------------------------------------------------------------------------------------------
 local function norm(s)
   s = s:lower():gsub("é", "e"):gsub("♀", "f"):gsub("♂", "m")
@@ -44,7 +51,7 @@ end
 
 function setRoster(index, from)
   local list = {}
-  for name, files in pairs(index) do
+  for name in pairs(index) do
     local words = {}
     for w in name:gmatch("[^%s%-%(%)]+") do words[#words + 1] = norm(w) end
     list[#list + 1] = { name = name, key = norm(name), words = words }
@@ -68,7 +75,7 @@ end
 -- Best matches for a typed query: whole-name prefix first, then a word prefix, then anywhere; shorter names first.
 function searchRoster(query, limit)
   local q = norm(query or "")
-  if q == "" then return {} end
+  if q == "" then return {}, {} end
   local hits = {}
   for _, e in ipairs(rosterList) do
     local score = false  -- must be initialised: TTS's Lua (MoonSharp) can leave a bare `local x` holding a stale value
@@ -135,48 +142,114 @@ function spawnPokemon(name, color)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Search panel (one per player colour, each visible only to that colour)
+-- Maps (for now: the states of the locked map board; later the data-driven map system)
 ----------------------------------------------------------------------------------------------------
+local function titleCase(s)
+  return (s:gsub("%-", " "):gsub("(%a)(%w*)", function(a, b) return a:upper() .. b end))
+end
+
+function findMapBoard()
+  for _, o in ipairs(getAllObjects()) do
+    local states = o.getStates()
+    if states and #states > 0 and (o.getCustomObject() or {}).image then return o end
+  end
+end
+
+-- { {id=stateId, name="Pugilis", current=true}, ... } sorted by name
+function mapList()
+  local board = findMapBoard()
+  if not board then return {} end
+  local data, list = board.getData(), {}
+  local function add(id, image, current)
+    local file = (image or ""):match("/maps/([%w%-]+)%.%a+$")
+    list[#list + 1] = { id = id, name = file and titleCase(file) or ("Map " .. id), current = current }
+  end
+  add(board.getStateId(), data.CustomImage and data.CustomImage.ImageURL, true)
+  for id, st in pairs(data.States or {}) do
+    add(tonumber(id), st.CustomImage and st.CustomImage.ImageURL, false)
+  end
+  table.sort(list, function(a, b) return a.name < b.name end)
+  return list
+end
+
+----------------------------------------------------------------------------------------------------
+-- Interface: toolbar on the right, one panel per player colour (each visible only to that colour)
+----------------------------------------------------------------------------------------------------
+local function panelXml(kind, c, title, height, body)
+  return string.format([[
+<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" offsetXY="-56 0" width="290" height="%d"
+       color="#141414F2" outline="#303030" outlineSize="1 1" padding="8 8 8 8" spacing="4"
+       childForceExpandHeight="false" childForceExpandWidth="true">
+  <HorizontalLayout preferredHeight="28" flexibleHeight="0" childForceExpandWidth="false" spacing="4">
+    <Text class="title" flexibleWidth="1">%s</Text>
+    <Button class="close" preferredWidth="28" onClick="closePanel" text="X"/>
+  </HorizontalLayout>
+  %s
+  <Panel flexibleHeight="1"/>
+</VerticalLayout>
+]], kind, c, c, height, title, body)
+end
+
 function buildUI()
-  local xml = {
-    [[<Defaults>
-  <Button class="dexResult" fontSize="15" alignment="MiddleLeft" textAlignment="MiddleLeft" padding="10 0 0 0"
-          colors="#2a2a2a|#3d6fb8|#24477a|#2a2a2a" textColor="#FFFFFF" preferredHeight="28"/>
-  <Button class="dexIcon" fontSize="14" colors="#2a2a2a|#c0392b|#962d22|#2a2a2a" textColor="#FFFFFF"/>
-  <Text class="dexTitle" fontSize="16" fontStyle="Bold" color="#FFFFFF" alignment="MiddleLeft"/>
-  <Text class="dexHint" fontSize="12" color="#AAAAAA" alignment="MiddleLeft"/>
+  local assets = {}
+  for name, path in pairs(ICONS) do assets[#assets + 1] = { name = name, url = BASE_URL .. path } end
+  UI.setCustomAssets(assets)
+
+  local xml = { [[
+<Defaults>
+  <Button class="bar" colors="#00000000|#FFFFFF33|#FFFFFF66|#00000000" tooltipPosition="Left" preferredHeight="44" flexibleHeight="0"/>
+  <Button class="row" fontSize="15" textAlignment="MiddleLeft" padding="10 0 0 0" textColor="#FFFFFF"
+          colors="#2a2a2a|#3d6fb8|#24477a|#2a2a2a" preferredHeight="28" flexibleHeight="0"/>
+  <Button class="close" fontSize="14" textColor="#FFFFFF" colors="#2a2a2a|#c0392b|#962d22|#2a2a2a"/>
+  <Text class="title" fontSize="16" fontStyle="Bold" color="#FFFFFF" alignment="MiddleLeft"/>
+  <Text class="hint" fontSize="12" color="#AAAAAA" alignment="MiddleLeft" preferredHeight="18" flexibleHeight="0"/>
+  <InputField class="search" fontSize="16" preferredHeight="34" flexibleHeight="0" characterLimit="40"/>
 </Defaults>
-<Button id="dexToggle" onClick="dexToggle" rectAlignment="MiddleLeft" offsetXY="68 0" width="110" height="36"
-        fontSize="16" fontStyle="Bold" colors="#c0392b|#e74c3c|#962d22|#c0392b" textColor="#FFFFFF">Pokémon</Button>
+<VerticalLayout id="toolbar" rectAlignment="MiddleRight" width="52" height="104" padding="4 4 4 4" spacing="4"
+                color="#000000E6" outline="#303030" outlineSize="1 1" childForceExpandHeight="false">
+  <Button class="bar" icon="pokeball" tooltip="Spawn a Pokémon" onClick="toggleDex"/>
+  <Button class="bar" icon="map" tooltip="Choose the map" onClick="toggleMaps"/>
+</VerticalLayout>
 ]] }
   for _, c in ipairs(COLORS) do
-    local results = {}
+    local rows = {}
+    rows[1] = string.format('<InputField id="dexIn_%s" class="search" placeholder="Type part of a name..." onValueChanged="dexSearch"/>', c)
+    rows[2] = string.format('<Text id="dexMsg_%s" class="hint">Click a result to place it in front of you.</Text>', c)
     for i = 1, RESULTS do
-      results[i] = string.format('<Button id="dexRes_%s_%d" class="dexResult" active="false" onClick="dexPick"></Button>', c, i)
+      rows[#rows + 1] = string.format('<Button id="dexRes_%s_%d" class="row" active="false" onClick="dexPick" text=" "/>', c, i)
     end
-    xml[#xml + 1] = string.format([[
-<Panel id="dex_%s" visibility="%s" active="false" rectAlignment="MiddleLeft" offsetXY="186 0" width="290" height="%d"
-       color="#161616F2" padding="8 8 8 8">
-  <VerticalLayout spacing="4" childForceExpandHeight="false" childAlignment="UpperCenter">
-    <HorizontalLayout preferredHeight="28" childForceExpandWidth="false" spacing="4">
-      <Text class="dexTitle" flexibleWidth="1">Spawn a Pokémon</Text>
-      <Button class="dexIcon" onClick="dexToggle" preferredWidth="28">X</Button>
-    </HorizontalLayout>
-    <InputField id="dexIn_%s" preferredHeight="34" fontSize="16" placeholder="Type part of a name..."
-                onValueChanged="dexSearch" characterLimit="40"/>
-    <Text id="dexMsg_%s" class="dexHint" preferredHeight="18">Click a result to place it in front of you.</Text>
-    %s
-  </VerticalLayout>
-</Panel>
-]], c, c, 104 + RESULTS * 32, c, c, table.concat(results, "\n    "))
+    xml[#xml + 1] = panelXml("dex", c, "Spawn a Pokémon", 104 + RESULTS * 32, table.concat(rows, "\n  "))
+
+    rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the board.</Text>', c) }
+    for i = 1, MAX_MAPS do
+      rows[#rows + 1] = string.format('<Button id="mapRes_%s_%d" class="row" active="false" onClick="mapPick" text=" "/>', c, i)
+    end
+    xml[#xml + 1] = panelXml("maps", c, "Choose the map", 70 + MAX_MAPS * 32, table.concat(rows, "\n  "))
   end
   UI.setXml(table.concat(xml))
 end
 
-function dexToggle(player)
+local function show(c, kind)
+  for _, k in ipairs({ "dex", "maps" }) do
+    UI.setAttribute(k .. "_" .. c, "active", (k == kind) and "true" or "false")
+  end
+  openPanel[c] = kind
+end
+
+function closePanel(player)
+  show(player.color, nil)
+end
+
+function toggleDex(player)
   local c = player.color
-  dexOpen[c] = not dexOpen[c]
-  UI.setAttribute("dex_" .. c, "active", dexOpen[c] and "true" or "false")
+  show(c, openPanel[c] ~= "dex" and "dex" or nil)
+end
+
+function toggleMaps(player)
+  local c = player.color
+  if openPanel[c] == "maps" then return show(c, nil) end
+  refreshMaps(c)
+  show(c, "maps")
 end
 
 function dexSearch(player, value)
@@ -185,31 +258,54 @@ function dexSearch(player, value)
   dexHits[c] = names
   for i = 1, RESULTS do
     local id = "dexRes_" .. c .. "_" .. i
-    if names[i] then
-      UI.setValue(id, names[i])
-      UI.setAttribute(id, "active", "true")
-    else
-      UI.setAttribute(id, "active", "false")
-    end
+    if names[i] then UI.setAttribute(id, "text", names[i]) end
+    UI.setAttribute(id, "active", names[i] and "true" or "false")
   end
   local msg
   if (value or "") == "" then
     msg = "Click a result to place it in front of you."
   elseif #names == 0 then
     msg = "No Pokémon matches \"" .. value .. "\"."
+  elseif #hits > RESULTS then
+    msg = #hits .. " matches, showing the best " .. RESULTS .. "."
   else
-    msg = #hits > RESULTS and (#hits .. " matches, showing the best " .. RESULTS) or (#hits .. " match" .. (#hits == 1 and "" or "es"))
+    msg = #hits .. (#hits == 1 and " match." or " matches.")
   end
   UI.setValue("dexMsg_" .. c, msg)
 end
 
 function dexPick(player, _, id)
   local c = player.color
-  local i = tonumber(id:match("_(%d+)$"))
-  local name = dexHits[c] and dexHits[c][i]
-  if name and spawnPokemon(name, c) then
-    UI.setValue("dexMsg_" .. c, "Placed " .. name .. ".")
+  local name = dexHits[c] and dexHits[c][tonumber(id:match("_(%d+)$"))]
+  if name and spawnPokemon(name, c) then UI.setValue("dexMsg_" .. c, "Placed " .. name .. ".") end
+end
+
+function refreshMaps(c)
+  local list = mapList()
+  mapRows[c] = list
+  for i = 1, MAX_MAPS do
+    local id, m = "mapRes_" .. c .. "_" .. i, list[i]
+    if m then
+      UI.setAttribute(id, "text", m.current and (m.name .. "   (on the board)") or m.name)
+      UI.setAttribute(id, "colors", m.current and "#3d6fb8|#3d6fb8|#24477a|#3d6fb8" or "#2a2a2a|#3d6fb8|#24477a|#2a2a2a")
+    end
+    UI.setAttribute(id, "active", m and "true" or "false")
   end
+  UI.setValue("mapMsg_" .. c, #list > 0 and "Click a map to put it on the board." or "No map board found on the table.")
+end
+
+function mapPick(player, _, id)
+  local c = player.color
+  local m = mapRows[c] and mapRows[c][tonumber(id:match("_(%d+)$"))]
+  local board = findMapBoard()
+  if not (m and board) or m.current then return end
+  board.setState(m.id)
+  printToAll(player.steam_name .. " put " .. m.name .. " on the board.", { 0.8, 0.9, 1 })
+  Wait.frames(function()
+    for _, other in ipairs(COLORS) do
+      if openPanel[other] == "maps" then refreshMaps(other) end
+    end
+  end, 5)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -227,8 +323,4 @@ function onChat(message, player)
     player.broadcast("Which one? " .. table.concat(names, ", "), { 1, 1, 0.6 })
   end
   return false  -- keep the command out of the chat log
-end
-
-function log(msg)
-  print("[PCTTS] " .. msg)
 end
