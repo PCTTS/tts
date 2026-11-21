@@ -67,11 +67,17 @@ class Arena:
 def surface_layers(a, p):
     """Surfaces textured with an image (map.json "textures": {surface: {"image": path, "span": tiles, "vary": bool}}):
     the image is scaled so one copy covers `span` tiles and repeated across the board (span 1 = one copy per tile).
-    With "vary", every copy is turned and mirrored at random so the repetition doesn't show.
+    With "vary", every copy is turned and mirrored at random so the repetition doesn't show. With "match", the
+    image is recoloured so its average equals the surface's palette colour (e.g. the same dirt, darker in a pit).
     Returns surface -> board-sized image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
         src = Image.open(a.folder / spec["image"]).convert("RGB")
+        if spec.get("match"):  # recolour so the image's average equals this surface's palette colour
+            mean = src.resize((1, 1), Image.BOX).getpixel((0, 0))
+            want = a.palette[surface]
+            src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, mean[i]): min(255, round(v * k)))
+                                      for i, band in enumerate(src.split())])
         size = round(spec.get("span", max(a.R, a.C)) * p)
         tile = src.resize((size, size), Image.LANCZOS)
         # "vary": each copy gets a random quarter-turn and mirror (fixed per position, so rebuilds match)
