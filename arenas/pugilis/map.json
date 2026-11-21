@@ -42,8 +42,6 @@
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/table-placeholder-v1.jpg",
-  "_textures": "Image textures for surfaces (paths relative to this folder). span = how many tiles one copy of the image covers; it repeats beyond that.",
-  "textures": { "floor": { "image": "textures/dirt1.png", "span": 1 } },
   "palette": {
     "floor": "#D9BC8E",
     "pit": "#A9845A",
