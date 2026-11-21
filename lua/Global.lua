@@ -82,7 +82,7 @@ end
 STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear status", color = "#9E9E9E" }
 STATUS_HINT = "Pick a status, then pick up a Pokémon."
 
-STANDEE_MESH = "models/standee-v1.obj"  -- a Pokémon: art quad on a round base with a facing arrow (build_standee.py)
+STANDEE_MESH = "models/standee-v2.obj"  -- a Pokémon: art on a round base with a facing arrow, HP sign above (build_standee.py)
 FIGURE_SCALE = 1.5   -- ImageScalar for the old flat figurines (only used if the roster has no standees)
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
@@ -837,12 +837,15 @@ function onObjectSpawn(obj)
 end
 
 ----------------------------------------------------------------------------------------------------
--- HP over each Pokémon's head: "Y/X", on two labels back to back so both sides of the table can read it.
+-- HP over each Pokémon's head: "Y/X" on a two-sided sign (a thin solid plate in the standee model, standee-v2),
+-- one label on each face. TTS draws an object's UI in a fixed order regardless of which part is nearer, but solid
+-- geometry hides UI behind it, so from the front you see the front label and from behind the back one, each the
+-- right way round. The sign turns with the Pokémon.
 -- Click the number and type 120 to set it, -35 to take damage or +20 to heal (kept between 0 and its max).
 -- Current and max HP live in the figure's memo; the max comes from the sheet (data/pokemon.json).
 ----------------------------------------------------------------------------------------------------
-HP_HEIGHT = -255        -- object UI units (100 = one world unit; up is -z): just above a standee's art
-HP_LEAN = "-40 0 0"     -- a label's tilt: "-90 0 0" stands it up facing the player, "-40 0 0" leans it back 50 degrees
+HP_HEIGHT = -255        -- object UI units (100 = one world unit; up is -z): the sign's centre (PLATE_Y in build_standee.py)
+HP_FACE = 3             -- how far each label sits from the plate's middle (the UI's +y is the object's -z, the front)
 HP_COLOR, HP_FAINTED = "#FFFFFF", "#FF6B6B"
 
 function maxHp(name)
@@ -850,49 +853,32 @@ function maxHp(name)
   return s and tonumber(s.hp) and math.floor(tonumber(s.hp)) or nil
 end
 
--- Who sees which label: each side of the table gets the one facing it (spectators and the GM: the near side).
--- Labels drawn on one object ignore depth (the later one always shows on top, mirrored from behind), so each
--- player is shown just one.
-local function seatsOn(side, extra)
-  local list = {}
-  for _, c in ipairs(COLORS) do
-    if SEAT_SIDE[c] == side then list[#list + 1] = c end
-  end
-  for _, c in ipairs(extra or {}) do list[#list + 1] = c end
-  return table.concat(list, "|")
-end
-
-local function hpLabelXml(guid, side, rotation, seats, hp, max)
+-- One face's label (an input box under 50 high hides its text).
+local function hpLabelXml(guid, side, rotation, dy, hp, max)
   return string.format([[
-  <Panel id="hp%s" visibility="%s" rotation="%s" width="170" height="50" color="#000000C8">
-    <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" width="84" height="50"
-      fontSize="26" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
-      colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
-    <Text rectAlignment="MiddleRight" offsetXY="-9 0" width="84" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
-  </Panel>
-]], side, seats, rotation, guid, side, hp, hp > 0 and HP_COLOR or HP_FAINTED, max)
+<Panel id="hp%s" position="0 %d %d" rotation="%s" width="170" height="50" color="#000000C8">
+  <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" width="84" height="50"
+    fontSize="26" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
+    colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
+  <Text rectAlignment="MiddleRight" offsetXY="-9 0" width="84" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
+</Panel>
+]], side, dy, HP_HEIGHT, rotation, guid, side, hp, hp > 0 and HP_COLOR or HP_FAINTED, max)
 end
 
--- The labels hang from a "spinner" turned by the figure's own yaw, so they keep facing the two long sides of the
--- table whichever way the Pokémon faces (an input box under 50 high hides its text).
-local function spinXml(id, yaw)
-  return string.format('<Panel id="%s" position="0 0 %d" rotation="0 0 %d" width="10" height="10" color="#00000000">\n',
-    id, HP_HEIGHT, yaw)
-end
-
--- Each label is leaned back toward the sky (HP_LEAN), so from anywhere above the table you see its front:
--- from the ends of the table it reads turned on its side, but never mirrored. The far side's label is the
--- same label on a second spinner turned 180 degrees.
 local function hpXml(obj, hp, max)
-  local yaw = math.floor(obj.getRotation().y + 0.5)
-  return spinXml("hpSpin", yaw) .. hpLabelXml(obj.guid, "F", HP_LEAN, seatsOn("south", { "Grey", "Black" }), hp, max)
-    .. "</Panel>\n" .. spinXml("hpSpinB", yaw + 180) .. hpLabelXml(obj.guid, "B", HP_LEAN, seatsOn("north"), hp, max)
-    .. "</Panel>\n"
+  return hpLabelXml(obj.guid, "F", "-90 0 0", HP_FACE, hp, max) .. hpLabelXml(obj.guid, "B", "90 0 0", -HP_FACE, hp, max)
 end
 
--- Give a Pokémon its HP labels (or bring them up to date). Its memo gets hp/maxHp if it had none.
+-- Give a Pokémon its HP labels (or bring them up to date). Its memo gets hp/maxHp if it had none. A standee on
+-- the old model (no sign) is switched to the current one first; it comes back through onObjectSpawn.
 function showHp(obj)
   if not (obj and obj.hasTag("Pokemon")) then return end
+  local mesh = obj.name == "Custom_Model" and (obj.getCustomObject() or {}).mesh or ""
+  if mesh:find("models/standee-", 1, true) and not mesh:find(STANDEE_MESH, 1, true) then
+    obj.setCustomObject({ mesh = BASE_URL .. STANDEE_MESH })
+    obj.reload()
+    return
+  end
   local st = figureState(obj)
   local max = maxHp(st.pokemon) or (st.maxHp and math.floor(st.maxHp))
   if not max then return end
@@ -902,23 +888,6 @@ function showHp(obj)
     obj.memo = JSON.encode(st)
   end
   obj.UI.setXml(hpXml(obj, hp, max))
-end
-
--- Keep a Pokémon's labels facing the table's sides after it's turned or put down.
-function turnHp(obj, yaw)
-  if obj and obj.hasTag("Pokemon") then
-    local y = math.floor((yaw or obj.getRotation().y) + 0.5)
-    obj.UI.setAttribute("hpSpin", "rotation", "0 0 " .. y)
-    obj.UI.setAttribute("hpSpinB", "rotation", "0 0 " .. (y + 180))
-  end
-end
-
-function onObjectRotate(obj, spin)
-  turnHp(obj, spin)
-end
-
-function onObjectDrop(_, obj)
-  turnHp(obj)
 end
 
 function refreshAllHp()

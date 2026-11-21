@@ -200,7 +200,7 @@ def main():
     g.searchPick(player, "-1", "dexRes_White_1")
     spawned = calls.spawned[1]
     check(spawned is not None and spawned.data.Nickname == "Charizard" and spawned.data.Name == "Custom_Model"
-          and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v1.obj")
+          and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v2.obj")
           and spawned.data.CustomMesh.DiffuseURL.endswith("standees/v3/charizard.webp") and spawned.data.CustomMesh.TypeIndex == 1,
           "clicking row 1 spawns Charizard as a standee (art on an arrowed base)")
     memo = json.loads(spawned.data.Memo)
@@ -331,18 +331,26 @@ def main():
     except ET.ParseError as e:
         check(False, f"its label XML parses ({e})")
     root_hp = ET.fromstring("<root>" + h.ui.xml + "</root>")
-    spin = next(e for e in root_hp.iter() if e.get("id") == "hpSpin")
     front = next(e for e in root_hp.iter() if e.get("id") == "hpF")
     back = next(e for e in root_hp.iter() if e.get("id") == "hpB")
-    spin_b = next(e for e in root_hp.iter() if e.get("id") == "hpSpinB")
-    check(spin.get("rotation") == "0 0 90" and spin_b.get("rotation") == "0 0 270"
-          and "White" in front.get("visibility") and "Grey" in front.get("visibility")
-          and "Green" in back.get("visibility") and "White" not in back.get("visibility"),
-          "the labels turn with the figure's yaw (90), back to back, and each side of the table sees only its own")
-    check(front.get("rotation") == back.get("rotation") == "-40 0 0", "both labels lean back toward the sky (never mirrored from above)")
-    g.onObjectRotate(h, 180)
-    check(h.ui.attrs["hpSpin.rotation"] == "0 0 180" and h.ui.attrs["hpSpinB.rotation"] == "0 0 360",
-          "turning the figure turns the labels back to face the sides")
+    check((front.get("rotation"), front.get("position")) == ("-90 0 0", "0 3 -255")
+          and (back.get("rotation"), back.get("position")) == ("90 0 0", "0 -3 -255")
+          and not front.get("visibility") and not back.get("visibility"),
+          "one label on each face of the sign, facing out, seen by everyone (the plate hides the far one)")
+
+    # a standee on the old model (no sign) is switched to the current one
+    lua.execute(r"""
+      oldFig = { memo = '{"pokemon":"Gengar"}', guid = "old111", name = "Custom_Model", reloaded = false }
+      oldFig.hasTag = function(t) return t == "Pokemon" end
+      oldFig.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/models/standee-v1.obj" } end
+      oldFig.setCustomObject = function(c) oldFig.newMesh = c.mesh end
+      oldFig.reload = function() oldFig.reloaded = true end
+      oldFig.UI = { setXml = function(x) oldFig.xml = x end }
+      showHp(oldFig)
+    """)
+    o = g.oldFig
+    check(o.reloaded and str(o.newMesh).endswith("models/standee-v2.obj") and o.xml is None,
+          "a standee without the sign gets the new model (its labels come when it respawns)")
 
     def hp():
         return json.loads(h.memo)["hp"]

@@ -1,6 +1,7 @@
 """Build a 3D standee for a figure image: a cut-out of the artwork standing on a round base with a facing arrow.
 
 Usage:  python -I tools/build_standee.py <figure image> --out DIR --tag TAG
+        python -I tools/build_standee.py --mesh models/standee-v2.obj     (the mesh with the HP sign)
 Writes DIR/<TAG>.obj and DIR/<TAG>.png (the artwork plus a strip for the base).
 
 Why a model instead of TTS's figurine: a custom model's colour tint recolours its whole texture (a figurine's
@@ -20,6 +21,10 @@ SIZE = 2.0        # artwork width and height (world units)
 BASE_R = 0.7      # base radius
 BASE_H = 0.15     # base height
 SEGMENTS = 32
+# The HP sign (standee-v2): a thin solid plate above the head. Global.lua puts the HP label on each face (object UI,
+# HP_HEIGHT -255 = PLATE_Y); TTS draws one object's UI in a fixed order, but solid geometry hides UI behind it, so
+# from either side only that side's label shows, the right way round.
+PLATE_W, PLATE_H, PLATE_D, PLATE_Y = 1.7, 0.5, 0.04, 2.55   # width, height, thickness, centre height
 IMG, STRIP = 512, 128   # texture: artwork on top, base strip underneath
 TEX_W, TEX_H = IMG, IMG + STRIP
 
@@ -54,7 +59,7 @@ def standee_texture(art):
     return tex
 
 
-def mesh():
+def mesh(plate=False):
     m = StandeeMesh()
 
     def uv(px, py):
@@ -82,10 +87,23 @@ def mesh():
         n = math.hypot(mx, mz)
         side = [uv(130, IMG + 4), uv(254, IMG + 4), uv(254, IMG + 124), uv(130, IMG + 124)]
         m.quad([(xa, BASE_H, za), (xb, BASE_H, zb), (xb, 0, zb), (xa, 0, za)], side, (mx / n, 0, mz / n))
+    if plate:  # a dark box (the base side's colour), PLATE_D thick
+        dark = [uv(192, IMG + 64)] * 4
+        x0, x1, y0, y1, z0, z1 = -PLATE_W / 2, PLATE_W / 2, PLATE_Y - PLATE_H / 2, PLATE_Y + PLATE_H / 2, -PLATE_D / 2, PLATE_D / 2
+        m.quad([(x0, y1, z0), (x1, y1, z0), (x1, y0, z0), (x0, y0, z0)], dark, (0, 0, -1))   # front
+        m.quad([(x0, y1, z1), (x1, y1, z1), (x1, y0, z1), (x0, y0, z1)], dark, (0, 0, 1))    # back
+        m.quad([(x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)], dark, (0, 1, 0))    # top
+        m.quad([(x0, y0, z0), (x1, y0, z0), (x1, y0, z1), (x0, y0, z1)], dark, (0, -1, 0))   # bottom
+        m.quad([(x0, y0, z0), (x0, y1, z0), (x0, y1, z1), (x0, y0, z1)], dark, (-1, 0, 0))   # sides
+        m.quad([(x1, y0, z0), (x1, y1, z0), (x1, y1, z1), (x1, y0, z1)], dark, (1, 0, 0))
     return m
 
 
 def main(argv):
+    if argv[:1] == ["--mesh"]:   # just the mesh with the HP sign: python -I tools/build_standee.py --mesh models/standee-v2.obj
+        mesh(plate=True).write(argv[1])
+        print("wrote", argv[1])
+        return
     if len(argv) < 1 or "--out" not in argv or "--tag" not in argv:
         sys.exit(__doc__)
     out, tag = Path(argv[argv.index("--out") + 1]), argv[argv.index("--tag") + 1]
