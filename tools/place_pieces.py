@@ -22,7 +22,7 @@ REPO = Path(__file__).resolve().parent.parent
 BASE_URL = "https://pctts.github.io/tts/"
 BELL_LIFT = 0.9          # gap between the tile top and the bell's lip
 FLAG_INSET = 0.38        # the pole's distance from the two tile edges of its corner
-BELL = {"mesh": "props/bell-v2.obj", "diffuse": "props/bell-v2.jpg", "collider": "props/bell-collider-v2.obj",
+BELL = {"mesh": "props/bell-v3.obj", "diffuse": "props/bell-v3.jpg", "collider": "props/bell-collider-v3.obj",
         "convex": True, "material": 2}
 FLAG = {"mesh": "props/flag-v1.obj", "diffuse": "props/flag-v1.jpg", "collider": "props/flag-collider-v1.obj",
         "convex": False, "material": 3}

@@ -2,13 +2,14 @@
 
 Usage:  python -I tools/build_pieces.py
 Writes (only files that are missing: bump a version when what a file holds changes, TTS caches by link):
-  props/bell-v2.obj, props/bell-v2.jpg, props/bell-collider-v2.obj  (v1: a church bell with a loop, superseded)
+  props/bell-v3.obj, props/bell-v3.jpg, props/bell-collider-v3.obj
+  (superseded, kept for older saves: v1 a church bell with a loop, v2 a rocket-nozzle bell)
   props/flag-v1.obj, props/flag-v1.jpg, props/flag-collider-v1.obj
 tools/place_pieces.py puts them on an arena's marker tiles.
 
-Bell: a plain bell shaped like a rocket nozzle's: a short narrow neck with a rounded cap, a wall that flares fast
-below it and then runs nearly straight to the open mouth; hollow and dark inside. Its own frame: y = 0 is the mouth, centred on the
-y axis.
+Bell: the board's bell icon turned around its axis: a dome, a straight flaring skirt, a darker rim band and a ball
+clapper hanging in the open mouth; hollow and dark inside. Its own frame: y = 0 is the bottom of the rim, centred on
+the y axis.
 Flag: a dark pole on a small round foot with a white cloth that waves out along +x, and a white ball on top.
 The whole model is tinted to show who holds the flag: white parts take the tint's colour, the dark pole stays
 dark. Its own frame: y = 0 is the tile top, the pole stands on the y axis.
@@ -27,18 +28,20 @@ OUT = REPO / "props"
 SEG = 64                              # segments around lathed parts
 
 # --- bell (units: a tile is about 3.25 across) -------------------------------------------------------
-# The bell is shaped like a rocket nozzle's bell (Rao's construction): a narrow throat with a short neck and a
-# rounded cap above it; below the throat an arc turns the wall out to BELL_ANGLES[0], then a smooth curve flattens
-# it to BELL_ANGLES[1] at the mouth.
-BELL_R, BELL_THROAT = 0.8, 0.24      # mouth and throat radius
-BELL_ANGLES = (40, 8)                # wall angle from vertical after the throat arc, and at the mouth (degrees)
-BELL_ARC = 0.3                       # radius of the arc that turns the wall out below the throat
-BELL_LEN, BELL_NECK, BELL_CAP = 1.25, 0.08, 0.10   # throat to mouth, the neck above the throat, the cap's rise
-BELL_WALL = 0.05                     # wall thickness
-BELL_TOP = BELL_LEN + BELL_NECK + BELL_CAP
+# The bell is the board's bell icon (tools/build_board.py, draw_marker) turned around its axis, in the icon's design
+# units (a tile is 128 there): a dome (the top half of the icon's ellipse), a straight flaring skirt (its trapezoid),
+# a rim band that steps out a little, and the ball clapper hanging in the mouth. BELL_UNIT scales it to the world.
+ICON_DOME = (26, 25, 19)                 # dome: radius, centre height, rise
+ICON_SKIRT = ((26, 24), (34.75, -4))     # skirt: top and bottom (radius, height); the rim covers the rest of it
+ICON_RIM = (37, -4, -11)                 # rim band: radius, top, bottom
+ICON_CLAPPER = (6.5, -15)                # clapper ball: radius, centre height
+ICON_WALL = 2.5                          # wall thickness
+BELL_UNIT = 0.8 / ICON_RIM[0]            # world units per icon unit: the mouth is 1.6 across
+BELL_TOP = (ICON_DOME[1] + ICON_DOME[2] - ICON_RIM[2]) * BELL_UNIT   # height of the dome's top above the mouth
 BRONZE = (204, 156, 70)
 BRONZE_DEEP = (122, 84, 34)
 BRONZE_LIGHT = (236, 198, 118)
+BRONZE_RIM = (150, 105, 30)              # the icon's darker gold: rim band and clapper
 
 # --- flag ---------------------------------------------------------------------------------------------
 POLE_R, POLE_H = 0.05, 3.3
@@ -116,6 +119,7 @@ BELL_V0, BELL_V1 = 8, 504           # texture rows used for heights BELL_TOP .. 
 
 
 def bell_v(y):
+    y = min(BELL_TOP, max(0.0, y))
     return 1 - (BELL_V0 + (1 - y / BELL_TOP) * (BELL_V1 - BELL_V0)) / BELL_TEX
 
 
@@ -123,48 +127,44 @@ def bell_region(u0, u1):
     return lambda fu, y: ((u0 + fu * (u1 - u0)) / BELL_TEX, bell_v(y))
 
 
-def bezier(p0, p1, p2, n):
-    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t * t * p2[0],
-             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t * t * p2[1]) for t in (i / n for i in range(n + 1))]
+def W(r, h):
+    """Icon units -> the bell's own frame (y = 0 at the bottom of the rim)."""
+    return (r * BELL_UNIT, (h - ICON_RIM[2]) * BELL_UNIT)
 
 
-def bell_outline(n_arc=8, n_wall=24, n_cap=8):
-    """The outside as (radius, height) from the mouth up to the apex. Smooth all the way: the cap ends vertical
-    on the neck, the neck runs straight down to the throat, the arc leaves it vertical, and the last curve
-    starts at the arc's angle (its control point is where the two end tangents meet)."""
-    tn, te = (math.radians(a) for a in BELL_ANGLES)
-    arc = [(BELL_ARC * math.sin(p), BELL_THROAT + BELL_ARC * (1 - math.cos(p))) for p in (tn * i / n_arc for i in range(n_arc + 1))]
-    xn, rn = arc[-1]                                          # x = distance below the throat
-    k = ((BELL_R - rn) - math.tan(te) * (BELL_LEN - xn)) / (math.tan(tn) - math.tan(te))
-    curve = bezier((xn, rn), (xn + k, rn + math.tan(tn) * k), (BELL_LEN, BELL_R), n_wall)
-    wall = [(r, BELL_LEN - x) for x, r in arc + curve[1:]]   # throat down to the mouth
-    neck_top = BELL_LEN + BELL_NECK
-    cap = bezier((0.0, BELL_TOP), (BELL_THROAT, BELL_TOP), (BELL_THROAT, neck_top), n_cap)
-    return (cap + wall)[::-1]
+def dome_points(shrink=0.0, n=14):
+    """The dome from its edge up to the top (or, shrunk by the wall, the inside of it)."""
+    r, c, rise = ICON_DOME
+    return [W((r - shrink) * math.cos(a), c + (rise - shrink) * math.sin(a)) for a in (math.pi / 2 * i / n for i in range(n + 1))]
 
 
 def bell():
     m = PieceMesh()
-    outside, inside = bell_region(4, 252), bell_region(260, 380)
-    outer = bell_outline()
-    # the inside: the outline moved in by the wall thickness along its normals, from the apex down to the mouth
-    inner = []
-    for i, (r, y) in enumerate(outer):
-        a, b = outer[max(0, i - 1)], outer[min(len(outer) - 1, i + 1)]
-        nr, ny = norm((b[1] - a[1], -(b[0] - a[0])))
-        inner.append((max(0.0, r - nr * BELL_WALL), y - ny * BELL_WALL))
-    inner[0] = (inner[0][0], 0.0)                 # flat rim at the mouth
-    inner[-1] = (0.0, inner[-1][1])
-    inner = inner[::-1]
+    body, inside, rim = bell_region(4, 252), bell_region(260, 380), bell_region(392, 508)
+    (r0, h0), (r1, h1) = ICON_SKIRT
+    rr, rt, rb = ICON_RIM
+    t = ICON_WALL
+    lathe(m, [W(r1, h1), W(r0, h0)], body)                               # skirt (straight, crisp edges)
+    lathe(m, dome_points(), body)                                        # dome
+    lathe(m, [W(rr, rb), W(rr, rt)], rim)                                # rim band
+    lathe(m, [W(rr, rt), W(r1, h1)], rim)                                # the ledge where the skirt meets it
+    # inside: the dome and the skirt line moved in by the wall, from the top down to the bottom of the rim
+    r_low = r1 + (r1 - r0) / (h1 - h0) * (rb - h1)                       # the skirt's line carried down to rb
+    inner = dome_points(t)[::-1] + [W(r0 - t, h0), W(r1 - t, h1), W(r_low - t, rb)]
     lathe(m, inner, inside)
-    lathe(m, [inner[-1], outer[0]], inside)       # the rim's underside
-    lathe(m, outer, outside)
+    lathe(m, [inner[-1], W(rr, rb)], rim)                                # underside of the rim
+    cr, ch = ICON_CLAPPER
+    lathe(m, sphere_profile(cr * BELL_UNIT, W(0, ch)[1]), rim, 32)       # clapper
     return m
 
 
 def bell_collider():
     m = PieceMesh()
-    lathe(m, [(0.0, 0.0)] + bell_outline(4, 6), lambda fu, y: (0.5, 0.5), 16)
+    (r0, h0), (r1, h1) = ICON_SKIRT
+    rr, rt, rb = ICON_RIM
+    cr, ch = ICON_CLAPPER
+    run = [W(0, ch - cr), W(rr, rb), W(rr, rt), W(r0, h0)] + dome_points(n=4)[1:]
+    lathe(m, run, lambda fu, y: (0.5, 0.5), 16)
     return m
 
 
@@ -174,13 +174,12 @@ def bell_texture():
     img = np.zeros((s, s, 3), np.float32)
     rows = np.arange(s)
     y = BELL_TOP * (1 - (rows - BELL_V0) / (BELL_V1 - BELL_V0))   # the height each texture row shows
-    base, deep, light = (np.array(c, np.float32) for c in (BRONZE, BRONZE_DEEP, BRONZE_LIGHT))
-    # outside: a little darker toward the mouth and the top, lightest a little above the middle
-    t = np.clip(1 - np.abs(y - 0.75) / 0.8, 0, 1)[:, None]
-    outside = base * (0.86 + 0.14 * t) + (light - base) * 0.18 * t
-    img[:, :256] = outside[:, None, :]
+    base, deep, light, rim = (np.array(c, np.float32) for c in (BRONZE, BRONZE_DEEP, BRONZE_LIGHT, BRONZE_RIM))
+    # body: a little darker toward the rim and the top, lightest a little above the middle
+    t = np.clip(1 - np.abs(y - 0.55 * BELL_TOP) / (0.6 * BELL_TOP), 0, 1)[:, None]
+    img[:, :256] = (base * (0.86 + 0.14 * t) + (light - base) * 0.18 * t)[:, None, :]
     img[:, 256:384] = (deep * 0.8)[None, None, :]                                       # inside
-    img[:, 384:] = (base * 0.85)[None, None, :]
+    img[:, 384:] = rim[None, None, :]                                                    # rim band, clapper
     img *= (1 + rng.normal(0, 0.025, (s, s, 1))).astype(np.float32)                     # faint casting texture
     out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
     return out.filter(ImageFilter.GaussianBlur(0.6))
@@ -256,9 +255,9 @@ def flag_texture():
 def main():
     OUT.mkdir(exist_ok=True)
     files = {
-        "bell-v2.obj": lambda p: bell().write(p),
-        "bell-v2.jpg": lambda p: bell_texture().save(p, quality=92),
-        "bell-collider-v2.obj": lambda p: bell_collider().write(p),
+        "bell-v3.obj": lambda p: bell().write(p),
+        "bell-v3.jpg": lambda p: bell_texture().save(p, quality=92),
+        "bell-collider-v3.obj": lambda p: bell_collider().write(p),
         "flag-v1.obj": lambda p: flag().write(p),
         "flag-v1.jpg": lambda p: flag_texture().save(p, quality=92),
         "flag-collider-v1.obj": lambda p: flag_collider().write(p),
