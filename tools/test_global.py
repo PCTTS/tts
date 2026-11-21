@@ -41,11 +41,34 @@ JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t)
 function print(s) calls.printed[#calls.printed + 1] = s end
 function printToAll(s) calls.printed[#calls.printed + 1] = s end
 Wait = { frames = function(f) f() end }
-local hand = { position = Vector(9.5, 2.9, -28.6), forward = Vector(0, 0, 1), rotation = Vector(0, 0, 0) }
-Player = setmetatable({}, { __index = function(_, c)
-  return { getHandTransform = function() if c == "White" then return hand end end }
-end })
-function spawnObjectData(t) calls.spawned[#calls.spawned + 1] = t; return { getName = function() return t.data.Nickname end } end
+Player = setmetatable({}, { __index = function(_, c) return { color = c } end })
+objects = {}
+local function stub(o)
+  o.hasTag = o.hasTag or function(tag) for _, t in ipairs(o.tags or {}) do if t == tag then return true end end return false end
+  o.getLock = o.getLock or function() return o.locked or false end
+  o.getStates = o.getStates or function() return nil end            -- every real TTS object has these
+  o.getCustomObject = o.getCustomObject or function() return {} end
+  objects[#objects + 1] = o
+  return o
+end
+-- team stands: near (south) at z = -26.4 facing the near player, far (north) turned 180 degrees
+local function makeStand(z, yaw)
+  local s = { tags = { "Stand" }, type = "Generic", locked = true }
+  s.getPosition = function() return Vector(0, 0.961, z) end
+  s.getRotation = function() return Vector(0, yaw, 0) end
+  s.positionToWorld = function(v)
+    if yaw == 0 then return Vector(v.x, 0.961 + v.y, z + v.z) end
+    return Vector(-v.x, 0.961 + v.y, z - v.z)
+  end
+  return stub(s)
+end
+southStand, northStand = makeStand(-26.4, 0), makeStand(26.4, 180)
+function spawnObjectData(t)
+  calls.spawned[#calls.spawned + 1] = t
+  local kind = t.data.Name == "CardCustom" and "Card" or (t.data.Name == "Figurine_Custom" and "Figurine" or "Generic")
+  return stub({ tags = t.data.Tags, type = kind, getName = function() return t.data.Nickname end,
+    getPosition = function() return t.position end })
+end
 
 -- a fake map board with three states
 local states = {
@@ -53,13 +76,15 @@ local states = {
   ["3"] = { CustomImage = { ImageURL = "https://example.com/uc?id=abc" } },
 }
 board = {
+  type = "Figurine", locked = true, getPosition = function() return Vector(0, -30, 0) end,
   getStates = function() return { {}, {} } end,
   getCustomObject = function() return { image = "https://pctts.github.io/tts/maps/terrera-mountain.jpg" } end,
   getData = function() return { CustomImage = { ImageURL = "https://pctts.github.io/tts/maps/terrera-mountain.jpg" }, States = states } end,
   getStateId = function() return 1 end,
   setState = function(id) calls.state = id end,
 }
-function getAllObjects() return { board } end
+stub(board)
+function getAllObjects() return objects end
 """
 
 
@@ -144,7 +169,8 @@ def main():
           and spawned.data.CustomImage.ImageURL.endswith("figures/charizard.webp")
           and spawned.data.CustomImage.ImageSecondaryURL.endswith("figures/charizard-back.webp"),
           "clicking row 1 spawns Charizard with front and back images")
-    check(abs(spawned.position.z - (-23.6)) < 0.01, "figure appears in front of the White seat")
+    check(abs(spawned.position.x - (-17.625)) < 0.01 and abs(spawned.position.z - (-28.0)) < 0.01,
+          f"White's Pokemon goes on the first pedestal of the near stand ({spawned.position.x:.2f}, {spawned.position.z:.2f})")
 
     # maps
     lst = g.mapList()
@@ -196,16 +222,28 @@ def main():
     deck = card.data.CustomDeck if card else None
     entry = deck and next(iter(deck.values()))
     check(card is not None and card.data.Name == "CardCustom" and card.data.Nickname == "Sitrus Berry"
-          and "/cards/items/sitrus-berry-" in entry.FaceURL and entry.BackURL.endswith("cards/back-items-v1.jpg")
+          and "/cards/items/sitrus-berry-" in entry.FaceURL and "cards/back-items-v" in entry.BackURL
           and card.data.CardID == int(next(iter(deck.keys()))) * 100, "clicking it spawns the Sitrus Berry card")
-    check(abs(card.position.x - 9.5) < 0.01 and abs(card.position.z - (-28.6)) < 0.01, "the card drops into White's hand")
+    check(abs(card.position.x - (-17.625)) < 0.01 and abs(card.position.z - (-26.4 - 5.1105)) < 0.01
+          and card.rotation.y == 270 and abs(card.rotation.z - 16.492) < 0.01 and card.data.SidewaysCard,
+          "the item card lies landscape in the first item slot on White's stand, tilted to the slope")
     check("1/2 hp" in card.data.Description, "the card's description is its effect")
     g.searchChanged(player, "belief", "skillsIn_White")
     g.searchPick(player, "-1", "skillsRes_White_1")
-    check(calls.spawned[n + 2].data.Nickname == "Belief" and calls.spawned[n + 2].data.Tags[1] == "WarriorSkill",
-          "warrior skill search spawns the Belief card")
+    sk = calls.spawned[n + 2]
+    check(sk.data.Nickname == "Belief" and sk.data.Tags[1] == "WarriorSkill"
+          and abs(sk.position.x - (-17.625)) < 0.01 and abs(sk.position.z - (-26.4 - 8.5481)) < 0.01,
+          "the warrior skill card goes in the first skill slot (below the item)")
     g.searchPick(player, "-1", "itemsRes_White_1")
     check(len(calls.spawned) == n + 2, "a stale click on the other panel's rows does nothing")
+    g.spawnCard("items", "Sitrus Berry", "White")
+    check(abs(calls.spawned[n + 3].position.x - (-10.575)) < 0.01, "the next item card takes the next column")
+    g.spawnCard("items", "Sitrus Berry", "Green")
+    far = calls.spawned[n + 4]
+    check(abs(far.position.x - 17.625) < 0.01 and abs(far.position.z - (26.4 + 5.1105)) < 0.01 and far.rotation.y == 450,
+          "a far-side seat (Green) uses the far stand, starting from its own left")
+    g.spawnPokemon("Gengar", "Grey")
+    check(abs(calls.spawned[n + 5].position.x - (-35)) < 0.01, "a spectator's Pokemon appears in the left strip")
 
     print("\nall checks passed" if not failures else f"\n{len(failures)} check(s) failed")
     sys.exit(1 if failures else 0)

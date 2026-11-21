@@ -1,4 +1,5 @@
-"""Build card images for items and warrior skills from the spreadsheet (original card design).
+"""Build card images for items and warrior skills from the spreadsheet (original card design: the name only,
+landscape, on a frame coloured by kind and class; the effect text goes in the card's hover description).
 
 Usage:  python -I tools/build_cards.py <spreadsheet.xlsx>     (sheets "items" and "warriorSkills")
 Writes cards/items/<name>-<hash>.jpg, cards/skills/<name>-<hash>.jpg, the two card backs, and
@@ -18,9 +19,10 @@ from build_figures import file_name  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "cards"
-DESIGN = "1"            # bump to rebuild every card after a design change
-W, H, SS = 600, 840, 2  # card size (poker proportions), supersampling
+DESIGN = "3"            # bump to rebuild every card after a design change (3: landscape, name only, one line)
+W, H, SS = 600, 840, 2  # card image size (portrait, as TTS maps it), supersampling
 CREAM, INK, MUTED = (247, 241, 228), (38, 32, 26), (120, 108, 94)
+ONE_LINE_MIN = 70       # names go on one line across the card unless that would make the text smaller than this
 COLOURS = {  # header/frame colour by kind and class (groups override classes)
     "items": {"Consumable": "#2F8F83", "Active": "#4C63B6", "Mega Stone": "#8E44AD", "Berry": "#3E8E41", None: "#7A7A7A"},
     "skills": {"Hero": "#C08A25", "Recovery": "#3A9D5D", "Normal": "#4F6D8F", None: "#7A7A7A"},
@@ -60,11 +62,11 @@ def wrap(text, f, width):
 
 
 def fit_text(text, names, width, height, start, smallest, spacing=1.25):
-    """Largest font size (from start down) whose wrapped text fits the box."""
+    """Largest font size (from start down) whose wrapped text fits the box (no line wider than it)."""
     for size in range(start, smallest - 1, -1):
         f = font(size * SS, names)
         lines = wrap(text, f, width * SS)
-        if len(lines) * size * spacing <= height:
+        if len(lines) * size * spacing <= height and all(f.getlength(l) <= width * SS for l in lines):
             return f, lines, size
     f = font(smallest * SS, names)
     return f, wrap(text, f, width * SS), smallest
@@ -79,57 +81,43 @@ def colour_for(kind, card):
     return hex_rgb(table.get(card.get("class"), table[None]))
 
 
+def landscape_to_card(img):
+    """Cards lie landscape on the stand slope: the art is drawn landscape, then turned a quarter (counter-
+    clockwise) onto the portrait card image, so it reads left-to-right once the card is turned on its side."""
+    return img.rotate(90, expand=True)
+
+
 def draw_face(kind, card):
-    s = SS
+    """Just the name, big, across the card, on a frame in the kind/class colour."""
+    s, w, h = SS, H, W  # landscape: H wide, W tall
     col = colour_for(kind, card)
-    img = Image.new("RGB", (W * s, H * s), col)
+    img = Image.new("RGB", (w * s, h * s), col)
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([18 * s, 18 * s, (W - 18) * s, (H - 18) * s], radius=20 * s, fill=CREAM)
-    d.rounded_rectangle([18 * s, 18 * s, (W - 18) * s, 176 * s], radius=20 * s, fill=col)
-    d.rectangle([18 * s, 150 * s, (W - 18) * s, 176 * s], fill=col)
-    # icon badge
-    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], 76 * s, 4))
-    img.paste(icon, ((W - 112) * s, 50 * s), icon)
-    # name, shrunk to fit the header
-    name_font, name_lines, _ = fit_text(card["name"], BOLD, W - 170, 110, 52, 26, spacing=1.1)
-    y = 97 * s - len(name_lines) * name_font.size * 0.55
-    for line in name_lines:
-        d.text((48 * s, y), line, font=name_font, fill=(255, 255, 255), anchor="lm")
-        y += name_font.size * 1.1
-    # subtitle: kind, class, group
-    bits = [LABEL[kind]] + [b for b in (card.get("class"), card.get("group")) if b]
-    d.text((48 * s, 208 * s), "  ·  ".join(bits).upper(), font=font(19 * s, SEMI), fill=col, anchor="lm")
-    d.line([48 * s, 232 * s, (W - 48) * s, 232 * s], fill=col + (0,), width=2 * s)
-    # effect text
-    effect = card.get("effect") or ""
-    effect = effect[:1].upper() + effect[1:]
-    bottom = 740 if card.get("mega") else 790
-    body_font, body_lines, size = fit_text(effect, REGULAR, W - 96, bottom - 256, 36, 18)
-    y = 256 * s
-    for line in body_lines:
-        d.text((48 * s, y), line, font=body_font, fill=INK)
-        y += size * 1.25 * s
-    if card.get("mega"):
-        d.rounded_rectangle([40 * s, 752 * s, (W - 40) * s, 800 * s], radius=14 * s, fill=col)
-        d.text((W / 2 * s, 776 * s), card["mega"], font=font(21 * s, SEMI), fill=(255, 255, 255), anchor="mm")
-    return img.resize((W, H), Image.LANCZOS)
+    d.rounded_rectangle([22 * s, 22 * s, (w - 22) * s, (h - 22) * s], radius=24 * s, fill=CREAM)
+    d.rounded_rectangle([34 * s, 34 * s, (w - 34) * s, (h - 34) * s], radius=18 * s, outline=col, width=4 * s)
+    # one line across the card if it can be big enough; otherwise wrap
+    name_font, lines, size = fit_text(card["name"], BOLD, w - 120, 150, 150, 40, spacing=1.08)
+    if len(lines) > 1 or size < ONE_LINE_MIN:
+        name_font, lines, size = fit_text(card["name"], BOLD, w - 120, h - 140, 150, 40, spacing=1.08)
+    y = h / 2 * s - (len(lines) - 1) * size * 1.08 * s / 2
+    for line in lines:
+        d.text((w / 2 * s, y), line, font=name_font, fill=INK, anchor="mm")
+        y += size * 1.08 * s
+    return landscape_to_card(img.resize((w, h), Image.LANCZOS))
 
 
 def draw_back(kind):
-    s = SS
+    s, w, h = SS, H, W
     col = hex_rgb({"items": "#3E4F86", "skills": "#7A4E1E"}[kind])
-    dark = tuple(round(v * 0.72) for v in col)
-    img = Image.new("RGB", (W * s, H * s), dark)
+    img = Image.new("RGB", (w * s, h * s), tuple(round(v * 0.72) for v in col))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([18 * s, 18 * s, (W - 18) * s, (H - 18) * s], radius=20 * s, fill=col)
-    d.rounded_rectangle([40 * s, 40 * s, (W - 40) * s, (H - 40) * s], radius=14 * s, outline=(255, 255, 255), width=3 * s)
-    for i in range(-H, W, 46):  # faint diagonal stripes
-        d.line([(i * s, H * s), ((i + H) * s, 0)], fill=tuple(min(255, v + 10) for v in col), width=10 * s)
-    d.rounded_rectangle([40 * s, 40 * s, (W - 40) * s, (H - 40) * s], radius=14 * s, outline=(255, 255, 255), width=3 * s)
-    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], 260 * s, 4))
-    img.paste(icon, ((W - 260) // 2 * s, 230 * s), icon)
-    d.text((W / 2 * s, 600 * s), LABEL[kind].upper(), font=font(48 * s, BOLD), fill=(255, 255, 255), anchor="mm")
-    return img.resize((W, H), Image.LANCZOS)
+    d.rounded_rectangle([18 * s, 18 * s, (w - 18) * s, (h - 18) * s], radius=20 * s, fill=col)
+    for i in range(-h, w, 46):  # faint diagonal stripes
+        d.line([(i * s, h * s), ((i + h) * s, 0)], fill=tuple(min(255, v + 10) for v in col), width=10 * s)
+    d.rounded_rectangle([40 * s, 40 * s, (w - 40) * s, (h - 40) * s], radius=14 * s, outline=(255, 255, 255), width=3 * s)
+    icon = draw_icons.white(draw_icons.render(draw_icons.SHAPES[ICON[kind]], 230 * s, 4))
+    img.paste(icon, ((w - 230) // 2 * s, (h - 230) // 2 * s), icon)
+    return landscape_to_card(img.resize((w, h), Image.LANCZOS))
 
 
 def read_sheet(path):

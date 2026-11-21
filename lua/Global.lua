@@ -2,9 +2,11 @@
 Source: https://github.com/PCTTS/tts (lua/Global.lua). Edit there, not in TTS.
 
 Toolbar (right edge of the screen), one panel open at a time, each player gets their own:
-  * Pokéball: search the roster, click a result and that figure appears in front of your seat.
-  * Potion:   search the item cards, click one and it goes into your hand.
-  * Swords:   search the warrior skill cards, click one and it goes into your hand.
+  * Pokéball: search the roster, click a result and that figure goes on your next free pedestal.
+  * Potion:   search the item cards, click one and it goes in the next free item slot on your stand.
+  * Swords:   search the warrior skill cards, click one and it goes in the next free skill slot.
+Team stands (tagged "Stand") sit on the two long sides: six pedestals on top, an item card and a warrior skill
+card on the slope under each. Which stand is yours depends on your seat colour (SEAT_SIDE).
   * Swirl:    pick a status, then pick up a Pokémon to give it that status (it's tinted in the status's
               type colour). One main status at a time; Confused and Flinched can stack on top.
               "Clear status" returns a Pokémon to normal.
@@ -34,9 +36,9 @@ TOOLS = {
 -- Searchable catalogues behind the search panels.
 SEARCH_KINDS = { "dex", "items", "skills" }
 CATALOGS = {
-  dex = { title = "Spawn a Pokémon", noun = "Pokémon", hint = "Click a result to place it in front of you." },
-  items = { title = "Item cards", noun = "item", hint = "Click a result to put the card in your hand.", deckBase = 1000, tag = "Item" },
-  skills = { title = "Warrior skill cards", noun = "warrior skill", hint = "Click a result to put the card in your hand.",
+  dex = { title = "Spawn a Pokémon", noun = "Pokémon", hint = "Click a result to put it on your next free pedestal." },
+  items = { title = "Item cards", noun = "item", hint = "Click a result to put the card on your stand.", deckBase = 1000, tag = "Item" },
+  skills = { title = "Warrior skill cards", noun = "warrior skill", hint = "Click a result to put the card on your stand.",
     deckBase = 3000, tag = "WarriorSkill" },
 }
 ROSTER_URL = BASE_URL .. "figures/index.json"
@@ -71,7 +73,21 @@ ROW_TEXT = "#111111" -- result rows: dark text on light grey (TTS can reset text
 ROW_STEP = 32        -- height of one result row plus spacing
 SEARCH_BASE = 108    -- search panel height with no results (title, search box, hint)
 MAPS_BASE = 70       -- map panel height with no rows (title, hint)
-NO_SEAT_SPOT = { -35, 3, 0 }  -- where things appear for players without a seat: the strip left of the board
+NO_SEAT_SPOT = { -35, 4, 22 }  -- where things appear for players without a seat: the strip left of the board
+-- Which team stand each seat uses: the near (south, z < 0) or far (north) long side of the table.
+SEAT_SIDE = { White = "south", Brown = "south", Red = "south", Orange = "south", Pink = "south",
+  Green = "north", Teal = "north", Blue = "north", Yellow = "north", Purple = "north" }
+-- Team stand geometry, in the stand's own frame (from tools/build_props.py, props/stand-v1.json): six columns,
+-- each a pedestal on top with an item card and a warrior skill card below it on the slope.
+STAND = {
+  x = { -17.625, -10.575, -3.525, 3.525, 10.575, 17.625 },
+  pedestal = { y = 2.6, z = -1.6 },
+  cards = { items = { y = 2.0644, z = -5.1105 },
+            skills = { y = 1.0467, z = -8.5481 } },
+  tilt = 16.492, cardScale = 1.5, length = 42.3,
+}
+CARD_YAW = 270  -- cards lie landscape: turned a quarter so the name reads left-to-right for the stand's player
+PEDESTAL_TOP = 0.25  -- a pedestal's height above the stand top
 COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
 
 catalog = {}         -- kind -> { index = name -> data, list = sorted search entries, keys = name -> deck id }
@@ -176,34 +192,58 @@ end
 ----------------------------------------------------------------------------------------------------
 -- Spawning
 ----------------------------------------------------------------------------------------------------
--- In front of the player's seat, in a row of six so repeated spawns don't land on each other.
-local function spawnSpot(color)
-  local n = spawnCount[color] or 0
-  spawnCount[color] = n + 1
-  local slot = (n % 6) - 2.5
-  local ok, hand = pcall(function() return Player[color].getHandTransform() end)
-  if ok and hand then
-    local fwd = Vector(hand.forward.x, 0, hand.forward.z):normalized()
-    local right = Vector(fwd.z, 0, -fwd.x)
-    local pos = hand.position + fwd * 5 + right * (slot * 2.6)
-    return Vector(pos.x, 4, pos.z), Vector(0, hand.rotation.y + FRONT_YAW, 0)
+-- The team stand on this player's side (tagged "Stand"; the near one has z < 0), or nil.
+function standFor(color)
+  local side = SEAT_SIDE[color]
+  if not side then return nil end
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Stand") and ((o.getPosition().z < 0) == (side == "south")) then return o end
   end
-  return Vector(NO_SEAT_SPOT[1], 4, NO_SEAT_SPOT[3] + slot * 2.6), Vector(0, FRONT_YAW, 0)
 end
 
--- Just above the player's hand zone, so a card drops into their hand (hidden from other players).
-local function handSpot(color)
-  local ok, hand = pcall(function() return Player[color].getHandTransform() end)
-  if ok and hand then
-    return Vector(hand.position.x, hand.position.y + 1.5, hand.position.z), Vector(0, hand.rotation.y + 180, 0)
+local function near(a, b, r)
+  return (a.x - b.x) ^ 2 + (a.z - b.z) ^ 2 < r * r
+end
+
+-- Is anything of this sort already sitting on the given spot?
+local function taken(spot, isCard)
+  for _, o in ipairs(getAllObjects()) do
+    local wanted = false
+    if isCard then wanted = o.type == "Card" else wanted = o.hasTag("Pokemon") or o.type == "Figurine" end
+    if wanted and near(o.getPosition(), spot, 1.0) then return true end
   end
-  return Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3]), Vector(0, 180, 0)
+  return false
+end
+
+-- Card rotation on the slope: a quarter turn (landscape), tilted to the slope's angle.
+function cardRotation(stand)
+  local tilt = STAND.tilt * (CARD_YAW == 270 and 1 or -1)
+  return Vector(0, stand.getRotation().y + CARD_YAW, tilt)
+end
+
+-- First free spot on the player's stand, columns from the player's left. kind: "dex" (pedestal) or a card kind.
+function freeSpot(color, kind)
+  local stand = standFor(color)
+  if not stand then return nil end
+  for _, x in ipairs(STAND.x) do
+    local spot
+    if kind == "dex" then
+      spot = stand.positionToWorld(Vector(x, STAND.pedestal.y + PEDESTAL_TOP, STAND.pedestal.z))
+    else
+      spot = stand.positionToWorld(Vector(x, STAND.cards[kind].y, STAND.cards[kind].z))
+    end
+    if not taken(spot, kind ~= "dex") then return spot, stand end
+  end
+  -- all full: past the stand's right-hand end (from its player's side)
+  return stand.positionToWorld(Vector(STAND.length / 2 + 3, 3, -5)), stand, true
 end
 
 function spawnPokemon(name, color)
   local files = roster[name]
   if not files then return nil end
-  local pos, rot = spawnSpot(color or "Grey")
+  local spot, stand = freeSpot(color or "Grey", "dex")
+  local pos = spot and Vector(spot.x, spot.y + 1.5, spot.z) or Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3])
+  local yaw = (stand and stand.getRotation().y or 0) + FRONT_YAW  -- front faces the stand's player
   return spawnObjectData({
     data = {
       Name = "Figurine_Custom",
@@ -219,28 +259,37 @@ function spawnPokemon(name, color)
       },
     },
     position = pos,
-    rotation = rot,
+    rotation = Vector(0, yaw, 0),
   })
 end
 
--- A single card (its own one-card deck sheet), named after the item/skill, with the effect as its description.
+-- A single landscape card (its own one-card deck sheet) on the next free slot of the player's stand:
+-- items in the upper row, warrior skills in the lower. The effect is its hover description.
 function spawnCard(kind, name, color)
   local card, key = catalog[kind].index[name], catalog[kind].keys[name]
   if not (card and key and cardBacks[kind]) then return nil end
   local deck = {}
   deck[tostring(key)] = { FaceURL = BASE_URL .. card.face, BackURL = BASE_URL .. cardBacks[kind], NumWidth = 1, NumHeight = 1,
     BackIsHidden = true, UniqueBack = false, Type = 0 }
-  local pos, rot = handSpot(color or "Grey")
+  local spot, stand, full = freeSpot(color or "Grey", kind)
+  local pos, rot
+  if spot and not full then
+    pos, rot = Vector(spot.x, spot.y + 0.05, spot.z), cardRotation(stand)
+  else
+    pos = spot and Vector(spot.x, spot.y + 1, spot.z) or Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3])
+    rot = Vector(0, (stand and stand.getRotation().y or 0) + CARD_YAW, 0)
+  end
+  local k = STAND.cardScale
   return spawnObjectData({
     data = {
       Name = "CardCustom",
-      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = k, scaleY = 1, scaleZ = k },
       Nickname = name,
       Description = card.effect or "",
       Tags = { CATALOGS[kind].tag },
       CardID = key * 100,
       CustomDeck = deck,
-      Hands = true,
+      SidewaysCard = true,
     },
     position = pos,
     rotation = rot,
@@ -425,7 +474,7 @@ function searchPick(player, _, id)
   local hits = searchHits[c]
   local name = hits and hits.kind == kind and hits.names[tonumber(i)]
   if name and spawnFrom(kind, name, c) then
-    UI.setValue(kind .. "Msg_" .. c, (kind == "dex" and "Placed " or "Added to your hand: ") .. name .. ".")
+    UI.setValue(kind .. "Msg_" .. c, "Placed " .. name .. ".")
   end
 end
 
