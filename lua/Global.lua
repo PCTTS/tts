@@ -4,6 +4,8 @@ Source: https://github.com/PCTTS/tts (lua/Global.lua). Edit there, not in TTS.
 Toolbar (right edge of the screen), one panel open at a time, each player gets their own:
   * Pokéball: search the roster, click a result and that figure appears in front of your seat.
   * Map:      pick which arena the board shows.
+  * Swirl:    pick a status, then pick up a Pokémon to give it that status (it's tinted in the status's
+              type colour). One main status at a time; Confused and Flinched can stack on top.
 Chat:  !spawn garchomp   spawns the best match (and lists close alternatives if unsure).
 
 The roster comes from figures/index.json on the PCTTS site, so new Pokemon appear without editing the mod.
@@ -12,14 +14,34 @@ The last roster loaded is kept in the save, so the spawner still works if the si
 
 BASE_URL = "https://pctts.github.io/tts/"
 ROSTER_URL = BASE_URL .. "figures/index.json"
-ICONS = { pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png" }
+ICONS = { pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png", status = "ui/icons/status-v3.png" }
 -- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
 -- UI images it shrinks, so a much larger image looks jagged.
 BAR_ICON, BAR_MARGIN, BAR_GAP = 32, 3, 6
 TOOLS = {
   { icon = "pokeball", tip = "Spawn a Pokémon", click = "toggleDex" },
   { icon = "map", tip = "Choose the map", click = "toggleMaps" },
+  { icon = "status", tip = "Give a status", click = "toggleStatus" },
 }
+-- Statuses from the rules, each tinted with its type's colour. `strength` = how far the figure's tint moves
+-- from white toward that colour (default STATUS_TINT). Volatile ones can stack on a main status.
+STATUS_TINT = 0.5
+STATUSES = {
+  { key = "burn", label = "Burned", type = "Fire", color = "#EE8130" },
+  { key = "paralysis", label = "Paralyzed", type = "Electric", color = "#F7D02C" },
+  { key = "poison", label = "Poisoned", type = "Poison", color = "#A33EA1" },
+  { key = "toxic", label = "Badly poisoned", type = "Poison", color = "#A33EA1", strength = 0.75 },
+  { key = "frostbite", label = "Frostbitten", type = "Ice", color = "#96D9D6" },
+  { key = "drowsy", label = "Drowsy", type = "Normal", color = "#A8A77A", strength = 0.8 },
+  { key = "confused", label = "Confused", type = "Psychic", color = "#F95587", volatile = true },
+  { key = "flinched", label = "Flinched", type = "Dark", color = "#705746", volatile = true },
+}
+STATUS_BY_KEY, STATUS_ROWS = {}, {}  -- rows: every status, then "clear"
+for _, s in ipairs(STATUSES) do
+  STATUS_BY_KEY[s.key] = s
+  STATUS_ROWS[#STATUS_ROWS + 1] = s
+end
+STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear all statuses", color = "#9E9E9E" }
 FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
@@ -33,6 +55,7 @@ COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue",
 roster = {}          -- name -> { front = "...", back = "..." } (paths relative to BASE_URL)
 rosterList = {}      -- sorted { name, key, words } for searching
 openPanel, dexHits, mapRows, spawnCount = {}, {}, {}, {}
+armed = {}           -- [colour] = status key waiting for that player to pick up a Pokémon
 
 ----------------------------------------------------------------------------------------------------
 -- Save / load
@@ -254,15 +277,26 @@ function buildUI()
       rows[#rows + 1] = string.format('<Button id="mapRes_%s_%d" class="row" active="false" onClick="mapPick" text=" "/>', c, i)
     end
     xml[#xml + 1] = panelXml("maps", c, "Choose the map", MAPS_BASE, table.concat(rows, "\n  "))
+
+    rows = { string.format('<Text id="statusMsg_%s" class="hint">%s</Text>', c, STATUS_HINT) }
+    for _, s in ipairs(STATUS_ROWS) do
+      rows[#rows + 1] = string.format('<Button id="statusRes_%s_%s" class="row" onClick="statusPick" text="%s" colors="%s"/>',
+        c, s.key, s.label, statusRowColors(s.color, false))
+    end
+    xml[#xml + 1] = panelXml("status", c, "Give a status", MAPS_BASE + #STATUS_ROWS * ROW_STEP, table.concat(rows, "\n  "))
   end
   UI.setXml(table.concat(xml))
 end
 
 local function show(c, kind)
-  for _, k in ipairs({ "dex", "maps" }) do
+  for _, k in ipairs({ "dex", "maps", "status" }) do
     UI.setAttribute(k .. "_" .. c, "active", (k == kind) and "true" or "false")
   end
   openPanel[c] = kind
+  if kind ~= "status" and armed[c] then  -- closing the status panel cancels a waiting status
+    armed[c] = nil
+    refreshStatus(c)
+  end
 end
 
 function closePanel(player)
@@ -341,6 +375,111 @@ function mapPick(player, _, id)
       if openPanel[other] == "maps" then refreshMaps(other) end
     end
   end, 5)
+end
+
+----------------------------------------------------------------------------------------------------
+-- Statuses: pick one in the panel, then pick up a Pokémon. Stored in the figure's memo, shown as a tint.
+----------------------------------------------------------------------------------------------------
+STATUS_HINT = "Pick a status, then pick up a Pokémon."
+
+local function hexRGB(hex)
+  return tonumber(hex:sub(2, 3), 16) / 255, tonumber(hex:sub(4, 5), 16) / 255, tonumber(hex:sub(6, 7), 16) / 255
+end
+
+-- Colour `t` of the way from hex a to hex b.
+local function mixHex(a, b, t)
+  local r1, g1, b1 = hexRGB(a)
+  local r2, g2, b2 = hexRGB(b)
+  local function ch(x, y) return math.floor((x + (y - x) * t) * 255 + 0.5) end
+  return string.format("#%02X%02X%02X", ch(r1, r2), ch(g1, g2), ch(b1, b2))
+end
+
+-- Row colours (normal|hover|pressed|disabled): pale type colour; strong when armed.
+function statusRowColors(hex, isArmed)
+  if isArmed then
+    local s = mixHex("#F0F0F0", hex, 0.75)
+    return table.concat({ s, s, s, s }, "|")
+  end
+  return table.concat({ mixHex("#F0F0F0", hex, 0.3), mixHex("#F0F0F0", hex, 0.5), mixHex("#F0F0F0", hex, 0.65),
+    mixHex("#F0F0F0", hex, 0.3) }, "|")
+end
+
+function toggleStatus(player)
+  local c = player.color
+  if openPanel[c] == "status" then return show(c, nil) end
+  show(c, "status")
+  refreshStatus(c)
+end
+
+function refreshStatus(c)
+  for _, s in ipairs(STATUS_ROWS) do
+    UI.setAttribute("statusRes_" .. c .. "_" .. s.key, "colors", statusRowColors(s.color, armed[c] == s.key))
+  end
+  UI.setValue("statusMsg_" .. c, armed[c] and "Now pick up a Pokémon (click the status again to cancel)." or STATUS_HINT)
+end
+
+function statusPick(player, _, id)
+  local c = player.color
+  local key = id:match("^statusRes_%a+_(%a+)$")
+  armed[c] = (armed[c] ~= key) and key or nil
+  refreshStatus(c)
+  if armed[c] then
+    local what = key == "clear" and "clear its statuses" or ("make it " .. STATUS_BY_KEY[key].label:lower())
+    player.broadcast("Pick up a Pokémon to " .. what .. ".", { 0.9, 0.9, 0.9 })
+  end
+end
+
+local function isFigure(obj)
+  if not obj or obj.getLock() then return false end
+  return obj.hasTag("Pokemon") or obj.type == "Figurine" or (obj.name or ""):find("Figurine_Custom", 1, true) ~= nil
+end
+
+-- Per-figure state lives in its memo as JSON: { pokemon = name, status = key|nil, confused = true|nil, flinched = true|nil }
+function figureState(obj)
+  local ok, st = pcall(JSON.decode, obj.memo or "")
+  if not ok or type(st) ~= "table" then st = {} end
+  st.pokemon = st.pokemon or obj.getName()
+  return st
+end
+
+function paintFigure(obj, st)
+  local key = st.status or (st.confused and "confused") or (st.flinched and "flinched") or nil
+  local def = key and STATUS_BY_KEY[key]
+  local r, g, b = 1, 1, 1
+  if def then r, g, b = hexRGB(mixHex("#FFFFFF", def.color, def.strength or STATUS_TINT)) end
+  obj.setColorTint({ r = r, g = g, b = b })
+  local labels = {}
+  if st.status then labels[#labels + 1] = STATUS_BY_KEY[st.status].label end
+  if st.confused then labels[#labels + 1] = "Confused" end
+  if st.flinched then labels[#labels + 1] = "Flinched" end
+  obj.setDescription(#labels > 0 and ("Status: " .. table.concat(labels, ", ")) or "")
+end
+
+function applyStatus(obj, key)
+  local st, def = figureState(obj), STATUS_BY_KEY[key]
+  local name, now = (st.pokemon ~= "" and st.pokemon) or "That Pokémon", false
+  if key == "clear" then
+    st.status, st.confused, st.flinched = nil, nil, nil
+  elseif def.volatile then
+    st[key] = (not st[key]) or nil   -- toggles
+    now = st[key]
+  else
+    st.status = (st.status ~= key) and key or nil  -- replaces the main status, or removes it if it's the same
+    now = st.status ~= nil
+  end
+  obj.memo = JSON.encode(st)
+  paintFigure(obj, st)
+  local msg = key == "clear" and (name .. " has no status now.")
+    or (name .. (now and " is now " or " is no longer ") .. def.label:lower() .. ".")
+  printToAll(msg, { 0.95, 0.88, 0.75 })
+end
+
+function onObjectPickUp(color, obj)
+  local key = armed[color]
+  if not key or not isFigure(obj) then return end
+  armed[color] = nil
+  applyStatus(obj, key)
+  refreshStatus(color)
 end
 
 ----------------------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@ reads names from a fake map board. (TTS's own Lua, MoonSharp, has quirks real Lu
 import json, re, sys, xml.etree.ElementTree as ET
 from pathlib import Path
 
+import lupa
 from lupa import LuaRuntime
 
 REPO = Path(__file__).resolve().parent.parent
@@ -34,7 +35,7 @@ UI = {
   setValue = function(id, v) calls.values[id] = v end,
 }
 WebRequest = { get = function(url, cb) calls.url = url; cb({ is_error = false, text = ROSTER_JSON }) end }
-JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t) return "{}" end }
+JSON = { decode = function(s) return py_json_decode(s) end, encode = function(t) return py_json_encode(t) end }
 function print(s) calls.printed[#calls.printed + 1] = s end
 function printToAll(s) calls.printed[#calls.printed + 1] = s end
 Wait = { frames = function(f) f() end }
@@ -70,8 +71,17 @@ def main():
             return lua.table_from([to_lua(x) for x in v])
         return v
 
+    def from_lua(v):
+        if lupa.lua_type(v) == "table":
+            keys = list(v.keys())
+            if keys and all(isinstance(k, int) for k in keys) and sorted(keys) == list(range(1, len(keys) + 1)):
+                return [from_lua(v[k]) for k in sorted(keys)]
+            return {str(k): from_lua(v[k]) for k in keys}
+        return v
+
     g = lua.globals()
-    g.py_json_decode = lambda s: to_lua(json.loads(s))
+    g.py_json_decode = lambda s: to_lua(json.loads(s)) if s else None
+    g.py_json_encode = lambda t: json.dumps(from_lua(t))
     g.ROSTER_JSON = (REPO / "figures" / "index.json").read_text(encoding="utf-8")
     lua.execute(PRELUDE)
 
@@ -101,10 +111,10 @@ def main():
         ids = [e.get("id") for e in root.iter() if e.get("id")]
         check(len(ids) == len(set(ids)), f"UI XML parses; {len(ids)} ids, all unique")
         bar = next(e for e in root.iter() if e.get("id") == "toolbar")
-        check((bar.get("width"), bar.get("height")) == ("38", "76"), f"toolbar is 38 x 76 ({bar.get('width')} x {bar.get('height')})")
+        check((bar.get("width"), bar.get("height")) == ("38", "114"), f"toolbar is 38 x 114 ({bar.get('width')} x {bar.get('height')})")
     except ET.ParseError as e:
         check(False, f"UI XML parses ({e})")
-    check(len(list(calls.assets.values())) == 2, "two toolbar icons registered")
+    check(len(list(calls.assets.values())) == 3, "three toolbar icons registered")
     check(any("roster: 704" in str(p) for p in calls.printed.values()), "roster downloaded (704 names)")
 
     # search
@@ -137,6 +147,36 @@ def main():
     g.toggleMaps(player)
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false",
           "map button opens the map panel (and closes the search panel)")
+
+    # statuses: arm one, pick up a figure, check tint/description/memo; toggles and clearing
+    lua.execute(r"""
+      fig = { memo = "", tint = nil, desc = nil, type = "Figurine", name = "Figurine_Custom",
+        hasTag = function(t) return t == "Pokemon" end, getLock = function() return false end,
+        getName = function() return "Garchomp" end,
+        setColorTint = function(c) fig.tint = c end, setDescription = function(d) fig.desc = d end }
+      setmetatable(fig, { __index = function(t, k) return rawget(t, k) end })
+      board_obj = { getLock = function() return true end }
+    """)
+    fig = g.fig
+    player.broadcast = lambda *a: None
+    g.toggleStatus(player)
+    check(calls.attrs["status_White.active"] == "true", "swirl button opens the status panel")
+    g.statusPick(player, "-1", "statusRes_White_burn")
+    check(g.armed["White"] == "burn", "picking Burned arms it")
+    g.onObjectPickUp("White", g.board_obj)
+    check(g.armed["White"] == "burn", "picking up a locked object (the board) doesn't use it")
+    g.onObjectPickUp("White", fig)
+    tint = fig.tint
+    check(g.armed["White"] is None and tint.r > 0.95 and tint.b < 0.65, f"pick-up applies it: orange tint ({tint.r:.2f}, {tint.g:.2f}, {tint.b:.2f})")
+    check(fig.desc == "Status: Burned" and '"burn"' in fig.memo, f"description and memo record it ({fig.desc})")
+    g.statusPick(player, "-1", "statusRes_White_confused"); g.onObjectPickUp("White", fig)
+    check(fig.desc == "Status: Burned, Confused", "Confused stacks on Burned")
+    g.statusPick(player, "-1", "statusRes_White_paralysis"); g.onObjectPickUp("White", fig)
+    check(fig.desc == "Status: Paralyzed, Confused", "a new main status replaces the old one")
+    g.statusPick(player, "-1", "statusRes_White_clear"); g.onObjectPickUp("White", fig)
+    check(fig.desc == "" and fig.tint.r == 1 and fig.tint.b == 1, "Clear all removes statuses and tint")
+    g.statusPick(player, "-1", "statusRes_White_drowsy"); g.toggleDex(player)
+    check(g.armed["White"] is None, "switching panels cancels a waiting status")
 
     print("\nall checks passed" if not failures else f"\n{len(failures)} check(s) failed")
     sys.exit(1 if failures else 0)
