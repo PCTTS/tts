@@ -17,7 +17,7 @@ What it looked like:
   nested L's on the corner staircases, straight lines in the alcoves.
 - All walls (inner and the board's outer edge): rock in `#8E6C48`, darker toward the bottom, with wavy
   horizontal strata lines.
-- Markers unchanged since: red fall edges `#D2392C`, spawn rings (blue 1 / red 2), flags, ATK/DEF bells.
+- Markers, all drawn upright: red fall edges `#D2392C`, spawn rings (blue 1 / red 2), flags, ATK/DEF bells.
 
 To rebuild it from today's builder: remove `"textures"` from `map.json`, remove `"paint"` and `"orient"` from the
 `F`, `A` and `D` legend entries (the original painted the flags, and drew every symbol upright), and set the stair
