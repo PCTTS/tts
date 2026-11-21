@@ -35,7 +35,7 @@
   "_float": "Floating islands: the whole board is lifted this many world units (at tile 3.24875) above the table, island edges drop a short cliff, and below that the rock tapers down to points (deepest under the middle of each island).",
   "float": { "lift": 2.9, "cliff": 0.45, "depth": 1.25, "power": 1.15, "max": 2.6 },
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v2.obj", "texture": "board-v4.jpg", "geometry": "board-v2.json" },
+  "board": { "mesh": "board-v2.obj", "texture": "board-v5.jpg", "geometry": "board-v2.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/sky-placeholder-v1.jpg",
   "_textures": "Placeholders from tools/draw_placeholders.py (grass on the islands, rock on the cliffs and undersides); the high ground is the Pugilis dirt (user's art) recoloured to earth brown.",

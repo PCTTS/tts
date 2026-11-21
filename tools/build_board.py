@@ -226,8 +226,8 @@ def draw_texture(a):
             o.rectangle([x0, y0t, x0 + p - 1, y0t + p - 1], outline=(40, 28, 18, 110), width=SS)
             if t.get("surface") == "stairs":
                 draw_steps(o, a, r, c, x0, y0t, p)
-            if t.get("paint", True):
-                turn = MARKER_TURN.get(a.away_from_pit(r, c)) if t.get("orient") == "away-from-pit" else None
+            if t.get("paint", True) and t.get("marker"):
+                turn = marker_turn(a, r, c, t)
                 if turn:   # drawn upright on its own layer, then turned so its bottom points the right way
                     layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
                     draw_marker(ImageDraw.Draw(layer), t.get("marker"), 0, 0, p)
@@ -286,25 +286,25 @@ FRINGE = {"reach": 0.42, "wobble": 0.3, "rough": 1.0, "tufts": 160}   # defaults
 
 
 def draw_coords(over, a, p):
-    """Coordinates 1..C and 1..R in the board's edge tiles, as player 1 reads them (x from their left along their
-    edge, y up the left side), and the same numbers upside down on player 2's two edges."""
+    """Coordinates in the board's edge tiles: x = 1..C along both player edges (from player 1's left), y = 1..R up
+    both side edges (from player 1's side). Like every drawing on a board they face its sides, not a player: each
+    number's bottom points at the nearer left/right edge."""
     f = font(round(p * 0.15))
     size = round(p * 0.28)
 
-    def label(text, cx, cy, flip):
+    def label(text, cx, cy):
         layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
         ImageDraw.Draw(layer).text((size / 2, size / 2), text, font=f, fill=(236, 226, 208, 190), anchor="mm",
                                    stroke_width=max(1, round(p * 0.012)), stroke_fill=(0, 0, 0, 150))
-        if flip:
-            layer = layer.rotate(180)
+        layer = layer.rotate(side_turn(a, cx, p))
         over.alpha_composite(layer, (round(cx - size / 2), round(cy - size / 2)))
 
     for c in range(a.C):
-        label(str(c + 1), c * p + p / 2, (a.R - 1) * p + p * 0.85, False)     # player 1's edge
-        label(str(c + 1), c * p + p / 2, p * 0.15, True)                      # player 2's edge
+        label(str(c + 1), c * p + p / 2, (a.R - 1) * p + p * 0.85)     # along player 1's edge
+        label(str(c + 1), c * p + p / 2, p * 0.15)                      # along player 2's edge
     for r in range(a.R):
-        label(str(a.R - r), p * 0.15, r * p + p / 2, False)                   # player 1's left
-        label(str(a.R - r), (a.C - 1) * p + p * 0.85, r * p + p / 2, True)    # player 2's left
+        label(str(a.R - r), p * 0.15, r * p + p / 2)                   # up the left edge
+        label(str(a.R - r), (a.C - 1) * p + p * 0.85, r * p + p / 2)    # up the right edge
 
 
 def grass_fringe(a, img, layers, p):
@@ -402,6 +402,26 @@ def draw_steps(o, a, r, c, x0, y0, p):
 # A marker's turn (degrees counter-clockwise) so its bottom points along a grid direction (dr, dc): drawn
 # upright, its bottom points down the image (+r).
 MARKER_TURN = {(1, 0): 0, (0, 1): 90, (-1, 0): 180, (0, -1): 270}
+
+
+def side_turn(a, x_px, p):
+    """The turn that points a drawing's bottom at the board's nearer left/right edge (x_px: its centre, in pixels)."""
+    return MARKER_TURN[(0, -1) if x_px < a.C * p / 2 else (0, 1)]
+
+
+def marker_turn(a, r, c, t):
+    """How a painted marker is turned (the user's rule: drawings face the board's sides, never either player):
+    spawn circles face their own player (spawn1 upright for player 1, spawn2 upside down for player 2); an
+    explicit "orient" wins ("away-from-pit": bottom away from the lower neighbours); anything else has its bottom
+    toward the nearer left/right edge."""
+    marker = t.get("marker", "")
+    if marker == "spawn1":
+        return 0
+    if marker == "spawn2":
+        return 180
+    if t.get("orient") == "away-from-pit" and a.away_from_pit(r, c):
+        return MARKER_TURN[a.away_from_pit(r, c)]
+    return MARKER_TURN[(0, -1) if c < a.C / 2 else (0, 1)]
 
 
 def draw_marker(o, marker, x0, y0, p):

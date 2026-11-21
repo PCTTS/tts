@@ -1,7 +1,7 @@
 {
  "Illusio": {
   "mesh": "arenas/illusio/board-v2.obj",
-  "texture": "arenas/illusio/board-v4.jpg",
+  "texture": "arenas/illusio/board-v5.jpg",
   "table": "misc/sky-placeholder-v1.jpg",
   "snaps": [
    [
@@ -836,7 +836,7 @@
  },
  "Ingis": {
   "mesh": "arenas/ingis/board-v2.obj",
-  "texture": "arenas/ingis/board-v2.jpg",
+  "texture": "arenas/ingis/board-v3.jpg",
   "table": "misc/volcano-placeholder-v1.jpg",
   "snaps": [
    [
@@ -2179,7 +2179,7 @@
  },
  "Pugilis": {
   "mesh": "arenas/pugilis/board-v14.obj",
-  "texture": "arenas/pugilis/board-v17.jpg",
+  "texture": "arenas/pugilis/board-v18.jpg",
   "table": "misc/table-placeholder-v1.jpg",
   "snaps": [
    [
@@ -3232,7 +3232,7 @@
  },
  "Viperia": {
   "mesh": "arenas/viperia/board-v1.obj",
-  "texture": "arenas/viperia/board-v1.jpg",
+  "texture": "arenas/viperia/board-v2.jpg",
   "table": "misc/jungle-placeholder-v1.jpg",
   "snaps": [
    [

@@ -33,7 +33,7 @@
     "d": { "level": 0, "surface": "floor", "marker": "trapdoor4" }
   },
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "board": { "mesh": "board-v1.obj", "texture": "board-v2.jpg", "geometry": "board-v1.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/jungle-placeholder-v1.jpg",
   "_textures": "Placeholders from tools/draw_placeholders.py: jungle floor, purple poison sludge, mossy stone wall tops, vine-covered wall faces.",
