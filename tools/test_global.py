@@ -57,6 +57,8 @@ local function stub(o)
   o.getLock = o.getLock or function() return o.locked or false end
   o.getStates = o.getStates or function() return nil end            -- every real TTS object has these
   o.getCustomObject = o.getCustomObject or function() return {} end
+  o.getRotation = o.getRotation or function() return Vector(0, 0, 0) end
+  o.UI = o.UI or { setXml = function() end, setAttribute = function() end }
   objects[#objects + 1] = o
   return o
 end
@@ -199,7 +201,7 @@ def main():
     spawned = calls.spawned[1]
     check(spawned is not None and spawned.data.Nickname == "Charizard" and spawned.data.Name == "Custom_Model"
           and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v1.obj")
-          and spawned.data.CustomMesh.DiffuseURL.endswith("standees/v2/charizard.webp") and spawned.data.CustomMesh.TypeIndex == 1,
+          and spawned.data.CustomMesh.DiffuseURL.endswith("standees/v3/charizard.webp") and spawned.data.CustomMesh.TypeIndex == 1,
           "clicking row 1 spawns Charizard as a standee (art on an arrowed base)")
     memo = json.loads(spawned.data.Memo)
     want = json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Charizard"]["hp"]
@@ -377,6 +379,20 @@ def main():
     check(f.memo == "Blue" and f.tint.b == 1, "Blue can take it over")
     f.menu[2].fn("Blue")
     check(f.memo == "" and f.tint.r == 0.6 and f.desc.startswith("Neutral."), "Make neutral resets it")
+
+    # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them
+    saved = g.onSave()
+    check(saved.startswith("PCTTS-STATE-1") and len(saved) > 100000 and '"Charizard"' in saved,
+          f"the save holds the downloaded roster, cards and stats as text ({len(saved) // 1024} KB)")
+    lua.execute(r"""
+      WebRequest.get = function(url, cb) cb({ is_error = true, error = "offline" }) end
+      catalog.dex = { index = {}, list = {}, keys = {} }
+      stats = {}
+    """)
+    g.onLoad(saved)
+    check(len(g.catalog.dex.list) == 704 and g.stats["Gengar"] is not None
+          and any("using the saved copy" in str(p) for p in calls.printed.values()),
+          "offline, a load falls back to the saved copies (roster, stats)")
 
     print("\nall checks passed" if not failures else f"\n{len(failures)} check(s) failed")
     sys.exit(1 if failures else 0)

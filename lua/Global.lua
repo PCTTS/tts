@@ -123,40 +123,73 @@ listNames, builtLists = {}, {}             -- names in each full list as built, 
 ----------------------------------------------------------------------------------------------------
 -- Save / load
 ----------------------------------------------------------------------------------------------------
+-- The downloads (roster, cards, stats) are kept as the text that came in and saved as that text: TTS saves the
+-- game every few seconds for rewind, and turning these tables back into JSON took over a second each time
+-- (the stutter). Each is decoded once per load: the fresh download, or the saved copy if the site can't be reached.
+DATA = {
+  { key = "roster", url = ROSTER_URL, use = function(t) setCatalog("dex", t, "downloaded") end },
+  { key = "cards", url = CARDS_URL, use = function(t) setCards(t, "downloaded") end },
+  { key = "stats", url = STATS_URL, use = function(t) stats = t; refreshAllHp() end },
+}
+STATE_MARK, STATE_SEP = "PCTTS-STATE-1", "\n\30\n"   -- a raw \30 (record separator) can't appear in JSON text
+rawData, savedState = {}, ""
+
+local function rememberData(key, text)
+  rawData[key] = text
+  local parts = { STATE_MARK }
+  for _, d in ipairs(DATA) do parts[#parts + 1] = d.key .. "=" .. (rawData[d.key] or "") end
+  savedState = table.concat(parts, STATE_SEP)
+end
+
+local function readSavedState(saved)
+  local texts = {}
+  if saved and saved:sub(1, #STATE_MARK) == STATE_MARK then
+    for part in (saved .. STATE_SEP):gmatch("(.-)" .. STATE_SEP) do
+      local key, text = part:match("^(%a+)=(.*)$")
+      if key and text ~= "" then texts[key] = text end
+    end
+  elseif saved and saved:sub(1, 1) == "{" then   -- an older save: decoded tables (slow, but only once)
+    local ok, old = pcall(JSON.decode, saved)
+    if ok and type(old) == "table" then texts.legacy = old end
+  end
+  return texts
+end
+
 function onLoad(saved)
-  local state = (saved and saved ~= "") and JSON.decode(saved) or {}
-  if state.roster then setCatalog("dex", state.roster, "saved copy") end
-  if state.cards then setCards(state.cards, "saved copy") end
-  if state.stats then stats = state.stats end
-  buildUI()
+  local texts = readSavedState(saved)
+  for key, text in pairs(texts) do
+    if key ~= "legacy" then rememberData(key, text) end
+  end
+  for _, d in ipairs(DATA) do
+    WebRequest.get(d.url, function(req)
+      local text = (not req.is_error and req.text and req.text ~= "") and req.text or nil
+      local from = "downloaded"
+      if not text then
+        log("Couldn't download the " .. d.key .. " (" .. tostring(req.error) .. "); using the saved copy.")
+        text, from = rawData[d.key], "saved copy"
+      end
+      local ok, data = false, nil
+      if text then ok, data = pcall(JSON.decode, text) end
+      if ok and type(data) == "table" and next(data) then
+        if from == "downloaded" then rememberData(d.key, text) end
+        d.use(data)
+      elseif texts.legacy and texts.legacy[d.key] then
+        d.use(texts.legacy[d.key])
+      end
+      if d.key == "cards" then buildUI() end   -- once, as soon as the card lists can go in it
+    end)
+  end
   for _, obj in ipairs(getAllObjects()) do flagMenu(obj) end   -- context menus aren't saved with the game
   refreshAllHp()
   Wait.time(refreshAllHp, 2)   -- again once the objects have finished loading (their own saved UI can replace ours)
-  fetchJSON(ROSTER_URL, "roster", function(index) setCatalog("dex", index, "downloaded") end)
-  fetchJSON(CARDS_URL, "cards", function(index) setCards(index, "downloaded") end)
-  fetchJSON(STATS_URL, "stats", function(data)
-    stats = data
-    refreshAllHp()
-  end)
 end
 
 function onSave()
-  return JSON.encode({ roster = catalog.dex.index, cards = savedCards, stats = stats })
+  return savedState
 end
 
 function log(msg)
   print("[PCTTS] " .. msg)
-end
-
-function fetchJSON(url, what, onData)
-  WebRequest.get(url, function(req)
-    if req.is_error or not req.text or req.text == "" then
-      log("Couldn't download the " .. what .. " (" .. tostring(req.error) .. "); using the saved copy.")
-      return
-    end
-    local ok, data = pcall(JSON.decode, req.text)
-    if ok and type(data) == "table" and next(data) then onData(data) end
-  end)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -190,7 +223,6 @@ function listSignature(kind)
 end
 
 function setCards(data, from)
-  savedCards = data
   cardBacks = data.backs or {}
   if data.items then setCatalog("items", data.items, from) end
   if data.skills then setCatalog("skills", data.skills, from) end
