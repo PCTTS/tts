@@ -168,7 +168,7 @@ def main():
         check((body.get("height"), body.get("padding")) == (str(67 * 32 - 4), "0 20 0 0"),
               f"a list's body is as tall as its rows, with room for the scrollbar ({body.get('height')}, {body.get('padding')})")
         sw = next(e for e in root.iter() if e.get("id") == "statusSwatch_White_burn")
-        check(sw.get("color") == "#EE8130", "each status row has a full-colour square (Burned: #EE8130)")
+        check(sw.get("color") == "#FF4421", "each status row has a full-colour square in its type's colour (Burned: Fire #FF4421)")
     except ET.ParseError as e:
         check(False, f"UI XML parses ({e})")
     check(len(list(calls.assets.values())) == 5, "five toolbar icons registered")
@@ -228,7 +228,7 @@ def main():
     check(g.armed["White"] == "burn", "picking up a locked object (the board) doesn't use it")
     g.onObjectPickUp("White", fig)
     tint = fig.tint
-    check(g.armed["White"] is None and tint.r > 0.9 and tint.b < 0.5, f"pick-up applies it: orange tint ({tint.r:.2f}, {tint.g:.2f}, {tint.b:.2f})")
+    check(g.armed["White"] is None and tint.r > 0.9 and tint.b < 0.5, f"pick-up applies it: Fire-red tint ({tint.r:.2f}, {tint.g:.2f}, {tint.b:.2f})")
     check(fig.desc == "Status: Burned" and '"burn"' in fig.memo, f"description and memo record it ({fig.desc})")
     g.statusPick(player, "-1", "statusRes_White_confused"); g.onObjectPickUp("White", fig)
     check(fig.desc == "Status: Burned, Confused", "Confused stacks on Burned")

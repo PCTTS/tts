@@ -52,21 +52,28 @@ CATALOGS = {
 ROSTER_URL = BASE_URL .. "figures/index.json"
 CARDS_URL = BASE_URL .. "cards/index.json"
 
--- Statuses from the rules, each tinted with its type's colour. `strength` = how far the figure's tint moves
--- from white toward that colour (default STATUS_TINT). Volatile ones can stack on a main status.
+-- Type colours, the same as the damage calculator sheets' type cells (their conditional formatting).
+TYPE_COLORS = {
+  Normal = "#ABAA95", Fire = "#FF4421", Water = "#2F9BFE", Electric = "#FFCC2E", Grass = "#74CE53", Ice = "#66CBFF",
+  Fighting = "#B95742", Poison = "#A7569B", Ground = "#D9BD5A", Flying = "#859AFF", Psychic = "#FF5697", Bug = "#AABB21",
+  Rock = "#B9AA69", Ghost = "#6667BA", Dragon = "#7767EB", Dark = "#765544", Steel = "#ABAABA", Fairy = "#EE99EE",
+}
+-- Statuses from the rules, each in the colour of the type that inflicts it. `strength` = how far the figure's tint
+-- moves from white toward that colour (default STATUS_TINT). Volatile ones can stack on a main status.
 STATUS_TINT = 0.6
 STATUSES = {
-  { key = "burn", label = "Burned", type = "Fire", color = "#EE8130", strength = 0.75 },
-  { key = "paralysis", label = "Paralyzed", type = "Electric", color = "#F7D02C", strength = 0.75 },
-  { key = "poison", label = "Poisoned", type = "Poison", color = "#A33EA1", strength = 0.45 },
-  { key = "toxic", label = "Badly poisoned", type = "Poison", color = "#A33EA1", strength = 0.8 },
-  { key = "frostbite", label = "Frostbitten", type = "Ice", color = "#96D9D6", strength = 0.9 },
-  { key = "drowsy", label = "Drowsy", type = "Normal", color = "#A8A77A", strength = 0.85 },
-  { key = "confused", label = "Confused", type = "Psychic", color = "#F95587", volatile = true },
-  { key = "flinched", label = "Flinched", type = "Dark", color = "#705746", volatile = true },
+  { key = "burn", label = "Burned", type = "Fire", strength = 0.75 },
+  { key = "paralysis", label = "Paralyzed", type = "Electric", strength = 0.75 },
+  { key = "poison", label = "Poisoned", type = "Poison", strength = 0.45 },
+  { key = "toxic", label = "Badly poisoned", type = "Poison", strength = 0.8 },
+  { key = "frostbite", label = "Frostbitten", type = "Ice", strength = 0.9 },
+  { key = "drowsy", label = "Drowsy", type = "Normal", strength = 0.85 },
+  { key = "confused", label = "Confused", type = "Psychic", volatile = true },
+  { key = "flinched", label = "Flinched", type = "Dark", volatile = true },
 }
 STATUS_BY_KEY, STATUS_ROWS = {}, {}  -- rows: every status, then "clear"
 for _, s in ipairs(STATUSES) do
+  s.color = TYPE_COLORS[s.type]
   STATUS_BY_KEY[s.key] = s
   STATUS_ROWS[#STATUS_ROWS + 1] = s
 end
