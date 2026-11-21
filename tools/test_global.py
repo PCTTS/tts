@@ -245,7 +245,7 @@ def main():
     g.mapPick(player, "-1", "mapRes_White_1")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v1.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v2.obj")
           and kinds.count("Flag") == 6 and kinds.count("Portal") == 6 and kinds.count("Bridge") == 6
           and str(calls.tableURL).endswith("misc/sky-placeholder-v1.jpg"),
           "picking Illusio: its board, 6 flags, 6 portals, 6 bridges and the sky under the table")

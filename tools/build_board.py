@@ -229,6 +229,23 @@ def draw_texture(a):
                     over.alpha_composite(layer.rotate(turn), (x0, y0t))
                 else:
                     draw_marker(o, t.get("marker"), x0, y0t, p)
+    for r in range(a.R):   # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope
+        for c in range(a.C):
+            sloped = slopes(a, r, c) if a.tile(r, c) else {}
+            if not sloped:
+                continue
+            band = a.tile(r, c)["slant"] / TILE * p
+            x0, y0t = c * p, r * p
+            for i in range(round(band)):
+                alpha = round(70 * (i / band) ** 1.5)   # i = distance down the slope from its top edge
+                if "N" in sloped:
+                    o.line([(x0, y0t + band - i), (x0 + p, y0t + band - i)], fill=(30, 18, 8, alpha))
+                if "S" in sloped:
+                    o.line([(x0, y0t + p - band + i), (x0 + p, y0t + p - band + i)], fill=(30, 18, 8, alpha))
+                if "W" in sloped:
+                    o.line([(x0 + band - i, y0t), (x0 + band - i, y0t + p)], fill=(30, 18, 8, alpha))
+                if "E" in sloped:
+                    o.line([(x0 + p - band + i, y0t), (x0 + p - band + i, y0t + p)], fill=(30, 18, 8, alpha))
     for r, c, side in a.data.get("edges", {}).get("fall", []):
         x0, y0t, w = c * p, r * p, 11 * SS
         box = {"N": [x0, y0t, x0 + p, y0t + w], "S": [x0, y0t + p - w, x0 + p, y0t + p],
@@ -372,15 +389,35 @@ def build_mesh(a):
             x0, x1, z0, z1 = x(c), x(c + 1), z(r), z(r + 1)  # z0 is the far (+z) edge
             u0, u1 = (c * PX + 1) / W, ((c + 1) * PX - 1) / W
             v0, v1 = 1 - (r * PX + 1) / H, 1 - ((r + 1) * PX - 1) / H
-            m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
-                   [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
+            sloped = slopes(a, r, c)
+            if not sloped:
+                m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
+                       [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
+            else:   # the top shrinks in on those sides; each slope runs from its edge down to the tile's edge
+                def tuv(px, pz):   # the tile's texture seen from above, so the slopes show its edge band
+                    return u0 + (px - x0) / (x1 - x0) * (u1 - u0), v0 + (z0 - pz) / (z0 - z1) * (v1 - v0)
+                w = {s: (t["slant"] if s in sloped else 0.0) for s in DIRS}
+                tx0, tx1, tz0, tz1 = x0 + w["W"], x1 - w["E"], z0 - w["N"], z1 + w["S"]
+                corners = [(tx0, tz0), (tx1, tz0), (tx1, tz1), (tx0, tz1)]
+                m.quad([(px, top, pz) for px, pz in corners], [tuv(px, pz) for px, pz in corners], (0, 1, 0))
+                for side, low in sloped.items():
+                    dh, run = top - low, t["slant"]
+                    up, bottom, normal = {
+                        "N": ([(tx0, tz0), (tx1, tz0)], [(x1, z0), (x0, z0)], (0, run, dh)),
+                        "S": ([(tx1, tz1), (tx0, tz1)], [(x0, z1), (x1, z1)], (0, run, -dh)),
+                        "E": ([(tx1, tz0), (tx1, tz1)], [(x1, z1), (x1, z0)], (dh, run, 0)),
+                        "W": ([(tx0, tz1), (tx0, tz0)], [(x0, z0), (x0, z1)], (-dh, run, 0)),
+                    }[side]
+                    ln = math.sqrt(sum(v * v for v in normal))
+                    pts = [(px, top, pz) for px, pz in up] + [(px, low, pz) for px, pz in bottom]
+                    m.quad(pts, [tuv(px, pz) for px, _, pz in pts], tuple(v / ln for v in normal))
             if not a.float:   # floating islands get their rocky underside instead (below)
                 bu = (0.5, 1 - (H - 2) / H)
                 m.quad([(x0, 0, z0), (x1, 0, z0), (x1, 0, z1), (x0, 0, z1)], [bu] * 4, (0, -1, 0))
             for side, (dr, dc, normal) in DIRS.items():
                 nb = a.tile(r + dr, c + dc)
                 low = a.top(nb) if nb else (a.rim() if a.float else 0.0)
-                if low >= top:
+                if low >= top or side in sloped:
                     continue
                 if side == "N":
                     edge = [(x0, z0), (x1, z0)]
@@ -398,6 +435,36 @@ def build_mesh(a):
     if a.float:
         underside(a, m, wall_uv)
     return m
+
+
+def slopes(a, r, c):
+    """A tile with "slant": w slopes down to lower land on its sides instead of a wall: {side: the neighbour's top}.
+    The slope sits inside the tile (the top shrinks by w on that side), so its neighbours stay flat. Supported
+    shapes: a raised area whose tiles all share the same slant, without inner (concave) corners and not next to
+    the sky; anything else stops the build rather than leave holes."""
+    t = a.tile(r, c)
+    w = t.get("slant", 0)
+    if not w:
+        return {}
+    top, out = a.top(t), {}
+    for side, (dr, dc, _) in DIRS.items():
+        nb = a.tile(r + dr, c + dc)
+        where = f"slanted tile row {r} col {c}"
+        if nb is None:
+            sys.exit(f"{where}: slopes next to the sky aren't supported")
+        if a.top(nb) < top:
+            out[side] = a.top(nb)
+        elif a.top(nb) == top and nb.get("slant", 0) != w:
+            sys.exit(f"{where}: neighbours at the same height need the same slant")
+    lows = set(out.values())
+    if len(lows) > 1:
+        sys.exit(f"slanted tile row {r} col {c}: all its lower neighbours must be the same height")
+    for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
+        diag = a.tile(r + dr, c + dc)
+        sides = ("N" if dr < 0 else "S", "W" if dc < 0 else "E")
+        if diag and a.top(diag) < top and not any(s in out for s in sides):
+            sys.exit(f"slanted tile row {r} col {c}: inner (concave) corners aren't supported")
+    return out
 
 
 def underside(a, m, wall_uv, S=4):
