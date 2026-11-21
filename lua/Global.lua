@@ -17,6 +17,10 @@ FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
 MAX_MAPS = 16        -- rows in the map panel
+ROW_TEXT = "#111111" -- result rows: dark text on light grey (TTS can reset text colour when a row's text changes)
+ROW_STEP = 32        -- height of one result row plus spacing
+DEX_BASE = 108       -- search panel height with no results (title, search box, hint)
+MAPS_BASE = 70       -- map panel height with no rows (title, hint)
 COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
 
 roster = {}          -- name -> { front = "...", back = "..." } (paths relative to BASE_URL)
@@ -177,7 +181,8 @@ end
 ----------------------------------------------------------------------------------------------------
 local function panelXml(kind, c, title, height, body)
   return string.format([[
-<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" offsetXY="-56 0" width="290" height="%d"
+<VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="MiddleRight" pivot="1 1" offsetXY="-56 52"
+       width="290" height="%d"
        color="#141414F2" outline="#303030" outlineSize="1 1" padding="8 8 8 8" spacing="4"
        childForceExpandHeight="false" childForceExpandWidth="true">
   <HorizontalLayout preferredHeight="28" flexibleHeight="0" childForceExpandWidth="false" spacing="4">
@@ -198,8 +203,8 @@ function buildUI()
   local xml = { [[
 <Defaults>
   <Button class="bar" colors="#00000000|#FFFFFF33|#FFFFFF66|#00000000" tooltipPosition="Left" preferredHeight="44" flexibleHeight="0"/>
-  <Button class="row" fontSize="15" textAlignment="MiddleLeft" padding="10 0 0 0" textColor="#FFFFFF"
-          colors="#2a2a2a|#3d6fb8|#24477a|#2a2a2a" preferredHeight="28" flexibleHeight="0"/>
+  <Button class="row" fontSize="15" textAlignment="MiddleLeft" padding="10 0 0 0" textColor="#111111"
+          colors="#E4E4E4|#B3D1FF|#8DB8F7|#E4E4E4" preferredHeight="28" flexibleHeight="0"/>
   <Button class="close" fontSize="14" textColor="#FFFFFF" colors="#2a2a2a|#c0392b|#962d22|#2a2a2a"/>
   <Text class="title" fontSize="16" fontStyle="Bold" color="#FFFFFF" alignment="MiddleLeft"/>
   <Text class="hint" fontSize="12" color="#AAAAAA" alignment="MiddleLeft" preferredHeight="18" flexibleHeight="0"/>
@@ -218,13 +223,13 @@ function buildUI()
     for i = 1, RESULTS do
       rows[#rows + 1] = string.format('<Button id="dexRes_%s_%d" class="row" active="false" onClick="dexPick" text=" "/>', c, i)
     end
-    xml[#xml + 1] = panelXml("dex", c, "Spawn a Pokémon", 104 + RESULTS * 32, table.concat(rows, "\n  "))
+    xml[#xml + 1] = panelXml("dex", c, "Spawn a Pokémon", DEX_BASE, table.concat(rows, "\n  "))
 
     rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the board.</Text>', c) }
     for i = 1, MAX_MAPS do
       rows[#rows + 1] = string.format('<Button id="mapRes_%s_%d" class="row" active="false" onClick="mapPick" text=" "/>', c, i)
     end
-    xml[#xml + 1] = panelXml("maps", c, "Choose the map", 70 + MAX_MAPS * 32, table.concat(rows, "\n  "))
+    xml[#xml + 1] = panelXml("maps", c, "Choose the map", MAPS_BASE, table.concat(rows, "\n  "))
   end
   UI.setXml(table.concat(xml))
 end
@@ -258,9 +263,13 @@ function dexSearch(player, value)
   dexHits[c] = names
   for i = 1, RESULTS do
     local id = "dexRes_" .. c .. "_" .. i
-    if names[i] then UI.setAttribute(id, "text", names[i]) end
+    if names[i] then
+      UI.setAttribute(id, "text", names[i])
+      UI.setAttribute(id, "textColor", ROW_TEXT)
+    end
     UI.setAttribute(id, "active", names[i] and "true" or "false")
   end
+  UI.setAttribute("dex_" .. c, "height", DEX_BASE + #names * ROW_STEP)
   local msg
   if (value or "") == "" then
     msg = "Click a result to place it in front of you."
@@ -287,10 +296,12 @@ function refreshMaps(c)
     local id, m = "mapRes_" .. c .. "_" .. i, list[i]
     if m then
       UI.setAttribute(id, "text", m.current and (m.name .. "   (on the board)") or m.name)
-      UI.setAttribute(id, "colors", m.current and "#3d6fb8|#3d6fb8|#24477a|#3d6fb8" or "#2a2a2a|#3d6fb8|#24477a|#2a2a2a")
+      UI.setAttribute(id, "textColor", ROW_TEXT)
+      UI.setAttribute(id, "colors", m.current and "#8DB8F7|#8DB8F7|#6FA3F0|#8DB8F7" or "#E4E4E4|#B3D1FF|#8DB8F7|#E4E4E4")
     end
     UI.setAttribute(id, "active", m and "true" or "false")
   end
+  UI.setAttribute("maps_" .. c, "height", MAPS_BASE + math.min(#list, MAX_MAPS) * ROW_STEP)
   UI.setValue("mapMsg_" .. c, #list > 0 and "Click a map to put it on the board." or "No map board found on the table.")
 end
 
