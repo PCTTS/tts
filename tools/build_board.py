@@ -62,6 +62,18 @@ class Arena:
     def top(self, t):
         return FLOOR0 + t.get("level", 0) * LEVEL_H
 
+    def away_from_pit(self, r, c):
+        """The grid direction (dr, dc) pointing away from this tile's lower neighbours, or None if it has none."""
+        t = self.tile(r, c)
+        dr = dc = 0
+        for nr, nc in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)):
+            n = self.tile(nr, nc)
+            if n and n.get("level", 0) < t.get("level", 0):
+                dr, dc = dr - (nr - r), dc - (nc - c)
+        if not (dr or dc):
+            return None
+        return (0, 1 if dc > 0 else -1) if abs(dc) >= abs(dr) else (1 if dr > 0 else -1, 0)
+
 
 # ------------------------------------------------------------------------------------------------ texture
 def recolor(img, frm, to, amount):
@@ -188,7 +200,14 @@ def draw_texture(a):
             o.rectangle([x0, y0t, x0 + p - 1, y0t + p - 1], outline=(40, 28, 18, 110), width=SS)
             if t.get("surface") == "stairs":
                 draw_steps(o, a, r, c, x0, y0t, p)
-            draw_marker(o, t.get("marker"), x0, y0t, p)
+            if t.get("paint", True):
+                turn = MARKER_TURN.get(a.away_from_pit(r, c)) if t.get("orient") == "away-from-pit" else None
+                if turn:   # drawn upright on its own layer, then turned so its bottom points the right way
+                    layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
+                    draw_marker(ImageDraw.Draw(layer), t.get("marker"), 0, 0, p)
+                    over.alpha_composite(layer.rotate(turn), (x0, y0t))
+                else:
+                    draw_marker(o, t.get("marker"), x0, y0t, p)
     for r, c, side in a.data.get("edges", {}).get("fall", []):
         x0, y0t, w = c * p, r * p, 11 * SS
         box = {"N": [x0, y0t, x0 + p, y0t + w], "S": [x0, y0t + p - w, x0 + p, y0t + p],
@@ -223,6 +242,11 @@ def draw_steps(o, a, r, c, x0, y0, p):
             o.line([(ax, ay), (bx, by)], fill=dark, width=3 * SS)
             off = (0, 3 * SS) if ay == by else (3 * SS, 0)
             o.line([(ax + off[0], ay + off[1]), (bx + off[0], by + off[1])], fill=light, width=2 * SS)
+
+
+# A marker's turn (degrees counter-clockwise) so its bottom points along a grid direction (dr, dc): drawn
+# upright, its bottom points down the image (+r).
+MARKER_TURN = {(1, 0): 0, (0, 1): 90, (-1, 0): 180, (0, -1): 270}
 
 
 def draw_marker(o, marker, x0, y0, p):

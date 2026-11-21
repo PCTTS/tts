@@ -19,7 +19,7 @@
     "####........####",
     "#####1.1.1.#####"
   ],
-  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. marker = something drawn on the tile.",
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. marker = something on the tile (painted on the board, and for flags/bells a 3D piece from tools/place_pieces.py). paint: false = don't paint the marker. orient: away-from-pit = turn the painted marker so its bottom points away from the neighbouring lower tiles.",
   "legend": {
     "#": { "void": true },
     ".": { "level": 2, "surface": "floor" },
@@ -27,9 +27,9 @@
     "s": { "level": 1, "surface": "stairs" },
     "1": { "level": 2, "surface": "floor", "marker": "spawn1" },
     "2": { "level": 2, "surface": "floor", "marker": "spawn2" },
-    "F": { "level": 2, "surface": "floor", "marker": "flag" },
-    "A": { "level": 2, "surface": "floor", "marker": "bell-attack" },
-    "D": { "level": 2, "surface": "floor", "marker": "bell-defense" }
+    "F": { "level": 2, "surface": "floor", "marker": "flag", "paint": false },
+    "A": { "level": 2, "surface": "floor", "marker": "bell-attack", "orient": "away-from-pit" },
+    "D": { "level": 2, "surface": "floor", "marker": "bell-defense", "orient": "away-from-pit" }
   },
   "_edges": "Marked tile edges: [row, col, side N/E/S/W]. fall = taking damage next to this edge knocks a Pokemon into the pit.",
   "edges": {

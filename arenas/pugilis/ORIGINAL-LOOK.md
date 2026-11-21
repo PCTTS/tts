@@ -19,9 +19,11 @@ What it looked like:
   horizontal strata lines.
 - Markers unchanged since: red fall edges `#D2392C`, spawn rings (blue 1 / red 2), flags, ATK/DEF bells.
 
-To rebuild it from today's builder: remove `"textures"` from `map.json` and set the stair line alphas in
-`draw_steps` back to 150 / 90, then build with `--tile 3.24875`.
+To rebuild it from today's builder: remove `"textures"` from `map.json`, remove `"paint"` and `"orient"` from the
+`F`, `A` and `D` legend entries (the original painted the flags, and drew every symbol upright), and set the stair
+line alphas in `draw_steps` back to 150 / 90, then build with `--tile 3.24875`.
 
 What changed afterwards (see `git log -- arenas/pugilis`): dirt textures on the floor, stairs and pit
 (user's art `Pugilis_Dirt2/5`, random turns and mirrors, stairs/pit darkened to their palette colours),
-much fainter stair lines, and sand on the inner and outer walls darkened to the pit colour.
+much fainter stair lines, sand on the inner and outer walls darkened to the pit colour, and (with the 3D bells
+and flags) the painted flags dropped and the bell symbols turned to face away from the pit.

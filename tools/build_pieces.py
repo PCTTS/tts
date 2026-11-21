@@ -1,18 +1,20 @@
-"""Build the arena pieces: a floating golden-bronze bell and a capturable flag.
+"""Build the arena pieces: a golden-bronze bell hanging in a wooden stand, and a capturable flag.
 
 Usage:  python -I tools/build_pieces.py
 Writes (only files that are missing: bump a version when what a file holds changes, TTS caches by link):
   props/bell-v3.obj, props/bell-v3.jpg, props/bell-collider-v3.obj
   (superseded, kept for older saves: v1 a church bell with a loop, v2 a rocket-nozzle bell)
-  props/flag-v1.obj, props/flag-v1.jpg, props/flag-collider-v1.obj
+  props/bellstand-v1.obj  (textured with props/stand-wood-v1.jpg, from build_props.py; also its own collider)
+  props/flag-v2.obj, props/flag-v2.jpg, props/flag-collider-v2.obj  (v1: a waving cloth on a foot, superseded)
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Bell: the board's bell icon turned around its axis: a dome, a straight flaring skirt, a darker rim band and a ball
 clapper hanging in the open mouth; hollow and dark inside. Its own frame: y = 0 is the bottom of the rim, centred on
 the y axis.
-Flag: a dark pole on a small round foot with a white cloth that waves out along +x, and a white ball on top.
-The whole model is tinted to show who holds the flag: white parts take the tint's colour, the dark pole stays
-dark. Its own frame: y = 0 is the tile top, the pole stands on the y axis.
+Bell stand: two posts on the bell's sides with feet, a crossbeam with knee braces, and a hanger the bell hangs from.
+Flag: a plain dark rod with a flat white triangle sticking out along +x from its top. The whole model is tinted
+to show who holds the flag: the white triangle takes the tint's colour, the dark rod stays dark. Its own frame:
+y = 0 is the tile top, the rod stands on the y axis.
 """
 import math, sys
 from pathlib import Path
@@ -21,7 +23,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_props import SmoothMesh  # noqa: E402  (OBJ with smooth normals; TTS's X mirroring handled)
+from build_props import PPU, WOOD_H, WOOD_W, SmoothMesh  # noqa: E402  (OBJ with smooth normals; TTS's X mirroring handled)
 
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "props"
@@ -43,13 +45,21 @@ BRONZE_DEEP = (122, 84, 34)
 BRONZE_LIGHT = (236, 198, 118)
 BRONZE_RIM = (150, 105, 30)              # the icon's darker gold: rim band and clapper
 
-# --- flag ---------------------------------------------------------------------------------------------
+BELL_LIFT = 0.9                          # gap between the tile top and the bottom of the bell's rim (it hangs)
+
+# --- bell stand: two posts on the bell's sides, a crossbeam, knee braces, feet, and a hanger down to the bell.
+# Its own frame: y = 0 is the tile top, the beam runs along x, the bell hangs on the y axis. In the team stands'
+# dark wood (props/stand-wood-v1.jpg, same scale), grain along each member.
+POST_X, POST_W = 1.25, 0.16              # posts' distance from the middle, and their thickness
+HANG = 0.2                               # hanger length, from the bell's top to the beam
+BEAM_Y = BELL_LIFT + BELL_TOP + HANG     # underside of the beam
+BEAM_H, BEAM_D, BEAM_OVER = 0.2, 0.22, 0.25   # beam height, depth, overhang past the posts
+BRACE, BRACE_W = 0.45, 0.1               # knee braces: how far down the post / along the beam, and their width
+FOOT_L, FOOT_H, FOOT_W = 0.84, 0.12, 0.22
+
+# --- flag: a straight triangle on a plain rod ------------------------------------------------------------
 POLE_R, POLE_H = 0.05, 3.3
-FOOT_R = 0.28
-FINIAL_R = 0.11
-CLOTH_L, CLOTH_H, CLOTH_TOP = 1.7, 1.0, 3.2
-WAVE_A, WAVES, DROOP = 0.10, 1.25, 0.12
-CLOTH_NX, CLOTH_NY = 32, 8
+FLAG_L, FLAG_H = 1.5, 1.1                # how far the triangle sticks out, and its height at the rod
 FLAG_WHITE = (246, 246, 243)
 POLE_DARK = (50, 38, 28)
 
@@ -193,45 +203,24 @@ def flag_uv(px, py):
     return px / FLAG_TW, 1 - py / FLAG_TH
 
 
-def cloth_point(fx, fy):
-    """fx 0..1 from the pole out, fy 0..1 from the top edge down -> position and front normal."""
-    x = POLE_R + fx * CLOTH_L
-    ph = 2 * math.pi * WAVES * fx
-    amp = WAVE_A * fx ** 0.7
-    z = amp * math.sin(ph)
-    dz = (WAVE_A * 0.7 * fx ** -0.3 * math.sin(ph) if fx > 0 else 0) + amp * 2 * math.pi * WAVES * math.cos(ph)
-    dz /= CLOTH_L
-    y = CLOTH_TOP - fy * CLOTH_H - DROOP * fx ** 2
-    return (x, y, z), norm((-dz, 0.0, 1.0))
-
-
 def flag():
     m = PieceMesh()
     dark = lambda fu, y: flag_uv(392 + 48 * fu, 8 + 240 * (1 - y / POLE_H))
-    white = lambda fu, y: flag_uv(460 + 44 * fu, 128)
-    lathe(m, [(FOOT_R, 0.0), (FOOT_R, 0.05), (FOOT_R * 0.8, 0.10), (POLE_R * 1.6, 0.13), (POLE_R, 0.15)], dark, 32)
-    lathe(m, [(POLE_R, 0.15), (POLE_R, POLE_H)], dark, 24)
-    lathe(m, sphere_profile(FINIAL_R, POLE_H + FINIAL_R * 0.8), white, 24)
-    for i in range(CLOTH_NX):
-        for j in range(CLOTH_NY):
-            cells = [(i, j), (i + 1, j), (i + 1, j + 1), (i, j + 1)]
-            pts, ns, uvs = [], [], []
-            for ci, cj in cells:
-                fx, fy = ci / CLOTH_NX, cj / CLOTH_NY
-                p, n = cloth_point(fx, fy)
-                pts.append(p)
-                ns.append(n)
-                uvs.append(flag_uv(6 + fx * 372, 6 + fy * 244))
-            m.face4(pts, uvs, ns)                                              # front
-            m.face4(pts, uvs, [tuple(-c for c in n) for n in ns])              # back
+    lathe(m, [(POLE_R, 0.0), (POLE_R, POLE_H)], dark, 24)                 # the rod
+    lathe(m, [(POLE_R, POLE_H), (0.0, POLE_H)], dark, 24)                 # its flat top
+    top = POLE_H - 0.02
+    tri = [(POLE_R, top, 0.0), (POLE_R + FLAG_L, top - FLAG_H / 2, 0.0), (POLE_R, top - FLAG_H, 0.0)]
+    uvs = [flag_uv(8 + (x - POLE_R) / FLAG_L * 368, 8 + (top - y) / FLAG_H * 240) for x, y, _ in tri]
+    for n in ((0.0, 0.0, 1.0), (0.0, 0.0, -1.0)):                         # front and back
+        m.face4(tri + [tri[2]], uvs + [uvs[2]], [n] * 4)
     return m
 
 
 def flag_collider():
-    """The pole and the cloth as two boxes (used as a non-convex collider on a locked flag)."""
+    """The rod and the triangle as two boxes (used as a non-convex collider on a locked flag)."""
     m = PieceMesh()
-    box(m, -FOOT_R, FOOT_R, 0, POLE_H + 2 * FINIAL_R, -FOOT_R, FOOT_R)
-    box(m, POLE_R, POLE_R + CLOTH_L, CLOTH_TOP - CLOTH_H - DROOP, CLOTH_TOP, -WAVE_A - 0.05, WAVE_A + 0.05)
+    box(m, -0.12, 0.12, 0, POLE_H, -0.12, 0.12)
+    box(m, POLE_R, POLE_R + FLAG_L, POLE_H - FLAG_H, POLE_H, -0.06, 0.06)
     return m
 
 
@@ -239,17 +228,63 @@ def flag_texture():
     rng = np.random.default_rng(12)
     img = np.zeros((FLAG_TH, FLAG_TW, 3), np.float32)
     img[:, :] = FLAG_WHITE
-    weave = rng.normal(0, 3.0, (FLAG_TH, FLAG_TW, 1)).astype(np.float32)
-    img += weave
+    img += rng.normal(0, 3.0, (FLAG_TH, FLAG_TW, 1)).astype(np.float32)               # faint weave
     img[:, 384:452] = POLE_DARK
-    img[:, 384:452] *= (1 + rng.normal(0, 0.06, (1, 68, 1))).astype(np.float32)     # grain along the pole
-    img[:, 452:] = FLAG_WHITE
-    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
-    d = ImageDraw.Draw(out)
-    hem = (222, 222, 217)
-    d.rectangle([6, 6, 377, 249], outline=hem, width=9)        # hem around the cloth
-    d.rectangle([6, 6, 26, 249], fill=(214, 214, 208))         # the sleeve around the pole
-    return out
+    img[:, 384:452] *= (1 + rng.normal(0, 0.06, (1, 68, 1))).astype(np.float32)     # grain along the rod
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+
+
+# ------------------------------------------------------------------------------------------------ bell stand
+def prism(m, quad, z0, z1, grain, base):
+    """A wooden member: a 4-corner outline in the x-y plane, from z0 to z1, textured with the team stands' wood
+    at its real scale, the grain along `grain` (a direction), starting `base` units into the texture."""
+    area = sum(quad[i][0] * quad[(i + 1) % 4][1] - quad[(i + 1) % 4][0] * quad[i][1] for i in range(4))
+    if area < 0:
+        quad = quad[::-1]                                                   # counter-clockwise
+    g = norm(grain)
+
+    def face(corners, n):
+        n = norm(n)
+        if abs(sum(n[i] * g[i] for i in range(3))) < 0.5:
+            a1 = g                                                          # grain lies in this face
+        else:                                                               # an end of the member
+            a1 = norm((n[1], -n[0], 0.0)) if abs(n[2]) < 0.9 else (1.0, 0.0, 0.0)
+        a2 = (n[1] * a1[2] - n[2] * a1[1], n[2] * a1[0] - n[0] * a1[2], n[0] * a1[1] - n[1] * a1[0])
+        uvs = [((base[0] + sum(c[i] * a1[i] for i in range(3))) * PPU / WOOD_W,
+                1 - (base[1] + sum(c[i] * a2[i] for i in range(3))) * PPU / WOOD_H) for c in corners]
+        m.face4(corners, uvs, [n] * 4)
+
+    face([(x, y, z1) for x, y in quad], (0, 0, 1))
+    face([(x, y, z0) for x, y in quad], (0, 0, -1))
+    for i in range(4):
+        (xa, ya), (xb, yb) = quad[i], quad[(i + 1) % 4]
+        face([(xa, ya, z0), (xb, yb, z0), (xb, yb, z1), (xa, ya, z1)], (yb - ya, -(xb - xa), 0))
+
+
+def rect(x0, y0, x1, y1):
+    return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+
+
+def bell_stand():
+    m = PieceMesh()
+    w = POST_W / 2
+    beam_x = POST_X + BEAM_OVER
+    prism(m, rect(-beam_x, BEAM_Y, beam_x, BEAM_Y + BEAM_H), -BEAM_D / 2, BEAM_D / 2, (1, 0, 0), (6, 8))
+    hang_top = BELL_LIFT + BELL_TOP - 0.03
+    prism(m, rect(-0.05, hang_top, 0.05, BEAM_Y + 0.01), -0.05, 0.05, (0, 1, 0), (20, 12))
+    for i, sx in enumerate((-1, 1)):
+        x = sx * POST_X
+        prism(m, rect(x - w, 0, x + w, BEAM_Y + 0.01), -w, w, (0, 1, 0), (10 + 4 * i, 6))
+        prism(m, rect(x - FOOT_W / 2, 0, x + FOOT_W / 2, FOOT_H), -FOOT_L / 2, FOOT_L / 2, (0, 0, 1), (24 + 3 * i, 14))
+        # knee brace from the post's inner face up to the beam's underside, overlapping both a little
+        px, qx = sx * (POST_X - w + 0.04), sx * (POST_X - w - BRACE)
+        py, qy = BEAM_Y - BRACE, BEAM_Y + 0.04
+        dx, dy = qx - px, qy - py
+        ln = math.hypot(dx, dy)
+        ox, oy = -dy / ln * BRACE_W / 2, dx / ln * BRACE_W / 2
+        brace = [(px + ox, py + oy), (qx + ox, qy + oy), (qx - ox, qy - oy), (px - ox, py - oy)]
+        prism(m, brace, -0.05, 0.05, (dx, dy, 0), (30 + 3 * i, 9))
+    return m
 
 
 def main():
@@ -258,9 +293,10 @@ def main():
         "bell-v3.obj": lambda p: bell().write(p),
         "bell-v3.jpg": lambda p: bell_texture().save(p, quality=92),
         "bell-collider-v3.obj": lambda p: bell_collider().write(p),
-        "flag-v1.obj": lambda p: flag().write(p),
-        "flag-v1.jpg": lambda p: flag_texture().save(p, quality=92),
-        "flag-collider-v1.obj": lambda p: flag_collider().write(p),
+        "bellstand-v1.obj": lambda p: bell_stand().write(p),
+        "flag-v2.obj": lambda p: flag().write(p),
+        "flag-v2.jpg": lambda p: flag_texture().save(p, quality=92),
+        "flag-collider-v2.obj": lambda p: flag_collider().write(p),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

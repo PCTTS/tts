@@ -7,7 +7,8 @@ model it has loaded for as long as it runs, so preview a changed model from a fr
 Reads the arena's map.json (markers) and its board geometry JSON (tile size, level heights; default: the
 highest-numbered board-v*.json), finds the locked board named after the arena, removes the pieces placed
 before (tag "ArenaPiece") and spawns new ones, locked, relative to the board:
-  bell-attack / bell-defense: a bronze bell floating over the middle of the tile ("ATK bell" / "DEF bell").
+  bell-attack / bell-defense: a bronze bell ("ATK bell" / "DEF bell") hanging over the middle of the tile in a
+        wooden stand whose posts stand on its sides, facing away from the pit (like the painted symbol).
   flag: a flag in the tile's corner farthest from the board's centre, its cloth flying outward, so a Pokemon
         can stand on the tile. Starts neutral; right-click > Capture tints it to the player's colour (Global.lua).
 Models come from tools/build_pieces.py. TTS only keeps the result in memory: save the game afterwards.
@@ -16,16 +17,19 @@ import json, math, re, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build_board import Arena  # noqa: E402
+from build_pieces import BELL_LIFT  # noqa: E402  (the stand's beam is built for the bell at this height)
 from tts import exec_lua, report  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 BASE_URL = "https://pctts.github.io/tts/"
-BELL_LIFT = 0.9          # gap between the tile top and the bell's lip
 FLAG_INSET = 0.38        # the pole's distance from the two tile edges of its corner
 BELL = {"mesh": "props/bell-v3.obj", "diffuse": "props/bell-v3.jpg", "collider": "props/bell-collider-v3.obj",
         "convex": True, "material": 2}
-FLAG = {"mesh": "props/flag-v1.obj", "diffuse": "props/flag-v1.jpg", "collider": "props/flag-collider-v1.obj",
+FLAG = {"mesh": "props/flag-v2.obj", "diffuse": "props/flag-v2.jpg", "collider": "props/flag-collider-v2.obj",
         "convex": False, "material": 3}
+STAND = {"mesh": "props/bellstand-v1.obj", "diffuse": "props/stand-wood-v1.jpg", "collider": "props/bellstand-v1.obj",
+         "convex": False, "material": 1}
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
 
 
@@ -38,6 +42,7 @@ def board_json(arena, name=None):
 
 def pieces(arena, info):
     data = json.loads((arena / "map.json").read_text(encoding="utf-8"))
+    grid = Arena(arena)
     R, C, T = info["rows"], info["cols"], info["tile"]
     out = []
     for r, row in enumerate(data["grid"]):
@@ -50,9 +55,14 @@ def pieces(arena, info):
             top = info["floor0"] + tile["level"] * info["level_height"]
             if marker in BELLS:
                 name, stat = BELLS[marker]
-                out.append({"kind": "Bell", "name": name, "model": BELL, "pos": [cx, top + BELL_LIFT, cz], "yaw": 0,
-                            "desc": f"Attack this bell to give all your Pokemon the {stat} bonus until the end of the turn. "
-                                    "Each bell can only be rung once per turn."})
+                desc = (f"Attack this bell to give all your Pokemon the {stat} bonus until the end of the turn. "
+                        "Each bell can only be rung once per turn.")
+                out.append({"kind": "Bell", "name": name, "model": BELL, "pos": [cx, top + BELL_LIFT, cz], "yaw": 0, "desc": desc})
+                # the stand's posts sit on the bell's sides as seen from the side away from the pit (where its
+                # painted symbol is read from): beam across that direction
+                away = grid.away_from_pit(r, c)
+                out.append({"kind": "BellStand", "name": name + " stand", "model": STAND, "pos": [cx, top, cz],
+                            "yaw": 90 if away and away[1] else 0, "desc": desc})
             else:
                 sx, sz = (1 if cx >= 0 else -1), (1 if cz >= 0 else -1)
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
