@@ -42,7 +42,8 @@ def font(size, names=("arialbd.ttf", "seguibl.ttf")):
 
 class Arena:
     def __init__(self, folder):
-        self.data = json.loads((Path(folder) / "map.json").read_text(encoding="utf-8"))
+        self.folder = Path(folder)
+        self.data = json.loads((self.folder / "map.json").read_text(encoding="utf-8"))
         self.grid = self.data["grid"]
         self.R, self.C = len(self.grid), len(self.grid[0])
         self.legend = self.data["legend"]
@@ -63,18 +64,41 @@ class Arena:
 
 
 # ------------------------------------------------------------------------------------------------ texture
+def surface_layers(a, p):
+    """Surfaces textured with an image (map.json "textures": {surface: {"image": path, "span": tiles}}): the image
+    is scaled so one copy covers `span` tiles and repeated across the whole board, so neighbouring tiles continue
+    the same picture instead of each showing a copy. Returns surface -> board-sized image."""
+    layers = {}
+    for surface, spec in (a.data.get("textures") or {}).items():
+        src = Image.open(a.folder / spec["image"]).convert("RGB")
+        size = round(spec.get("span", max(a.R, a.C)) * p)
+        tile = src.resize((size, size), Image.LANCZOS)
+        layer = Image.new("RGB", (a.C * p, a.R * p))
+        for y in range(0, a.R * p, size):
+            for x in range(0, a.C * p, size):
+                layer.paste(tile, (x, y))
+        layers[surface] = layer
+    return layers
+
+
 def draw_texture(a):
     W, H = a.C * PX * SS, (a.R * PX + STRIP) * SS
     p = PX * SS
     img = Image.new("RGB", (W, H), a.palette["cliff"])
     d = ImageDraw.Draw(img)
     rnd = random.Random(1)
+    layers = surface_layers(a, p)
     for r in range(a.R):
         for c in range(a.C):
             t = a.tile(r, c)
             if t:
-                base = a.palette[t.get("surface", "floor")]
-                d.rectangle([c * p, r * p, (c + 1) * p - 1, (r + 1) * p - 1], fill=shade(base, rnd.uniform(0.96, 1.04)))
+                surface = t.get("surface", "floor")
+                box = [c * p, r * p, (c + 1) * p, (r + 1) * p]
+                if surface in layers:   # an image texture: this tile shows its own part of it
+                    img.paste(layers[surface].crop(box), box[:2])
+                else:
+                    base = a.palette[surface]
+                    d.rectangle([box[0], box[1], box[2] - 1, box[3] - 1], fill=shade(base, rnd.uniform(0.96, 1.04)))
     # walls: rock with horizontal strata, darker toward the bottom
     y0 = a.R * p
     for y in range(STRIP * SS):
