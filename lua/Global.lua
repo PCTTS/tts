@@ -29,7 +29,7 @@ STATUS_TINT = 0.6
 STATUSES = {
   { key = "burn", label = "Burned", type = "Fire", color = "#EE8130", strength = 0.75 },
   { key = "paralysis", label = "Paralyzed", type = "Electric", color = "#F7D02C", strength = 0.75 },
-  { key = "poison", label = "Poisoned", type = "Poison", color = "#A33EA1" },
+  { key = "poison", label = "Poisoned", type = "Poison", color = "#A33EA1", strength = 0.45 },
   { key = "toxic", label = "Badly poisoned", type = "Poison", color = "#A33EA1", strength = 0.8 },
   { key = "frostbite", label = "Frostbitten", type = "Ice", color = "#96D9D6", strength = 0.9 },
   { key = "drowsy", label = "Drowsy", type = "Normal", color = "#A8A77A", strength = 0.85 },
