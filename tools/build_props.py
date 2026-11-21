@@ -1,7 +1,7 @@
 """Build the table props: the slanted team stand (pedestals on top, item/skill cards on the slope) and a pillar.
 
 Usage:  python -I tools/build_props.py
-Writes props/stand-v1.obj, props/pillar-v1.obj, props/props-v1.jpg (shared texture) and props/stand-v1.json
+Writes props/stand-v1.obj (+ its solid collider props/stand-collider-v1.obj), props/pillar-v1.obj, props/props-v1.jpg (shared texture) and props/stand-v1.json
 (slot positions the TTS script uses: pedestals on top, two card slots per pedestal on the slope).
 
 Stand, in its own frame (as placed on the near/south trim): the back face (toward the board) is z = 0 and the
@@ -68,6 +68,27 @@ def stand():
     return m
 
 
+def stand_collider():
+    """The stand's solid body without the lip (convex, so TTS treats it as a solid: a card flipped on the slope
+    gets pushed back out instead of dropping through a hollow surface). The lip stays visual only."""
+    m = StandeeMesh()
+    x0, x1 = -LENGTH / 2, LENGTH / 2
+    zc, zd = -TOP_D, -TOP_D - RUN
+    slope_n = (0, RUN, -(TOP_H - LOW_H))
+    ln = math.hypot(slope_n[1], slope_n[2])
+    slope_n = (0, slope_n[1] / ln, slope_n[2] / ln)
+    face(m, "top", [(x0, TOP_H, 0), (x1, TOP_H, 0), (x1, TOP_H, zc), (x0, TOP_H, zc)], (0, 1, 0))
+    face(m, "slope", [(x0, TOP_H, zc), (x1, TOP_H, zc), (x1, LOW_H, zd), (x0, LOW_H, zd)], slope_n)
+    face(m, "side", [(x0, LOW_H, zd), (x1, LOW_H, zd), (x1, 0, zd), (x0, 0, zd)], (0, 0, -1))
+    face(m, "side", [(x0, 0, 0), (x1, 0, 0), (x1, TOP_H, 0), (x0, TOP_H, 0)], (0, 0, 1))
+    face(m, "side", [(x0, 0, zd), (x1, 0, zd), (x1, 0, 0), (x0, 0, 0)], (0, -1, 0))
+    for x, nx in ((x0, -1), (x1, 1)):
+        body = [(x, 0, 0), (x, TOP_H, 0), (x, TOP_H, zc), (x, LOW_H, zd), (x, 0, zd)]
+        for a, b in ((1, 2), (2, 3), (3, 4)):
+            m.tri([body[0], body[a], body[b]], [region_uv("side", 0.5, 0.5)] * 3, (nx, 0, 0))
+    return m
+
+
 def pillar():
     """Unit radius (scale x/z per object): base ring, shaft, cap ring."""
     m = StandeeMesh()
@@ -120,6 +141,7 @@ def slots():
 def main():
     OUT.mkdir(exist_ok=True)
     stand().write(OUT / "stand-v1.obj")
+    stand_collider().write(OUT / "stand-collider-v1.obj")
     pillar().write(OUT / "pillar-v1.obj")
     texture().save(OUT / "props-v1.jpg", quality=92)
     info = slots()
