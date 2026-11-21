@@ -45,7 +45,7 @@
   "_textures": "Image textures for surfaces (paths relative to this folder). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour.",
   "textures": {
     "floor": { "image": "textures/dirt2.png", "span": 1, "vary": true },
-    "pit": { "image": "textures/dirt4.png", "span": 1, "vary": true, "match": true },
+    "pit": { "image": "textures/dirt2.png", "span": 1, "vary": true, "match": true },
     "stairs": { "image": "textures/dirt2.png", "span": 1, "vary": true, "match": true }
   },
   "palette": {
