@@ -11,6 +11,8 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/portal-v1.obj, props/portal-v1.jpg  (also its own collider)
   props/bridge1-v1.obj, props/bridge2-v1.obj, props/bridge-v1.jpg, props/bridge-collider1-v1.obj, -collider2-
   props/zoneframe2-v1.obj, props/zoneframe-v1.jpg  (also its own collider)
+  props/ball-v1.obj, props/ball-v1.jpg, props/ball-collider-v1.obj
+  props/trap-v1.obj, props/trap-v1.jpg, props/trap-collider-v1.obj
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
@@ -19,6 +21,10 @@ Bridge: a flat plank deck spanning 1 or 2 tiles of sky between two islands (alon
 Its own frame: y = 0 is the deck's top (level with the islands when the bridge is up), centred.
 Zone frame: a thin flat square ring just inside a 2x2 capture zone's border, white so a tint gives it the colour
 of the player holding the zone. Its own frame: y = 0 is the tile top, centred on the zone.
+Pokimari ball (Chrysalia): a cream ball with stitched seams; its collider is a flat-bottomed cylinder so it stays
+where it's put instead of rolling. Its own frame: y = 0 is the bottom.
+Trap (Chrysalia): a low metal plate ringed with teeth; only the plate is solid (a Pokemon stands on it). Its own
+frame: y = 0 is the tile top.
 
 Bell: the board's bell icon turned around its axis: a dome, a straight flaring skirt, a darker rim band and a ball
 clapper hanging in the open mouth; hollow and dark inside. Its own frame: y = 0 is the bottom of the rim, centred on
@@ -80,6 +86,8 @@ BOARD_TILE = 3.24875
 PORTAL_R, PORTAL_H = 1.3, 0.05           # radius, thickness (it lies on the tile; a Pokemon stands on it)
 BRIDGE_W, BRIDGE_D = 2.7, 0.22           # deck width (across) and thickness
 ZONE_W, ZONE_H, ZONE_INSET = 0.16, 0.035, 0.05   # zone frame: band width, thickness, gap inside the zone's border
+BALL_R = 0.55                            # Pokimari ball radius
+TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, teeth around its rim
 
 
 def norm(v):
@@ -378,6 +386,77 @@ def zone_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
 
 
+# ------------------------------------------------------------------------------------------------ ball
+BALL_TW, BALL_TH = 512, 256
+
+
+def ball():
+    m = PieceMesh()
+    lathe(m, sphere_profile(BALL_R, BALL_R, 24), lambda fu, y: (fu, 1 - (4 + 248 * (1 - y / (2 * BALL_R))) / BALL_TH), 48)
+    return m
+
+
+def ball_collider():
+    m = PieceMesh()
+    r = BALL_R * 0.9
+    lathe(m, [(0.0, 0.0), (r, 0.0), (r, 2 * BALL_R), (0.0, 2 * BALL_R)], lambda fu, y: (0.5, 0.5), 16)
+    return m
+
+
+def ball_texture():
+    """Cream leather in four panels: seams round the middle and down four sides, with stitches across them."""
+    rng = np.random.default_rng(31)
+    img = np.zeros((BALL_TH, BALL_TW, 3), np.float32)
+    img[:, :] = (236, 226, 200)
+    img *= (0.95 + 0.08 * rng.random((BALL_TH, BALL_TW, 1))).astype(np.float32)
+    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(1.2))
+    d = ImageDraw.Draw(out)
+    seam, stitch = (120, 84, 52), (196, 60, 48)
+    mid = 4 + 248 / 2
+    d.line([(0, mid), (BALL_TW, mid)], fill=seam, width=5)
+    for x in range(0, BALL_TW, 12):
+        d.line([(x, mid - 7), (x + 5, mid + 7)], fill=stitch, width=2)
+    for k in range(4):
+        x = k * BALL_TW / 4 + BALL_TW / 8
+        d.line([(x, 20), (x, BALL_TH - 20)], fill=seam, width=5)
+        for y in range(24, BALL_TH - 20, 12):
+            d.line([(x - 7, y), (x + 7, y + 5)], fill=stitch, width=2)
+    return out
+
+
+# ------------------------------------------------------------------------------------------------ trap
+def trap():
+    m = PieceMesh()
+    lathe(m, [(TRAP_R, 0.0), (TRAP_R, TRAP_H), (0.0, TRAP_H)], lambda fu, y: (0.25, 0.5), 40)   # the plate
+    lathe(m, [(TRAP_R * 0.55, TRAP_H + 0.001), (0.0, TRAP_H + 0.001)], lambda fu, y: (0.25, 0.85), 32)  # trigger pad
+    for k in range(TRAP_TEETH):   # teeth: thin triangles standing round the rim, leaning in
+        a0, a1 = 2 * math.pi * k / TRAP_TEETH, 2 * math.pi * (k + 0.6) / TRAP_TEETH
+        am = (a0 + a1) / 2
+        r0, rt = TRAP_R * 0.9, TRAP_R * 0.74
+        base = [(r0 * math.cos(a0), TRAP_H, r0 * math.sin(a0)), (r0 * math.cos(a1), TRAP_H, r0 * math.sin(a1))]
+        tip = (rt * math.cos(am), TRAP_H + 0.26, rt * math.sin(am))
+        out = (math.cos(am), 0.4, math.sin(am))
+        for n in (out, (-out[0], 0.4, -out[2])):
+            m.face4([base[0], base[1], tip, tip], [(0.75, 0.2), (0.75, 0.2), (0.75, 0.8), (0.75, 0.8)], [n] * 4)
+    return m
+
+
+def trap_collider():
+    m = PieceMesh()
+    lathe(m, [(0.0, 0.0), (TRAP_R, 0.0), (TRAP_R, TRAP_H), (0.0, TRAP_H)], lambda fu, y: (0.5, 0.5), 16)
+    return m
+
+
+def trap_texture():
+    rng = np.random.default_rng(37)
+    img = np.zeros((64, 64, 3), np.float32)
+    img[:, :32] = (74, 72, 70)                  # plate: dark iron
+    img[40:, :32] = (150, 54, 40)               # trigger pad: rusty red
+    img[:, 32:] = (176, 176, 182)               # teeth: bright steel
+    img *= (0.92 + 0.12 * rng.random((64, 64, 1))).astype(np.float32)
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+
+
 # ------------------------------------------------------------------------------------------------ bell stand
 def prism(m, quad, z0, z1, grain, base):
     """A wooden member: a 4-corner outline in the x-y plane, from z0 to z1, textured with the team stands' wood
@@ -451,6 +530,12 @@ def main():
         "bridge-v1.jpg": lambda p: bridge_texture().save(p, quality=92),
         "zoneframe2-v1.obj": lambda p: zone_frame(2).write(p),
         "zoneframe-v1.jpg": lambda p: zone_texture().save(p, quality=92),
+        "ball-v1.obj": lambda p: ball().write(p),
+        "ball-v1.jpg": lambda p: ball_texture().save(p, quality=92),
+        "ball-collider-v1.obj": lambda p: ball_collider().write(p),
+        "trap-v1.obj": lambda p: trap().write(p),
+        "trap-v1.jpg": lambda p: trap_texture().save(p, quality=92),
+        "trap-collider-v1.obj": lambda p: trap_collider().write(p),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

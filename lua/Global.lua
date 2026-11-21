@@ -210,7 +210,7 @@ function onLoad(saved)
         setupStand(obj)
       elseif obj.hasTag("Pokemon") then
         plainStandee(obj)
-      elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") then
+      elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap") then
         pieceSetup(obj)
       end
     end
@@ -490,6 +490,7 @@ end
 -- Flags start neutral, portals in their starting pair's colour, bridges dropped (closed); pieceSetup gives
 -- them their buttons and menus.
 function spawnArenaPiece(p, origin, base)
+  if p.kind == "BallBag" then return spawnBallBag(p, origin, base) end
   local data = {
     Name = "Custom_Model", Nickname = p.name, Description = p.desc or "", Tags = { p.kind, "ArenaPiece" },
     Locked = true, ColorDiffuse = { r = 1, g = 1, b = 1 }, Memo = "",
@@ -1136,6 +1137,36 @@ function refreshZones()
   end
 end
 
+----------------------------------------------------------------------------------------------------
+-- Pokimari balls (Chrysalia): a bag beside the board that never runs out. Players roll for the drop spot, put a
+-- ball there and move it themselves when it's hit (the mod doesn't roll or work out bounces).
+-- Traps (Chrysalia): a trap piece on its tile; once it has caught a Pokémon, right-click > Spring trap removes it.
+----------------------------------------------------------------------------------------------------
+BALL_DESC = "Pokimari ball. Hit it and it bounces away in a straight line, tile by tile, dealing 1/16 HP to each "
+  .. "Pokémon it hits."
+TRAP_DESC = "Trap. A Pokémon that ends its turn here finishes its activation and skips its next one; then the trap "
+  .. "is used up (right-click > Spring trap removes it)."
+
+function spawnBallBag(p, origin, base)
+  local ball = {
+    Name = "Custom_Model", Nickname = "Pokimari ball", Description = BALL_DESC, Tags = { "Ball", "ArenaPiece" },
+    ColorDiffuse = { r = 1, g = 1, b = 1 },
+    Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+    CustomMesh = { MeshURL = base .. p.mesh, DiffuseURL = base .. p.diffuse, NormalURL = "",
+      ColliderURL = base .. p.collider, Convex = true, MaterialIndex = p.material, TypeIndex = 0, CastShadows = true },
+  }
+  return spawnObjectData({
+    data = {
+      Name = "Infinite_Bag", Nickname = p.name, Tags = { "BallBag", "ArenaPiece" },
+      Description = "Draw a ball, roll a d20 for its drop spot and put it there.",
+      ColorDiffuse = { r = 0.93, g = 0.87, b = 0.72 },
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      ContainedObjects = { ball },
+    },
+    position = origin + Vector(p.pos[1], p.pos[2], p.pos[3]), rotation = { 0, p.yaw or 0, 0 },
+  })
+end
+
 -- Buttons, menus and snap points for an arena piece (after it spawns, and again on load: none of it is reliably
 -- kept by a save).
 function pieceSetup(obj)
@@ -1149,6 +1180,10 @@ function pieceSetup(obj)
       "Shuffle the portals", "die"))
     obj.clearContextMenu()
     obj.addContextMenuItem("Shuffle portals", function(color) shufflePortals(color) end)
+  elseif obj.hasTag("Trap") then
+    obj.setDescription(TRAP_DESC)
+    obj.clearContextMenu()
+    obj.addContextMenuItem("Spring trap", function() obj.destruct() end)
   elseif obj.hasTag("Zone") then
     obj.setDescription(ZONE_DESC)
     Wait.frames(refreshZones, 1)

@@ -220,18 +220,18 @@ def main():
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Illusio", False), ("Ingis", False), ("Pugilis", True), ("Viperia", False)],
-          f"map list shows Illusio, Ingis, Pugilis and Viperia, Pugilis on the table ({got})")
+    check(got == [("Chrysalia", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True), ("Viperia", False)],
+          f"map list shows the five arenas, Pugilis on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
-          and calls.attrs["mapRes_White_3.text"] == "Pugilis   (on the board)",
+          and calls.attrs["mapRes_White_4.text"] == "Pugilis   (on the board)",
           "map button opens the map panel (and closes the search panel)")
     n = len(calls.spawned)
-    g.mapPick(player, "-1", "mapRes_White_3")
+    g.mapPick(player, "-1", "mapRes_White_4")
     check(len(calls.spawned) == n, "picking the arena that's already on the table does nothing")
     lua.execute("board.destroyed = true")
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_3")
+    g.mapPick(player, "-1", "mapRes_White_4")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     brd = new[0].data if new else None
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
@@ -244,7 +244,7 @@ def main():
     # Illusio: floating islands with 6 flags, 6 portals in their starting colours, 6 bridges that start dropped
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_1")
+    g.mapPick(player, "-1", "mapRes_White_2")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v2.obj")
@@ -264,7 +264,7 @@ def main():
     # Ingis: its board with the rock coordinates, three capture zone frames (neutral), the volcanic table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_2")
+    g.mapPick(player, "-1", "mapRes_White_3")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
@@ -281,7 +281,7 @@ def main():
     # Viperia: 16 x 15, its 3 flags, no snap points on the walls, the jungle table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_4")
+    g.mapPick(player, "-1", "mapRes_White_5")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     vmap = json.loads((REPO / "arenas" / "viperia" / "map.json").read_text(encoding="utf-8"))
@@ -291,6 +291,34 @@ def main():
           and kinds.count("Flag") == 3 and len(kinds) == 4 and len(vidx["snaps"]) == 16 * 15 - walls
           and str(calls.tableURL).endswith("misc/jungle-placeholder-v1.jpg"),
           f"picking Viperia: its board, 3 flags, snap points on all {16 * 15 - walls} tiles but the {walls} walls, the jungle table")
+
+    # Chrysalia: its pitch, 3 capture zone frames, 2 traps and a bag of Pokimari balls beside the board
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", "mapRes_White_1")
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    bag = next((s for s in new if s.data.Tags[1] == "BallBag"), None)
+    ball = bag.data.ContainedObjects[1] if bag else None
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/chrysalia/board-v1.obj")
+          and kinds.count("Zone") == 3 and kinds.count("Trap") == 2 and bag is not None and bag.data.Name == "Infinite_Bag"
+          and ball.Nickname == "Pokimari ball" and ball.CustomMesh.ColliderURL.endswith("props/ball-collider-v1.obj")
+          and abs(bag.position.x - 34.01) < 0.01 and str(calls.tableURL).endswith("misc/pitch-placeholder-v1.jpg"),
+          "picking Chrysalia: its board, 3 zone frames, 2 traps, an endless bag of Pokimari balls beside it, the pitch table")
+    lua.execute(r"""
+      trapObj = { tags = { "Trap", "ArenaPiece" }, menu = {} }
+      trapObj.hasTag = function(t) return t == "Trap" or t == "ArenaPiece" end
+      trapObj.clearContextMenu = function() trapObj.menu = {} end
+      trapObj.addContextMenuItem = function(label, fn) trapObj.menu[#trapObj.menu + 1] = { label = label, fn = fn } end
+      trapObj.setDescription = function(d) trapObj.desc = d end
+      trapObj.destruct = function() trapObj.gone = true end
+      onObjectSpawn(trapObj)
+    """)
+    tr = g.trapObj
+    np_ = len(list(calls.printed.values()))
+    tr.menu[1].fn("Red")
+    check(tr.menu[1].label == "Spring trap" and tr.gone and len(list(calls.printed.values())) == np_,
+          "right-click > Spring trap removes the trap, without a chat message")
 
     # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
     lua.execute(r"""

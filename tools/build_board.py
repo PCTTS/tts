@@ -270,6 +270,14 @@ def draw_texture(a):
                 region[on] = np.concatenate([np.broadcast_to(np.array([30, 18, 8], np.uint8), (int(on.sum()), 3)),
                                              alpha[on][:, None]], axis=1)
                 over.paste(Image.fromarray(region, "RGBA"), (bx0, by0))
+    for r, c, text in a.data.get("spots", []):   # numbered spots, painted like field markings, facing the sides
+        layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
+        ld = ImageDraw.Draw(layer)
+        u = p / 128
+        ld.ellipse([p / 2 - 36 * u, p / 2 - 36 * u, p / 2 + 36 * u, p / 2 + 36 * u], outline=(246, 246, 240, 215),
+                   width=round(4 * u))
+        ld.text((p / 2, p / 2 + 1 * u), str(text), font=font(round(36 * u)), fill=(246, 246, 240, 225), anchor="mm")
+        over.alpha_composite(layer.rotate(MARKER_TURN[(0, -1) if c < a.C / 2 else (0, 1)]), (c * p, r * p))
     if a.data.get("coords"):
         draw_coords(over, a, p)
     for r, c, side in a.data.get("edges", {}).get("fall", []):
@@ -417,7 +425,7 @@ def marker_turn(a, r, c, t):
     marker = t.get("marker", "")
     if marker == "spawn1":
         return 0
-    if marker == "spawn2":
+    if marker.startswith("spawn2"):
         return 180
     if t.get("orient") == "away-from-pit" and a.away_from_pit(r, c):
         return MARKER_TURN[a.away_from_pit(r, c)]
@@ -429,11 +437,17 @@ def draw_marker(o, marker, x0, y0, p):
         return
     cx, cy, u = x0 + p / 2, y0 + p / 2, p / 128  # u = one design pixel
     ink = (45, 32, 22, 255)
-    if marker.startswith("spawn"):
+    if marker.startswith("spawn"):   # spawn1, spawn2, spawn2-star (a controlled spawn: a star above the number)
         col = (47, 111, 214, 255) if marker == "spawn1" else (214, 69, 47, 255)
         r = 40 * u
         o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(255, 255, 255, 70), outline=col, width=round(7 * u))
-        o.text((cx, cy + 2 * u), marker[-1], font=font(round(46 * u)), fill=col, anchor="mm")
+        star = marker.endswith("-star")
+        o.text((cx, cy + (8 if star else 2) * u), marker[5], font=font(round((38 if star else 46) * u)), fill=col,
+               anchor="mm")
+        if star:
+            pts = [(cx + (10 if k % 2 == 0 else 4) * u * math.cos(-math.pi / 2 + k * math.pi / 5),
+                    cy - 20 * u + (10 if k % 2 == 0 else 4) * u * math.sin(-math.pi / 2 + k * math.pi / 5)) for k in range(10)]
+            o.polygon(pts, fill=col)
     elif marker == "flag":
         o.ellipse([cx - 22 * u, cy + 30 * u, cx + 22 * u, cy + 42 * u], fill=(0, 0, 0, 70))
         o.rectangle([cx - 4 * u, cy - 40 * u, cx + 3 * u, cy + 36 * u], fill=ink)

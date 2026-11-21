@@ -16,6 +16,11 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/viperia/textures/vine-top.png           wall tops: mossy stone under leaves
   arenas/viperia/textures/vine-wall.png          wall sides: stone blocks with vines hanging down, seamless left-right
   misc/jungle-placeholder-v1.jpg                 table image around a jungle arena: dense leaves
+  arenas/chrysalia/textures/pitch.png            the whole 16x16 ground: mown grass with a stripe per column
+  arenas/chrysalia/textures/turf-edge.png        board edge and pool rims: turf over soil, seamless left-right
+  arenas/chrysalia/textures/ice.png              ice: pale blue, cracks and glints
+  arenas/chrysalia/textures/water.png            water: blue with ripples
+  misc/pitch-placeholder-v1.jpg                  table image around the pitch: more striped grass
 """
 from pathlib import Path
 
@@ -344,8 +349,67 @@ def jungle_table():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.8))
 
 
+def pitch(h, w, stripes, rng):
+    """Mown grass: alternating light/dark stripes (vertical bands), fine blade noise."""
+    band = (np.arange(w)[None, :] * stripes // w) % 2
+    base = np.where(band[..., None] == 0, np.array((86, 146, 62), np.float32), np.array((70, 126, 50), np.float32))
+    img = base * (0.94 + 0.12 * fbm(h, w, rng, 12, 3))[..., None]
+    img *= (1 + rng.normal(0, 0.05, (h, w, 1))).astype(np.float32)
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def turf_edge():
+    """The board's edge: a band of turf over brown soil (seamless left-right)."""
+    rng = np.random.default_rng(111)
+    h, w = 1024, N
+    rows = np.arange(h, dtype=np.float32)[:, None]
+    wav = fbm(h, w, rng, 6, 3, wrap_x=True)
+    turf = rows < (0.03 + 0.012 * wav) * h          # a low board's edge only shows the top of the strip
+    soil = mix((92, 66, 42), (122, 90, 58), fbm(h, w, rng, 8, 4, wrap_x=True))
+    img = np.where(turf[..., None], mix((62, 118, 44), (86, 146, 62), wav), soil)
+    img *= (1 + rng.normal(0, 0.04, (h, w, 1))).astype(np.float32)
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def ice():
+    """Pale blue ice: cloudy depth, white cracks, a few glints."""
+    rng = np.random.default_rng(113)
+    img = mix((150, 196, 226), (214, 238, 250), fbm(N, N, rng, 3, 5))
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(9):
+        x, y = rng.random() * N, rng.random() * N
+        ang = rng.random() * 6.3
+        pts = [(x, y)]
+        for _ in range(rng.integers(5, 12)):
+            ang += rng.normal(0, 0.45)
+            x, y = x + 18 * np.cos(ang), y + 18 * np.sin(ang)
+            pts.append((x, y))
+        d.line(pts, fill=(248, 252, 255, 200), width=2)
+    for _ in range(14):
+        x, y, r = rng.random() * N, rng.random() * N, rng.uniform(4, 9)
+        d.line([(x - r, y), (x + r, y)], fill=(255, 255, 255, 220), width=2)
+        d.line([(x, y - r), (x, y + r)], fill=(255, 255, 255, 220), width=2)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+def water():
+    """Blue water with soft ripples and highlights."""
+    rng = np.random.default_rng(117)
+    t = fbm(N, N, rng, 3, 5)
+    rip = 0.5 + 0.5 * np.sin((t * 6 + fbm(N, N, rng, 2) * 2) * 2 * np.pi)
+    img = mix((30, 92, 160), (70, 150, 210), 0.65 * t + 0.35 * rip)
+    img = img + (np.array((210, 236, 250), np.float32) - img) * (0.35 * np.clip((rip - 0.85) / 0.15, 0, 1))[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
+
+
 def main():
     files = {
+        "arenas/chrysalia/textures/pitch.png": lambda p: pitch(2048, 2048, 16, np.random.default_rng(107)).save(p),
+        "arenas/chrysalia/textures/turf-edge.png": lambda p: turf_edge().save(p),
+        "arenas/chrysalia/textures/ice.png": lambda p: ice().save(p),
+        "arenas/chrysalia/textures/water.png": lambda p: water().save(p),
+        "misc/pitch-placeholder-v1.jpg": lambda p: pitch(1211, 2048, 28, np.random.default_rng(109)).save(p, quality=90),
         "arenas/viperia/textures/jungle1.png": lambda p: jungle_floor(101).save(p),
         "arenas/viperia/textures/jungle2.png": lambda p: jungle_floor(102).save(p),
         "arenas/viperia/textures/poison.png": lambda p: poison().save(p),
