@@ -157,7 +157,7 @@ def draw_steps(o, a, r, c, x0, y0, p):
     vert = [s for s in ("E", "W") if s in low]    # low side left/right -> vertical step lines
     if len(horiz) > 1 or len(vert) > 1:
         return
-    dark, light = (60, 40, 25, 90), (255, 245, 225, 52)  # light enough for the surface texture to show through
+    dark, light = (60, 40, 25, 18), (255, 245, 225, 10)  # faint, so the surface texture shows through
     for k in (0.28, 0.52, 0.76):
         d = round(k * p)
         yc = (y0 + d if horiz[0] == "N" else y0 + p - d) if horiz else None
