@@ -82,6 +82,29 @@ def recolor(img, frm, to, amount):
     return res
 
 
+def texture_choices(a, spec, surface, w, h):
+    """The copies a texture spec can use, as [per image: [copies]], each w x h. "vary" gives every orientation
+    (four quarter-turns, each also mirrored); "match" recolours to the palette colour of `surface`, or of the
+    palette entry it names (e.g. "match": "stairs")."""
+    choices = []
+    for path in spec.get("images") or [spec["image"]]:
+        src = Image.open(a.folder / path).convert("RGB")
+        for rule in spec.get("recolor", []):
+            src = recolor(src, hex_rgb(rule["from"]), hex_rgb(rule["to"]), rule.get("amount", 1.0))
+        if spec.get("match"):
+            typical = ImageStat.Stat(src).median   # the median ignores dark/light details, so they keep contrast
+            key = spec["match"] if isinstance(spec["match"], str) else surface
+            want = hex_rgb(key) if key.startswith("#") else a.palette[key]
+            src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, typical[i]): min(255, round(v * k)))
+                                      for i, band in enumerate(src.split())])
+        variants = [src]
+        if spec.get("vary"):
+            variants = [v for t in (src, src.transpose(Image.FLIP_LEFT_RIGHT)) for v in
+                        (t, t.transpose(Image.ROTATE_90), t.transpose(Image.ROTATE_180), t.transpose(Image.ROTATE_270))]
+        choices.append([v.resize((w, h), Image.LANCZOS) for v in variants])
+    return choices
+
+
 def surface_layers(a, p):
     """Surfaces textured with images (map.json "textures": {surface: {...}}):
       "image": path, or "images": [paths] — with several, each copy picks one at random (equal chances)
@@ -93,23 +116,10 @@ def surface_layers(a, p):
     Random choices are seeded by arena and surface, so rebuilds come out the same. Returns surface -> board image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
+        if surface == "walls":
+            continue  # inner walls are textured in the wall strip (see draw_texture)
         size = round(spec.get("span", max(a.R, a.C)) * p)
-        choices = []   # per image: its copies (all orientations when "vary", otherwise just the image)
-        for path in spec.get("images") or [spec["image"]]:
-            src = Image.open(a.folder / path).convert("RGB")
-            for rule in spec.get("recolor", []):
-                src = recolor(src, hex_rgb(rule["from"]), hex_rgb(rule["to"]), rule.get("amount", 1.0))
-            if spec.get("match"):
-                typical = ImageStat.Stat(src).median   # the median ignores dark/light details, so they keep contrast
-                want = a.palette[surface]
-                src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, typical[i]): min(255, round(v * k)))
-                                          for i, band in enumerate(src.split())])
-            tile = src.resize((size, size), Image.LANCZOS)
-            if spec.get("vary"):
-                choices.append([v for t in (tile, tile.transpose(Image.FLIP_LEFT_RIGHT)) for v in
-                                (t, t.transpose(Image.ROTATE_90), t.transpose(Image.ROTATE_180), t.transpose(Image.ROTATE_270))])
-            else:
-                choices.append([tile])
+        choices = texture_choices(a, spec, surface, size, size)
         rnd = random.Random(f"{a.data.get('name')}/{surface}")
         layer = Image.new("RGB", (a.C * p, a.R * p))
         for y in range(0, a.R * p, size):
@@ -137,7 +147,8 @@ def draw_texture(a):
                 else:
                     base = a.palette[surface]
                     d.rectangle([box[0], box[1], box[2] - 1, box[3] - 1], fill=shade(base, rnd.uniform(0.96, 1.04)))
-    # walls: rock with horizontal strata, darker toward the bottom
+    # wall strip, below the tiles. Left half: rock with horizontal strata, darker toward the bottom (outer walls).
+    # Right half: the "walls" texture, if the map has one (inner walls); otherwise rock too.
     y0 = a.R * p
     for y in range(STRIP * SS):
         k = 0.78 + 0.22 * (1 - y / (STRIP * SS))
@@ -145,6 +156,16 @@ def draw_texture(a):
     for y in range(y0 + 6 * SS, H, 15 * SS):
         wob = [(x, y + round(2 * SS * math.sin(x / (37.0 * SS) + y))) for x in range(0, W + 1, 16 * SS)]
         d.line(wob, fill=shade(a.palette["cliff"], 0.7), width=2 * SS)
+    wall_spec = (a.data.get("textures") or {}).get("walls")
+    if wall_spec:
+        # one tile's worth of texture per slice, stretched so it looks the same scale on a wall as on a tile:
+        # the strip spans the board's full height range, a slice one tile's width
+        span = FLOOR0 + a.max_level * LEVEL_H
+        tall = round(STRIP * SS * TILE / span)
+        choices = texture_choices(a, wall_spec, "walls", p, tall)
+        rnd = random.Random(f"{a.data.get('name')}/walls")
+        for i in range(a.C // 2, a.C):
+            img.paste(rnd.choice(rnd.choice(choices)).crop((0, 0, p, STRIP * SS)), (i * p, y0))
     # fine grain everywhere
     noise = Image.effect_noise((W, H), 9).convert("RGB")
     img = ImageChops.add(img, noise, 1.0, -128)
@@ -305,7 +326,8 @@ def build_mesh(a):
                 else:
                     edge = [(x0, z1), (x0, z0)]
                 (ax, az), (bx, bz) = edge
-                us = ((r * 5 + c * 3 + len(side)) % a.C) * PX
+                half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
+                us = (((r * 5 + c * 3 + len(side)) % half) + (half if nb else 0)) * PX
                 m.quad([(ax, top, az), (bx, top, bz), (bx, low, bz), (ax, low, az)],
                        [wall_uv(us, top), wall_uv(us + PX - 1, top), wall_uv(us + PX - 1, low), wall_uv(us, low)], normal)
     return m
