@@ -85,6 +85,7 @@ STAND = {
   cards = { items = { y = 2.0644, z = -5.1105 },
             skills = { y = 1.0467, z = -8.5481 } },
   tilt = 16.492, cardScale = 1.5, length = 42.3,
+  snapLift = 0.55,  -- card snap points float this far off the slope, so a card held flat clears the rising slope
 }
 CARD_YAW = 270  -- cards lie landscape: turned a quarter so the name reads left-to-right for the stand's player
 PEDESTAL_TOP = 0.25  -- a pedestal's height above the stand top
@@ -215,6 +216,26 @@ local function taken(spot, isCard)
   return false
 end
 
+-- How far "off the slope" is, in the stand's frame: the slope's normal (it rises toward the board, +z).
+local function slopeLift(d)
+  local a = math.rad(STAND.tilt)
+  return d * math.cos(a), -d * math.sin(a)  -- (y, z)
+end
+
+-- The stand's card snap points (one per card slot), a little above the slope, rotation snapping to the slope.
+function standSnapPoints()
+  local dy, dz = slopeLift(STAND.snapLift)
+  local tilt = STAND.tilt * (CARD_YAW == 270 and 1 or -1)
+  local snaps = {}
+  for _, x in ipairs(STAND.x) do
+    for _, kind in ipairs({ "items", "skills" }) do
+      local c = STAND.cards[kind]
+      snaps[#snaps + 1] = { position = { x, c.y + dy, c.z + dz }, rotation = { 0, CARD_YAW, tilt }, rotation_snap = true }
+    end
+  end
+  return snaps
+end
+
 -- Card rotation on the slope: a quarter turn (landscape), tilted to the slope's angle.
 function cardRotation(stand)
   local tilt = STAND.tilt * (CARD_YAW == 270 and 1 or -1)
@@ -274,7 +295,8 @@ function spawnCard(kind, name, color)
   local spot, stand, full = freeSpot(color or "Grey", kind)
   local pos, rot
   if spot and not full then
-    pos, rot = Vector(spot.x, spot.y + 0.05, spot.z), cardRotation(stand)
+    local dy, dz = slopeLift(0.15)
+    pos, rot = stand.positionToWorld(stand.positionToLocal(spot) + Vector(0, dy, dz)), cardRotation(stand)
   else
     pos = spot and Vector(spot.x, spot.y + 1, spot.z) or Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3])
     rot = Vector(0, (stand and stand.getRotation().y or 0) + CARD_YAW, 0)

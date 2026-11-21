@@ -60,6 +60,10 @@ local function makeStand(z, yaw)
     if yaw == 0 then return Vector(v.x, 0.961 + v.y, z + v.z) end
     return Vector(-v.x, 0.961 + v.y, z - v.z)
   end
+  s.positionToLocal = function(v)
+    if yaw == 0 then return Vector(v.x, v.y - 0.961, v.z - z) end
+    return Vector(-v.x, v.y - 0.961, z - v.z)
+  end
   return stub(s)
 end
 southStand, northStand = makeStand(-26.4, 0), makeStand(26.4, 180)
@@ -224,7 +228,8 @@ def main():
     check(card is not None and card.data.Name == "CardCustom" and card.data.Nickname == "Sitrus Berry"
           and "/cards/items/sitrus-berry-" in entry.FaceURL and "cards/back-items-v" in entry.BackURL
           and card.data.CardID == int(next(iter(deck.keys()))) * 100, "clicking it spawns the Sitrus Berry card")
-    check(abs(card.position.x - (-17.625)) < 0.01 and abs(card.position.z - (-26.4 - 5.1105)) < 0.01
+    lift_z = 0.15 * __import__("math").sin(__import__("math").radians(16.492))
+    check(abs(card.position.x - (-17.625)) < 0.01 and abs(card.position.z - (-26.4 - 5.1105 - lift_z)) < 0.01
           and card.rotation.y == 270 and abs(card.rotation.z - 16.492) < 0.01 and card.data.SidewaysCard,
           "the item card lies landscape in the first item slot on White's stand, tilted to the slope")
     check("1/2 hp" in card.data.Description, "the card's description is its effect")
@@ -232,7 +237,7 @@ def main():
     g.searchPick(player, "-1", "skillsRes_White_1")
     sk = calls.spawned[n + 2]
     check(sk.data.Nickname == "Belief" and sk.data.Tags[1] == "WarriorSkill"
-          and abs(sk.position.x - (-17.625)) < 0.01 and abs(sk.position.z - (-26.4 - 8.5481)) < 0.01,
+          and abs(sk.position.x - (-17.625)) < 0.01 and abs(sk.position.z - (-26.4 - 8.5481 - lift_z)) < 0.01,
           "the warrior skill card goes in the first skill slot (below the item)")
     g.searchPick(player, "-1", "itemsRes_White_1")
     check(len(calls.spawned) == n + 2, "a stale click on the other panel's rows does nothing")
@@ -240,8 +245,12 @@ def main():
     check(abs(calls.spawned[n + 3].position.x - (-10.575)) < 0.01, "the next item card takes the next column")
     g.spawnCard("items", "Sitrus Berry", "Green")
     far = calls.spawned[n + 4]
-    check(abs(far.position.x - 17.625) < 0.01 and abs(far.position.z - (26.4 + 5.1105)) < 0.01 and far.rotation.y == 450,
+    check(abs(far.position.x - 17.625) < 0.01 and abs(far.position.z - (26.4 + 5.1105 + lift_z)) < 0.01 and far.rotation.y == 450,
           "a far-side seat (Green) uses the far stand, starting from its own left")
+    snaps = g.standSnapPoints()
+    first = snaps[1].position
+    check(len(snaps) == 12 and abs(first[2] - (2.0644 + 0.55 * 0.9589)) < 0.01 and snaps[1].rotation_snap,
+          "12 card snap points per stand, lifted off the slope, snapping rotation")
     g.spawnPokemon("Gengar", "Grey")
     check(abs(calls.spawned[n + 5].position.x - (-35)) < 0.01, "a spectator's Pokemon appears in the left strip")
 

@@ -1,7 +1,7 @@
 """Build the table props: the slanted team stand (pedestals on top, item/skill cards on the slope) and a pillar.
 
 Usage:  python -I tools/build_props.py
-Writes props/stand-v1.obj (+ its solid collider props/stand-collider-v1.obj), props/pillar-v1.obj, props/props-v1.jpg (shared texture) and props/stand-v1.json
+Writes props/stand-v1.obj (+ its solid collider props/stand-collider-v1.obj), props/pillar-v2.obj, props/props-v1.jpg (shared texture) and props/stand-v1.json
 (slot positions the TTS script uses: pedestals on top, two card slots per pedestal on the slope).
 
 Stand, in its own frame (as placed on the near/south trim): the back face (toward the board) is z = 0 and the
@@ -26,7 +26,8 @@ RUN, LOW_H = 7.6, 0.35           # slope: horizontal run toward the player, heig
 LIP_H, LIP_W = 0.22, 0.25        # lip at the bottom of the slope
 CARD_SCALE = 1.5                 # cards lie landscape: 3.06 x 2.19 at scale 1
 CARD_ALONG = 2.19 * CARD_SCALE   # card size along the slope
-PILLAR_H, SEG = 2.6, 28          # pillar height (level with the stand top), segments around
+SNAP_LIFT = 0.55                 # card snap points float this far off the slope: a card held flat clears it
+PILLAR_H, SEG = 2.6, 96          # pillar height (level with the stand top), segments around
 TEX_W, TEX_H = 1024, 256         # texture: four 256px regions
 REGIONS = {"top": 0, "slope": 1, "side": 2, "pillar": 3}
 COLOURS = {"top": "#CDB38A", "slope": "#BFA27A", "side": "#8E6C48", "pillar": "#B39572"}
@@ -89,28 +90,53 @@ def stand_collider():
     return m
 
 
+class SmoothMesh(StandeeMesh):
+    def quad_smooth(self, corners, uvs, normals, facing):
+        """A quad with one normal per corner (smooth shading); wound to face `facing` (world space)."""
+        pts = [(-x, y, z) for x, y, z in corners]                  # TTS mirrors OBJ on X
+        ns = [(-a, b, c) for a, b, c in normals]
+        fn = (-facing[0], facing[1], facing[2])
+        e1 = [pts[1][i] - pts[0][i] for i in range(3)]
+        e2 = [pts[2][i] - pts[0][i] for i in range(3)]
+        cross = (e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0])
+        order = [0, 1, 2, 3] if sum(cross[i] * fn[i] for i in range(3)) > 0 else [3, 2, 1, 0]
+        bv, bt, bn = len(self.v), len(self.vt), len(self.vn)
+        self.v += [pts[i] for i in order]
+        self.vt += [uvs[i] for i in order]
+        self.vn += [ns[i] for i in order]
+        idx = [(bv + k + 1, bt + k + 1, bn + k + 1) for k in range(4)]
+        self.f.append((idx[0], idx[1], idx[2]))
+        self.f.append((idx[0], idx[2], idx[3]))
+
+
+# Pillar outline (radius, height), bottom to top: plinth, a bevel up to the shaft, the shaft, a bevel out to
+# the capital. Unit shaft radius (scale x/z per object). Turned around the y axis with smooth shading around,
+# crisp edges between the profile's segments.
+PILLAR_PROFILE = [(1.25, 0.0), (1.25, 0.12), (1.15, 0.12), (1.15, 0.22), (1.0, 0.34), (1.0, PILLAR_H - 0.34),
+                  (1.15, PILLAR_H - 0.22), (1.15, PILLAR_H - 0.12), (1.25, PILLAR_H - 0.12), (1.25, PILLAR_H)]
+
+
 def pillar():
-    """Unit radius (scale x/z per object): base ring, shaft, cap ring."""
-    m = StandeeMesh()
-    rings = [(1.15, 0.0), (1.15, 0.22), (1.0, 0.22), (1.0, PILLAR_H - 0.22), (1.15, PILLAR_H - 0.22), (1.15, PILLAR_H)]
-    pts = [(math.cos(2 * math.pi * i / SEG), math.sin(2 * math.pi * i / SEG)) for i in range(SEG)]
-    for (r0, y0), (r1, y1) in zip(rings, rings[1:]):
+    m = SmoothMesh()
+    ring = [(math.cos(2 * math.pi * i / SEG), math.sin(2 * math.pi * i / SEG)) for i in range(SEG + 1)]
+    for (r0, y0), (r1, y1) in zip(PILLAR_PROFILE, PILLAR_PROFILE[1:]):
+        dr, dy = r1 - r0, y1 - y0
+        ln = math.hypot(dr, dy)
+        nr, ny = dy / ln, -dr / ln          # outward normal of this profile segment, in the (radius, y) plane
         for i in range(SEG):
-            (ca, sa), (cb, sb) = pts[i], pts[(i + 1) % SEG]
-            mx, mz = (ca + cb) / 2, (sa + sb) / 2
-            n = math.hypot(mx, mz)
-            if y0 != y1:
-                normal = (mx / n, 0, mz / n)          # a wall: faces outward
-            else:
-                normal = (0, 1 if r1 < r0 else -1, 0)  # a flat ledge: top of the base ring / underside of the cap
-            uv = [region_uv("pillar", i / SEG, y0 / PILLAR_H), region_uv("pillar", (i + 1) / SEG, y0 / PILLAR_H),
-                  region_uv("pillar", (i + 1) / SEG, y1 / PILLAR_H), region_uv("pillar", i / SEG, y1 / PILLAR_H)]
-            m.quad([(r0 * ca, y0, r0 * sa), (r0 * cb, y0, r0 * sb), (r1 * cb, y1, r1 * sb), (r1 * ca, y1, r1 * sa)], uv, normal)
-    for y, ny in ((PILLAR_H, 1), (0.0, -1)):  # caps
+            (ca, sa), (cb, sb) = ring[i], ring[i + 1]
+            corners = [(r0 * ca, y0, r0 * sa), (r0 * cb, y0, r0 * sb), (r1 * cb, y1, r1 * sb), (r1 * ca, y1, r1 * sa)]
+            normals = [(nr * ca, ny, nr * sa), (nr * cb, ny, nr * sb), (nr * cb, ny, nr * sb), (nr * ca, ny, nr * sa)]
+            fu0, fu1 = i / SEG, (i + 1) / SEG
+            uvs = [region_uv("pillar", fu0, y0 / PILLAR_H), region_uv("pillar", fu1, y0 / PILLAR_H),
+                   region_uv("pillar", fu1, y1 / PILLAR_H), region_uv("pillar", fu0, y1 / PILLAR_H)]
+            mid = ((ca + cb) / 2, (sa + sb) / 2)
+            m.quad_smooth(corners, uvs, normals, (nr * mid[0], ny, nr * mid[1]))
+    top_r = PILLAR_PROFILE[-1][0]
+    for y, ny in ((PILLAR_H, 1), (0.0, -1)):  # flat caps
         for i in range(SEG):
-            (ca, sa), (cb, sb) = pts[i], pts[(i + 1) % SEG]
-            uv = [region_uv("top", 0.5, 0.5)] * 3
-            m.tri([(0, y, 0), (1.15 * ca, y, 1.15 * sa), (1.15 * cb, y, 1.15 * sb)], uv, (0, ny, 0))
+            (ca, sa), (cb, sb) = ring[i], ring[i + 1]
+            m.tri([(0, y, 0), (top_r * ca, y, top_r * sa), (top_r * cb, y, top_r * sb)], [region_uv("top", 0.5, 0.5)] * 3, (0, ny, 0))
     return m
 
 
@@ -135,14 +161,14 @@ def slots():
         cards[kind] = {"z": round(-TOP_D + ux * t, 4), "y": round(TOP_H + uy * t + 0.03, 4)}
     return {"x": [round((i - (SLOTS - 1) / 2) * SLOT_W, 4) for i in range(SLOTS)],
             "pedestal": {"z": -TOP_D / 2, "y": TOP_H}, "cards": cards, "tilt": round(tilt, 3),
-            "card_scale": CARD_SCALE, "depth": TOP_D + RUN + LIP_W, "length": LENGTH, "pillar_height": PILLAR_H}
+            "card_scale": CARD_SCALE, "snap_lift": SNAP_LIFT, "depth": TOP_D + RUN + LIP_W, "length": LENGTH, "pillar_height": PILLAR_H}
 
 
 def main():
     OUT.mkdir(exist_ok=True)
     stand().write(OUT / "stand-v1.obj")
     stand_collider().write(OUT / "stand-collider-v1.obj")
-    pillar().write(OUT / "pillar-v1.obj")
+    pillar().write(OUT / "pillar-v2.obj")
     texture().save(OUT / "props-v1.jpg", quality=92)
     info = slots()
     (OUT / "stand-v1.json").write_text(json.dumps(info, indent=1), encoding="utf-8")

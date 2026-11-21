@@ -23,6 +23,7 @@
  },
  "tilt": 16.492,
  "card_scale": 1.5,
+ "snap_lift": 0.55,
  "depth": 11.05,
  "length": 42.3,
  "pillar_height": 2.6
