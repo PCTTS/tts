@@ -7,7 +7,9 @@ Art comes from PokeAPI's official artwork (the same art as the official Pokedex)
 rebuilds are identical. Each image is trimmed, fitted onto a square canvas with the feet at the bottom,
 and saved as WebP. Names PokeAPI spells differently, placeholders and custom art are in roster-aliases.json.
 
-Writes figures/<name>.webp, figures/<name>-back.webp and figures/index.json (roster name -> files).
+Writes figures/<name>.webp, figures/<name>-back.webp (the old flat figurines), standees/v2/<name>.webp (the 3D
+standee's texture: the art plus its base strip, lossless; mesh models/standee-v1.obj from build_standee.py) and
+figures/index.json (roster name -> files).
 Downloads are kept in .local/source/ (not published).
 """
 import io, json, os, re, sys, time, unicodedata, urllib.error, urllib.request
@@ -16,10 +18,14 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build_standee import standee_texture  # noqa: E402
+
 REPO = Path(__file__).resolve().parent.parent
 TOOLS = REPO / "tools"
 SRC = REPO / ".local" / "source"
 OUT = REPO / "figures"
+STANDEES = REPO / "standees" / "v2"
 PIN = "c0542f7c51215d9672439012838c99f520596cbd"  # PokeAPI/sprites commit, 2026-11-13
 ART_URL = "https://raw.githubusercontent.com/PokeAPI/sprites/{pin}/sprites/pokemon/other/official-artwork/{id}.png"
 CANVAS, MARGIN = 512, 8
@@ -122,7 +128,9 @@ def make_figure(job):
     f = file_name(n)
     front.save(OUT / f"{f}.webp", "WEBP", quality=90, method=6)
     ImageOps.mirror(front).save(OUT / f"{f}-back.webp", "WEBP", quality=90, method=6)
-    return {"front": f"figures/{f}.webp", "back": f"figures/{f}-back.webp", "source": source}
+    standee_texture(front).save(STANDEES / f"{f}.webp", "WEBP", lossless=True, method=6)
+    return {"front": f"figures/{f}.webp", "back": f"figures/{f}-back.webp", "standee": f"standees/v2/{f}.webp",
+            "source": source}
 
 
 def main(args):
@@ -163,6 +171,7 @@ def main(args):
         list(pool.map(download, todo))
 
     OUT.mkdir(exist_ok=True)
+    STANDEES.mkdir(parents=True, exist_ok=True)
     index_file = OUT / "index.json"
     index = json.loads(index_file.read_text(encoding="utf-8")) if only and index_file.exists() else {}
     jobs = [(n, r) for n, r in sorted(plan.items()) if not only or n in only]

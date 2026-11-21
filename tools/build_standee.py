@@ -31,8 +31,15 @@ class StandeeMesh(Mesh):
 
 
 def texture(figure_path):
+    return standee_texture(Image.open(figure_path))
+
+
+def standee_texture(art):
+    """The standee's texture for a figure image (square, feet at the bottom): the art, and the base strip under it."""
     tex = Image.new("RGBA", (TEX_W, TEX_H), (0, 0, 0, 0))
-    art = Image.open(figure_path).convert("RGBA").resize((IMG, IMG), Image.LANCZOS)
+    art = art.convert("RGBA")
+    if art.size != (IMG, IMG):
+        art = art.resize((IMG, IMG), Image.LANCZOS)
     tex.alpha_composite(art, (0, 0))
     S = 4  # draw the base strip at 4x for smooth edges
     strip = Image.new("RGBA", (TEX_W * S, STRIP * S), (0, 0, 0, 0))

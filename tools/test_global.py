@@ -76,7 +76,7 @@ end
 southStand, northStand = makeStand(-26.4, 0), makeStand(26.4, 180)
 function spawnObjectData(t)
   calls.spawned[#calls.spawned + 1] = t
-  local kind = t.data.Name == "CardCustom" and "Card" or (t.data.Name == "Figurine_Custom" and "Figurine" or "Generic")
+  local kind = t.data.Name == "CardCustom" and "Card" or ((t.data.Name == "Figurine_Custom" or (t.data.CustomMesh and t.data.CustomMesh.TypeIndex == 1)) and "Figurine" or "Generic")
   return stub({ tags = t.data.Tags, type = kind, getName = function() return t.data.Nickname end,
     getPosition = function() return t.position end })
 end
@@ -194,10 +194,10 @@ def main():
     # spawning
     g.searchPick(player, "-1", "dexRes_White_1")
     spawned = calls.spawned[1]
-    check(spawned is not None and spawned.data.Nickname == "Charizard"
-          and spawned.data.CustomImage.ImageURL.endswith("figures/charizard.webp")
-          and spawned.data.CustomImage.ImageSecondaryURL.endswith("figures/charizard-back.webp"),
-          "clicking row 1 spawns Charizard with front and back images")
+    check(spawned is not None and spawned.data.Nickname == "Charizard" and spawned.data.Name == "Custom_Model"
+          and spawned.data.CustomMesh.MeshURL.endswith("models/standee-v1.obj")
+          and spawned.data.CustomMesh.DiffuseURL.endswith("standees/v2/charizard.webp") and spawned.data.CustomMesh.TypeIndex == 1,
+          "clicking row 1 spawns Charizard as a standee (art on an arrowed base)")
     check(abs(spawned.position.x - (-17.625)) < 0.01 and abs(spawned.position.z - (-28.0)) < 0.01,
           f"White's Pokemon goes on the first pedestal of the near stand ({spawned.position.x:.2f}, {spawned.position.z:.2f})")
 

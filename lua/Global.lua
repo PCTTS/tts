@@ -80,7 +80,8 @@ end
 STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear status", color = "#9E9E9E" }
 STATUS_HINT = "Pick a status, then pick up a Pokémon."
 
-FIGURE_SCALE = 1.5   -- figurine ImageScalar; the old sprite figurines used 1.5
+STANDEE_MESH = "models/standee-v1.obj"  -- a Pokémon: art quad on a round base with a facing arrow (build_standee.py)
+FIGURE_SCALE = 1.5   -- ImageScalar for the old flat figurines (only used if the roster has no standees)
 FRONT_YAW = 0        -- added to the seat's rotation so the figure's front faces its player
 RESULTS = 8          -- search results shown at once
 MAX_MAPS = 16        -- rows in the map panel
@@ -290,25 +291,29 @@ function spawnPokemon(name, color)
   local files = roster[name]
   if not files then return nil end
   local spot, stand = freeSpot(color or "Grey", "dex")
-  local pos = spot and Vector(spot.x, spot.y + 1.5, spot.z) or Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3])
+  local pos = spot and Vector(spot.x, spot.y + 0.5, spot.z) or Vector(NO_SEAT_SPOT[1], NO_SEAT_SPOT[2], NO_SEAT_SPOT[3])
   local yaw = (stand and stand.getRotation().y or 0) + FRONT_YAW  -- front faces the stand's player
-  return spawnObjectData({
-    data = {
-      Name = "Figurine_Custom",
-      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
-      Nickname = name,
-      Tags = { "Pokemon" },
-      Memo = JSON.encode({ pokemon = name }),
-      CustomImage = {
-        ImageURL = BASE_URL .. files.front,
-        ImageSecondaryURL = BASE_URL .. files.back,
-        ImageScalar = FIGURE_SCALE,
-        WidthScale = 0,
-      },
-    },
-    position = pos,
-    rotation = Vector(0, yaw, 0),
-  })
+  local data = {
+    Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+    Nickname = name,
+    Tags = { "Pokemon" },
+    Memo = JSON.encode({ pokemon = name }),
+  }
+  if files.standee then
+    -- the standee: the art on a round base whose arrow points the way the Pokémon faces (the art's left);
+    -- a tint (statuses) recolours all of it
+    data.Name = "Custom_Model"
+    data.ColorDiffuse = { r = 1, g = 1, b = 1 }
+    data.CustomMesh = { MeshURL = BASE_URL .. STANDEE_MESH, DiffuseURL = BASE_URL .. files.standee, NormalURL = "",
+      ColliderURL = "", Convex = true, MaterialIndex = 0, TypeIndex = 1, CastShadows = true }
+  else
+    -- an older roster without standees: the flat two-sided figurine
+    pos = Vector(pos.x, pos.y + 1, pos.z)
+    data.Name = "Figurine_Custom"
+    data.CustomImage = { ImageURL = BASE_URL .. files.front, ImageSecondaryURL = BASE_URL .. files.back,
+      ImageScalar = FIGURE_SCALE, WidthScale = 0 }
+  end
+  return spawnObjectData({ data = data, position = pos, rotation = Vector(0, yaw, 0) })
 end
 
 -- A single landscape card (its own one-card deck sheet) on the next free slot of the player's stand:
