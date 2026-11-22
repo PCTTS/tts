@@ -234,7 +234,34 @@ function unstretchCard(card)
   return false
 end
 
--- Hand zones: eight, just past the table's edge (so cards on the team stands never fall into a hand), one pair on
+-- The board, its backdrop, the team stands and the map's fixed pieces can't be deleted or cut by players (right-click
+-- menu or hotkeys); the map picker replaces boards by script, which isn't a player action. Anything else in the same
+-- selection is still deleted.
+PROTECTED_TAGS = { "Board3D", "ArenaBackdrop", "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand" }
+
+function isProtected(obj)
+  for _, tag in ipairs(PROTECTED_TAGS) do
+    if obj.hasTag(tag) then return true end
+  end
+  return false
+end
+
+function onPlayerAction(player, action, targets)
+  if action ~= Player.Action.Delete and action ~= Player.Action.Cut then return true end
+  local kept, rest = 0, {}
+  for _, obj in ipairs(targets or {}) do
+    if isProtected(obj) then kept = kept + 1 else rest[#rest + 1] = obj end
+  end
+  if kept == 0 then return true end
+  if action == Player.Action.Delete then
+    for _, obj in ipairs(rest) do obj.destruct() end
+  end
+  player.broadcast("The map board, stands and map pieces can't be deleted. To change the map, use the map picker.",
+    { 1, 0.75, 0.5 })
+  return false
+end
+
+-- Hand zones: eight, just past the table's edge-- Hand zones: eight, just past the table's edge (so cards on the team stands never fall into a hand), one pair on
 -- each side; they also set each seat's spacebar camera. A save or reload can bring back TTS's default zones (which
 -- reach over the stands), so the layout is checked on every load and put back if it differs.
 HAND_SIZE = { w = 9.48, h = 6.7, d = 3.56, y = 2.85, gap = 0.5 }

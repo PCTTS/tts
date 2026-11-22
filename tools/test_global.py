@@ -50,6 +50,7 @@ Player = setmetatable({}, { __index = function(_, c)
   return { color = c, steam_name = c .. "Player", broadcast = function(msg) calls.broadcast = msg end,
     getHandObjects = function() return (handHeld or {})[c] or {} end }
 end })
+rawset(Player, "Action", { Copy = 0, Cut = 1, Delete = 2, PickUp = 8 })
 Color = { fromString = function(c)
   return ({ Red = { r = 0.856, g = 0.1, b = 0.094 }, Blue = { r = 0.118, g = 0.53, b = 1 } })[c] or { r = 1, g = 1, b = 1 }
 end }
@@ -728,6 +729,26 @@ def main():
     hc = g.heldCard.pos
     check(abs(hc.x + 9.48) < 1e-6 and abs(hc.z + edge_z) < 1e-6, "a card Red was holding is put back into Red's moved hand")
     check(not g.ensureHandZones(), "a correct layout is left alone")
+
+    # players can't delete or cut the board, stands or fixed map pieces; other objects in the selection still go
+    lua.execute(r"""
+      local function obj(tags)
+        local o = { tags = tags }
+        o.hasTag = function(t) for _, x in ipairs(o.tags) do if x == t then return true end end return false end
+        o.destruct = function() o.gone = true end
+        return o
+      end
+      pBoard, pFlag, pCard, pTree = obj({ "Board3D" }), obj({ "Flag", "ArenaPiece" }), obj({ "Item" }), obj({ "Tree", "ArenaPiece" })
+      pPlayer = { color = "Red", broadcast = function(m) pPlayer.msg = m end }
+      delMixed = onPlayerAction(pPlayer, Player.Action.Delete, { pBoard, pCard })
+      cutFlag = onPlayerAction(pPlayer, Player.Action.Cut, { pFlag, pTree })
+      delTree = onPlayerAction(pPlayer, Player.Action.Delete, { pTree })
+      pickBoard = onPlayerAction(pPlayer, Player.Action.PickUp, { pBoard })
+    """)
+    check(g.delMixed is False and not g.pBoard.gone and g.pCard.gone and "map picker" in str(g.pPlayer.msg),
+          "deleting the board with a card selected: the board stays (with a note), the card is deleted")
+    check(g.cutFlag is False and not g.pFlag.gone and not g.pTree.gone, "cutting a flag (and a tree with it) is cancelled")
+    check(g.delTree is True and g.pickBoard is True, "a tree can still be deleted; other actions on the board aren't blocked")
 
     # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them.
     # TTS's Lua (MoonSharp) fails "pattern too complex" on patterns over text this size (real Lua doesn't), so the
