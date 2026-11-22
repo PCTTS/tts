@@ -11,6 +11,7 @@ import json, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import fast_data  # noqa: E402
 from place_pieces import pieces  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
@@ -46,6 +47,7 @@ def main():
             index[name] = entry
             print(f"{name}: {entry['mesh']}, {entry['texture']}, {len(entry['snaps'])} snap points, {len(entry['pieces'])} pieces")
     (REPO / "arenas" / "index.json").write_text(json.dumps(index, indent=1), encoding="utf-8")
+    fast_data.main()   # the plain-text copy the game reads (JSON is far too slow in TTS)
     print(f"wrote arenas/index.json ({len(index)} arenas)")
 
 

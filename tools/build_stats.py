@@ -7,6 +7,9 @@ roster (figures/index.json) spells them. The mod shows each Pokemon's HP over it
 import json, sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import fast_data  # noqa: E402
+
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "data" / "pokemon.json"
 
@@ -41,6 +44,7 @@ def main(argv):
     no_stats = sorted(n for n in roster if n not in stats or stats[n]["hp"] is None)
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps(dict(sorted(stats.items())), indent=1, ensure_ascii=False), encoding="utf-8")
+    fast_data.main()   # the plain-text copy the game reads (JSON is far too slow in TTS)
     print(f"{len(stats)} Pokemon -> {OUT.relative_to(REPO)}; roster names without HP: {no_stats or 'none'}")
 
 

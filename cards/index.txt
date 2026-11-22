@@ -1,0 +1,690 @@
+PCTTS-DATA-1 cards
+back	abilities	cards/back-abilities-v5.jpg
+back	items	cards/back-items-v5.jpg
+back	skills	cards/back-skills-v5.jpg
+card	abilities	Adaptability			cards/abilities/adaptability-cf1db4ce.jpg	this pokemons positive stat changes last until the mega ends
+card	abilities	Aerialate			cards/abilities/aerialate-0287123e.jpg	if flying damage would deal more damage to the target, this pokemons attack is treated as flying type against that target
+card	abilities	Aftermath			cards/abilities/aftermath-fc8ec65d.jpg	start of game choose one - when knocked out by a contact move, attacker takes 1/4 of their max hp or when knocked out by a non contact move, attacker takes 1/4 of their max hp
+card	abilities	Analytic			cards/abilities/analytic-e213c371.jpg	attacks base power is multiplied by 1.3x when attacking a target who has already moved
+card	abilities	Anger Point			cards/abilities/anger-point-8030f89a.jpg	gains 6 stages of attack when crit
+card	abilities	Anger Shell			cards/abilities/anger-shell-2344a04e.jpg	while hp is below 50%, defense is at -1 stage and attack, speed, and range are at +1 stage
+card	abilities	Aqua Boost			cards/abilities/aqua-boost-9c844d61.jpg	Adjacent pokemons Water attacks deal 1.5 damage
+card	abilities	Arena Trap			cards/abilities/arena-trap-2c63ae8b.jpg	reduce range of pokemon within 2 by 1 at the start of each turn
+card	abilities	Armor Tail			cards/abilities/armor-tail-b7ab88d3.jpg	enemies within 2 do not move forward during their attacks (hitboxes treat starting location as ending location)
+card	abilities	Aroma Veil			cards/abilities/aroma-veil-3df9522f.jpg	allied pokemon within 3 are not affected by effects that force them to target certain pokemon
+card	abilities	Aura Break			cards/abilities/aura-break-8e5d661f.jpg	Any aura ability that affects a tile that this pokemon stands on has its effect canceled completely until this pokemon is no longer in the aura
+card	abilities	Aura Guard			cards/abilities/aura-guard-dbc02752.jpg	allied pokemon within 3 are protected from all passive auras
+card	abilities	Bad Dreams			cards/abilities/bad-dreams-37d4d8fc.jpg	20% chance to make enemies within 2 drowsy (start of turn). drowsy enemies lose 1/8 hp at the end of each turn
+card	abilities	Barnacled			cards/abilities/barnacled-d0541494.jpg	this pokemon cannot take more than 1/5 of its total hp in damage in a single hit
+card	abilities	Battle Armor			cards/abilities/battle-armor-ac7a7b17.jpg	cannot be crit
+card	abilities	Battle Formation			cards/abilities/battle-formation-5de92e9d.jpg	start of turn:gain 1 stage of attack and defense, pokemon cannot make a 180 turn(even to attack)
+card	abilities	Beads of Ruin			cards/abilities/beads-of-ruin-9d8c5763.jpg	aura that lowers defense of all pokemon within 2 by 25%
+card	abilities	Beast Boost			cards/abilities/beast-boost-a0c8f2a3.jpg	when this pokemon makes a ko, gain 1 stage to highest stat
+card	abilities	Berserk			cards/abilities/berserk-4ffd60fa.jpg	raises attack 1 stage when hp drops to 50% or lower
+card	abilities	Big Pecks			cards/abilities/big-pecks-ee53c7d5.jpg	defense cannot be lowered
+card	abilities	Black Hole			cards/abilities/black-hole-269a425e.jpg	adjacent enemies cannot move
+card	abilities	Blaze			cards/abilities/blaze-fb5da882.jpg	base attack power is 1.5x when hp is 1/3 or lower
+card	abilities	Bodyguard			cards/abilities/bodyguard-aee512f8.jpg	Switches places with adjacent allies when they are attacked
+card	abilities	Calming			cards/abilities/calming-155dec8f.jpg	50% chance to make enemies within 2 drowsy (start of turn)
+card	abilities	Catastrophe			cards/abilities/catastrophe-b22bed5f.jpg	deal 1.5x damage per every secondary attack effect check that fails, and 1.2x per each that succeeds
+card	abilities	Celebrate			cards/abilities/celebrate-572341da.jpg	after knocking out an enemy, this pokemon can move a second time (this pokemon must end on an objective or an item during its second move to count as taking control of the objective)
+card	abilities	Cheek Pouch			cards/abilities/cheek-pouch-bcf39770.jpg	restores 1/4 hp when eating a berry (in addition to other effects)
+card	abilities	Chilling Neigh			cards/abilities/chilling-neigh-afca6ee2.jpg	raises attack 1 stage when this pokemon makes a ko
+card	abilities	Chilly Reception			cards/abilities/chilly-reception-42871b43.jpg	The first time this pokemon takes damage each turn, set snow on all tiles within 2
+card	abilities	Chlorophyll			cards/abilities/chlorophyll-cd95e0d2.jpg	doubles speed in the sun (start of turn)
+card	abilities	Clear Body			cards/abilities/clear-body-475cad8e.jpg	stats cannot be lowered by other pokemon or their effects
+card	abilities	Climber			cards/abilities/climber-b1931939.jpg	Can climb high spaces
+card	abilities	Cloud Nine			cards/abilities/cloud-nine-a5ce86d6.jpg	removes the effect of weather within 2 (start of turn, is considered a weather condition, triggers after other weather conditions)
+card	abilities	Color Change			cards/abilities/color-change-a0958efd.jpg	changes type to match attacking type (triggers before damage is taken)
+card	abilities	Comatose			cards/abilities/comatose-5d8729e9.jpg	pokemon is always treated as if drowsy (does not incur the negative effects of it)
+card	abilities	Commander			cards/abilities/commander-bf2338b3.jpg	starts the game in dondozo's mouth, giving dondozo +1 stage to all stats (including range) and changing properties of order up (+attack for curly, + defense for droopy, and +speed for stretchy). when dondozo is defeated tatsugiri pops out and can be placed on any adjacent tile, or the tile dondozo was standing on
+card	abilities	Competitive			cards/abilities/competitive-630a94f2.jpg	raises attack 2 stages when any stat is lowered by an enemy pokemon or effect
+card	abilities	Compound Eyes			cards/abilities/compound-eyes-49d2c979.jpg	attacks have 1.3x base accuracy
+card	abilities	Confidence			cards/abilities/confidence-589f36e3.jpg	Raises defense of allies within 2
+card	abilities	Conqueror			cards/abilities/conqueror-fda1f6f1.jpg	1.2x defense and attack per defeated enemy
+card	abilities	Contrary			cards/abilities/contrary-d743d653.jpg	stat changes on this pokemon are reversed
+card	abilities	Corrosion			cards/abilities/corrosion-075f3d61.jpg	can damage and Poison Steel types
+card	abilities	Costar			cards/abilities/costar-897fdc93.jpg	copies all stat changes of allies within 2 tiles
+card	abilities	Cotton Down			cards/abilities/cotton-down-ac7727f1.jpg	when this pokemon is hit, all pokemon within 2 have their speed lowered 1 stage
+card	abilities	Crushing Grip			cards/abilities/crushing-grip-0b97e925.jpg	reduce the range of closest target hit by 2
+card	abilities	Cud Chew			cards/abilities/cud-chew-3a9b707b.jpg	when this pokemon eats a berry, it eats it a second time at the end of the turn
+card	abilities	Curious Medicine			cards/abilities/curious-medicine-8d363272.jpg	pokemon within 2 have their stat changes eliminated (start of turn)
+card	abilities	Current Flow			cards/abilities/current-flow-6bffd4c6.jpg	Double speed and defense and increase range by 1 when in rain (start of turn)
+card	abilities	Cursed Body			cards/abilities/cursed-body-64d18340.jpg	enemies that target this pokemon who damaged this pokemon with an attack the previous turn will auto fail
+card	abilities	Damp			cards/abilities/damp-f0375e75.jpg	prevents explosion and on death effects from enemies within 2 (aura)
+card	abilities	Dancer			cards/abilities/dancer-375f9257.jpg	gains all stat changes applied to pokemon within 2 (aura)
+card	abilities	Data Drive			cards/abilities/data-drive-2b4b9060.jpg	This pokemon does not consume its plate item when it is used. Ignore attacks secondary text when attacking if this pokemon is holding a plate
+card	abilities	Dauntless			cards/abilities/dauntless-b27579ac.jpg	pokemon damaged by this pokemons attacks are pulled one tile closer
+card	abilities	Daze			cards/abilities/daze-cba6aef0.jpg	75% chance to make enemies within 2 drowsy (start of turn)
+card	abilities	Dazzling			cards/abilities/dazzling-6a41273a.jpg	enemies within 2 do not move forward during their attacks (hitboxes treat starting location as ending location)
+card	abilities	Dazzling Diamond			cards/abilities/dazzling-diamond-8f9851cd.jpg	allies within 2 can make two attacks on their turn, each with half their normal power
+card	abilities	Deep Sleep			cards/abilities/deep-sleep-70d4fad7.jpg	Heals 1/4 hp per turn while drowsy
+card	abilities	Defeatist			cards/abilities/defeatist-2f95631c.jpg	attack has 1.2 power when hp is above 50% and 0.8 when hp is below
+card	abilities	Defend Order			cards/abilities/defend-order-102b917a.jpg	This pokemon has +1 defense until the end of its activation each turn
+card	abilities	Defiant			cards/abilities/defiant-6052e297.jpg	raises attack 2 stages when a stat is lowered by an enemy effect
+card	abilities	Defiant (Grass)			cards/abilities/defiant-grass-367502ff.jpg	raises attack 2 stages when a stat is lowered by an enemy effect
+card	abilities	Devouring Storm			cards/abilities/devouring-storm-859ceb00.jpg	pokemon with water attacks must target this pokemon if possible. water attacks that include this pokemon are completely nullified, and this pokemon restores 1/8th of its total hp
+card	abilities	Directionally Challenged			cards/abilities/directionally-challenged-0a2fbbad.jpg	all pokemon within 2 have any directional damage multipliers from attacks on them doubled
+card	abilities	Disguise			cards/abilities/disguise-9f71c49d.jpg	prevents the first attack this pokemon takes from doing damage
+card	abilities	Disgust			cards/abilities/disgust-1e709bce.jpg	Pokemon hit by this pokemon will switch places with a friendly neighbor
+card	abilities	Dodge			cards/abilities/dodge-0e7c2355.jpg	start of game choose one - 20% chance to dodge attacks that make contact, lowers attackers speed on proc or 20% chance to dodge attacks that make do not make contact, lowers attackers speed on proc
+card	abilities	Doodle			cards/abilities/doodle-be8d3a65.jpg	start of turn: choose a pokemon within 3 and gain its ability until the end of this turn
+card	abilities	Download			cards/abilities/download-e1f5dcde.jpg	if targets defense is higher than this pokemons attack, gain +1 attack before hitting
+card	abilities	Dragon Fury			cards/abilities/dragon-fury-734ea0ea.jpg	this pokemons attacks push targets 1 tile back
+card	abilities	Dragon's Maw			cards/abilities/dragons-maw-3be49d51.jpg	friendly Dragon pokemon within 2 have their attacks base power multiplied by 1.3x
+card	abilities	Dragonize			cards/abilities/dragonize-5e16530b.jpg	Enemy pokemon within 3 are treated as having the dragon type
+card	abilities	Drizzle			cards/abilities/drizzle-70ce56fc.jpg	Summon rain weather within 2 tiles (start of turn)
+card	abilities	Drought			cards/abilities/drought-02f06476.jpg	Summons sun weather condition within 2 tiles (start of turn)
+card	abilities	Dry Skin			cards/abilities/dry-skin-936f4e55.jpg	takes 1/8 damage each turn in sun, heal 1/8 each turn in rain or when hit by Water move. takes 1.25 damage from Fire moves
+card	abilities	Duelist			cards/abilities/duelist-062ad337.jpg	this pokemon has a permanent 1.5x attack and defense multiplier. Reduced by .1x for each pokemon within 2, minimum of 1.0x
+card	abilities	Earth Eater			cards/abilities/earth-eater-eac10536.jpg	restores 1/8 hp when hit by a Ground type move
+card	abilities	Eelevate			cards/abilities/eelevate-fad32a4b.jpg	this pokemon floats above the ground. when this pokemon ko's an enemy pokemon, it gains 1 attack stage
+card	abilities	Effect Spore			cards/abilities/effect-spore-4ded9f33.jpg	Start of game chose one - enemies that make contact have a 30% chance of suffering a random status ailment (1-2 paralysis, 3-4 Poison, 5-6 drowsy) or enemies that make do not make contact have a 30% chance of suffering a random status ailment (1-2 paralysis, 3-4 Poison, 5-6 drowsy)
+card	abilities	Electric Surge			cards/abilities/electric-surge-3c7225d9.jpg	summons Electric terrain within 2 tiles (start of turn)
+card	abilities	Electromorphosis			cards/abilities/electromorphosis-797236ab.jpg	raises the base power of next attack by 50% when hit
+card	abilities	Emergency Exit			cards/abilities/emergency-exit-15f94c74.jpg	when this pokemon reaches 50% hp or lower, move directly away from attacker (in a straight line) up to 3 tiles. reset counter for first impression
+card	abilities	Explode			cards/abilities/explode-c67d092f.jpg	On death all surrounding pokemon take damage. Damage is calculated as an attack with 50 base power, calculated with users attack stat. Cannot be avoided
+card	abilities	Eye of the Storm			cards/abilities/eye-of-the-storm-0631cda9.jpg	any weather or terrain set within 2 is completely canceled (start of turn). this effect checks every time a weather ability is activated
+card	abilities	Fairy Aura			cards/abilities/fairy-aura-044bd7e7.jpg	friendly pokemon within 2 with fairy type attacks gain a 1.5x damage multiplier
+card	abilities	Fairy Lock			cards/abilities/fairy-lock-7de40049.jpg	Any pokemon that hit this pokemon have the range of their next move set to 2, ignoring any other range buffs or debuffs
+card	abilities	Fillet Away			cards/abilities/fillet-away-28c89402.jpg	When this pokemon is damaged, gain +1 attack and speed
+card	abilities	Filter			cards/abilities/filter-b6578b49.jpg	super effective attacks that target this pokemon have their base power treated as .75x (only effects this pokemon)
+card	abilities	Fire Mane			cards/abilities/fire-mane-ebdc55bf.jpg	water type attacks that pass through the row of 3 tiles in front of this pokemon do not continue to target through it. allied attacks that pass through these tiles may change their type to fire, only on tiles on or after the affected tiles
+card	abilities	Fisticuffs			cards/abilities/fisticuffs-72e94fe6.jpg	this pokemon ignores immunities. this pokemons attacks gain an addative .2x multiplier for each enemy within 2 at the time of the hit
+card	abilities	Flame Body			cards/abilities/flame-body-a487011d.jpg	start of game choose one - 30% chance to burn attackers that make contact or 30% chance to burn attackers that do not make contact
+card	abilities	Flame Boost			cards/abilities/flame-boost-982e57e4.jpg	adjacent friendly Fire pokemon's attacks have 1.5x base power
+card	abilities	Flash Fire			cards/abilities/flash-fire-03df508a.jpg	raises attack one stage when hit by a Fire move. take no damage from attack
+card	abilities	Flower Gift			cards/abilities/flower-gift-3c5363f9.jpg	attack and defense are 1.5x in the sunlight
+card	abilities	Flower Veil			cards/abilities/flower-veil-1d18d04c.jpg	friendly Grass pokemon within 4 tiles cannot have their stats lowered by enemy pokemon and effects
+card	abilities	Fluffy			cards/abilities/fluffy-e33aebc9.jpg	start of game choose one - damage from physical moves is halved or damage from special moves is halved. damage from Fire moves is doubled
+card	abilities	Friend Guard			cards/abilities/friend-guard-8e9a898f.jpg	when a friendly pokemon within 2 tiles is attacked, treat the attack as having .75x base power
+card	abilities	Frighten			cards/abilities/frighten-c6645d36.jpg	lowers speed and range of enemies within 2 (start of turn)
+card	abilities	Frostbite			cards/abilities/frostbite-f0987296.jpg	start of game choose one - 30% chance to inflict frostbite on attackers that make contact or 30% chance to inflict frostbite attackers that do not make contact
+card	abilities	Fur Coat			cards/abilities/fur-coat-d42fe626.jpg	start of game choose one - take 1/2 damage from physical attacks or take 1/2 damage from special attacks
+card	abilities	Gale Wings			cards/abilities/gale-wings-3789cb49.jpg	move forward 1 extra tile before attacking
+card	abilities	Galvanize			cards/abilities/galvanize-0cedfe15.jpg	
+card	abilities	Gem Shield			cards/abilities/gem-shield-d263cbeb.jpg	any attack that hits this pokemon can be redirected. when redirecting an attack, take all tiles behind this pokemon (based on attackers position) and choose a different side for those tiles to be moved to. can double target mons that already were hit, and can cause user to take damage. distance is calculated from attacker
+card	abilities	Gluttony			cards/abilities/gluttony-77e1d57c.jpg	when a pokemon within 2 tiles eats a berry, this pokemon gains that bonus as well
+card	abilities	Good as Gold			cards/abilities/good-as-gold-e965274f.jpg	cannot be statused
+card	abilities	Gooey			cards/abilities/gooey-fa58f07d.jpg	Start of game choose one - attackers that make contact have their speed lowered 1 stage or attackers that do not make contact have their speed lowered 1 stage
+card	abilities	Grand Champion			cards/abilities/grand-champion-ca849832.jpg	has an addative .1x attack and defense multiplier per fainted pokemon
+card	abilities	Grass Pelt			cards/abilities/grass-pelt-a03cf2d7.jpg	base defense is 1.5x when standing on Grassy terrain (start of turn)
+card	abilities	Grassy Surge			cards/abilities/grassy-surge-af40769f.jpg	summons Grassy terrain within 2 tiles (start of turn)
+card	abilities	Grim Neigh			cards/abilities/grim-neigh-eeca7044.jpg	raises attack 1 stage when this pokemon makes a ko
+card	abilities	Guard Dog			cards/abilities/guard-dog-04a4ec3a.jpg	Intimidate causes pokemon to gain 1 attack instead, cannot be forced backwards
+card	abilities	Gulp Missile			cards/abilities/gulp-missile-85259438.jpg	collects either an arrokuda or pikachu after attacking (pikachu if cramorant has 50% hp or less). when hit while holding one, shoot missle that deals 1/8 hp and paralyzes if it is a pikachu. counts as a physical attack that does not make contact.
+card	abilities	Harvest			cards/abilities/harvest-48162f9c.jpg	50% chance to regain a used berry each turn if no item is held, 100% in sun
+card	abilities	Healer			cards/abilities/healer-dc379958.jpg	50% chance to heal adjacent allies status conditions (end of turn)
+card	abilities	Healiong Steps			cards/abilities/healiong-steps-0655b4cc.jpg	all adjacent tiles and tiles this pokemon walks over provide allies who end their turn on them 1/8 their total hp. each time a new movement occurs, previous trail dissapears
+card	abilities	Heart of Ice			cards/abilities/heart-of-ice-a84de9a1.jpg	friendly Ice type pokemon within 2 have their attacks base power multiplied by 1.3x
+card	abilities	Heart of Rock			cards/abilities/heart-of-rock-be8f265e.jpg	friendly Rock type pokemon within 2 have their attacks base power multiplied by 1.3x
+card	abilities	Heart of Steel			cards/abilities/heart-of-steel-aa958339.jpg	friendly Steel type pokemon within 2 have their attacks base power multiplied by 1.3x
+card	abilities	Heatproof			cards/abilities/heatproof-0c83255e.jpg	Fire attacks that target this pokemon have their base power treated as half (only applied to this pokemon)
+card	abilities	Hero			cards/abilities/hero-1ddbd36f.jpg	gain 1 attack and defense if you have 2 less pokemon than your oponent lasts until the end of the following turn)
+card	abilities	Hexapod			cards/abilities/hexapod-83ba1b34.jpg	this pokemon has 2 extra range, and can use its range to move in any way it would like
+card	abilities	High Rise			cards/abilities/high-rise-5bdd92e0.jpg	attack gains 1.5x base power if attacking from above target
+card	abilities	Honey Gatherer			cards/abilities/honey-gatherer-4b0ec1ad.jpg	when this pokemon uses a non-honey item, gain honey
+card	abilities	Hospitality			cards/abilities/hospitality-eacfab20.jpg	restores 1/16 hp to all allies within 2 (end of turn)
+card	abilities	Huge Power			cards/abilities/huge-power-2b082877.jpg	this pokemons attack stat is doubled
+card	abilities	Hunger Switch			cards/abilities/hunger-switch-f670a053.jpg	switches forms at the end of each turn
+card	abilities	Hustle			cards/abilities/hustle-262f09cd.jpg	attack base power is 1.5, accuracy is .8
+card	abilities	Hydration			cards/abilities/hydration-19152aa1.jpg	cures all status ailment in the rain (end of turn)
+card	abilities	Hyper Cutter			cards/abilities/hyper-cutter-4ea70a43.jpg	attack cannot be lowered
+card	abilities	Ice Body			cards/abilities/ice-body-dac9a0da.jpg	restores 1/8 hp at the end of each turn when in snow
+card	abilities	Ice Face			cards/abilities/ice-face-8d3b2c25.jpg	pokemon does not take damage from the first physical/special (choose at start of game) attack it takes, then transforms. turns back into Ice head form when you end turn in snow
+card	abilities	Ice Scales			cards/abilities/ice-scales-025f6baf.jpg	start of game choose one - damage from physical moves is halved or damage from special moves is halved. damage from Fire moves is doubled
+card	abilities	Illuminate			cards/abilities/illuminate-0d06e09f.jpg	allies within 3 gain a +10% accuracy modifier
+card	abilities	Illusion			cards/abilities/illusion-9dd775b4.jpg	start disguised as a friendly pokemon (until you take damage from an attack)
+card	abilities	Immunity			cards/abilities/immunity-40e963aa.jpg	cannot be Poisoned
+card	abilities	Impenetrable Shell			cards/abilities/impenetrable-shell-b6e6c8ca.jpg	if this pokemon is hit by a crit, ignore the normal effect and instead lower attackers attack 1 stage
+card	abilities	Imposter			cards/abilities/imposter-d4c6ff23.jpg	at the end of the turn, if ditto is in its base form, it can become an amalgam form. when it does this, choose an enemy pokemon within 5 and copy its attack, defense, speed, attack, and ability. this transformation lasts for two turns
+card	abilities	Infiltrator			cards/abilities/infiltrator-2bcbc026.jpg	doubles positive accuracy and damage bonuses from direction and height differences
+card	abilities	Innards Out			cards/abilities/innards-out-53b04402.jpg	If this pokemon is ko'd, the attacker takes damage equal to the damage dealt in the hit that ko'd this. does not count overkill damage
+card	abilities	Inner Focus			cards/abilities/inner-focus-01885efe.jpg	this pokemon cannot be flinched. this pokemon is immune to abilities that would lower its stats at the start of a turn
+card	abilities	Instinct			cards/abilities/instinct-c10a0ff6.jpg	20% chance to dodge attacks
+card	abilities	Interference			cards/abilities/interference-a644358b.jpg	lowers accuracy of enemies within 2 (start of turn)
+card	abilities	Intimidate			cards/abilities/intimidate-41da8a57.jpg	lowers attack of enemies within 2 (start of turn)
+card	abilities	Iron Barbs			cards/abilities/iron-barbs-3b6c1caf.jpg	attackers that make contact lose 1/8 hp
+card	abilities	Iron Claws			cards/abilities/iron-claws-4c2c31ed.jpg	this pokemons attack is split into 4 hits, each of which have 1/3 the base power of the original attack and make their bonus effect checks seperately
+card	abilities	Iron Fist			cards/abilities/iron-fist-8f922923.jpg	this pokemon can make a second attack against a different target if it did not move during this turn
+card	abilities	Ironbark			cards/abilities/ironbark-217012e7.jpg	This pokemon has no weaknesses
+card	abilities	Jagged Edge			cards/abilities/jagged-edge-b8be52e8.jpg	start of game choose one - attackers that make contact lose 1/16 hp or attackers that do not make contact lose 1/16 hp
+card	abilities	Jungle Healing			cards/abilities/jungle-healing-2cca85fd.jpg	restore adjacent allies 1/8hp and cure status conditions (end of turn)
+card	abilities	Justified			cards/abilities/justified-070d9635.jpg	raises attack when hit by a Dark type move (does not absorb attack)
+card	abilities	Keen Eye			cards/abilities/keen-eye-42d146f5.jpg	base accuracy cannot be lowerd
+card	abilities	Kickin Hawk			cards/abilities/kickin-hawk-f804e303.jpg	gain an 8% speed and attack boost, multiplied by the round count
+card	abilities	Last Bastion			cards/abilities/last-bastion-7cfb74c7.jpg	increases attack and defense 2 stages if all allies have been defeated (lasts until the end of next turn)
+card	abilities	Leaf Guard			cards/abilities/leaf-guard-14b2e17c.jpg	prevents from being statused in the sun (check for in the sun at the start of each turn)
+card	abilities	Levitate			cards/abilities/levitate-52cbe37b.jpg	this pokemon floats above the Ground
+card	abilities	Libero			cards/abilities/libero-6a09498c.jpg	this pokemons first attack against a target who would Normal resist the attack is dealt as neutral damage instead
+card	abilities	Life Force			cards/abilities/life-force-44e32a07.jpg	Restores 1/8 hp at the end of each turn
+card	abilities	Lighting Crater			cards/abilities/lighting-crater-69fe983f.jpg	pokemon with electric attacks must target this pokemon if possible. electric attacks that include this pokemon are completely nullified, and this pokemon restores 1/8th of its total hp
+card	abilities	Lightning Rod			cards/abilities/lightning-rod-0e35476d.jpg	raises attack 1 stage if hit by an Electric move, takes no damage from attack, pokemon with Electric attacks must target this pokemon if possible
+card	abilities	Limber			cards/abilities/limber-d0db3d46.jpg	cannot be paralyzed
+card	abilities	Lingering Aroma			cards/abilities/lingering-aroma-08ca9cd1.jpg	start of game choose one - pokemon that make contact while attacking this pokemon have their ability changed to lingering aroma or pokemon that do not make contact while attacking this pokemon have their ability changed to lingering aroma
+card	abilities	Liquid Ooze			cards/abilities/liquid-ooze-cc485874.jpg	when this pokemon takes damage from an attack which heals the user, the user losese ⅛ hp instead of healing
+card	abilities	Liquid Voice			cards/abilities/liquid-voice-48858eff.jpg	this pokemons attack is Water and Fairy type at the same time
+card	abilities	Luchador			cards/abilities/luchador-926d0c8e.jpg	attacks targeting this pokemon make their accuracy check twice. if one misses, attack deals 1/2 damage. if both miss, attack misses
+card	abilities	Lullaby			cards/abilities/lullaby-3d713274.jpg	enemies within 2 have a 50% to become drowsy at the start of each turn
+card	abilities	Lunar Opposite			cards/abilities/lunar-opposite-d0ad6ceb.jpg	if solRock is on the field, this pokemon ignores any stat changes (negative or positive) on enemy pokemon when attacking or defending
+card	abilities	Magic Bounce			cards/abilities/magic-bounce-e6afa57d.jpg	secondary attack effects that are not stat reductions that affect this pokemon affect the attacker instead
+card	abilities	Magic Guard			cards/abilities/magic-guard-d96186a3.jpg	can only take damage from direct attacks
+card	abilities	Magic Powder			cards/abilities/magic-powder-c4319f83.jpg	start of turn: make the nearest enemy within 2 a pure psychic type until the end of the turn
+card	abilities	Magic Roulette			cards/abilities/magic-roulette-2d83e46b.jpg	when a status condition is applied to a pokemon, you can choose to randomly assign that status to a pokemon on the team of the target
+card	abilities	Magician			cards/abilities/magician-497aca12.jpg	steals the targets item if you have no item
+card	abilities	Magma Armor			cards/abilities/magma-armor-a8d6b792.jpg	cannot be frostbitten
+card	abilities	Magnet Pull			cards/abilities/magnet-pull-c81694b8.jpg	enemy Steel types within 2 have their range lowerd by 2 unless they are taking the most direct path towards this pokemon
+card	abilities	Majesty			cards/abilities/majesty-039b3645.jpg	if the target of this pokemons attack would take more damage from electric type, treat the attack as electric
+card	abilities	Marvel Scale			cards/abilities/marvel-scale-7d7e1ed8.jpg	gains 2 stages of defense while suffering from status ailment
+card	abilities	Mechanized Marvel			cards/abilities/mechanized-marvel-9ae6e2b3.jpg	when this pokemon is attacked, it may make an attack with half base power if there is a valid target
+card	abilities	Medic			cards/abilities/medic-6739b139.jpg	restores adjacent allies hp 1/8 (end of turn)
+card	abilities	Mega Launcher			cards/abilities/mega-launcher-5bb5b114.jpg	This pokemon pushes targets back 1 tile for every 40 damage done
+card	abilities	Mega Sol			cards/abilities/mega-sol-79456ea3.jpg	Allied pokemon within 3 are treated as being in sun while making attacks
+card	abilities	Melee			cards/abilities/melee-e363385b.jpg	when adjacent enemy is attacked, turn to face and deal 1/8 hp. this counts as a contact attack
+card	abilities	Merciless			cards/abilities/merciless-80dd68b0.jpg	always crits against Poisoned target
+card	abilities	Metabolic Supercharge			cards/abilities/metabolic-supercharge-d0acfb19.jpg	pokemon with fire attacks must target this pokemon if possible. fire attacks that include this pokemon are completely nullified, and this pokemon restores 1/8th of its total hp
+card	abilities	Mimicry			cards/abilities/mimicry-0facd416.jpg	type changes when standing on terrain (start of turn)
+card	abilities	Mind's Eye			cards/abilities/minds-eye-ca9c251c.jpg	ignores opponenets base evasion bonuses, cannot have its accuracy lowered, and can hit Ghosts
+card	abilities	Mirror Armor			cards/abilities/mirror-armor-8355249b.jpg	when this pokemons stats are lowered, the pokemon that inflicted that change has their stats lowered instead
+card	abilities	Misty Surge			cards/abilities/misty-surge-0aae86ac.jpg	summons misty terrain within 2 tiles (start of turn)
+card	abilities	Mold Breaker			cards/abilities/mold-breaker-fff1e5e2.jpg	ignores targets abilities while attacking
+card	abilities	Mold Breaker (Fire)			cards/abilities/mold-breaker-fire-3f06e68d.jpg	ignores targets abilities while attacking
+card	abilities	Moody			cards/abilities/moody-634fdc44.jpg	at the start of each turn raise 1 stat 2 stages and lower one stat 1 stage (1=attack, 2=defense, 3=speed, 4=range, 5=accuracy, 6=evasion, D6)
+card	abilities	Motor Drive			cards/abilities/motor-drive-5a71ac64.jpg	raises speed when hit by an Electric move
+card	abilities	Mountaineer			cards/abilities/mountaineer-2a2534e3.jpg	Can climb high places
+card	abilities	Moxie			cards/abilities/moxie-7c0b8326.jpg	raises attack 1 stage on kill
+card	abilities	Multiscale			cards/abilities/multiscale-5f1d1968.jpg	when this pokemon is attacked at full hp, treat the attack as having half as much base power (only applies to this pokemon)
+card	abilities	Mummy			cards/abilities/mummy-98e233de.jpg	start of game choose one - pokemon that make contact have their ability changed to mummy or pokemon that do not make contact have their ability changed to mummy. With either choice the ability retains its properties
+card	abilities	Mycelium Might			cards/abilities/mycelium-might-c78f0665.jpg	skips accuracy check if attacking a target who has already moved this turn
+card	abilities	Natural Cure			cards/abilities/natural-cure-f63b32a8.jpg	30% chance to cure the status ailments of surrounding allies (end of turn)
+card	abilities	Negative Outlook			cards/abilities/negative-outlook-b2382c75.jpg	Any bonus effect checks made on or by a pokemon within 2 tiles has their odds halved
+card	abilities	Neutralizing Gas			cards/abilities/neutralizing-gas-76880df9.jpg	all poekmon within 2 tiles have no abilities (aura)
+card	abilities	Nightmare			cards/abilities/nightmare-9028b3a9.jpg	50% chance to make enemies within 3 drowsy (start of turn). drowsy enemies lose 1/8 hp at the end of each turn
+card	abilities	No Guard			cards/abilities/no-guard-44f355d8.jpg	this pokemon skips accuracy checks. pokemon attacking this pokemon skip accuracy checks
+card	abilities	Nurse			cards/abilities/nurse-7e2ac164.jpg	50% chance to heal neighbors from status conditions at the end of each turn
+card	abilities	Oblivious			cards/abilities/oblivious-f44c3b9e.jpg	while defending, attacker does not get accuracy or attack bonuses for direction and height difference. this pokemon is immune to abilities that would lower its stats at the start of a turn
+card	abilities	Opportunist			cards/abilities/opportunist-2b8ab69b.jpg	when an enemy within 2 gains a stat bonus, this pokemon gains an identical stat bonus
+card	abilities	Overcoat			cards/abilities/overcoat-63c643a2.jpg	This pokemon ignores all effects of the weather
+card	abilities	Overgrow			cards/abilities/overgrow-f9df811f.jpg	base attack power is 1.5x when hp is 1/3 or lower
+card	abilities	Own Tempo			cards/abilities/own-tempo-00bda817.jpg	cannot be slept, confused, or paralyzed. this pokemon is immune to abilities that would lower its stats at the start of a turn
+card	abilities	Parental Bond			cards/abilities/parental-bond-c03f252a.jpg	this pokemon makes 2 checks for any attack effects
+card	abilities	Parry			cards/abilities/parry-7bc4f38d.jpg	start of game choose one - 30% chance tododge attacks that make contact or 30% chance to dodge attacks that do not make contact
+card	abilities	Pastel Veil			cards/abilities/pastel-veil-e0b41a4c.jpg	this pokemon and friendly pokemon within 4 cannot be Poisoned. friendly pokemon that enter within range 4 of this pokemon are cured of Poison (aura)
+card	abilities	Perfect Mimic			cards/abilities/perfect-mimic-cae47b4c.jpg	triples positive accuracy and damage bonuses from direction and height differences
+card	abilities	Perish Body			cards/abilities/perish-body-239162c3.jpg	
+card	abilities	Perpetual Motion			cards/abilities/perpetual-motion-ab513422.jpg	Get a copy of any item consumed by allies within 3. Must replace current item.
+card	abilities	Pickpocket			cards/abilities/pickpocket-7f5234ee.jpg	steals item from pokemon it hits if this pokemon has no item
+card	abilities	Pickup			cards/abilities/pickup-7c4efd27.jpg	picks up and uses consumable items dropped within 2 tiles (aura). also picks up the egg in capture the egg when dropped within 2
+card	abilities	Piercing Drill			cards/abilities/piercing-drill-228a0087.jpg	while attacking, each consecutive attack gains an addative .1x multiplier per successful attack on previous turns
+card	abilities	Pixilate			cards/abilities/pixilate-c4cd540f.jpg	if fairy damage would deal more damage to the target, this pokemons attack is treated as fairy type against that target
+card	abilities	Poison Current			cards/abilities/poison-current-f8183a92.jpg	all adjacent tiles and tiles this pokemon poison enemies who and heal allies for 1/16 their total hp end their turn on them. each time a new movement occurs, previous trail dissapears
+card	abilities	Poison Heal			cards/abilities/poison-heal-6942f84d.jpg	restores 1/8 hp each turn when Poisoned (instead of suffering damage)
+card	abilities	Poison Point			cards/abilities/poison-point-ee8c6ea8.jpg	start of game choose one - 30% chance to Poison attackers that make contact or 30% chance to Poison attackers that do not make contact
+card	abilities	Poison Puppeteer			cards/abilities/poison-puppeteer-5f2af4a5.jpg	enemy pokemon within 4 that become Poisoned also become confused
+card	abilities	Poison Touch			cards/abilities/poison-touch-9c12f3b7.jpg	extra 30% chance to Poison target on hit
+card	abilities	Polyscale			cards/abilities/polyscale-eb162539.jpg	the first hit each turn that damages this pokemon has its damage halved
+card	abilities	Positive Outlook			cards/abilities/positive-outlook-6d6c00de.jpg	Any bonus effect checks made on or by a pokemon within 2 tiles has their odds doubled. automatically succeeds if chance goes above 100%
+card	abilities	Powder			cards/abilities/powder-e95473ba.jpg	at the start of the game choose a type. If any pokemon within 2 uses a move of that type, it loses 1/4 of its maximum hp
+card	abilities	Power Construct			cards/abilities/power-construct-35b5eef6.jpg	transform into zygarde complete when hp drops to 50% or lower
+card	abilities	Power Spot			cards/abilities/power-spot-a6663f28.jpg	friendly pokemon within 2 have their attacks base power multiplied by 1.3x (aura)
+card	abilities	Power of Alchemy			cards/abilities/power-of-alchemy-aba40e8b.jpg	this pokemon steals the ability from the first enemy it hits (steals the closer enemies ability if many are hit at once)
+card	abilities	Prehistoric Predator			cards/abilities/prehistoric-predator-76b1b339.jpg	while attacking a pokemon who has an attack that is supereffective on you, treat your attack as being super effective. If it is already super effective, it is double super effective. if it is already double supper effective, add an extra 1.5x multiplier
+card	abilities	Pride			cards/abilities/pride-ba8079e9.jpg	has 1.5x base attack and defense when suffering from status ailment. ignores the attack drop from burn or frostbite
+card	abilities	Propeller Tail			cards/abilities/propeller-tail-b87d681c.jpg	ignores effects that force user to hit a certain target
+card	abilities	Protean			cards/abilities/protean-4791664c.jpg	when attacking, you may swap this pokemons water type with a type that is super effective on the target. your attack switches to match this type
+card	abilities	Protosynthesis			cards/abilities/protosynthesis-ccdab616.jpg	start of turn: gain +1 stages to highest stat in the sun
+card	abilities	Psychic Surge			cards/abilities/psychic-surge-84889f75.jpg	summons Psychic terrain within 2 tiles (start of turn)
+card	abilities	Punk Rock			cards/abilities/punk-rock-29f683f0.jpg	attack gains 5% base power for each target above 1 within attack's tiles
+card	abilities	Pure Power			cards/abilities/pure-power-6aa68aec.jpg	this pokemons attack stat is doubled
+card	abilities	Purify			cards/abilities/purify-45831cd2.jpg	start of turn: heal the status of all friendly pokemon within 2 and restore 1/4 of their hp if you do
+card	abilities	Purifying Salt			cards/abilities/purifying-salt-a55d03b0.jpg	this pokemon is protected from status conditions and takes half damage from Ghost moves
+card	abilities	Quark Drive			cards/abilities/quark-drive-4269e930.jpg	start of turn: gain +1 stages to highest stat in Electric terrain
+card	abilities	Queenly Majesty			cards/abilities/queenly-majesty-91f40532.jpg	enemies within 2 do not move forward during their attacks (hitboxes treat starting location as ending location)
+card	abilities	Quick Draw			cards/abilities/quick-draw-c185aee2.jpg	after this pokemon attacks, it has a 30% chance to move (must end its second move on an objective to capture it)
+card	abilities	Quick Feet			cards/abilities/quick-feet-1c92d8c8.jpg	raises speed 1 stage while being affected by status ailment
+card	abilities	Rain Dish			cards/abilities/rain-dish-37d93219.jpg	heal 1/8hp each turn in the rain
+card	abilities	Rattled			cards/abilities/rattled-835ebd97.jpg	raises speed 1 stage when hit by Bug Ghost or Dark move
+card	abilities	Refridgerate			cards/abilities/refridgerate-6638bb54.jpg	if ice damage would deal more damage to the target, this pokemons attack is treated as ice type against that target
+card	abilities	Regenerator			cards/abilities/regenerator-4ebeca26.jpg	restores 1/8 hp at the end of each turn
+card	abilities	Reversi			cards/abilities/reversi-47b4eda4.jpg	stat changes applied to this pokemon by enemies are reversed
+card	abilities	Ripen			cards/abilities/ripen-63adf601.jpg	doubles effects of berries
+card	abilities	Rivalry			cards/abilities/rivalry-1e097c57.jpg	deals 1.5x damage when targetting a pokemon with the same type as this pokemon
+card	abilities	Rocky Payload			cards/abilities/rocky-payload-55fc4bfd.jpg	
+card	abilities	Rough Skin			cards/abilities/rough-skin-534ef17b.jpg	start of game choose one - attackers that make contact lose 1/16 hp or attackers that do not make contact lose 1/16 hp
+card	abilities	Run Away			cards/abilities/run-away-bdb5f8f5.jpg	when hit by an attack, this pokemon may move 1 tile
+card	abilities	Run Up			cards/abilities/run-up-a329c59e.jpg	5% extra base power for each tile moved this turn before attack
+card	abilities	Sand Force			cards/abilities/sand-force-8dfb4867.jpg	attack has 1.3 base power if used in sandstorm
+card	abilities	Sand Rush			cards/abilities/sand-rush-c890aceb.jpg	doubles speed in sandstorm (start of turn) and protects from sand damage
+card	abilities	Sand Slither			cards/abilities/sand-slither-9da41215.jpg	this pokemons attacks have a 1.5x multiplier while in sandstorm
+card	abilities	Sand Spit			cards/abilities/sand-spit-11186444.jpg	summons sandstorm weather within 2 tiles when hit
+card	abilities	Sand Stream			cards/abilities/sand-stream-bc9cbc3a.jpg	Summon sandstorm weather within 2 tiles (start of turn)
+card	abilities	Sand Veil			cards/abilities/sand-veil-2253ac6a.jpg	increases evasion 1.25x during sandstorm (start of turn)
+card	abilities	Sap Sipper			cards/abilities/sap-sipper-8ac8ca51.jpg	raises attack 1 stage when hit by a Grass move, takes no damage from attack
+card	abilities	Schooling			cards/abilities/schooling-2f983aa5.jpg	transforms into schooling wishiwashi when hp is 20% or higher
+card	abilities	Scrappy			cards/abilities/scrappy-b06777c2.jpg	can hit Ghosts
+card	abilities	Seed Sower			cards/abilities/seed-sower-2f9e94d3.jpg	summon Grassy terrain within 2 tiles when hit
+card	abilities	Seeing Red			cards/abilities/seeing-red-a1e96f60.jpg	raises attack 1 stage when this pokemon drops to 75, 50, and 25% hp
+card	abilities	Sequence			cards/abilities/sequence-353e6a3b.jpg	extra .5x attack per Electric pokemon within 3
+card	abilities	Serene Grace			cards/abilities/serene-grace-d92bea71.jpg	doubles the chance of secondary effects
+card	abilities	Shackle			cards/abilities/shackle-59e0bc1c.jpg	Lowers range of target by 1 tile
+card	abilities	Shadow Dash			cards/abilities/shadow-dash-ce3965f2.jpg	When no pokemon within 3, range increases 2
+card	abilities	Shadow Tag			cards/abilities/shadow-tag-17fb6600.jpg	enemy pokemon within 2 cannot move away from this pokemon
+card	abilities	Share			cards/abilities/share-85da50aa.jpg	This pokemon receives buffs from warrior abilities applied to other friendly pokemon
+card	abilities	Sharpness			cards/abilities/sharpness-5f22a6b4.jpg	gain an addative .2x multiplier for each consecutive turn the target pokemon has been attacked by this pokemon
+card	abilities	Shattering Presence			cards/abilities/shattering-presence-f719d60a.jpg	enemy pokemon within 3 have their abilities turned off
+card	abilities	Shed Skin			cards/abilities/shed-skin-9b74e133.jpg	50% chance to heal from status ailments (end of turn)
+card	abilities	Sheer Force			cards/abilities/sheer-force-226a69e6.jpg	removes secondary effect of attack, multiplies its base power by 1.3x
+card	abilities	Shell Armor			cards/abilities/shell-armor-e0b5c783.jpg	cannot be crit
+card	abilities	Shield			cards/abilities/shield-0d247fe2.jpg	protects allies from multitile attacks
+card	abilities	Shield Dust			cards/abilities/shield-dust-0fe29901.jpg	protects against secondary effects from moves
+card	abilities	Shields Down			cards/abilities/shields-down-35b4c2c8.jpg	transforms into core form at 50% hp. cannot be statused or have stats lowered while in core form
+card	abilities	Simple			cards/abilities/simple-3c3722d1.jpg	doubles effects of positive stat multipliers. halves the effect of negative ones
+card	abilities	Skater			cards/abilities/skater-34ddefe6.jpg	increases range to all Ice tiles connected to Ice within range and adjacent tiles
+card	abilities	Skill Link			cards/abilities/skill-link-2c74db44.jpg	multihit attacks always hit the maximum number of times
+card	abilities	Slush Rush			cards/abilities/slush-rush-a91197c9.jpg	doubles speed in snow (start of turn)
+card	abilities	Sniper			cards/abilities/sniper-0c1b97ae.jpg	crits deal 2.25x damage instead of 1.5x
+card	abilities	Snow Cloak			cards/abilities/snow-cloak-8b97d008.jpg	increases evasion 1.25x in the snow
+card	abilities	Snow Warning			cards/abilities/snow-warning-5cfcab70.jpg	summons snow weather effect within 2 tiles (start of turn)
+card	abilities	Solar Opposite			cards/abilities/solar-opposite-aebe366b.jpg	if lunatone is on the field, this pokemon can make a second move after attacking with a range of 2. This pokemon must end its move on a map asset to be affected by or affect it
+card	abilities	Solar Power			cards/abilities/solar-power-251ddfc2.jpg	attack base power is 1.5x when in sun, but pokemon takes 1/8hp at the end of turn (checks at the start of turn)
+card	abilities	Solid Rock			cards/abilities/solid-rock-7aed6cb7.jpg	super effective moves deal 1/4 damage
+card	abilities	Son of God			cards/abilities/son-of-god-c91781d4.jpg	always deals neutral damage. can jump high places. restores 1/16 hp at the end of each turn. 10% chance to dodge attacks
+card	abilities	Soul Heart			cards/abilities/soul-heart-f98a47bb.jpg	raises attack 1 stage when this pokemon makes a ko
+card	abilities	Speed Boost			cards/abilities/speed-boost-8eea1ae9.jpg	Gain 15% base speed multiplied by the turn count
+card	abilities	Speed Swap			cards/abilities/speed-swap-7163933e.jpg	When this pokemon takes its turn, you may swap speed with a pokemon within 3 (this swaps the final value with stat stages and other buffs included)
+card	abilities	Spicy Spray			cards/abilities/spicy-spray-0d83da82.jpg	any pokemon that damages this pokemon is burned
+card	abilities	Spirit			cards/abilities/spirit-f1ec13b6.jpg	Restore hp to 1/2 and gain 1 attack when hp reaches 1/4
+card	abilities	Splashback			cards/abilities/splashback-b60236cd.jpg	Takes 1/16 damage per attack missed. Emotional type damage
+card	abilities	Sponge			cards/abilities/sponge-7216e88c.jpg	when an adjacent enemy is attacked, turn to face them and deal 1/16 their hp as damage. heal half of this. this counts as an attack that makes contact
+card	abilities	Sprint			cards/abilities/sprint-bc9dd569.jpg	One extra range
+card	abilities	Stakeout			cards/abilities/stakeout-85f99aac.jpg	this pokemons attack has 1.5x base power when attacking a pokemon that changed the tile it stands on this turn (includes pokemon who moved due to an attack)
+card	abilities	Stalwart			cards/abilities/stalwart-22c23068.jpg	ignores effects that force this pokemon to target certain pokemon
+card	abilities	Stamina			cards/abilities/stamina-b6a708a6.jpg	raises defense 1 stage when hit
+card	abilities	Stance Change			cards/abilities/stance-change-8ce6b39e.jpg	when this pokemon attacks, switch to shield form
+card	abilities	Static			cards/abilities/static-123fe70d.jpg	start of game choose one - 30% chance to paralyze attackers that make contact or 30% chance to paralyze attackers that do not make contact
+card	abilities	Steam Engine			cards/abilities/steam-engine-8b71f6d7.jpg	raises speed 6 stages when hit by a Water move (does not absorb attack)
+card	abilities	Steel Ball			cards/abilities/steel-ball-3cb04dd4.jpg	allied pokemon within 3 gain 1 stage of defense whenever they are hit by an attack
+card	abilities	Steely Spirit			cards/abilities/steely-spirit-6f5d00d3.jpg	adjacent Steel type allies have their attacks base power multiplied by 1.5x
+card	abilities	Stench			cards/abilities/stench-b5b460bd.jpg	attacks have a 10% chance to flinch target
+card	abilities	Sticky Hold			cards/abilities/sticky-hold-36a4446f.jpg	
+card	abilities	Storm Drain			cards/abilities/storm-drain-ef2bd795.jpg	enemy pokemon with Water attacks must attack this pokemon if possible. when this pokemon is hit by a Water move, raises attack 1 stage and take no damage
+card	abilities	Strong Jaw			cards/abilities/strong-jaw-9381186a.jpg	ignore all positive defense modifiers while attacking
+card	abilities	Sturdy			cards/abilities/sturdy-40fe9528.jpg	The first time this pokemons hp is lowerd to 0, it survives on 1 hp
+card	abilities	Suction Cups			cards/abilities/suction-cups-ef0ff13b.jpg	cannot be forced backwards by enemy pokemon effects
+card	abilities	Super Fighting Robot			cards/abilities/super-fighting-robot-130832ab.jpg	this pokemon can make a second attack using its base form's attack with 1/2 power
+card	abilities	Super Luck			cards/abilities/super-luck-8099895c.jpg	one extra crit stage
+card	abilities	Supersweet Syrup			cards/abilities/supersweet-syrup-8e80fc46.jpg	lowers speed of enemy pokemon within 2 by 2 stages (start of turn)
+card	abilities	Supreme Overlord			cards/abilities/supreme-overlord-5f80812c.jpg	gains 10% base attack per fallen ally
+card	abilities	Surge Surfer			cards/abilities/surge-surfer-ae064a20.jpg	doubles speed when on Electric terrain
+card	abilities	Swarm			cards/abilities/swarm-d881470b.jpg	base attack power is 1.5x when hp is 1/3 or lower
+card	abilities	Sweet Veil			cards/abilities/sweet-veil-f8fab655.jpg	friendly pokemon within 4 cannot be slept
+card	abilities	Swift Swim			cards/abilities/swift-swim-17472868.jpg	double speed when in the rain (start of turn)
+card	abilities	Sword of Ruin			cards/abilities/sword-of-ruin-fa14bb45.jpg	aura that lowers defense of all pokemon within 2 by 25%
+card	abilities	Symbiosis			cards/abilities/symbiosis-01d6f2f1.jpg	when a friendly pokemon within 2 uses an item, give it this pokemons item (cannot be used this turn if it is a manual consumable)
+card	abilities	Synchronize			cards/abilities/synchronize-9c580958.jpg	status ailments and stat changes applied to this pokemon by enemies are applied to the enemy as well
+card	abilities	Syrup Bomb			cards/abilities/syrup-bomb-3026a174.jpg	When you hit a target, lower its speed by 2 stages
+card	abilities	Tablets of Ruin			cards/abilities/tablets-of-ruin-d5996986.jpg	aura that lowers attack of all pokemon within 2 by 25%
+card	abilities	Take Soul			cards/abilities/take-soul-04417308.jpg	when any pokemon faints, this pokemon gains an addative .3x attack and defense multipliers
+card	abilities	Tangled Feet			cards/abilities/tangled-feet-de24baa4.jpg	evasion bonuses are doubled when pokemon is confused. evasion deductions are halved
+card	abilities	Tangling Hair			cards/abilities/tangling-hair-78dd952b.jpg	start of game choose one - enemies that make contact lose 1 speed or enemies that do not make contact lose 1 speed
+card	abilities	Tar Shot			cards/abilities/tar-shot-1705f201.jpg	start of turn: make the nearest enemy within 2 take 1.5x damage from fire type attacks until the end of the turn
+card	abilities	Teatime			cards/abilities/teatime-1e0d12f5.jpg	when this pokemon hits an opponent, the target immediately consumes its held item if it is consumable
+card	abilities	Telepathy			cards/abilities/telepathy-dc53228b.jpg	always dodges friendly pokemons attacks
+card	abilities	Tenacity			cards/abilities/tenacity-35a630ae.jpg	start of game choose one - 30% chance to flinch attackers who make contact or 30% chance to flinch attackers that do not make contact
+card	abilities	Terrify			cards/abilities/terrify-5f51e27f.jpg	lowers attack and defense of enemy pokemon within 3 (start of turn)
+card	abilities	Thermal Exchange			cards/abilities/thermal-exchange-f0a59fe5.jpg	gains 1 attack when hit by a Fire move, cannot be burned
+card	abilities	Thick Fat			cards/abilities/thick-fat-2240f4b2.jpg	halves damage from Ice and Fire type attacks
+card	abilities	Thrust			cards/abilities/thrust-e39a391c.jpg	this pokemons attacks have 1 extra knockback
+card	abilities	Tinted Lens			cards/abilities/tinted-lens-481a58a3.jpg	doubles base power of attack when attack is not very effective
+card	abilities	Toilet Man			cards/abilities/toilet-man-9204a734.jpg	This pokemons attack is super effective against water type
+card	abilities	Topsy Turvy			cards/abilities/topsy-turvy-5f69e01a.jpg	Reverses all stat changed on targets after hitting them
+card	abilities	Torrent			cards/abilities/torrent-745159c3.jpg	base attack power is 1.5x when hp is 1/3 or lower
+card	abilities	Tough Claws			cards/abilities/tough-claws-390f39f5.jpg	If this pokemon triggers an on hit effect, make a second attack with 1/4 base power on the target that ignores on hit effects
+card	abilities	Toxic Boost			cards/abilities/toxic-boost-fd263f20.jpg	attacks base power is 1.5x when Poisoned
+card	abilities	Toxic Chain			cards/abilities/toxic-chain-f88f37d0.jpg	30% chance to badly Poison on hit(triggers before attacks effect)
+card	abilities	Toxic Debris			cards/abilities/toxic-debris-4be6412c.jpg	when hit, put toxic spikes on surrounding tiles (lasts until the end of next turn, any pokemon that end their turn on debris is Poisoned)
+card	abilities	Trace			cards/abilities/trace-163b7083.jpg	Copy the ability of the first enemy you hit. You choose the ability if many are hit at once
+card	abilities	Transistor			cards/abilities/transistor-bad359a4.jpg	friendly Electric pokemon within 2 have thier attacks base power multiplied by 1.3x
+card	abilities	Triage			cards/abilities/triage-53658017.jpg	this pokemon doubles any healing recieved
+card	abilities	Truant			cards/abilities/truant-088eb700.jpg	cannot attack twice in a row
+card	abilities	Unaware			cards/abilities/unaware-c7c7af96.jpg	ignores any stat changes that would reduce damage dealt when attacking. ignores any stat changes that would increase damage dealt when defending
+card	abilities	Unburden			cards/abilities/unburden-52417ba2.jpg	gain 2 speed stages when item is used
+card	abilities	Unnerve			cards/abilities/unnerve-0688de51.jpg	enemy pokemon within 2 cannot use consumable items, and active items that are consumed automatically do not trigger
+card	abilities	Unseen Fist			cards/abilities/unseen-fist-7e4dcb45.jpg	this pokemons attacks do not trigger any on hit effects from target
+card	abilities	Unstoppable Force			cards/abilities/unstoppable-force-7a35af54.jpg	this pokemon pushes enemy pokemon with its movement
+card	abilities	Vanguard			cards/abilities/vanguard-e541f0f5.jpg	attack has 1.5x base power when this pokemon is the first to move
+card	abilities	Vessel of Ruin			cards/abilities/vessel-of-ruin-3343e838.jpg	aura that lowers attack of all pokemon within 2 by 25%
+card	abilities	Victory Dance			cards/abilities/victory-dance-0cb5f52f.jpg	Gain +1 speed, attack, and defense when this pokemon KO's an opponent
+card	abilities	Victory Star			cards/abilities/victory-star-16931b20.jpg	allies within 2 have 1.1x base accuracy (aura)
+card	abilities	Volt Absorb			cards/abilities/volt-absorb-f0f72a1f.jpg	Heal 1/8 when hit by Electric move
+card	abilities	Voltage Amp			cards/abilities/voltage-amp-7d9b87fc.jpg	pokemon within 2 may choose to change their attack type to electric when they make an attack
+card	abilities	Voltage Mirror			cards/abilities/voltage-mirror-cedb800d.jpg	when this pokemon is attacked by an electric attack, you may force the attack to bounce to another pokemon within 2
+card	abilities	Wandering Spirit			cards/abilities/wandering-spirit-05e0f898.jpg	when a pokemon makes contact/does not make contact (choose at start of game) with this pokemon, swap abilities with it
+card	abilities	Warm Glow			cards/abilities/warm-glow-eb09e308.jpg	when a pokemon starts its turn within 2 tiles, it may choose to gain the electric type until the end of the next round
+card	abilities	Water Absorb			cards/abilities/water-absorb-623be7a2.jpg	restores 1/8 hp when hit by a Water type move
+card	abilities	Water Absorb (Water)			cards/abilities/water-absorb-water-80326a72.jpg	restores 1/8 hp when hit by a Water type move
+card	abilities	Water Bubble			cards/abilities/water-bubble-aa4dff6b.jpg	base power of attack is doubled, cannot be burned, takes half damage from Fire moves
+card	abilities	Water Compaction			cards/abilities/water-compaction-9664de80.jpg	raises defense 2 stages when hit by a Water move. does not absorb the attack
+card	abilities	Water Veil			cards/abilities/water-veil-62ce8ef6.jpg	cannot be burned
+card	abilities	Wave Rider			cards/abilities/wave-rider-7b4f6575.jpg	Extends range to all connected Water tiles if one is in range and adjacent tiles to that Water
+card	abilities	Weak Armor			cards/abilities/weak-armor-8f2fd017.jpg	raises speed 2 stages and lowers defense 1 when hit
+card	abilities	Well-Baked Body			cards/abilities/well-baked-body-51c0eb3e.jpg	raises defense 2 stages when hit by a Fire move
+card	abilities	White Smoke			cards/abilities/white-smoke-288f7d01.jpg	friendly pokemon within 2 cannot have their stats lowered (aura)
+card	abilities	Wind Power			cards/abilities/wind-power-85f64e85.jpg	doubles speed when hit by a wind move, does not take damage from the move(wind move list)
+card	abilities	Wind Rider			cards/abilities/wind-rider-413df90e.jpg	raises attack when hit by a wind move. does not take damage from attack (wind move list)
+card	abilities	Wonder Skin			cards/abilities/wonder-skin-0a9227b9.jpg	before being targetted with an attack that can lower the targets stats, gain 1 stage of evasion
+card	abilities	Zen Mode			cards/abilities/zen-mode-035a1447.jpg	Switch to zen mode at half hp
+card	abilities	Zero to Hero			cards/abilities/zero-to-hero-52d925f5.jpg	after this pokemon attacks an enemy AND THEN ends a turn 3 tiles or more away from any enemy pokemon, transform into palafin hero
+card	items	Abomasite		Mega Stone	cards/items/abomasite-eedd95eb.jpg	abomasnow holding this item can mega evolve. when this pokemon is standing in snow weather, that weather cannot be replaced by a different weather condition
+card	items	Absolite	Consumable	Mega Stone	cards/items/absolite-701589ed.jpg	absol holding this item can mega evolve into normal mega absol. this item can be "consumed" to make its next attack lower targets range by 1
+card	items	Absolite Z	Active	Mega Stone	cards/items/absolite-z-e4d11f20.jpg	absol holding this item can mega evolve into absol z. holder cannot have its attack stages lowered
+card	items	Aerodactylite	Active	Mega Stone	cards/items/aerodactylite-0b2c9dec.jpg	aerodactyl holding this item can mega evolve. when attacked by a super effective attack, the attack has a .9x multiplier applied to it
+card	items	Aggronite	Consumable	Mega Stone	cards/items/aggronite-01da1079.jpg	aggron holding this item can mega evolve. this item can be "consumed" to give the users next attack an addative .1x attack multiplier per enemy pokemon within 3 that has a super effective attack on this pokemon
+card	items	Alakazite	Consumable	Mega Stone	cards/items/alakazite-d926f252.jpg	alakazam holding this item can mega evolve. this item can be "consumed" to gain 1 stage of attack
+card	items	Altarianite	Active	Mega Stone	cards/items/altarianite-4115f7eb.jpg	altaria holding this item cann mega evolve. holder restores 1/16 hp when they end their turn outside or any weather or terrain
+card	items	Ampharosite	Active	Mega Stone	cards/items/ampharosite-2da1d60c.jpg	ampharos holding this item can mega evolve. when this pokemon attacks, it gains a .05x addative multiplier for every tile that would have been within its move range that it could not move to for any reason (including borders of arena)
+card	items	Antidote	Consumable	Type 1	cards/items/antidote-399887bf.jpg	heals poison for pokemon and allies within 2
+card	items	Apicot Berry	Consumable	Berry	cards/items/apicot-berry-be74ee92.jpg	eaten at 1/2 hp, raises defense until the end of next turn
+card	items	Attack Bell	Consumable		cards/items/attack-bell-8df09613.jpg	increases attack of all allies by 1.15x this turn
+card	items	Audinite	Consumable	Mega Stone	cards/items/audinite-40a3b099.jpg	audino holding this item can mega evolved. this item can be "consumed" to double the effect or chances of any healing effect this pokemon caused
+card	items	Awakening	Consumable	Type 1	cards/items/awakening-d1ff31ab.jpg	heals sleep for pokemon and allies within 2
+card	items	Banettite	Consumable	Mega Stone	cards/items/banettite-aea453b2.jpg	bannette holding this item can mega evolve. this item can be "consumed" to supress one distance based aura being created from an enemy pokemon within 2 until the end of the round
+card	items	Barbaracite	Consumable	Mega Stone	cards/items/barbaracite-4334986c.jpg	barbaracle holding this item can mega evolve. this item can be "consumed" to gain 1 stage of defense until the end of the round
+card	items	Battle Shield	Active		cards/items/battle-shield-802f74fb.jpg	this pokemon protects allies from attacks
+card	items	Baxcalibrite	Consumable	Mega Stone	cards/items/baxcalibrite-93c7c8e9.jpg	baxcalibur holding this item can mega evolve. this item can be "consumed" to ignore the downside of glaive rush or greatsword until the end of the round
+card	items	Beedrillite	Active	Mega Stone	cards/items/beedrillite-9df53edc.jpg	beedrill holding this item can mega evolve. attacks on this pokemon deal 3 less damage for every 10 speed lower than holder
+card	items	Big Root	Active		cards/items/big-root-356831f7.jpg	attacks that steal hp from their target heal 30% more than they ordinarily would
+card	items	Big Stick	Consumable		cards/items/big-stick-ede4412b.jpg	warrior skills do not affect you for this turn. attackers/defenders under the influence of warrior skills are treated as if those skills are not active
+card	items	Blank Plate	Consumable		cards/items/blank-plate-f3371847.jpg	for this turn, this pokemon's attack deals normal type damage (instead of its normal type)
+card	items	Blast Furnace	Active		cards/items/blast-furnace-c7b1f58e.jpg	when hit by a fire move, attack is increased 2 stages (consumed)
+card	items	Blastoisinite	Active	Mega Stone	cards/items/blastoisinite-b8bcf57e.jpg	blastoise holding this item can mega evolve. when this pokemon would be affected by a status condition from an enemy, ignore it and give the next attack this pokemon makes an addative 0.1x multiplier
+card	items	Blazikenite	Consumable	Mega Stone	cards/items/blazikenite-0cc54b93.jpg	blaziken holding this item can mega evolve. this item can be "consumed" to give an addative .1x attack multiplier on for each turn before the current that this pokemon has attacked
+card	items	Booster Energy	Consumable		cards/items/booster-energy-f6fac433.jpg	trigger this pokemons ability if that ability is protosynthesis or quark drive
+card	items	Burn Block	Consumable	Type 2	cards/items/burn-block-c467a187.jpg	blocks burn for 3 turns for pokemon and allies within 2
+card	items	Burn Heal	Consumable	Type 1	cards/items/burn-heal-8fddc79f.jpg	heals burn for pokemon and allies within 2
+card	items	Cameruptite	Consumable	Mega Stone	cards/items/cameruptite-4c9b393b.jpg	camerupt holding this item can mega evolve. this item can be "consumed" to add a 50% chance to lower targets attack during holders next attack
+card	items	Chandelurite	Active	Mega Stone	cards/items/chandelurite-da61ec96.jpg	chandelure holding this item can mega evolve. this pokemon is always treated as being on high ground while attacking or being attacked
+card	items	Charizardite X	Active	Mega Stone	cards/items/charizardite-x-63c99aaf.jpg	charizard holding this item can mega evolve into charizard x. whenever this pokemon takes damage, it may move 1 tile
+card	items	Charizardite Y	Active	Mega Stone	cards/items/charizardite-y-2ca603d9.jpg	charizard holding this item can mega evolve into charizard y. when this pokemon is standing in sun weather, that weather cannot be replaced by a different weather condition
+card	items	Chesnaughtite	Consumable	Mega Stone	cards/items/chesnaughtite-08542e1b.jpg	chesnaught holding this item can mega evolve. this item can be "consumed" to treat its ability as if holder has ko'd 1 more pokemon
+card	items	Chili Powder	Active		cards/items/chili-powder-8d0b37c0.jpg	when defeated, nearby pokemon are burned
+card	items	Chimechite	Active	Mega Stone	cards/items/chimechite-926a57ca.jpg	chimecho holding this item can mega evolve. this pokemon makes a second accuracy check when an attack hits a target. if it hits, confuse the target
+card	items	Clear Amulet	Active		cards/items/clear-amulet-74683aef.jpg	prevents stats from being lowered by enemy pokemon and their effects
+card	items	Clefableite	Active	Mega Stone	cards/items/clefableite-c71c092d.jpg	clefable holding this item can mega evolve. this pokemon restores 1/32 of its total hp at the end of each turn
+card	items	Clodsire Heart	Active		cards/items/clodsire-heart-af53c8d7.jpg	ignores opponents positive stat changes during attacks
+card	items	Cloud in a Jar	Consumable		cards/items/cloud-in-a-jar-65cb15e2.jpg	Remove all weather from tiles within 3
+card	items	Counter Charm	Active		cards/items/counter-charm-41871d6f.jpg	attacker take 20% recoil damage while attacking. Does not stack with effects like jagged edge
+card	items	Covert Cloak	Active		cards/items/covert-cloak-e3ec3576.jpg	protects this pokemon from the secondary effects of attacks
+card	items	Crabominite	Active	Mega Stone	cards/items/crabominite-649ef1a2.jpg	crabominable holding this item can mega evolve. holder does not trigger on hit effects
+card	items	Cursed Flute	Active		cards/items/cursed-flute-162ab992.jpg	when defeated, nearby pokemon are confused
+card	items	Custap Berry	Consumable	Berry	cards/items/custap-berry-f6e2593b.jpg	eaten at 1/2 hp, raises speed until the end of next turn
+card	items	DNA Splicer	Consumable		cards/items/dna-splicer-1f32688a.jpg	Choose a friendly pokemon within 3 and one core stat (attack, defense, speed). Set both pokemons base value of that stat to the average of the two until the end of the following turn
+card	items	Darkranite	Active	Mega Stone	cards/items/darkranite-81a7fc5e.jpg	darkrai holding this item can mega evolve. holder deals an extra 1.1x damage to non drowsy targets
+card	items	Defense Bell	Consumable		cards/items/defense-bell-f149bb40.jpg	increases defense of all allies by 1.15x this turn
+card	items	Defensive Underdog Charm	Active		cards/items/defensive-underdog-charm-98496e74.jpg	when attacked, gain a +.01 defense multiplier for each 10 BST lower the holder is than the attacker
+card	items	Delphoxite	Active	Mega Stone	cards/items/delphoxite-621d1732.jpg	delphox holding this item can mega evolve. holder restores 1/8th its total hp whenever it lowers an enemies stats
+card	items	Diancite	Active	Mega Stone	cards/items/diancite-8f604473.jpg	diancie holding this item can mega evolve. this pokemon has a 1.05x defense multiplier
+card	items	Discharger	Active		cards/items/discharger-c6a23e35.jpg	when defeated, nearby pokemon are paralyzed
+card	items	Draco Plate	Consumable		cards/items/draco-plate-c77aa3a8.jpg	for this turn, this pokemon's attack deals dragon type damage (instead of its normal type)
+card	items	Dragalgite	Consumable	Mega Stone	cards/items/dragalgite-658e824b.jpg	dragalge holding this item can mega evolve. this item can be "consumed" to cleanse the status of all enemy pokemon within 3. holder restores 1/8 its total hp per pokemon cleansed
+card	items	Dragon Heart	Active		cards/items/dragon-heart-1ac1839d.jpg	ignores opponents positive abilities during attacks
+card	items	Dragoninite	Consumable	Mega Stone	cards/items/dragoninite-73ce5dcd.jpg	dragonite holding this item can mega evolve. this item can be "consumed" to give holder +1 defense
+card	items	Dread Plate	Consumable		cards/items/dread-plate-8f1381b3.jpg	for this turn, this pokemon's attack deals dark type damage (instead of its normal type)
+card	items	Dry Ice	Active		cards/items/dry-ice-72aaa0e1.jpg	when defeated, nearby pokemon are afflicted with frostbite
+card	items	Dumbell	Active		cards/items/dumbell-f234f7ba.jpg	increases attack 1.15x
+card	items	Earth Plate	Consumable		cards/items/earth-plate-dc4fd9cf.jpg	for this turn, this pokemon's attack deals ground type damage (instead of its normal type)
+card	items	Eelektrossite	Active	Mega Stone	cards/items/eelektrossite-ff7bc153.jpg	eelectross holding this item can mega evolve. this pokemons attack restore 1/8th the damage dealt as hp
+card	items	Eject Button	Active		cards/items/eject-button-063d1f3b.jpg	when hit by an attack, will move up to 3 spaces (in a line) directly away from attacker (consumed)
+card	items	Electric Seed	Consumable		cards/items/electric-seed-e365cb52.jpg	summon electric terrain effect for 2 turn within 2 spaces
+card	items	Emboarite	Active	Mega Stone	cards/items/emboarite-46cfc54b.jpg	emboar holding this item can mega evolve. holders attacks cannot be blocked or redirected
+card	items	Enchanted Earmuffs	Active	Type 3	cards/items/enchanted-earmuffs-918e4038.jpg	protects pokemon and adjacent allies from sleep and confusion
+card	items	Enigma Berry	Consumable	Berry	cards/items/enigma-berry-a84c3f81.jpg	eaten after being hit with a super effective move, restores 1/4 hp
+card	items	Excadrite	Active	Mega Stone	cards/items/excadrite-4e355afe.jpg	excadrill holding this item can mega evolve. holder takes .9x damage from attacks targetting the side or rear of this pokemon
+card	items	Expert Belt	Active		cards/items/expert-belt-85158406.jpg	super effective attacks get a 1.3x damage boost
+card	items	Falinksite	Consumable	Mega Stone	cards/items/falinksite-c1ddbf1d.jpg	Falinks holding this item can mega evolve. this item can be "consumed" to give the holder the effects of battle formation if the ability is not currently active
+card	items	Feraligite	Active	Mega Stone	cards/items/feraligite-512506f9.jpg	feraligatr holding this item can mega evolve. this pokemon takes .9x damage from dragon type attacks
+card	items	Fist Plate	Consumable		cards/items/fist-plate-7beb417a.jpg	for this turn, this pokemon's attack deals fighting type damage (instead of its normal type)
+card	items	Flame Plate	Consumable		cards/items/flame-plate-877f2b7c.jpg	for this turn, this pokemon's attack deals fire type damage (instead of its normal type)
+card	items	Floettite	Active	Mega Stone	cards/items/floettite-f5180573.jpg	floette eternal holding this item can mega evolve. holder cannot have its stats lowered
+card	items	Focus Sash	Active		cards/items/focus-sash-75914f3c.jpg	the first time this pokemon takes fatal damage, it survives on 1 hp instead
+card	items	Fog Machine	Active		cards/items/fog-machine-a4d34b2f.jpg	extra 10% evasion bonus when attacked
+card	items	Froslassite	Active	Mega Stone	cards/items/froslassite-703d6246.jpg	froslass holding this item can mega evolve. when this pokemon is standing in snow weather, that weather cannot be replaced by a different weather condition
+card	items	Frozen Stone	Consumable		cards/items/frozen-stone-c4121cc8.jpg	summon snow weather effect for 2 turn within 2 spaces
+card	items	Full Heal	Consumable		cards/items/full-heal-65a65e19.jpg	heals all status conditions for pokemon and allies within 2
+card	items	Galladite	Active	Mega Stone	cards/items/galladite-d772c3e6.jpg	gallade holding this item can mega evolve. this pokemon has +1 crit stage
+card	items	Garchompite	Active	Mega Stone	cards/items/garchompite-f41c08d9.jpg	garchomp holding this item can mega evolve into normal mega garchomp. this pokemons attacks ignore immunities
+card	items	Garchompite Z	Active	Mega Stone	cards/items/garchompite-z-26ac7a46.jpg	garchomp holding this item can mega evolve into garchomp z. this pokemons attacks gain 1.5 accuracy (rounded down) per 10 speed higher instead of 1, and attacks made against this pokemon lose 1.5 accruacy (rounded down) per 10 speed lower instead of 1
+card	items	Gardevoirite	Active	Mega Stone	cards/items/gardevoirite-c5be4be9.jpg	gardevoir holding this item can mega evolve. allied pokemon within 2 take 1/2 damage from allied pokemons attacks
+card	items	Garlic Powder	Active		cards/items/garlic-powder-8bc07f9f.jpg	hitting a pokemon causes them to switch places with an allied neighbor
+card	items	Generator	Active		cards/items/generator-b94346bc.jpg	when hit by an electric move range is increased 2 stages (consumed)
+card	items	Gengarite	Active	Mega Stone	cards/items/gengarite-e3a82c04.jpg	gengar holding this item can mega evolve. when this pokemon attacks, gain a .05x multiplier for each tile the user could have moved this turn but did not
+card	items	Glalitite	Active	Mega Stone	cards/items/glalitite-47a05074.jpg	glalie holding this item can mega evolve. holder cannot be statused
+card	items	Glimmoranite	Active	Mega Stone	cards/items/glimmoranite-23c8123d.jpg	glimmora holding this item can mega evolve. once per round, when a pokemon within 2 tiles takes damage from poison, this pokemon restores that much hp
+card	items	Golisopite	Active	Mega Stone	cards/items/golisopite-b1c7a200.jpg	golisopod holding this item can mega evolve. holders first impression is reset on a target if golisopod moves to a tile more than 3 tiles away from target at any point during its turn
+card	items	Golurkite	Consumable	Mega Stone	cards/items/golurkite-f27370e4.jpg	golurk holding this item can mega evolve. this item can be "consumed" to treat golurk as discarding its item, allowing it to hold a second item
+card	items	Grass Seed	Consumable		cards/items/grass-seed-90df39e4.jpg	summon grassy terrain effect for 2 turn within 2 spaces
+card	items	Gravity Essence	Consumable		cards/items/gravity-essence-a6166898.jpg	all pokemon within 4 are grounded until the end of the following turn (a grounded flying type pokemon retains its weaknesses and takes 1x damage from ground moves)
+card	items	Greninjite	Active	Mega Stone	cards/items/greninjite-8905f0a9.jpg	greninja holding this item can mega evolve. this pokemon has a 1.05x speed multiplier
+card	items	Gyradosite	Active	Mega Stone	cards/items/gyradosite-4b9b304f.jpg	gyrados holding this item can mega evolve. holder can not be considered grounded.
+card	items	Hare Charm	Active		cards/items/hare-charm-4cc64b71.jpg	This pokemon has +1 speed until the end of its activation
+card	items	Hawluchanite	Active	Mega Stone	cards/items/hawluchanite-447d3e9d.jpg	hawlucha holding this item can mega evolve. holder can choose any combination of their attacks viable types to use for each attack
+card	items	Heatranite	Consumable	Mega Stone	cards/items/heatranite-21399eab.jpg	heatran holding this item can mega evolve. this item can be "consumed" to make any 4x super effective attacks normally supereffective until the end of the round
+card	items	Heavy Duty Boots	Active		cards/items/heavy-duty-boots-faa7af85.jpg	This pokemon and any pokemon it attacks or is attacked by are treated as not standing on terrain during the attack. This pokemon ignores any passive secondary effects from terrain
+card	items	Heracronite	Consumable	Mega Stone	cards/items/heracronite-d453365d.jpg	heracross holding this item can mega evolve. this item can be "consumed" to give the user an addative .1x attack and defense multiplier per enemy within 3 tiles that shares at least 1 type with user
+card	items	Hero's Mantle	Active		cards/items/heros-mantle-df376e0c.jpg	when taking damage that would kill pokemon, 10% chance to survive on 1 hp
+card	items	Hero's Proof	Consumable		cards/items/heros-proof-d8f1581d.jpg	raises attack 1 stage for 3 turns, pokemon faints at the end of those turns
+card	items	Heros Shield	Consumable		cards/items/heros-shield-1941ed37.jpg	this pokemon cannot attack this turn. If this pokemon is attacked this turn, treat the attack as failing against this target. This pokemon cannot end its turn on a flag
+card	items	Honey	Consumable		cards/items/honey-9037f2c3.jpg	Restore 70 hp, lowers users range by 1
+card	items	Houndoominite	Active	Mega Stone	cards/items/houndoominite-1ffad088.jpg	houndoom holding this item can mega evolve. this pokemon restores 1/16 its total hp when it ends its turn outside of sun
+card	items	Ice Block	Consumable	Type 2	cards/items/ice-block-874fced6.jpg	protects from freeze for 3 turns for pokemon and allies within 2
+card	items	Ice Heal	Consumable	Type 1	cards/items/ice-heal-faf61926.jpg	heals freeze for pokemon and allies within 2
+card	items	Icicle Plate	Consumable		cards/items/icicle-plate-bfdaa6d5.jpg	for this turn, this pokemon's attack deals ice type damage (instead of its normal type)
+card	items	Insect Plate	Consumable		cards/items/insect-plate-ef5b1a6e.jpg	for this turn, this pokemon's attack deals bug type damage (instead of its normal type)
+card	items	Iron Plate	Consumable		cards/items/iron-plate-233386b4.jpg	for this turn, this pokemon's attack deals steel type damage (instead of its normal type)
+card	items	Joboca Berry	Consumable	Type 5, Berry	cards/items/joboca-berry-11f91f9e.jpg	eaten when hit with a physical move, attacker loses 1 stage of attack until end of next turn
+card	items	Kangaskhanite	Active	Mega Stone	cards/items/kangaskhanite-54185e70.jpg	kangaskhan holding this item can mega evolve. when this pokemon fails a bonus effect check, it pushes its target 1 tile back
+card	items	Kings Rock	Active		cards/items/kings-rock-77d36b2a.jpg	all attacks have a 20% chance to flinch (affects all hits of a multihit)
+card	items	Lansat Berry	Consumable	Berry	cards/items/lansat-berry-d46b221c.jpg	eaten at 1/2 hp, raises crit stage by 2 until end of next turn
+card	items	Lawn Mower	Consumable		cards/items/lawn-mower-a69ebb62.jpg	Remove all terrain from tiles within 3
+card	items	Legend Plate	Consumable		cards/items/legend-plate-3a1c7a53.jpg	for this turn, this pokemon's attack deals neutral damage to all target (instead of its normal type)
+card	items	Liechi Berry	Consumable	Berry	cards/items/liechi-berry-a79d2936.jpg	eaten at 1/2 hp, raises attack until the end of the next turn
+card	items	Loaded Dice	Active		cards/items/loaded-dice-fb4837cf.jpg	when making a multihit attack, you roll twice to determine how many hits complete and can choose which die result to use
+card	items	Lopunnite	Active	Mega Stone	cards/items/lopunnite-1ef319fa.jpg	lopunny holding this item can mega evolve. holder has a 1.05x speed multiplier
+card	items	Lucarionite	Active	Mega Stone	cards/items/lucarionite-2cd08b49.jpg	lucario holding this item can mega evolve into normal mega lucario. holder is immune to effects of enemy auras
+card	items	Lucarionite Z	Active	Mega Stone	cards/items/lucarionite-z-4bca15ba.jpg	lucario holding this item can mega evolve into lucario z. holder cannot have its defense lowered
+card	items	Lucky Charm	Active		cards/items/lucky-charm-a0dc22dc.jpg	50% chance to heal status conditions at the begining of each turn
+card	items	Lum Berry	Consumable	Berry	cards/items/lum-berry-f35c652a.jpg	eaten when statused, removes status effect
+card	items	Magearnite	Active	Mega Stone	cards/items/magearnite-1a05a70f.jpg	magearna holding this item can mega evolve. holder has a 1.05x attack multiplier
+card	items	Magic Balloon	Active		cards/items/magic-balloon-ee62be36.jpg	allows pokemon to jump high spaces and jump over enemies
+card	items	Magic Mirror	Active		cards/items/magic-mirror-ead93120.jpg	increases speed 1.15x
+card	items	Malamarite	Active	Mega Stone	cards/items/malamarite-ddd3cb6f.jpg	Malamar holding this item can mega evolve. holder gains an addative .1x damage multiplier for each stat that has a stage adjustment
+card	items	Manectite	Active	Mega Stone	cards/items/manectite-8cf1c218.jpg	manectric holding this item can mega evolve. supereffective attacks on holder deal .9x damage
+card	items	Mark Of Moxie	Consumable		cards/items/mark-of-moxie-7065f111.jpg	for 3 turns, defeating an opponent raises attack until the end of next turn
+card	items	Mawilite	Active	Mega Stone	cards/items/mawilite-870d3740.jpg	mawile holding this item can mega evolve. holder cannot have its ability turned off or supressed in any way
+card	items	Meadow Plate	Consumable		cards/items/meadow-plate-d0df75dc.jpg	for this turn, this pokemon's attack deals grass type damage (instead of its normal type)
+card	items	Medichamite	Active	Mega Stone	cards/items/medichamite-abec9ec0.jpg	medicham holding this item can mega evolve. this pokemons ability can not be turned off or supressed in any way
+card	items	Meganiumite	Active	Mega Stone	cards/items/meganiumite-7fc0b709.jpg	meganium holding this item can mega evolve. this pokemon ignores the effects of all non sun weather while attacking or being attacked
+card	items	Meowsticite	Consumable	Mega Stone	cards/items/meowsticite-7907237c.jpg	mewostic holding this item can mega evolve. holder can change its attack type to grass or ghost
+card	items	Metagrossite	Active	Mega Stone	cards/items/metagrossite-c8f632c5.jpg	metagross holding this item can mega evolve. when holder fails an attack check, it pushes target back 1 tile
+card	items	Metal Mirror	Active	Type 4	cards/items/metal-mirror-9d584404.jpg	attacker takes 30% recoil damage when attacking with a special attack. Does not stack with effects like jagged edge
+card	items	Micle Berry	Consumable	Berry	cards/items/micle-berry-291bab1b.jpg	eaten at 1/2 hp, raises accuracy until the end of next turn
+card	items	Mind Plate	Consumable		cards/items/mind-plate-f0de1ab6.jpg	for this turn, this pokemon's attack deals psychic type damage (instead of its normal type)
+card	items	Mirror Herb	Active		cards/items/mirror-herb-71de7483.jpg	copies first positive stat change that enemy pokemon gains while within 4 (is consumed)
+card	items	Misty Seed	Consumable		cards/items/misty-seed-78ec6051.jpg	summon misty terrain effect for 2 turn within 2 spaces
+card	items	Mundane Potion	Consumable		cards/items/mundane-potion-57f5c3b1.jpg	for 3 turns, restore 1/16 hp at the end of each turn
+card	items	Ninja Cloak	Active		cards/items/ninja-cloak-f71e0a7b.jpg	pokemon can walk through oponents
+card	items	Noise Maker	Consumable		cards/items/noise-maker-ff5e6155.jpg	stops warrior abilities from being activated at all next turn
+card	items	Obvious Weak Spot	Active		cards/items/obvious-weak-spot-ee669169.jpg	if an enemy attacks this pokemon, you can choose for their secondary attack effect roll to automatically succeed. If you chose not to, they perform the check normally
+card	items	Offensive Underdog Charm	Active		cards/items/offensive-underdog-charm-f41f9711.jpg	when attacked, gain a +.01 attack multiplier for each 10 BST lower the holder is than the attacker
+card	items	Omniblock	Consumable		cards/items/omniblock-8987dd2b.jpg	blocks all status conditions for pokemon and allies within 2 for 3 turns
+card	items	Padded Cloak	Active	Type 3	cards/items/padded-cloak-253cf2ad.jpg	protects pokemon and adjacent allies from burn and freeze
+card	items	Paralyz Block	Consumable	Type 2	cards/items/paralyz-block-5019e4d2.jpg	block paralysis for 3 turns for pokemon allies within 2
+card	items	Paralyz Heal	Consumable	Type 1	cards/items/paralyz-heal-2f5de40e.jpg	heals paralysis for pokemon and allies within 2
+card	items	Pidgeotite	Active	Mega Stone	cards/items/pidgeotite-3e0fa601.jpg	pidgeot holding this item can mega evolve. enemy pokemon within 2 have the effect of any positive multiplier halved when attacking or being attacked
+card	items	Pinsirite	Consumable	Mega Stone	cards/items/pinsirite-f75dd7ab.jpg	pinsir holding this item can mega evolve. this item can be "consumed" to give the user an addative .1x attack and defense multiplier per enemy within 3 tiles that shares at least 1 type with user
+card	items	Pixie Plate	Consumable		cards/items/pixie-plate-4a6f3ea1.jpg	for this turn, this pokemon's attack deals fairy type damage (instead of its normal type)
+card	items	Plush Doll	Consumable		cards/items/plush-doll-6f059857.jpg	move 1 tile in any direction and sacrafice 1/4 hp to summon a plush doll with twice that many hitpoints and the users base defense (the plush doll is cosidered an allied pokemon that cannot receive stat bonuses, obstructs enemies from moving, does not take a turn, and will count towards objectives)
+card	items	Pocket Sand	Active	Type 4	cards/items/pocket-sand-af07e895.jpg	attacker takes 30% recoil damage when attacking with a physical non-contact move. Does not stack with effects like jagged edge
+card	items	Poison Block	Consumable	Type 2	cards/items/poison-block-6baf156c.jpg	protects form poison for 3 turns for pokemon and allies within 2
+card	items	Poison Capsule	Active		cards/items/poison-capsule-f461b0c2.jpg	when defeated, nearby pokemon are poisoned
+card	items	Potion	Consumable		cards/items/potion-b4250d1a.jpg	heals 50 hp
+card	items	Power Charm	Active		cards/items/power-charm-e2c4eea2.jpg	if this pokemon is your last to move, increase attack by 1
+card	items	Power Herb	Active		cards/items/power-herb-5a9fbfc3.jpg	2 turn moves finish in one turn (consumed)
+card	items	Protective Pads	Active		cards/items/protective-pads-5cc1df36.jpg	pokemon is not affected by "on hit" effects (includes tenacity)
+card	items	Psychic Seed	Consumable		cards/items/psychic-seed-c6b00eb4.jpg	summon psychic terrain effect for 2 turn within 2 spaces
+card	items	Puzzle Box	Consumable		cards/items/puzzle-box-d4cafd71.jpg	once consumed, produce an aura that reverses all speed interactions for any pokemon within 3 tiles. This does not change basepower for moves that are determined by speed. Lasts for 2 turns
+card	items	Pyroarite	Active	Mega Stone	cards/items/pyroarite-dcc84313.jpg	pyroar holding this item can mega evolve. this pokemon has a 1.05x attack multiplier
+card	items	Raichunite X	Active	Mega Stone	cards/items/raichunite-x-69f5d212.jpg	raichu holding this item can mega evolve into raichu x. if electric terrain is set and this pokemon is standing on an affected tile, that terrain lasts for an extra turn
+card	items	Raichunite Y	Consumable	Mega Stone	cards/items/raichunite-y-52866c54.jpg	raichu holding this item can mega evolve into raichu y. this item can be "consumed" to give user 1 stage of speed
+card	items	Rain Stone	Consumable		cards/items/rain-stone-25af5506.jpg	summon rain weather effect for 2 turn within 2 spaces
+card	items	Recovery Herb	Active		cards/items/recovery-herb-34dee2b6.jpg	Eliminates the "unique" downsides of moves (consumed)
+card	items	Red Card	Active		cards/items/red-card-50f2ee7f.jpg	when this pokemon takes damage, attacker moves directly backwards 2 squares (consumed)
+card	items	Rocky Helmet	Active	Type 4	cards/items/rocky-helmet-ba7320d7.jpg	attacker takes 30% recoil damage when attacking with a contact move. Does not stack with effects like jagged edge
+card	items	Rubber Gloves	Active	Type 3	cards/items/rubber-gloves-79c88d70.jpg	protects pokemon and adjacent allies from poison and paralysis
+card	items	Sablenite	Active	Mega Stone	cards/items/sablenite-a1fa5b7b.jpg	sableye holding this item can mega evolve. holder cannot be statused
+card	items	Sacrificial Lamb	Active		cards/items/sacrificial-lamb-c507d383.jpg	this pokemon will switch with adjacent allies who are attacked before the attack
+card	items	Salamencite	Consumable	Mega Stone	cards/items/salamencite-fc26b567.jpg	salamence holding this item can mega evolve. this item can be consumed to change the type of the holders next attack to fire type
+card	items	Sand Stone	Consumable		cards/items/sand-stone-67581ee2.jpg	summon sandstorm weather effect for 2 turn within 2 spaces
+card	items	Savory Sandwich	Consumable		cards/items/savory-sandwich-5a88bde4.jpg	for 3 turns, attacks have a 50% chance to lower targets defense
+card	items	Savory Smoothie	Consumable		cards/items/savory-smoothie-8e4e7360.jpg	for 3 turns, attacks have a 50% chance to raise defense (stats raised this way count as an attack effect stat raise)
+card	items	Sceptilite	Active	Mega Stone	cards/items/sceptilite-f8c2ca19.jpg	sceptile holding this item can mega evolve. holder cannot be statused
+card	items	Scizorite	Active	Mega Stone	cards/items/scizorite-dfb02516.jpg	scizor holding this item can mega evolve. this pokemon deals 1.1x damage to the closest target it attacks
+card	items	Scolipite	Active	Mega Stone	cards/items/scolipite-993f8344.jpg	scolipede holding this item can mega evolve. this pokemon can use its movement however it would like
+card	items	Scovillainite	Active	Mega Stone	cards/items/scovillainite-26350b43.jpg	scovillain holding this item can mega evolve. holders attack cleanses targets of status effects and restores 1/8 total hp per cleansed target
+card	items	Scraftinite	Consumable	Mega Stone	cards/items/scraftinite-d66c84b5.jpg	scrafty holding this item can mega evolve. this item can be "consumed" to prevent and cleanse any status on a friendly pokemon within 3
+card	items	Second Wind	Active		cards/items/second-wind-86d3cc2c.jpg	this pokemon can chose to reroll their damage roll and accuracy roll while attacking
+card	items	Sharpedonite	Consumable	Mega Stone	cards/items/sharpedonite-23a430e1.jpg	sharpedo holding this item can mega evolve. this item can be "consumed" to remove any negative stat stage changes on holder
+card	items	Shell Bell	Active		cards/items/shell-bell-cc76a34c.jpg	holder restores 1/8 of the damage it deals when attacking as hp
+card	items	Siren Song	Consumable		cards/items/siren-song-899084fb.jpg	for 2 turns, enemies that have the option to target you MUST target you
+card	items	Sitrus Berry	Consumable	Berry	cards/items/sitrus-berry-ef671460.jpg	eaten at 1/2 hp, restore 1/4 hp
+card	items	Skarmorite	Active	Mega Stone	cards/items/skarmorite-bc9ebcfe.jpg	skarmory holding this item can mega evolve. any attack that targets this pokemon and another pokemon has a negative, addative .1x multiplier on each target for each target over 1 that the attack suceeds on
+card	items	Sky Plate	Consumable		cards/items/sky-plate-c6563e7a.jpg	for this turn, this pokemon's attack deals flying type damage (instead of its normal type)
+card	items	Sleep Block	Consumable	Type 2	cards/items/sleep-block-35972042.jpg	protects from sleep for 3 turns for pokemon and allies within 2
+card	items	Sleeping Salts	Active		cards/items/sleeping-salts-8d8ca53c.jpg	when defeated, nearby pokemon are made drowsy
+card	items	Slippery Fish	Active		cards/items/slippery-fish-7be576f6.jpg	when this pokemon makes contact or has contact made with it, switch this item with the other pokemons held item
+card	items	Slowbronite	Active	Mega Stone	cards/items/slowbronite-4e80cd77.jpg	slowbro holding this item can mega evolve. attacks on user have -1 crit stage, which switches to +1 while mega evolved
+card	items	Sniper Lense	Consumable		cards/items/sniper-lense-e4f18efd.jpg	for 2 turns this pokemons attack has +3 crit stage (only affects first hit of multihits)
+card	items	Speed Bell	Consumable		cards/items/speed-bell-1b64a481.jpg	increase speed for all allies by 1.15x this turn
+card	items	Speedy Underdog Charm	Active		cards/items/speedy-underdog-charm-0b33391f.jpg	when attacking or defending, gain a +.01 speed multiplier for each 10 BST lower the holder is than the attacker/target
+card	items	Spicy Sandwich	Consumable		cards/items/spicy-sandwich-2443e84e.jpg	for 3 turns, attacks have a 50% chance to lower targets attack
+card	items	Spicy Smoothie	Consumable		cards/items/spicy-smoothie-40dc67b7.jpg	for 3 turns, attacks have a 50% chance to raise attack (stats raised this way count as an attack effect stat raise)
+card	items	Spider Tac	Consumable		cards/items/spider-tac-7cb85ed2.jpg	for 3 turn, this pokemon will lower targets range by 1
+card	items	Splash Plate	Consumable		cards/items/splash-plate-d90bceb1.jpg	for this turn, this pokemon's attack deals water type damage (instead of its normal type)
+card	items	Spooky Plate	Consumable		cards/items/spooky-plate-a7ab131f.jpg	for this turn, this pokemon's attack deals ghost type damage (instead of its normal type)
+card	items	Staff Of Purpose	Active		cards/items/staff-of-purpose-768317d8.jpg	restores 1/16 hp at the end of each turn
+card	items	Staraptite	Consumable	Mega Stone	cards/items/staraptite-cf189044.jpg	staraptor holding this item can mega evolve. this item can be "consumed" to give the user the effect of vanguard this turn if vanguard is not already active
+card	items	Starf Berry	Consumable	Berry	cards/items/starf-berry-7dfee300.jpg	eaten at 1/2 hp, raise a random stat by 2 stages until end of next turn (attack defense speed)
+card	items	Starminite	Active	Mega Stone	cards/items/starminite-743d7e7e.jpg	starmie holding this item can mega evolve. this pokemon can move 1 tile after attacking
+card	items	Steelixite	Consumable	Mega Stone	cards/items/steelixite-a994da5f.jpg	steelix holding this item can mega evolve. this item can be "consumed" to set sand within 2 tiles for 1 turn
+card	items	Sticky Barb	Active		cards/items/sticky-barb-3b7d625a.jpg	when this pokemon is hit by a (start of game choose one) contact/non-contact attack, the barb attatches to the attacker and deals 1/8 of their hp in damage at the end of each turn
+card	items	Stone Plate	Consumable		cards/items/stone-plate-6adc8d16.jpg	for this turn, this pokemon's attack deals rock type damage (instead of its normal type)
+card	items	Strategy Tome	Active		cards/items/strategy-tome-eff310d6.jpg	increases defense 1.15x
+card	items	Succulent Sandwich	Consumable		cards/items/succulent-sandwich-c55f6961.jpg	for 3 turns, attacks have a 50% chance to lower targets range
+card	items	Succulent Smoothie	Consumable		cards/items/succulent-smoothie-3d774165.jpg	for 3 turns, attacks have a 50% chance to raise range (stats raised this way count as an attack effect stat raise)
+card	items	Sun Stone	Consumable		cards/items/sun-stone-bbed241f.jpg	summon sun weather effect for 2 turn within 2 spaces
+card	items	Super Potion	Consumable		cards/items/super-potion-e29732bb.jpg	heals 80 hp
+card	items	Swampertite	Consumable	Mega Stone	cards/items/swampertite-9099e4fc.jpg	swampert holding this item can mega evolve. item can be "consumed" to make holders next attack push targets one tile away
+card	items	Sweet Sandwich	Consumable		cards/items/sweet-sandwich-969df30f.jpg	for 3 turns, attacks have a 50% chance to lower targets speed
+card	items	Sweet Smoothie	Consumable		cards/items/sweet-smoothie-3014db4e.jpg	for 3 turns, attacks have a 50% chance to raise speed (stats raised this way count as an attack effect stat raise)
+card	items	Swift Charm	Active		cards/items/swift-charm-d9d5473a.jpg	If this pokemon is your last to move, increase range 1 stage
+card	items	Sylph Wings	Consumable		cards/items/sylph-wings-68080a1c.jpg	Gain 15% evasion bonus for 2 turns
+card	items	Tamato Berry	Consumable	Type 5, Berry	cards/items/tamato-berry-88dc7e02.jpg	eaten when hit with a special move, attacker loses 1 stage of attack until end of next turn
+card	items	Target Charm	Active		cards/items/target-charm-5080c541.jpg	increases crit chance 2 stages
+card	items	Tatsugirinite	Consumable	Mega Stone	cards/items/tatsugirinite-3e74d540.jpg	tatsugiri holding this pokemon can mega evolve. this item can be "consumed" to remove 1 weather or terrain this pokemon is standing in
+card	items	Terrain Orb	Active		cards/items/terrain-orb-4fad3a8c.jpg	increases range of terrain effects by 1 tile
+card	items	Theiving Sack	Active		cards/items/theiving-sack-a0af8fcb.jpg	at the end of each turn, will collect and use any collectable items that are dropped as a present within 3 (does not affect passively active items) (this pokemon will pickup the egg in capture the egg if it in range and no other egg is held)
+card	items	Third Eye	Active		cards/items/third-eye-c54f359a.jpg	this pokemon will always dodge friendly pokemons attacks
+card	items	Toxic Plate	Consumable		cards/items/toxic-plate-c0768915.jpg	for this turn, this pokemon's attack deals poison type damage (instead of its normal type)
+card	items	Travelers Charm	Active		cards/items/travelers-charm-902cdce8.jpg	cannot be statused, must be equipped to a pokemon with single tile target attack
+card	items	Trekking Pole	Consumable		cards/items/trekking-pole-1ad10b4f.jpg	for 2 turns, gain +.05 attack multiplier for each tile moved during this turn (Does NOT stack with nomad or run up)
+card	items	Turtle Charm	Active		cards/items/turtle-charm-67571f78.jpg	This pokemon has +1 defense until the end of its activation
+card	items	Turtle Shell	Active		cards/items/turtle-shell-0452853b.jpg	this pokemon cannot be crit
+card	items	Twice Lucky	Consumable		cards/items/twice-lucky-e2912ea5.jpg	Refresh warrior skill (cannot be used on hero or recovery class abilities)
+card	items	Type 1	Consumable		cards/items/type-1-a131c97a.jpg	choose "type 1 status item" and then choose which to use at the start of the game
+card	items	Type 2	Consumable		cards/items/type-2-361a877a.jpg	choose "type 2 status item" and then choose which to use at the start of the game
+card	items	Type 3	Active		cards/items/type-3-7d27fca9.jpg	choose "type 3 status item" and then choose which to use at the start of the game
+card	items	Type 4	Active		cards/items/type-4-7324129f.jpg	choose "type 4 item" and then choose which to use at the start of the game
+card	items	Type 5	Active		cards/items/type-5-e9ebc301.jpg	choose "type 5 item" and then choose which to use at the start of the game
+card	items	Tyranitarite	Active	Mega Stone	cards/items/tyranitarite-ce672a31.jpg	tyranitar holding this item can mega evolve. when this pokemon is standing in the sand weather, that weather cannot be replaced by a different weather condition
+card	items	Utility Umbrella	Active		cards/items/utility-umbrella-091f4c68.jpg	This pokemon and any pokemon it attacks or is attacked by are treated as not standing in the weather during the attack. This pokemon ignores any passive secondary effects from the weather
+card	items	Venusaurite	Active	Mega Stone	cards/items/venusaurite-df0c8dd2.jpg	venusaur holding this item can mega evolve. whenver this pokemon ends its turn, enemy pokemon within 2 have a 20% chance to become poisoned
+card	items	Victreebelite	Consumable	Mega Stone	cards/items/victreebelite-0f446252.jpg	victreebell holding this item can mega evolve. this item can be "consumed" to force any attacks that have the option to target this pokemon to target this pokemon for 2 turns
+card	items	Water Wheel	Active		cards/items/water-wheel-e4235cd2.jpg	when hit by a water move, speed is increased 2 stages (consumed)
+card	items	Weak Spot Lense	Active		cards/items/weak-spot-lense-9ca774bb.jpg	when opponent within 2 gains a stat bonus, they take 1/16 damage (this counts as an attack that makes contact)
+card	items	Weakness Policy	Active		cards/items/weakness-policy-b2bde57f.jpg	when hit by a super effective move, increase attack 2 stages until the end of next turn (consumed)
+card	items	Weather Stone	Active		cards/items/weather-stone-d3f15111.jpg	increases range of weather abilities by 1 tile
+card	items	Weighted Bat	Active		cards/items/weighted-bat-a5923efe.jpg	this pokemon will force targets backwards one additional tile on hit
+card	items	White Herb	Active		cards/items/white-herb-26bb34c8.jpg	restores negative stat change when it is applied (consumed)
+card	items	Wide Lense	Active		cards/items/wide-lense-3b3b916e.jpg	gain 10% accuracy bonus
+card	items	Winged Boots	Consumable		cards/items/winged-boots-998e8f17.jpg	increases range by 1 for 2 turns
+card	items	Yache Berry	Consumable	Berry	cards/items/yache-berry-ab19b39a.jpg	eaten before attacked with a super effective move, halves the attacks damage
+card	items	Zap Plate	Consumable		cards/items/zap-plate-e321ca4e.jpg	for this turn, this pokemon's attack deals electric type damage (instead of its normal type)
+card	items	Zeraorite	Active	Mega Stone	cards/items/zeraorite-406fd3ba.jpg	zeraora holding this item can mega evolve. holders attack ignores immunities
+card	items	Zoom Lense	Active		cards/items/zoom-lense-bffd8bcb.jpg	gain 20% accuracy bonus if you attack a pokemon that has already moved
+card	skills	Added Bonus	Normal		cards/skills/added-bonus-27d6f19f.jpg	gain +30% chance to inflict status condition for 2 turns
+card	skills	Adrenaline	Normal		cards/skills/adrenaline-9f588b3c.jpg	gain 1 attack stage for 1 turn
+card	skills	Belief	Hero		cards/skills/belief-261e77ff.jpg	increase defense 2 stage and block status for 3 turns
+card	skills	Bewilder	Hero		cards/skills/bewilder-49b12836.jpg	all allies have an 80% chance to confuse for 1 turn
+card	skills	Brace For Impact	Normal		cards/skills/brace-for-impact-513b6c7c.jpg	Gain +2 defense
+card	skills	Brotherhood	Normal		cards/skills/brotherhood-bce2dda6.jpg	give self and allies within 3 +1 defense stage for 1 turn
+card	skills	Bustle	Normal		cards/skills/bustle-26f2fb76.jpg	give self and allies within 2 +1 range for 1 turn
+card	skills	Call To Action	Recovery		cards/skills/call-to-action-8d3d1baa.jpg	Restore 40 hp to all allies. Can be used twice
+card	skills	Camouflage	Normal		cards/skills/camouflage-54fcd621.jpg	Choose one of your types and replace it with a new type until the end of the following turn. New type cannot match your second type
+card	skills	Chesto	Hero		cards/skills/chesto-5585e2c9.jpg	increase attack 3 stages and decrease defense 2 stages for pokemon and allies within 2
+card	skills	Cold Eyes	Hero		cards/skills/cold-eyes-66a5d68e.jpg	increases speed, and evasion 1 stage and skip accuracy check for 3 turns
+card	skills	Compassion	Hero		cards/skills/compassion-ecd51b7a.jpg	heal allies within 3 and self for 80 and give affected allies 2 stages of defense
+card	skills	Convalesce	Recovery		cards/skills/convalesce-0a632768.jpg	apply following buff to all allies: for three turns at the end of each turn restore 10% hp
+card	skills	Courage	Hero		cards/skills/courage-e7a38cd2.jpg	increase range and attack by 2 stages for 1 turn
+card	skills	Crack Shot	Normal		cards/skills/crack-shot-e2cc6b16.jpg	allies within 2 skip accuracy check for 1 turn
+card	skills	Critical Success	Normal		cards/skills/critical-success-5f9edaaa.jpg	This pokemons next attack roll this turn will roll a 20 on the damage roll and succeed any secondary attack effect rolls
+card	skills	Cunning	Hero		cards/skills/cunning-c4cc219a.jpg	increase speed 2 stages and add 50% chance to status for 3 turns
+card	skills	Cyclone	Normal		cards/skills/cyclone-e2c035dc.jpg	Push enemies back 2 additional tiles this turn
+card	skills	Deafening Shout	Normal		cards/skills/deafening-shout-08c334a9.jpg	For the rest of this turn all pokemon are treated as having no abilities during attacks. Any active stat changes as a result of the pokemons ability are nullified during the attack. This does not include form change abilities
+card	skills	Detox	Normal	Type X	cards/skills/detox-7129dd24.jpg	heal all allied pokemon from poison or paralysis. Heal any pokemon that had a status removed for 1/4 their max hp
+card	skills	Eagle Eye	Normal		cards/skills/eagle-eye-52fa76fb.jpg	increase accuracy by 1 stage for 3 turns for allies within 2
+card	skills	Elegance	Hero		cards/skills/elegance-060a47db.jpg	for 3 turns increases range 2 and attack skips accuracy checks
+card	skills	Elements Blessing	Normal		cards/skills/elements-blessing-5eecd006.jpg	If this pokemons attack makes a bonus check against its target, replace it with a 30% chance to burn and a 30% chance to inflict frostbite for 2 turns
+card	skills	Empathy	Recovery		cards/skills/empathy-59c32864.jpg	Restore 100 hp to user and all allies within 4
+card	skills	Faith	Hero		cards/skills/faith-7391e520.jpg	all allies skip accuracy check for 3 turns
+card	skills	Fortify	Normal		cards/skills/fortify-2c00b036.jpg	gain 1 defense stage for 3 turns
+card	skills	Furin Kazan	Hero		cards/skills/furin-kazan-eedcf03a.jpg	raise attack, defense, and accuracy of all allies by 1 for 1 turn
+card	skills	Grace	Hero		cards/skills/grace-1bd6b5d7.jpg	fully restore hp of pokemon and allies within 3 but also makes them drowsy
+card	skills	Great Uniter	Hero		cards/skills/great-uniter-9d5a80c2.jpg	raise attack and accuracy 1 stage for 3 turns and restore 1/4 max hp when you defeat an enemy for those three turns
+card	skills	Greed	Normal		cards/skills/greed-730da626.jpg	defeated targets drop a second gift for 3 turns. This gift contains a copy of your help item. If you hold no item, it contains a super potion instead. You choose which surrounding tile the box lands on
+card	skills	High Jump	Normal		cards/skills/high-jump-0f6cae85.jpg	can jump high elevations and enemy pokemon for 3 turns. This pokemon is treated as standing on high ground for 3 turns
+card	skills	Impact	Normal		cards/skills/impact-07ccbb0c.jpg	gain 50% chance to flinch for 2 turns
+card	skills	Inspiration	Hero		cards/skills/inspiration-3e0db4a3.jpg	raise attack and evasion for all allies for 1 turn
+card	skills	Invigorate	Normal		cards/skills/invigorate-60a01869.jpg	Gain +2 speed
+card	skills	Kabuki Dance	Hero		cards/skills/kabuki-dance-8586df7f.jpg	raise all allies attack and speed 1 stage for 1 turn
+card	skills	Lazybones	Hero		cards/skills/lazybones-e140f35c.jpg	block all crits and stops checks for secondary effects on all allies for 3 turns
+card	skills	Love N Honor	Hero		cards/skills/love-n-honor-92fd2cb8.jpg	pokemon and allies within 3 restore 80 health and gain 1 attack for 1 turn
+card	skills	Marksman	Normal		cards/skills/marksman-d861bd37.jpg	gain +2 crit stages and +1 accuracy for allies within 2
+card	skills	Mayhem	Hero		cards/skills/mayhem-4457d80f.jpg	pokemon can jump high ledges and enemies, increase range by 1, and 50% chance to flinch for 3 turns
+card	skills	Mighty Blow	Normal		cards/skills/mighty-blow-a974863b.jpg	this pokemons next attack has a 1.3x multiplier applied to it. This affects all hits of a multihit
+card	skills	Natures Blessing	Recovery		cards/skills/natures-blessing-dc182b1e.jpg	Restore 80 hp to all grounded allies
+card	skills	Nene Ninpo	Hero		cards/skills/nene-ninpo-b66ce9b3.jpg	all moves that target pokemon have a base accuracy of 0 for 1 turn. this pokemons attack has a base accuracy of 100 for this turn
+card	skills	Ninjitsu	Hero		cards/skills/ninjitsu-8acb1acf.jpg	increases range, lets pokemon jump enemies and high ledges, and increases crit chance 3 stages for 3 turns
+card	skills	One Eyed Dragon	Hero		cards/skills/one-eyed-dragon-7234566c.jpg	increase range of pokemon and allies within 2 by 3 for 1 turn
+card	skills	Quick Strike	Normal		cards/skills/quick-strike-e60e7b9b.jpg	gain 1 range and 50% chance to flinch (does not count as an attack effect)
+card	skills	Rebellion	Hero		cards/skills/rebellion-8d12895e.jpg	increase crit chance by 2 for all allies for 3 turns
+card	skills	Resolution	Hero		cards/skills/resolution-af799f11.jpg	increase defense 3 stages for 3 turns
+card	skills	Sacrifice	Hero		cards/skills/sacrifice-20374536.jpg	increase range and attack by 2 stages, accuracy and speed by 1 permanantly. Set max HP to 1/4 of base hp
+card	skills	Salve	Normal		cards/skills/salve-0df378a1.jpg	cure pokemon and allies within 3 of all status conditions. Heal any pokemon that had a status removed for 1/4 their max hp
+card	skills	Shout	Normal	Type X	cards/skills/shout-76a78403.jpg	cure any allies who are confused or sleeping. Heal any pokemon that had a status removed for 1/4 their max hp
+card	skills	Sirens Blessing	Normal		cards/skills/sirens-blessing-75a2667a.jpg	If this pokemons attack makes a bonus check against its target, replace it with a 30% chance to make drowsy and a 30% chance to confuse for 2 turns
+card	skills	Soft Light	Hero		cards/skills/soft-light-1f899f77.jpg	heals all allies for 70 and removes status conditions
+card	skills	Strategist	Hero		cards/skills/strategist-8fcbde4c.jpg	all allies gain +1 speed and +1 crit chance for 3 turns
+card	skills	Stroke Of Genius	Normal		cards/skills/stroke-of-genius-fa038a48.jpg	Recover one of your previously held items (replace current item if holding one)
+card	skills	Sweet Song	Recovery		cards/skills/sweet-song-8b74d5ef.jpg	Restore 50 hp to all allies
+card	skills	Tactical Retreat	Recovery		cards/skills/tactical-retreat-a8553ddd.jpg	restore 40 hp to all allies and give them +1 range. Allies with no enemies within 2 tiles (ignoring all terrain) restore 80 hp but do not receive the range bonus
+card	skills	Temperate	Normal	Type X	cards/skills/temperate-79823a33.jpg	heal all allies who are burned or frozen. Heal any pokemon that had a status removed for 1/4 their max hp
+card	skills	Terminate	Hero		cards/skills/terminate-8d3956dd.jpg	cancel all active warrior effects
+card	skills	The Pharoah's Curse	Normal		cards/skills/the-pharoahs-curse-b2515989.jpg	Replace this pokemons ability with mummy for 2 turns (you choose contact or non contact)
+card	skills	Top Speed	Normal		cards/skills/top-speed-a854046a.jpg	Increase range by 2
+card	skills	Trickster	Hero		cards/skills/trickster-c6ff1a4a.jpg	increase speed 2 stages, allow pokemon to jump enemies and high ledges, and increase crit chance for 3 turns
+card	skills	Type X	Normal		cards/skills/type-x-eff7ddba.jpg	choose "type x skill" and then choose which to use at the start of the game
+card	skills	Unrivaled	Hero		cards/skills/unrivaled-651990f6.jpg	increase attack, speed, and defense 1 stage for 4 turns
+card	skills	Vipers Bite	Hero		cards/skills/vipers-bite-0bc7cb32.jpg	attack gains extra effect "inflict random status condition" for 3 turns
+card	skills	Vipers Blessing	Normal		cards/skills/vipers-blessing-4f050f60.jpg	If this pokemons attack makes a bonus check against its target, replace it with a 30% chance to poison and a 30% chance to paralyze for 2 turns
+card	skills	Warrior Woman	Hero		cards/skills/warrior-woman-0b44a3e8.jpg	gain +1 speed and 100% flinch chance for 1 turn
+card	skills	Willpower	Hero		cards/skills/willpower-814fbe01.jpg	increases crit chance 2 stages and attack 1 stage for 1 turn

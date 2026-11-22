@@ -20,6 +20,7 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import fast_data  # noqa: E402
 import draw_icons  # noqa: E402
 from build_figures import file_name  # noqa: E402
 
@@ -220,6 +221,7 @@ def main(argv):
         for p in stale:
             p.unlink()
     (OUT / "index.json").write_text(json.dumps(index, indent=1, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+    fast_data.main()   # the plain-text copy the game reads (JSON is far too slow in TTS)
     print(f"{len(jobs)} cards, name size {size}px ({made} new, {len(stale)} old ones {'removed' if '--prune' in argv else 'kept (--prune removes them)'}) + backs + cards/index.json")
 
 

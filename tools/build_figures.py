@@ -19,6 +19,7 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import fast_data  # noqa: E402
 from build_standee import standee_texture  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
@@ -179,6 +180,7 @@ def main(args):
         for n, entry in zip((n for n, _ in jobs), pool.map(make_figure, jobs, chunksize=4)):
             index[n] = entry
     index_file.write_text(json.dumps(dict(sorted(index.items())), indent=1, ensure_ascii=False), encoding="utf-8")
+    fast_data.main()   # the plain-text copy the game reads (JSON is far too slow in TTS)
     size = sum(p.stat().st_size for p in OUT.glob("*.webp"))
     print(f"wrote {len(index) * 2} images ({size / 1e6:.1f} MB) + figures/index.json")
     for n in unresolved:

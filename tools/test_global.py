@@ -136,10 +136,10 @@ def main():
     g = lua.globals()
     g.py_json_decode = lambda s: to_lua(json.loads(s)) if s else None
     g.py_json_encode = lambda t: json.dumps(from_lua(t))
-    g.ROSTER_JSON = (REPO / "figures" / "index.json").read_text(encoding="utf-8")
-    g.CARDS_JSON = (REPO / "cards" / "index.json").read_text(encoding="utf-8")
-    g.STATS_JSON = (REPO / "data" / "pokemon.json").read_text(encoding="utf-8")
-    g.ARENAS_JSON = (REPO / "arenas" / "index.json").read_text(encoding="utf-8")
+    g.ROSTER_JSON = (REPO / "figures" / "index.txt").read_text(encoding="utf-8")
+    g.CARDS_JSON = (REPO / "cards" / "index.txt").read_text(encoding="utf-8")
+    g.STATS_JSON = (REPO / "data" / "pokemon.txt").read_text(encoding="utf-8")
+    g.ARENAS_JSON = (REPO / "arenas" / "index.txt").read_text(encoding="utf-8")
     lua.execute(PRELUDE)
 
     src = (REPO / "lua" / "Global.lua").read_text(encoding="utf-8")
@@ -781,8 +781,30 @@ def main():
     check(not re.search(r"g?match\(|gsub\(|:find\([^)]*\)(?<!true\))", reader.split("elseif")[0]),
           "the saved-text reader splits with plain find/sub (no Lua patterns on 280 KB of text)")
     saved = g.onSave()
-    check(saved.startswith("PCTTS-STATE-1") and len(saved) > 100000 and '"Charizard"' in saved,
+    check(saved.startswith("PCTTS-STATE-1") and len(saved) > 100000 and "Charizard\t" in saved,
           f"the save holds the downloaded roster, cards and stats as text ({len(saved) // 1024} KB)")
+
+    # the downloads are plain text (tools/fast_data.py; JSON took TTS ~15 s per 100 KB): read back, each is the
+    # same table as its JSON (an empty field is nil), and the reader uses plain find/sub only
+    fast = src[src.index("local function splitPlain"):src.index("function onLoad(saved)")]
+    check(not re.search(r"g?match\(|gsub\(|:find\([^)]*\)(?<!true\))", fast),
+          "the plain-text reader splits with plain find/sub only")
+
+    def same(a, b):
+        if isinstance(b, dict):
+            b = {k: v for k, v in b.items() if v is not None and v != ""}   # empty = nil (the script reads card.effect or "")
+            a = {k: v for k, v in a.items() if v != ""} if isinstance(a, dict) else a
+            return isinstance(a, dict) and set(a) == set(b) and all(same(a[k], b[k]) for k in b)
+        if isinstance(b, list):
+            return isinstance(a, list) and len(a) == len(b) and all(same(x, y) for x, y in zip(a, b))
+        if isinstance(b, float) or isinstance(a, float):
+            return isinstance(a, (int, float)) and abs(a - b) < 1e-4
+        return a == b
+    for key, stem in (("roster", "figures/index"), ("cards", "cards/index"), ("stats", "data/pokemon"),
+                      ("arenas", "arenas/index")):
+        got = from_lua(g.readData(key, (REPO / f"{stem}.txt").read_text(encoding="utf-8")))
+        want = json.loads((REPO / f"{stem}.json").read_text(encoding="utf-8"))
+        check(same(got, want), f"{stem}.txt reads back as the same table as {stem}.json")
     lua.execute(r"""
       WebRequest.get = function(url, cb) cb({ is_error = true, error = "offline" }) end
       catalog.dex = { index = {}, list = {}, keys = {} }

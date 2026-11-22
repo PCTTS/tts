@@ -1,0 +1,705 @@
+PCTTS-DATA-1 stats
+Abomasnow	290	189	210	125	3	Grass,Ice
+Abomasnow Mega	290	269	260	65	3	Grass,Ice
+Absol	240	275	180	155	4	Dark
+Absol Mega	240	315	180	235	4	Dark
+Absol Mega Z	240	323	180	307	4	Dark,Ghost
+Accelgor	270	205	135	295	4	Bug
+Aegislash Blade	230	285	125	125	3	Steel,Ghost
+Aegislash Shield	230	125	285	125	3	Steel,Ghost
+Aerodactyl	270	215	145	265	4	Rock,Flying
+Aerodactyl Mega	270	275	185	305	4	Rock,Flying
+Aggron	250	250	245	105	2	Steel,Rock
+Aggron Mega	250	310	315	105	2	Steel
+Alakazam	220	275	135	245	3	Psychic
+Alakazam Mega	220	355	175	305	3	Psychic
+Alcremie	240	240	237	133	3	Fairy
+Alomomola	440	155	130	135	3	Water
+Altaria	260	160	265	165	3	Dragon,Fairy
+Altaria Mega	260	240	285	165	3	Dragon,Fairy
+Ambipom	260	205	150	235	4	Normal
+Amoonguss	338	215	205	92	2	Grass,Poison
+Ampharos	290	265	169	126	3	Electric,Dragon
+Ampharos Mega	290	365	209	106	3	Electric,Dragon
+Annihilape	330	235	180	185	3	Fighting,Ghost
+Appletun	330	245	210	65	2	Grass,Dragon
+Araquanid	246	145	249	89	3	Water,Bug
+Arbok	230	220	210	190	3	Poison
+Arboliva	266	255	224	105	3	Grass,Normal
+Arcanine	290	225	165	195	3	Fire
+Arcanine Hisui	300	235	165	185	3	Fire,Rock
+Archaludon	290	255	200	175	3	Steel,Dragon
+Archeops	260	285	135	225	4	Rock,Flying
+Arctovish	290	230	215	115	3	Water,Ice
+Arctozolt	290	250	195	115	3	Electric,Ice
+Ariados	310	210	220	110	3	Bug,Poison
+Armaldo	260	275	200	105	3	Rock,Bug
+Armarouge	280	255	185	155	3	Fire,Psychic
+Aromatisse	312	263	196	79	3	Fairy
+Articuno	290	195	229	175	3	Ice,Flying
+Articuno Galar	290	255	190	195	3	Psychic,Flying
+Audino	346	160	239	105	3	Normal,Fairy
+Audino Mega	346	200	319	105	3	Normal,Fairy
+Aurorus	356	203	170	121	3	Rock,Ice
+Avalugg	300	239	235	76	2	Ice
+Avalugg Hisui	300	259	225	81	2	Ice,Rock
+Azelf	260	255	145	235	4	Psychic,Fairy
+Azumarill	310	135	175	115	3	Water,Fairy
+Banette	238	304	173	135	3	Ghost,Normal
+Banette Mega	238	404	203	155	3	Ghost,Normal
+Barbaracle	254	235	220	141	3	Rock,Water
+Barbaracle Mega	254	305	255	181	3	Rock,Fighting
+Barreskewda	232	251	115	277	4	Water
+Basculegion F	350	205	145	161	3	Water,Ghost
+Basculegion M	350	229	145	161	3	Water,Ghost
+Bastiodon	230	209	311	100	2	Rock,Steel
+Baxcalibur	340	295	183	179	3	Dragon,Ice
+Baxcalibur Mega	340	355	223	179	3	Dragon,Ice
+Beartic	300	250	195	105	3	Ice,Fighting
+Beautifly	230	235	200	185	4	Bug,Flying
+Beedrill	240	250	140	220	4	Bug,Poison
+Beedrill Mega	240	370	140	360	4	Bug,Poison
+Beer	473	63	65	405	3	Water,Poison
+Beheeyem	260	255	175	125	3	Psychic
+Bellibolt	328	241	186	95	3	Electric
+Bellossom	290	205	200	105	3	Grass
+Bewear	350	255	145	125	3	Normal,Fighting
+Bibarel	268	200	195	187	3	Normal,Water
+Blacephalon	216	307	137	219	3	Fire,Ghost
+Blastoise	268	205	216	161	3	Water
+Blastoise Mega	268	305	246	161	3	Water
+Blaziken	270	255	160	165	3	Fire,Fighting
+Blaziken Mega	270	335	180	205	3	Fire,Fighting
+Blissey	620	155	150	115	3	Normal
+Boltund	248	205	150	247	4	Electric
+Bombirdier	250	236	195	169	3	Flying,Dark
+Bouffalant	300	225	210	115	3	Normal
+Brambleghast	220	235	210	185	4	Grass,Ghost
+Braviary	310	251	155	165	4	Normal,Flying
+Braviary Hisui	330	229	156	135	4	Psychic,Flying
+Breloom	230	285	190	145	3	Grass,Fighting
+Bronzong	274	238	267	71	2	Steel,Psychic
+Brute Bonnet	332	259	203	115	3	Grass,Dark
+Bruxish	246	215	190	189	3	Water,Psychic
+Butterfree	260	235	180	175	4	Bug,Flying
+Buzzwole	324	283	197	163	3	Bug,Fighting
+Cacturne	250	245	170	185	3	Grass,Dark
+Calyrex	310	165	200	175	3	Psychic,Grass
+Camerupt	310	235	220	85	3	Fire,Ground
+Camerupt Mega	310	320	290	85	3	Fire,ground
+Carbink	230	190	305	125	3	Rock,Fairy
+Carnivine	258	265	230	97	3	Grass
+Carracosta	258	261	233	98	3	Water,Rock
+Castform Rainy	250	205	210	185	3	Water
+Castform Sandy	250	205	210	185	3	Rock
+Castform Snowy	250	205	210	185	3	Ice
+Castform Sunny	250	205	210	185	3	Fire
+Celebi	310	205	205	205	4	Psychic,Grass
+Celesteela	304	219	209	127	3	Steel,Flying
+Centiskorch	310	235	170	135	3	Fire,Bug
+Ceruledge	260	255	185	175	3	Fire,Ghost
+Cetitan	450	231	125	151	3	Ice
+Chandelure	230	295	185	165	3	Ghost,Fire
+Chandelure Mega	230	355	225	185	3	Ghost,Fire
+Charizard	266	223	167	205	3	Fire,Dragon
+Charizard X Mega	266	275	205	205	3	Fire,Dragon
+Charizard Y Mega	266	233	197	205	3	Fire,Flying
+Chatot	262	189	92	187	3	Normal,Flying
+Cherrim	250	179	153	175	3	Grass
+Chesnaught	286	229	202	133	3	Grass,Fighting
+Chesnaught Mega	286	289	292	93	3	Grass,Fighting
+Chi-Yu	220	275	205	205	3	Dark,Fire
+Chien-Pao	270	245	150	275	4	Dark,Ice
+Chimecho	240	215	195	200	4	Psychic
+Chimecho Mega	240	295	255	200	4	Psychic,Steel
+Cinccino	260	195	155	240	4	Normal
+Cinderace	270	237	155	243	4	Fire
+Clawitzer	252	270	205	123	3	Water
+Claydol	260	175	260	155	3	Ground,Psychic
+Clefable	300	257	168	125	3	Fairy
+Clefable Mega	300	337	208	145	3	Fairy
+Clodsire	370	210	225	45	3	Poison,Ground
+Cloyster	210	210	245	185	3	Water,Ice
+Coalossal	330	225	230	65	2	Rock,Fire
+Cobalion	292	185	206	221	3	Steel,Fighting
+Cofagrigus	251	250	265	84	3	Ghost
+Comfey	212	199	234	205	4	Fairy
+Conkeldurr	320	285	165	95	3	Fighting
+Copperajah	354	285	181	30	2	Steel
+Corsola	315	235	195	105	2	Water,Rock
+Corsola Galar	305	225	215	115	2	Ghost
+Corviknight	306	194	211	139	3	Flying,Steel
+Crabominable	304	279	176	91	2	Fighting,Ice
+Crabominable Mega	304	329	261	71	2	Fighting,Ice
+Cradily	282	233	244	91	2	Rock,Grass
+Cramorant	250	215	210	175	3	Flying,Water
+Crawdaunt	236	315	184	115	3	Water,Dark
+Cresselia	350	155	235	175	3	Psychic
+Crobat	280	185	165	265	4	Poison,Flying
+Crustle	250	260	245	95	2	Bug,Rock
+Cryogonal	270	195	190	215	3	Ice
+Cursola	230	335	220	65	2	Ghost
+Cyclizar	250	200	153	247	4	Dragon,Normal
+Dachsbun	224	185	200	195	3	Fairy
+Darkrai	250	275	185	255	4	Dark
+Darkrai Mega	250	335	265	195	4	Dark
+Darmanitan	320	285	115	195	3	Fire
+Darmanitan Galar	320	285	115	195	3	Ice
+Darmanitan Galar Zen	320	325	115	275	3	Ice,Fire
+Darmanitan Zen	320	285	215	115	3	Fire,Psychic
+Decidueye	266	239	200	145	3	Grass,Ghost
+Decidueye Hisui	286	249	190	125	3	Grass,Fighting
+Dedenne	244	187	182	237	4	Electric,Fairy
+Delcatty	250	240	155	205	3	Normal
+Delibird	220	175	215	240	4	Ice,Flying
+Delphox	260	233	177	213	3	Fire,Psychic
+Delphox Mega	260	333	202	273	3	Fire,Psychic
+Dewgong	290	210	205	145	3	Water,Ice
+Dhelmise	250	291	224	85	2	Ghost,Grass
+Diancie	210	230	305	105	3	Rock,Fairy
+Diancie Mega	210	350	225	225	3	Rock,Fairy
+Diggersby	280	147	174	176	3	Normal,Ground
+Ditto	206	101	101	101	3	Normal
+Dodrio	230	235	160	225	4	Normal,Flying
+Dondozo	410	235	185	75	2	Water
+Donphan	290	260	195	105	3	Ground
+Dracovish	290	220	185	155	3	Water,Dragon
+Dracozolt	290	240	165	155	3	Electric,Dragon
+Dragalge	240	249	268	93	3	Poison,Dragon
+Dragalge Mega	240	319	323	93	3	Poison,Dragon
+Dragapult	286	245	155	289	4	Dragon,Ghost
+Dragonite	292	273	200	165	3	Dragon,Flying
+Dragonite Mega	292	295	245	205	3	Dragon,Flying
+Drampa	266	275	206	103	2	Normal,Dragon
+Drampa Mega	266	325	256	103	2	Normal,Dragon
+Drapion	250	216	189	195	3	Poison,Dark
+Drednaw	290	244	163	153	3	Water,Rock
+Drifblim	410	165	110	165	3	Ghost,Flying
+Druddigon	264	280	205	101	3	Dragon
+Dubwool	254	200	215	181	3	Normal
+Dudunsparce	360	215	160	115	3	Normal
+Dugtrio	200	220	170	260	4	Ground
+Dugtrio Alola	205	235	165	245	4	Ground,Steel
+Duraludon	250	195	240	175	3	Steel,Dragon
+Durant	226	223	178	223	4	Bug,Steel
+Dusknoir	230	235	290	95	3	Ghost
+Dustox	280	190	245	135	4	Bug,Poison
+Eelektross	280	290	165	115	3	Electric
+Eelektross Mega	280	350	175	175	3	Electric
+Eiscue Ice	260	200	205	105	3	Ice
+Eiscue Noice	260	200	125	265	4	Ice
+Eldegoss	270	210	215	155	3	Grass
+Electivire	260	251	157	195	3	Electric,Fighting
+Electrode	230	165	155	305	4	Electric
+Electrode Hisui	230	165	155	305	4	Electric,Grass
+Emboar	330	251	135	135	3	Fire,Ground
+Emboar Mega	330	301	190	155	3	Fire,Ground
+Emolga	220	215	184	231	4	Electric,Flying
+Empoleon	278	237	193	142	3	Water,Steel
+Enamorus I	258	275	155	217	3	Fairy,Flying
+Enamorus T	258	275	220	97	2	Fairy,Flying
+Entei	340	235	165	205	3	Fire
+Escavalier	270	275	245	60	2	Bug,Steel
+Espathra	300	207	128	215	4	Psychic
+Espeon	240	265	159	225	4	Psychic
+Excadrill	330	275	129	181	3	Ground,Steel
+Excadrill Mega	330	335	169	211	3	Ground,steel
+Exeggutor	300	255	180	115	3	Grass,Psychic
+Exeggutor Alola	300	275	180	95	3	Grass,Dragon
+Exploud	318	211	180	141	3	Normal
+Falinks	240	205	165	155	3	Fighting
+Falinks Mega	240	275	205	205	3	Fighting
+Farigiraf	350	225	150	125	3	Normal,Psychic
+Fearow	240	210	160	240	4	Flying
+Feraligatr	280	215	194	161	3	Water
+Feraligatr Mega	280	325	229	161	3	Water,Dragon
+Ferrothorn	258	253	272	67	2	Grass,Steel
+Fezandipiti	286	187	212	203	3	Poison,Fairy
+Flamigo	274	235	156	185	3	Flying,Fighting
+Flapple	250	270	185	145	3	Grass,Dragon
+Flareon	240	300	175	135	4	Fire
+Floatzel	280	215	120	235	4	Water
+Floette Eternal	258	255	200	189	4	Fairy
+Floette Mega	258	315	240	209	4	Fairy
+Florges	266	229	227	155	3	Fairy
+Flutter Mane	220	275	195	275	4	Ghost,Fairy
+Flygon	270	210	165	205	4	Bug,Dragon
+Forretress	260	240	265	85	3	Bug,Steel
+Froslass	250	185	165	250	4	Ice,Ghost
+Froslass Mega	250	305	195	270	4	Ice,Ghost
+Frosmoth	250	285	180	135	3	Ice,Bug
+Furfrou	260	205	176	209	3	Normal
+Furret	280	182	183	205	4	Normal
+Gallade	246	255	185	165	3	Psychic,Fighting
+Gallade Mega	246	335	215	225	3	Psychic,Fighting
+Galvantula	250	219	160	221	4	Bug,Electric
+Garbodor	270	230	195	155	3	Poison
+Garchomp	326	265	185	209	3	Dragon,Ground
+Garchomp Mega	326	345	215	189	3	Dragon,Ground
+Garchomp Mega Z	326	287	175	307	4	Dragon
+Gardevoir	246	255	185	165	3	Psychic,Fairy
+Gardevoir Mega	246	235	205	205	3	Psychic,Fairy
+Garganacl	310	225	225	90	2	Rock
+Gastrodon	332	237	198	83	3	Water,Ground
+Genesect	252	245	195	203	3	Bug,Steel
+Gengar	230	265	139	225	3	Ghost,Poison
+Gengar Mega	230	340	179	265	3	Ghost,Poison
+Gholdengo	284	271	191	173	3	Steel,Ghost
+Gigalith	280	290	205	75	2	Rock
+Glaceon	240	265	210	135	4	Ice
+Glalie	270	220	185	175	3	Ice
+Glalie Mega	270	300	185	215	3	Ice
+Glastrier	310	295	245	65	2	Ice
+Glimmora	276	265	176	177	3	Rock,Poison
+Glimmora Mega	276	305	206	207	3	Rock,Poison
+Gliscor	260	195	205	195	3	Ground,Flying
+Gogoat	356	205	148	141	3	Grass
+Golduck	270	195	210	175	3	Water,Psychic
+Golem	270	265	220	95	3	Rock,Ground
+Golem Alola	270	265	220	95	3	Rock,Electric
+Golisopod	260	255	250	85	3	Bug,Water
+Golisopod Mega	260	305	315	85	3	Bug,Steel
+Golurk	288	282	165	115	3	Ground,Ghost
+Golurk Mega	288	352	215	115	3	Ground,Ghost
+Goodra	290	225	225	165	3	Dragon
+Goodra Hisui	270	225	255	125	3	Dragon,Steel
+Gorebyss	220	287	234	109	3	Water
+Gothitelle	250	245	220	135	3	Psychic,Dark
+Gouging Fire	320	235	219	187	3	Fire,Dragon
+Gourgeist	240	215	222	173	3	Ghost,Grass
+Gourgeist Large	260	225	222	143	3	Ghost,Grass
+Gourgeist Small	220	205	222	203	3	Ghost,Grass
+Gourgeist Super	280	235	222	113	3	Ghost,Grass
+Grafaiai	236	215	174	225	4	Poison,Normal
+Granbull	290	275	190	95	3	Fairy
+Grapploct	270	261	220	99	2	Fighting
+Great Tusk	340	267	189	179	3	Ground,Fighting
+Greedant	350	230	195	75	2	Normal
+Greninja	254	211	143	249	4	Water,Dark
+Greninja Mega	254	271	163	289	4	Water,Dark
+Grimmsnarl	300	255	170	125	3	Dark,Fairy
+Grumpig	270	215	200	165	3	Psychic
+Gumshoos	286	245	200	119	3	Normal
+Guzzlord	556	207	111	91	2	Dark,Dragon
+Gyarados	300	255	184	167	3	Water,Flying
+Gyarados Mega	300	315	244	167	3	Water,Dark
+Hariyama	398	245	125	105	3	Fighting
+Hatterene	224	307	238	81	3	Psychic,Fairy
+Hawlucha	266	189	154	241	4	Fighting,Flying
+Hawlucha Mega	266	281	209	241	4	Fighting,Flying
+Haxorus	262	299	165	199	3	Dragon
+Heatmor	280	215	157	198	3	Fire
+Heatran	292	265	217	159	3	Fire,Steel
+Heatran Mega	292	355	252	139	3	Fire,Steel
+Heliolisk	234	223	170	223	4	Electric,Normal
+Heracross	270	255	175	175	3	Bug,Fighting
+Heracross Mega	270	375	215	155	3	Bug,Fighting
+Hippowdon	326	230	195	99	2	Ground
+Hitmonchan	210	235	248	157	3	Fighting
+Hitmonlee	220	245	207	179	3	Fighting
+Hitmontop	210	205	210	225	3	Fighting
+Honchkrow	310	255	138	147	3	Dark,Flying
+Hoopa Confined	270	305	195	145	3	Psychic,Ghost
+Houndoom	260	245	150	195	4	Dark,Fire
+Houndoom Mega	260	305	210	235	4	Dark,Fire
+Houndstone	274	207	228	141	3	Ghost
+Huntail	220	262	259	109	3	Water
+Hydrapple	322	260	175	93	3	Grass,Dragon
+Hydreigon	294	255	185	201	3	Dark,Dragon
+Hypno	280	221	210	139	3	Psychic
+Illumise	240	151	165	175	3	Bug
+Incineroar	300	240	185	125	3	Fire,Dark
+Indeedee Female	250	205	220	175	3	Psychic,Normal
+Indeedee Male	230	260	165	195	3	Psychic,Normal
+Infernape	262	213	154	221	3	Fire,Fighting
+Inteleon	250	255	135	245	4	Water
+Iron Boulder	290	245	193	253	4	Rock,Psychic
+Iron Bundle	222	253	179	277	4	Ice,Water
+Iron Crown	290	249	213	201	3	Steel,Psychic
+Iron Hands	418	285	181	105	3	Fighting,Electric
+Iron Jugulis	298	249	171	221	4	Dark,Flying
+Iron Leaves	290	265	201	213	4	Grass,Psychic
+Iron Moth	270	285	175	225	4	Fire,Poison
+Iron Thorns	310	273	199	149	3	Rock,Electric
+Iron Treads	290	229	195	217	3	Ground,Steel
+Iron Valiant	258	265	165	237	3	Fairy,Fighting
+Jellicent	310	210	205	125	3	Water,Ghost
+Jirachi	310	205	205	205	3	Steel,Psychic
+Jolteon	240	225	160	265	4	Electric
+Jumpluff	260	145	180	265	4	Grass,Flying
+Jynx	240	245	170	195	3	Ice,Psychic
+Kabutops	230	255	200	165	3	Rock,Water
+Kangaskhan	320	228	187	115	3	Normal
+Kangaskhan Mega	320	288	227	135	3	Normal
+Kartana	228	367	167	223	4	Grass,Steel
+Kecleon	230	185	195	85	3	Normal
+Keldeo	292	263	185	221	3	Water,Fighting
+Kilowattrel	250	215	130	255	4	Electric,Flying
+Kingambit	310	275	210	105	2	Dark,Steel
+Kingdra	260	205	205	180	3	Water,Dragon
+Kingler	220	265	210	155	3	Water
+Klawf	250	250	195	155	3	Rock
+Kleavor	250	275	170	175	3	Bug,Rock
+Klefki	254	200	241	155	3	Steel,Fairy
+Klinklang	230	215	220	185	3	Steel
+Komala	240	255	220	135	3	Normal
+Kommo-O	260	225	235	175	3	Dragon,Fighting
+Kricketune	264	175	257	154	3	Bug
+Krookodile	300	239	145	189	3	Ground,Dark
+Landorus I	288	255	175	207	4	Ground,Flying
+Landorus T	288	295	175	187	4	Ground,Flying
+Lanturn	360	202	149	139	3	Water,Electric
+Lapras	370	176	179	125	3	Water,Ice
+Latias	270	225	225	225	4	Dragon,Psychic
+Latios	270	265	195	225	4	Dragon,Psychic
+Leafeon	240	225	199	195	4	Grass
+Leavanny	260	195	206	189	3	Bug,Grass
+Ledian	250	180	205	215	3	Bug,Flying
+Lickilicky	330	175	215	130	3	Normal
+Liepard	238	206	189	217	4	Dark
+Lilligant	250	225	190	185	3	Grass
+Lilligant Hisui	250	215	170	215	3	Grass,Fighting
+Linoone	266	185	169	230	4	Normal
+Lokix	252	244	165	189	3	Bug,Dark
+Lopunny	240	210	185	215	4	Normal,Fighting
+Lopunny Mega	240	330	195	275	4	Normal,Fighting
+Lucario	250	250	165	185	3	Fighting,Steel
+Lucario Mega	250	310	183	229	3	Fighting,Steel
+Lucario Mega Z	250	348	165	307	3	Fighting,Steel
+Ludicolo	270	240	195	145	3	Water,Grass
+Lumineon	248	168	202	232	3	Water
+Lunatone	290	210	155	145	3	Rock,Psychic
+Lurantis	250	290	205	105	3	Grass
+Luvdisc	196	85	125	199	3	Water
+Luxray	270	245	173	162	3	Electric,Dark
+Lycanroc Dusk	260	239	135	225	4	Rock
+Lycanroc Midday	260	235	135	229	4	Rock
+Lycanroc Midnight	280	246	155	169	4	Rock
+Mabostiff	270	245	165	175	3	Dark
+Machamp	290	265	180	115	3	Fighting
+Magcargo	270	260	225	95	2	Fire,Rock
+Magearna	270	265	235	135	3	Steel,Fairy
+Magearna Mega	270	345	235	195	3	Steel,fairy
+Magmortar	260	255	167	171	3	Fire
+Magnezone	250	265	210	125	3	Steel,Electric
+Malamar	282	204	213	151	3	Dark,Psychic
+Malamar Mega	282	224	258	181	3	Dark,Psychic
+Mamoswine	330	265	145	165	3	Ice,Ground
+Manaphy	310	205	205	205	3	Water
+Mandibuzz	330	150	205	165	4	Dark,Flying
+Manectric	250	235	150	215	4	Electric
+Manectric Mega	250	295	190	275	4	Electric
+Mantine	280	200	225	145	3	Water,Flying
+Maractus	260	261	184	145	3	Grass
+Marowak	250	225	250	125	3	Ground
+Marowak Alola	250	225	250	125	3	Fire,Ghost
+Marshadow	290	255	175	255	3	Fighting,Ghost
+Masquerain	250	245	190	165	3	Bug,Water
+Maushold	258	175	190	227	3	Normal
+Mawile	210	320	185	135	3	Steel,Fairy
+Mawile Mega	210	360	265	135	3	Steel,Fairy
+Medicham	230	145	175	200	3	Fighting,Psychic
+Medicham Mega	230	225	195	240	3	Fighting,Psychic
+Meganium	270	210	205	165	3	Grass,Fairy
+Meganium Mega	270	330	235	165	3	Grass,Fairy
+Melmetal	380	291	213	73	2	Steel
+Meloetta Aria	310	261	210	185	3	Normal,Psychic
+Meloetta Pirouette	310	261	172	261	3	Normal,Fighting
+Meowscarada	262	225	145	251	4	Grass,Dark
+Meowstic Mega	310	325	225	245	4	Psychic
+Meowstic-F	258	194	185	213	3	Psychic
+Meowstic-M	258	194	185	213	3	Psychic
+Mesprit	270	215	215	165	3	Psychic,Fairy
+Metagross	270	275	225	145	3	Steel,Psychic
+Metagross Mega	270	295	265	225	3	Steel,Psychic
+Mew	310	205	205	205	4	Psychic
+Mienshao	240	255	140	215	4	Fighting
+Mightyena	250	215	160	175	3	Dark
+Milotic	300	205	209	198	3	Water
+Miltank	300	165	180	205	3	Normal
+Mimikyu	220	225	208	197	3	Ghost,Fairy
+Minior Core	230	205	125	245	4	Rock,Flying
+Minior Meteor	230	125	255	125	3	Rock,Flying
+Minun	230	175	120	195	3	Electric
+Mismagius	230	215	190	215	3	Ghost,Fairy
+Moltres	290	255	180	185	3	Fire,Flying
+Moltres Galar	290	205	220	185	3	Dark,Flying
+Morpeko Full Belly	226	225	200	199	3	Electric,Dark
+Morpeko Hangry	226	225	200	199	3	Electric,Dark
+Mothim	250	238	185	177	4	Bug,Flying
+Mr. Mime	220	225	220	185	3	Psychic,Fairy
+Mr. Rime	225	200	200	225	3	Ice,Psychic
+Mudsdale	310	255	210	75	3	Ground
+Muk	320	235	190	105	3	Poison
+Muk Alola	320	235	190	105	3	Poison,Dark
+Munkidori	286	265	161	217	3	Poison,Psychic
+Musharna	342	239	185	84	3	Psychic
+Naganadel	256	259	151	247	4	Poison,Dragon
+Nidoking	272	229	174	175	3	Poison,Ground
+Nidoqueen	290	209	194	157	3	Poison,Ground
+Nihilego	328	259	183	211	3	Rock,Poison
+Ninetales	256	167	200	227	4	Fire
+Ninetales Alola	256	187	184	223	4	Ice,Fairy
+Ninjask	232	185	108	325	4	Bug,Flying
+Noctowl	310	227	161	152	4	Psychic,Flying
+Noivern	280	199	165	251	4	Flying,Dragon
+Obstagoon	296	185	187	195	3	Dark,Normal
+Octillery	260	285	210	95	3	Water
+Ogerpon	270	245	145	225	3	Grass,mask
+Oinkologne	340	200	175	135	3	Normal
+Okidogi	286	261	206	165	3	Poison,Fighting
+Omastar	250	255	220	125	3	Rock,Water
+Oranguru	300	185	215	125	3	Normal,Psychic
+Orbeetle	245	165	255	185	3	Bug,Psychic
+Oricorio Baile	260	211	170	209	3	Fire,Flying
+Oricorio Pa'u	260	211	170	209	3	Psychic,Flying
+Oricorio Pom-Pom	260	211	170	209	3	Electric,Flying
+Oricorio Sensu	260	211	170	209	3	Ghost,Flying
+Orthworm	280	225	210	135	3	Steel
+Overqwil	280	235	165	175	3	Dark,Poison
+Pachirisu	230	160	215	245	3	Electric
+Palafin Hero	310	325	189	205	3	Water
+Palafin Zero	310	145	159	205	3	Water
+Palossand	280	235	260	75	2	Ghost,Ground
+Pangoro	300	263	166	121	3	Fighting,Dark
+Parasect	300	260	195	95	3	Bug,Grass
+Passimian	310	245	155	165	3	Fighting
+Pawmot	250	235	150	215	4	Electric,Fighting
+Pecharunt	286	181	253	181	3	Poison,Ghost
+Pelipper	260	195	175	135	3	Water,Flying
+Perserker	250	265	230	105	3	Steel
+Persian	240	210	165	235	4	Normal
+Persian Alola	240	155	190	235	4	Dark
+Pheromosa	252	279	79	307	4	Bug,Fighting
+Phione	280	190	190	190	3	Water
+Pidgeot	276	210	150	214	4	Normal,Flying
+Pidgeot Mega	276	320	165	254	4	Normal,Flying
+Pincurchin	236	207	230	35	2	Electric
+Pinsir	240	260	175	175	3	Bug
+Pinsir Mega	240	320	215	215	3	Bug,Flying
+Plusle	230	175	120	195	3	Electric
+Politoed	290	185	180	145	3	Water
+Poliwrath	290	210	205	145	3	Water,Fighting
+Polteageist	230	273	202	145	3	Ghost
+Porygon-Z	280	275	150	185	3	Normal
+Primarina	270	260	195	125	3	Water,Fairy
+Primeape	255	240	160	195	3	Fighting
+Probopass	240	195	300	115	2	Rock,Electric
+Purugly	252	169	200	229	4	Normal
+Pyroar	282	223	143	217	3	Fire,Normal
+Pyroar Mega	282	263	183	257	3	Fire,Normal
+Pyukumuku	270	125	265	15	2	Water
+Quagsire	340	215	220	75	3	Water,Ground
+Quaquaval	280	245	160	175	3	Water,Fighting
+Qwilfish	240	220	215	175	3	Poison,Water
+Rabsca	260	255	230	105	3	Bug,Psychic
+Raging Bolt	360	279	185	155	3	Electric,Dragon
+Raichu	230	251	164	205	3	Electric
+Raichu Alola	240	195	170	245	4	Electric,Psychic
+Raichu Mega X	240	285	225	245	4	Electric
+Raichu Mega Y	240	335	170	285	4	electric
+Raikou	290	235	180	235	4	Electric
+Rampardos	304	335	115	121	3	Rock
+Rapidash	240	205	190	215	4	Fire,Fairy
+Rapidash Galar	240	205	190	215	4	Psychic,Fairy
+Raticate	250	197	179	224	3	Normal
+Raticate Alola	290	207	185	168	3	Dark,Normal
+Regice	270	205	305	105	2	Ice
+Regidrago	510	205	105	165	3	Dragon
+Regileki	270	205	105	405	4	Electric
+Regirock	270	205	305	105	2	Rock
+Registeel	270	170	305	105	2	Steel
+Relicanth	310	215	210	115	3	Water,Rock
+Reuniclus	330	265	175	80	3	Psychic
+Revavroom	270	243	162	185	3	Steel,Poison
+Rhyperior	340	285	189	85	2	Ground,Rock
+Ribombee	230	212	155	253	4	Bug,Fairy
+Rillaboom	310	225	165	175	3	Grass
+Roaring Moon	320	283	177	243	3	Dragon,Dark
+Roserade	230	260	175	185	3	Grass,Poison
+Rotom	220	215	198	217	4	Electric,Ghost
+Rotom Fan	210	235	228	177	4	Electric,Flying
+Rotom Frost	210	235	228	177	4	Electric,Ice
+Rotom Heat	210	235	228	177	4	Electric,Fire
+Rotom Mow	210	235	228	177	4	Electric,Grass
+Rotom Wash	210	235	228	177	4	Electric,Water
+Runerigus	251	250	265	84	3	Ground,Ghost
+Sableye	270	175	300	105	3	Dark,Ghost
+Sableye Mega	270	195	410	45	3	Dark,Ghost
+Salamence	300	275	165	205	3	Dragon,Flying
+Salamence Mega	300	295	225	245	3	Dragon,Flying
+Salazzle	246	227	138	239	4	Poison,Fire
+Samurott	300	225	180	145	3	Water
+Samurott Hisui	290	221	164	175	3	Water,Dark
+Sandaconda	254	239	210	147	3	Ground
+Sandslash	260	265	180	145	3	Ground
+Sandslash Alola	260	215	230	145	3	Ice,Steel
+Sandy Shocks	280	247	187	207	3	Electric,Ground
+Sawk	260	255	160	175	3	Fighting
+Sawsbuck	270	225	160	195	3	Normal,Grass
+Sceptile	250	215	155	245	4	Grass,Dragon
+Sceptile Mega	250	295	165	295	4	Grass,Dragon
+Scizor	250	280	185	135	3	Bug,Steel
+Scizor Mega	250	320	245	155	3	Bug,Steel
+Scolipede	230	185	173	262	4	Bug,Poison
+Scolipede Mega	230	265	263	160	4	Bug,Poison
+Scovillain	240	231	224	155	3	Grass,Fire
+Scovillain Mega	240	291	264	155	3	Grass,Fire
+Scrafty	240	235	254	121	3	Dark,Fighting
+Scrafty Mega	240	315	294	141	3	Dark,Fighting
+Scream Tail	340	135	219	227	3	Fairy,Psychic
+Seaking	270	234	175	171	3	Water
+Seismitoad	320	222	155	153	3	Water,Ground
+Serperior	260	164	195	231	4	Grass,Dragon
+Seviper	276	205	234	135	3	Poison
+Sharpedo	250	245	140	215	4	Water,Dark
+Sharpedo Mega	250	285	195	235	4	Water,Dark
+Shaymin Land	310	205	205	205	3	Grass
+Shaymin Sky	310	245	155	259	4	Grass,Flying
+Shiftry	290	230	140	190	3	Grass,Dark
+Shiinotic	260	270	215	105	3	Grass,Fairy
+Shuckle	200	25	465	15	2	Bug,Rock
+Sigilyph	254	211	186	199	4	Psychic,Flying
+Silvally	300	195	195	195	3	Normal
+Simipour	260	211	172	207	3	Water
+Simisage	260	211	172	207	3	Grass
+Simisear	260	211	172	207	3	Fire
+Sinistcha	252	271	209	145	3	Grass,Ghost
+Sirfetch'd	234	285	196	135	3	Fighting
+Skarmory	240	215	250	145	3	Steel,Flying
+Skarmory Mega	240	335	250	225	3	Steel,Flying
+Skeledirge	318	225	180	137	3	Fire,Ghost
+Skuntank	316	201	160	173	3	Poison,Dark
+Slaking	410	325	170	205	3	Normal
+Slitherwing	280	275	189	167	3	Bug,Fighting
+Slowbro	300	250	205	95	2	Water,Psychic
+Slowbro Galar	330	220	205	95	2	Poison,Psychic
+Slowbro Mega	300	280	275	95	2	Water,Psychic
+Slowking	300	255	215	80	2	Water,Psychic
+Slowking Galar	300	250	235	65	2	Poison,Psychic
+Slurpuff	274	175	229	172	3	Fairy
+Sneasler	270	265	145	245	4	Fighting,Poison
+Snorlax	430	225	180	65	2	Normal
+Solrock	290	210	155	145	3	Rock,Psychic
+Spectrier	310	295	145	265	4	Ghost
+Spidops	250	258	267	75	3	Bug
+Spinda	230	125	125	125	3	Normal
+Spiritomb	225	219	300	106	3	Ghost,Dark
+Stakataka	232	270	317	31	2	Rock,Steel
+Staraptor	280	245	125	205	4	Normal,Flying
+Staraptor Mega	280	285	185	225	4	Fighting,Flying
+Starmie	230	205	180	235	4	Water,Psychic
+Starmie Mega	230	285	220	245	4	Water,Psychic
+Steelix	276	240	269	65	2	Steel,Ground
+Steelix Mega	276	320	329	65	2	Steel,Ground
+Stonjourner	310	255	160	145	3	Rock
+Stoutland	280	225	185	165	3	Normal
+Stunfisk	328	225	218	79	2	Ground,Electric
+Stunfisk Galar	328	255	188	79	2	Ground,Steel
+Sudowoodo	280	240	225	105	2	Rock
+Suicune	310	185	235	175	3	Water
+Sunflora	260	265	195	130	3	Grass
+Swampert	310	230	185	125	3	Water,Ground
+Swampert Mega	310	310	225	145	3	Water,Ground
+Swanna	260	204	185	201	4	Water,Flying
+Swellow	230	205	190	225	4	Normal,Flying
+Swoobat	244	184	179	243	4	Psychic,Flying
+Sylveon	300	225	200	125	4	Fairy
+Talonflame	266	167	160	257	4	Fire,Flying
+Tangrowth	310	240	195	105	3	Grass
+Tapu Bulu	250	265	215	155	3	Grass,Fairy
+Tapu Fini	250	195	250	175	3	Water,Fairy
+Tapu Koko	250	235	165	265	4	Electric,Fairy
+Tapu Lele	250	265	195	195	3	Psychic,Fairy
+Tatsugiri	246	255	180	169	3	Dragon,Water
+Tatsugiri Mega	246	285	240	191	3	Dragon,Water
+Tauros	260	205	170	225	4	Normal
+Tauros Aqua	260	225	180	205	4	Fighting,Water
+Tauros Blaze	260	225	180	205	4	Fighting,Fire
+Tauros Combat	260	225	180	205	4	Fighting
+Tentacruel	270	175	200	205	3	Water,Poison
+Terrakion	292	263	185	221	3	Rock,Fighting
+Thievul	250	189	206	205	4	Dark
+Throh	350	205	200	95	2	Fighting
+Thundurus I	268	255	155	227	4	Electric,Flying
+Thundurus T	268	295	155	207	4	Electric,Flying
+Ting-Lu	420	225	195	95	2	Dark,Ground
+Tinkaton	280	175	197	193	3	Fairy,Steel
+Toedscruel	270	185	190	205	3	Ground,Grass
+Togedemaru	240	224	189	197	3	Electric,Steel
+Togekiss	280	245	215	165	3	Fairy,Flying
+Torkoal	270	175	245	75	2	Fire
+Tornadus I	268	255	155	227	4	Flying
+Tornadus T	268	225	175	247	4	Flying
+Torterra	300	238	195	117	3	Grass,Ground
+Toucannon	270	265	190	125	3	Normal,Flying
+Toxapex	275	186	299	90	2	Poison,Water
+Toxicroak	276	197	157	220	3	Poison,Fighting
+Toxtricity	260	263	172	155	3	Electric,Poison
+Trevenant	280	240	198	132	3	Ghost,Grass
+Tropius	308	260	175	107	3	Grass,Flying
+Tsareena	254	245	201	150	3	Grass
+Turtonator	230	247	266	107	3	Fire,Dragon
+Typhlosion	266	223	168	205	3	Fire
+Typhlosion Hisui	266	243	168	195	3	Fire,Ghost
+Tyranitar	310	273	215	127	3	Rock,Dark
+Tyranitar Mega	310	333	275	147	3	Rock,Dark
+Tyrantrum	274	247	182	147	3	Rock,Dragon
+Umbreon	300	135	245	135	4	Dark
+Unfezant	270	235	154	191	4	Normal,Flying
+Unown	206	149	101	101	3	Psychic
+Ursaluna	370	285	190	105	3	Ground,Normal
+Ursaluna Bloodmoon	336	275	190	109	3	Ground,Normal
+Ursaring	290	275	170	115	3	Normal,Ground
+Urshifu Rapid Strike	310	265	165	199	3	Fighting,Water
+Urshifu Single Strike	310	265	165	199	3	Fighting,Dark
+Uxie	260	200	265	125	3	Psychic,Fairy
+Vanilluxe	252	225	210	163	3	Ice,Fairy
+Vaporeon	370	225	160	135	4	Water
+Veluza	290	254	161	145	3	Water,Psychic
+Venomoth	250	185	195	220	4	Bug,Poison
+Venusaur	270	215	200	165	3	Grass,Poison
+Venusaur Mega	270	258	259	165	3	Grass,Poison
+Vespiquen	280	235	250	85	3	Bug,Flying
+Victini	310	205	205	205	4	Psychic,Fire
+Victreebel	270	255	180	145	3	Grass,Poison
+Victreebel Mega	270	315	225	145	3	Grass,Poison
+Vikavolt	264	295	170	121	2	Bug,Electric
+Vileplume	260	255	210	125	3	Grass,Poison
+Virizion	292	185	206	221	3	Grass,Fighting
+Vivillon	270	185	172	223	4	Bug,Flying
+Volbeat	240	151	165	175	3	Bug
+Volcanion	270	265	215	145	3	Fire,Water
+Volcarona	280	275	175	205	3	Bug,Fire
+Wailord	450	185	95	125	3	Water
+Walking Wake	308	255	179	223	3	Water,Dragon
+Walrein	330	210	185	125	3	Ice,Water
+Watchog	270	214	207	159	3	Normal
+Weavile	250	245	155	255	3	Dark,Ice
+Weezing	260	250	215	125	3	Poison
+Weezing Galar	260	250	215	125	3	Poison,Fairy
+Whimsicott	230	193	190	237	4	Grass,Fairy
+Whiscash	370	196	159	125	3	Water,Ground
+Wigglytuff	390	186	179	95	3	Normal,Fairy
+Wishiwashi	200	285	270	95	2	Water
+Wishiwashi (Single)	200	45	50	85	4	Water
+Wo-Chien	280	195	240	145	3	Dark,Grass
+Wormadam Hidden	250	163	220	120	3	Bug,Dark
+Wormadam Mind	250	163	220	120	3	Bug,Ghost
+Wormadam Sand	250	163	220	120	3	Bug,Ground
+Wormadam Trash	250	163	220	120	3	Bug,Steel
+Wugtrio	200	215	190	245	4	Water
+Wyrdeer	316	246	153	135	3	Normal,Psychic
+Xatu	240	195	220	195	3	Psychic,Flying
+Xurkitree	276	351	147	171	3	Electric
+Yanmega	282	237	147	195	4	Bug,Flying
+Zangoose	256	235	174	185	3	Normal
+Zapdos	290	255	180	205	3	Electric,Flying
+Zapdos Galar	290	255	185	205	3	Fighting,Flying
+Zarude	320	245	205	215	3	Dark,Grass
+Zebstrika	260	195	158	237	4	Electric
+Zeraora	286	229	160	291	4	Electric
+Zeraora Mega	286	319	160	311	4	Electric
+Zoroark	230	245	160	215	4	Dark
+Zoroark Hisui	220	255	150	225	4	Normal,Ghost
+Zygarde 10%	218	215	182	235	4	Dragon,Ground

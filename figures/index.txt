@@ -1,0 +1,705 @@
+PCTTS-DATA-1 roster
+Abomasnow	figures/abomasnow.webp	figures/abomasnow-back.webp	standees/v3/abomasnow.webp	abomasnow
+Abomasnow Mega	figures/abomasnow-mega.webp	figures/abomasnow-mega-back.webp	standees/v3/abomasnow-mega.webp	abomasnow-mega
+Absol	figures/absol.webp	figures/absol-back.webp	standees/v3/absol.webp	absol
+Absol Mega	figures/absol-mega.webp	figures/absol-mega-back.webp	standees/v3/absol-mega.webp	absol-mega
+Absol Mega Z	figures/absol-mega-z.webp	figures/absol-mega-z-back.webp	standees/v3/absol-mega-z.webp	absol-mega-z
+Accelgor	figures/accelgor.webp	figures/accelgor-back.webp	standees/v3/accelgor.webp	accelgor
+Aegislash Blade	figures/aegislash-blade.webp	figures/aegislash-blade-back.webp	standees/v3/aegislash-blade.webp	aegislash-blade
+Aegislash Shield	figures/aegislash-shield.webp	figures/aegislash-shield-back.webp	standees/v3/aegislash-shield.webp	aegislash-shield
+Aerodactyl	figures/aerodactyl.webp	figures/aerodactyl-back.webp	standees/v3/aerodactyl.webp	aerodactyl
+Aerodactyl Mega	figures/aerodactyl-mega.webp	figures/aerodactyl-mega-back.webp	standees/v3/aerodactyl-mega.webp	aerodactyl-mega
+Aggron	figures/aggron.webp	figures/aggron-back.webp	standees/v3/aggron.webp	aggron
+Aggron Mega	figures/aggron-mega.webp	figures/aggron-mega-back.webp	standees/v3/aggron-mega.webp	aggron-mega
+Alakazam	figures/alakazam.webp	figures/alakazam-back.webp	standees/v3/alakazam.webp	alakazam
+Alakazam Mega	figures/alakazam-mega.webp	figures/alakazam-mega-back.webp	standees/v3/alakazam-mega.webp	alakazam-mega
+Alcremie	figures/alcremie.webp	figures/alcremie-back.webp	standees/v3/alcremie.webp	alcremie
+Alomomola	figures/alomomola.webp	figures/alomomola-back.webp	standees/v3/alomomola.webp	alomomola
+Altaria	figures/altaria.webp	figures/altaria-back.webp	standees/v3/altaria.webp	altaria
+Altaria Mega	figures/altaria-mega.webp	figures/altaria-mega-back.webp	standees/v3/altaria-mega.webp	altaria-mega
+Ambipom	figures/ambipom.webp	figures/ambipom-back.webp	standees/v3/ambipom.webp	ambipom
+Amoonguss	figures/amoonguss.webp	figures/amoonguss-back.webp	standees/v3/amoonguss.webp	amoonguss
+Ampharos	figures/ampharos.webp	figures/ampharos-back.webp	standees/v3/ampharos.webp	ampharos
+Ampharos Mega	figures/ampharos-mega.webp	figures/ampharos-mega-back.webp	standees/v3/ampharos-mega.webp	ampharos-mega
+Annihilape	figures/annihilape.webp	figures/annihilape-back.webp	standees/v3/annihilape.webp	annihilape
+Appletun	figures/appletun.webp	figures/appletun-back.webp	standees/v3/appletun.webp	appletun
+Araquanid	figures/araquanid.webp	figures/araquanid-back.webp	standees/v3/araquanid.webp	araquanid
+Arbok	figures/arbok.webp	figures/arbok-back.webp	standees/v3/arbok.webp	arbok
+Arboliva	figures/arboliva.webp	figures/arboliva-back.webp	standees/v3/arboliva.webp	arboliva
+Arcanine	figures/arcanine.webp	figures/arcanine-back.webp	standees/v3/arcanine.webp	arcanine
+Arcanine Hisui	figures/arcanine-hisui.webp	figures/arcanine-hisui-back.webp	standees/v3/arcanine-hisui.webp	arcanine-hisui
+Archaludon	figures/archaludon.webp	figures/archaludon-back.webp	standees/v3/archaludon.webp	archaludon
+Archeops	figures/archeops.webp	figures/archeops-back.webp	standees/v3/archeops.webp	archeops
+Arctovish	figures/arctovish.webp	figures/arctovish-back.webp	standees/v3/arctovish.webp	arctovish
+Arctozolt	figures/arctozolt.webp	figures/arctozolt-back.webp	standees/v3/arctozolt.webp	arctozolt
+Ariados	figures/ariados.webp	figures/ariados-back.webp	standees/v3/ariados.webp	ariados
+Armaldo	figures/armaldo.webp	figures/armaldo-back.webp	standees/v3/armaldo.webp	armaldo
+Armarouge	figures/armarouge.webp	figures/armarouge-back.webp	standees/v3/armarouge.webp	armarouge
+Aromatisse	figures/aromatisse.webp	figures/aromatisse-back.webp	standees/v3/aromatisse.webp	aromatisse
+Articuno	figures/articuno.webp	figures/articuno-back.webp	standees/v3/articuno.webp	articuno
+Articuno Galar	figures/articuno-galar.webp	figures/articuno-galar-back.webp	standees/v3/articuno-galar.webp	articuno-galar
+Audino	figures/audino.webp	figures/audino-back.webp	standees/v3/audino.webp	audino
+Audino Mega	figures/audino-mega.webp	figures/audino-mega-back.webp	standees/v3/audino-mega.webp	audino-mega
+Aurorus	figures/aurorus.webp	figures/aurorus-back.webp	standees/v3/aurorus.webp	aurorus
+Avalugg	figures/avalugg.webp	figures/avalugg-back.webp	standees/v3/avalugg.webp	avalugg
+Avalugg Hisui	figures/avalugg-hisui.webp	figures/avalugg-hisui-back.webp	standees/v3/avalugg-hisui.webp	avalugg-hisui
+Azelf	figures/azelf.webp	figures/azelf-back.webp	standees/v3/azelf.webp	azelf
+Azumarill	figures/azumarill.webp	figures/azumarill-back.webp	standees/v3/azumarill.webp	azumarill
+Banette	figures/banette.webp	figures/banette-back.webp	standees/v3/banette.webp	banette
+Banette Mega	figures/banette-mega.webp	figures/banette-mega-back.webp	standees/v3/banette-mega.webp	banette-mega
+Barbaracle	figures/barbaracle.webp	figures/barbaracle-back.webp	standees/v3/barbaracle.webp	barbaracle
+Barbaracle Mega	figures/barbaracle-mega.webp	figures/barbaracle-mega-back.webp	standees/v3/barbaracle-mega.webp	barbaracle-mega
+Barreskewda	figures/barreskewda.webp	figures/barreskewda-back.webp	standees/v3/barreskewda.webp	barraskewda
+Basculegion F	figures/basculegion-f.webp	figures/basculegion-f-back.webp	standees/v3/basculegion-f.webp	basculegion-female
+Basculegion M	figures/basculegion-m.webp	figures/basculegion-m-back.webp	standees/v3/basculegion-m.webp	basculegion-male
+Bastiodon	figures/bastiodon.webp	figures/bastiodon-back.webp	standees/v3/bastiodon.webp	bastiodon
+Baxcalibur	figures/baxcalibur.webp	figures/baxcalibur-back.webp	standees/v3/baxcalibur.webp	baxcalibur
+Baxcalibur Mega	figures/baxcalibur-mega.webp	figures/baxcalibur-mega-back.webp	standees/v3/baxcalibur-mega.webp	baxcalibur-mega
+Beartic	figures/beartic.webp	figures/beartic-back.webp	standees/v3/beartic.webp	beartic
+Beautifly	figures/beautifly.webp	figures/beautifly-back.webp	standees/v3/beautifly.webp	beautifly
+Beedrill	figures/beedrill.webp	figures/beedrill-back.webp	standees/v3/beedrill.webp	beedrill
+Beedrill Mega	figures/beedrill-mega.webp	figures/beedrill-mega-back.webp	standees/v3/beedrill-mega.webp	beedrill-mega
+Beer	figures/beer.webp	figures/beer-back.webp	standees/v3/beer.webp	custom
+Beheeyem	figures/beheeyem.webp	figures/beheeyem-back.webp	standees/v3/beheeyem.webp	beheeyem
+Bellibolt	figures/bellibolt.webp	figures/bellibolt-back.webp	standees/v3/bellibolt.webp	bellibolt
+Bellossom	figures/bellossom.webp	figures/bellossom-back.webp	standees/v3/bellossom.webp	bellossom
+Bewear	figures/bewear.webp	figures/bewear-back.webp	standees/v3/bewear.webp	bewear
+Bibarel	figures/bibarel.webp	figures/bibarel-back.webp	standees/v3/bibarel.webp	bibarel
+Blacephalon	figures/blacephalon.webp	figures/blacephalon-back.webp	standees/v3/blacephalon.webp	blacephalon
+Blastoise	figures/blastoise.webp	figures/blastoise-back.webp	standees/v3/blastoise.webp	blastoise
+Blastoise Mega	figures/blastoise-mega.webp	figures/blastoise-mega-back.webp	standees/v3/blastoise-mega.webp	blastoise-mega
+Blaziken	figures/blaziken.webp	figures/blaziken-back.webp	standees/v3/blaziken.webp	blaziken
+Blaziken Mega	figures/blaziken-mega.webp	figures/blaziken-mega-back.webp	standees/v3/blaziken-mega.webp	blaziken-mega
+Blissey	figures/blissey.webp	figures/blissey-back.webp	standees/v3/blissey.webp	blissey
+Boltund	figures/boltund.webp	figures/boltund-back.webp	standees/v3/boltund.webp	boltund
+Bombirdier	figures/bombirdier.webp	figures/bombirdier-back.webp	standees/v3/bombirdier.webp	bombirdier
+Bouffalant	figures/bouffalant.webp	figures/bouffalant-back.webp	standees/v3/bouffalant.webp	bouffalant
+Brambleghast	figures/brambleghast.webp	figures/brambleghast-back.webp	standees/v3/brambleghast.webp	brambleghast
+Braviary	figures/braviary.webp	figures/braviary-back.webp	standees/v3/braviary.webp	braviary
+Braviary Hisui	figures/braviary-hisui.webp	figures/braviary-hisui-back.webp	standees/v3/braviary-hisui.webp	braviary-hisui
+Breloom	figures/breloom.webp	figures/breloom-back.webp	standees/v3/breloom.webp	breloom
+Bronzong	figures/bronzong.webp	figures/bronzong-back.webp	standees/v3/bronzong.webp	bronzong
+Brute Bonnet	figures/brute-bonnet.webp	figures/brute-bonnet-back.webp	standees/v3/brute-bonnet.webp	brute-bonnet
+Bruxish	figures/bruxish.webp	figures/bruxish-back.webp	standees/v3/bruxish.webp	bruxish
+Butterfree	figures/butterfree.webp	figures/butterfree-back.webp	standees/v3/butterfree.webp	butterfree
+Buzzwole	figures/buzzwole.webp	figures/buzzwole-back.webp	standees/v3/buzzwole.webp	buzzwole
+Cacturne	figures/cacturne.webp	figures/cacturne-back.webp	standees/v3/cacturne.webp	cacturne
+Calyrex	figures/calyrex.webp	figures/calyrex-back.webp	standees/v3/calyrex.webp	calyrex
+Camerupt	figures/camerupt.webp	figures/camerupt-back.webp	standees/v3/camerupt.webp	camerupt
+Camerupt Mega	figures/camerupt-mega.webp	figures/camerupt-mega-back.webp	standees/v3/camerupt-mega.webp	camerupt-mega
+Carbink	figures/carbink.webp	figures/carbink-back.webp	standees/v3/carbink.webp	carbink
+Carnivine	figures/carnivine.webp	figures/carnivine-back.webp	standees/v3/carnivine.webp	carnivine
+Carracosta	figures/carracosta.webp	figures/carracosta-back.webp	standees/v3/carracosta.webp	carracosta
+Castform Rainy	figures/castform-rainy.webp	figures/castform-rainy-back.webp	standees/v3/castform-rainy.webp	castform-rainy
+Castform Sandy	figures/castform-sandy.webp	figures/castform-sandy-back.webp	standees/v3/castform-sandy.webp	placeholder: Rock-tinted
+Castform Snowy	figures/castform-snowy.webp	figures/castform-snowy-back.webp	standees/v3/castform-snowy.webp	castform-snowy
+Castform Sunny	figures/castform-sunny.webp	figures/castform-sunny-back.webp	standees/v3/castform-sunny.webp	castform-sunny
+Celebi	figures/celebi.webp	figures/celebi-back.webp	standees/v3/celebi.webp	celebi
+Celesteela	figures/celesteela.webp	figures/celesteela-back.webp	standees/v3/celesteela.webp	celesteela
+Centiskorch	figures/centiskorch.webp	figures/centiskorch-back.webp	standees/v3/centiskorch.webp	centiskorch
+Ceruledge	figures/ceruledge.webp	figures/ceruledge-back.webp	standees/v3/ceruledge.webp	ceruledge
+Cetitan	figures/cetitan.webp	figures/cetitan-back.webp	standees/v3/cetitan.webp	cetitan
+Chandelure	figures/chandelure.webp	figures/chandelure-back.webp	standees/v3/chandelure.webp	chandelure
+Chandelure Mega	figures/chandelure-mega.webp	figures/chandelure-mega-back.webp	standees/v3/chandelure-mega.webp	chandelure-mega
+Charizard	figures/charizard.webp	figures/charizard-back.webp	standees/v3/charizard.webp	charizard
+Charizard X Mega	figures/charizard-x-mega.webp	figures/charizard-x-mega-back.webp	standees/v3/charizard-x-mega.webp	charizard-mega-x
+Charizard Y Mega	figures/charizard-y-mega.webp	figures/charizard-y-mega-back.webp	standees/v3/charizard-y-mega.webp	charizard-mega-y
+Chatot	figures/chatot.webp	figures/chatot-back.webp	standees/v3/chatot.webp	chatot
+Cherrim	figures/cherrim.webp	figures/cherrim-back.webp	standees/v3/cherrim.webp	cherrim
+Chesnaught	figures/chesnaught.webp	figures/chesnaught-back.webp	standees/v3/chesnaught.webp	chesnaught
+Chesnaught Mega	figures/chesnaught-mega.webp	figures/chesnaught-mega-back.webp	standees/v3/chesnaught-mega.webp	chesnaught-mega
+Chi-Yu	figures/chi-yu.webp	figures/chi-yu-back.webp	standees/v3/chi-yu.webp	chi-yu
+Chien-Pao	figures/chien-pao.webp	figures/chien-pao-back.webp	standees/v3/chien-pao.webp	chien-pao
+Chimecho	figures/chimecho.webp	figures/chimecho-back.webp	standees/v3/chimecho.webp	chimecho
+Chimecho Mega	figures/chimecho-mega.webp	figures/chimecho-mega-back.webp	standees/v3/chimecho-mega.webp	chimecho-mega
+Cinccino	figures/cinccino.webp	figures/cinccino-back.webp	standees/v3/cinccino.webp	cinccino
+Cinderace	figures/cinderace.webp	figures/cinderace-back.webp	standees/v3/cinderace.webp	cinderace
+Clawitzer	figures/clawitzer.webp	figures/clawitzer-back.webp	standees/v3/clawitzer.webp	clawitzer
+Claydol	figures/claydol.webp	figures/claydol-back.webp	standees/v3/claydol.webp	claydol
+Clefable	figures/clefable.webp	figures/clefable-back.webp	standees/v3/clefable.webp	clefable
+Clefable Mega	figures/clefable-mega.webp	figures/clefable-mega-back.webp	standees/v3/clefable-mega.webp	clefable-mega
+Clodsire	figures/clodsire.webp	figures/clodsire-back.webp	standees/v3/clodsire.webp	clodsire
+Cloyster	figures/cloyster.webp	figures/cloyster-back.webp	standees/v3/cloyster.webp	cloyster
+Coalossal	figures/coalossal.webp	figures/coalossal-back.webp	standees/v3/coalossal.webp	coalossal
+Cobalion	figures/cobalion.webp	figures/cobalion-back.webp	standees/v3/cobalion.webp	cobalion
+Cofagrigus	figures/cofagrigus.webp	figures/cofagrigus-back.webp	standees/v3/cofagrigus.webp	cofagrigus
+Comfey	figures/comfey.webp	figures/comfey-back.webp	standees/v3/comfey.webp	comfey
+Conkeldurr	figures/conkeldurr.webp	figures/conkeldurr-back.webp	standees/v3/conkeldurr.webp	conkeldurr
+Copperajah	figures/copperajah.webp	figures/copperajah-back.webp	standees/v3/copperajah.webp	copperajah
+Corsola	figures/corsola.webp	figures/corsola-back.webp	standees/v3/corsola.webp	corsola
+Corsola Galar	figures/corsola-galar.webp	figures/corsola-galar-back.webp	standees/v3/corsola-galar.webp	corsola-galar
+Corviknight	figures/corviknight.webp	figures/corviknight-back.webp	standees/v3/corviknight.webp	corviknight
+Crabominable	figures/crabominable.webp	figures/crabominable-back.webp	standees/v3/crabominable.webp	crabominable
+Crabominable Mega	figures/crabominable-mega.webp	figures/crabominable-mega-back.webp	standees/v3/crabominable-mega.webp	crabominable-mega
+Cradily	figures/cradily.webp	figures/cradily-back.webp	standees/v3/cradily.webp	cradily
+Cramorant	figures/cramorant.webp	figures/cramorant-back.webp	standees/v3/cramorant.webp	cramorant
+Crawdaunt	figures/crawdaunt.webp	figures/crawdaunt-back.webp	standees/v3/crawdaunt.webp	crawdaunt
+Cresselia	figures/cresselia.webp	figures/cresselia-back.webp	standees/v3/cresselia.webp	cresselia
+Crobat	figures/crobat.webp	figures/crobat-back.webp	standees/v3/crobat.webp	crobat
+Crustle	figures/crustle.webp	figures/crustle-back.webp	standees/v3/crustle.webp	crustle
+Cryogonal	figures/cryogonal.webp	figures/cryogonal-back.webp	standees/v3/cryogonal.webp	cryogonal
+Cursola	figures/cursola.webp	figures/cursola-back.webp	standees/v3/cursola.webp	cursola
+Cyclizar	figures/cyclizar.webp	figures/cyclizar-back.webp	standees/v3/cyclizar.webp	cyclizar
+Dachsbun	figures/dachsbun.webp	figures/dachsbun-back.webp	standees/v3/dachsbun.webp	dachsbun
+Darkrai	figures/darkrai.webp	figures/darkrai-back.webp	standees/v3/darkrai.webp	darkrai
+Darkrai Mega	figures/darkrai-mega.webp	figures/darkrai-mega-back.webp	standees/v3/darkrai-mega.webp	darkrai-mega
+Darmanitan	figures/darmanitan.webp	figures/darmanitan-back.webp	standees/v3/darmanitan.webp	darmanitan-standard
+Darmanitan Galar	figures/darmanitan-galar.webp	figures/darmanitan-galar-back.webp	standees/v3/darmanitan-galar.webp	darmanitan-galar-standard
+Darmanitan Galar Zen	figures/darmanitan-galar-zen.webp	figures/darmanitan-galar-zen-back.webp	standees/v3/darmanitan-galar-zen.webp	darmanitan-galar-zen
+Darmanitan Zen	figures/darmanitan-zen.webp	figures/darmanitan-zen-back.webp	standees/v3/darmanitan-zen.webp	darmanitan-zen
+Decidueye	figures/decidueye.webp	figures/decidueye-back.webp	standees/v3/decidueye.webp	decidueye
+Decidueye Hisui	figures/decidueye-hisui.webp	figures/decidueye-hisui-back.webp	standees/v3/decidueye-hisui.webp	decidueye-hisui
+Dedenne	figures/dedenne.webp	figures/dedenne-back.webp	standees/v3/dedenne.webp	dedenne
+Delcatty	figures/delcatty.webp	figures/delcatty-back.webp	standees/v3/delcatty.webp	delcatty
+Delibird	figures/delibird.webp	figures/delibird-back.webp	standees/v3/delibird.webp	delibird
+Delphox	figures/delphox.webp	figures/delphox-back.webp	standees/v3/delphox.webp	delphox
+Delphox Mega	figures/delphox-mega.webp	figures/delphox-mega-back.webp	standees/v3/delphox-mega.webp	delphox-mega
+Dewgong	figures/dewgong.webp	figures/dewgong-back.webp	standees/v3/dewgong.webp	dewgong
+Dhelmise	figures/dhelmise.webp	figures/dhelmise-back.webp	standees/v3/dhelmise.webp	dhelmise
+Diancie	figures/diancie.webp	figures/diancie-back.webp	standees/v3/diancie.webp	diancie
+Diancie Mega	figures/diancie-mega.webp	figures/diancie-mega-back.webp	standees/v3/diancie-mega.webp	diancie-mega
+Diggersby	figures/diggersby.webp	figures/diggersby-back.webp	standees/v3/diggersby.webp	diggersby
+Ditto	figures/ditto.webp	figures/ditto-back.webp	standees/v3/ditto.webp	ditto
+Dodrio	figures/dodrio.webp	figures/dodrio-back.webp	standees/v3/dodrio.webp	dodrio
+Dondozo	figures/dondozo.webp	figures/dondozo-back.webp	standees/v3/dondozo.webp	dondozo
+Donphan	figures/donphan.webp	figures/donphan-back.webp	standees/v3/donphan.webp	donphan
+Dracovish	figures/dracovish.webp	figures/dracovish-back.webp	standees/v3/dracovish.webp	dracovish
+Dracozolt	figures/dracozolt.webp	figures/dracozolt-back.webp	standees/v3/dracozolt.webp	dracozolt
+Dragalge	figures/dragalge.webp	figures/dragalge-back.webp	standees/v3/dragalge.webp	dragalge
+Dragalge Mega	figures/dragalge-mega.webp	figures/dragalge-mega-back.webp	standees/v3/dragalge-mega.webp	dragalge-mega
+Dragapult	figures/dragapult.webp	figures/dragapult-back.webp	standees/v3/dragapult.webp	dragapult
+Dragonite	figures/dragonite.webp	figures/dragonite-back.webp	standees/v3/dragonite.webp	dragonite
+Dragonite Mega	figures/dragonite-mega.webp	figures/dragonite-mega-back.webp	standees/v3/dragonite-mega.webp	dragonite-mega
+Drampa	figures/drampa.webp	figures/drampa-back.webp	standees/v3/drampa.webp	drampa
+Drampa Mega	figures/drampa-mega.webp	figures/drampa-mega-back.webp	standees/v3/drampa-mega.webp	drampa-mega
+Drapion	figures/drapion.webp	figures/drapion-back.webp	standees/v3/drapion.webp	drapion
+Drednaw	figures/drednaw.webp	figures/drednaw-back.webp	standees/v3/drednaw.webp	drednaw
+Drifblim	figures/drifblim.webp	figures/drifblim-back.webp	standees/v3/drifblim.webp	drifblim
+Druddigon	figures/druddigon.webp	figures/druddigon-back.webp	standees/v3/druddigon.webp	druddigon
+Dubwool	figures/dubwool.webp	figures/dubwool-back.webp	standees/v3/dubwool.webp	dubwool
+Dudunsparce	figures/dudunsparce.webp	figures/dudunsparce-back.webp	standees/v3/dudunsparce.webp	dudunsparce-two-segment
+Dugtrio	figures/dugtrio.webp	figures/dugtrio-back.webp	standees/v3/dugtrio.webp	dugtrio
+Dugtrio Alola	figures/dugtrio-alola.webp	figures/dugtrio-alola-back.webp	standees/v3/dugtrio-alola.webp	dugtrio-alola
+Duraludon	figures/duraludon.webp	figures/duraludon-back.webp	standees/v3/duraludon.webp	duraludon
+Durant	figures/durant.webp	figures/durant-back.webp	standees/v3/durant.webp	durant
+Dusknoir	figures/dusknoir.webp	figures/dusknoir-back.webp	standees/v3/dusknoir.webp	dusknoir
+Dustox	figures/dustox.webp	figures/dustox-back.webp	standees/v3/dustox.webp	dustox
+Eelektross	figures/eelektross.webp	figures/eelektross-back.webp	standees/v3/eelektross.webp	eelektross
+Eelektross Mega	figures/eelektross-mega.webp	figures/eelektross-mega-back.webp	standees/v3/eelektross-mega.webp	eelektross-mega
+Eiscue Ice	figures/eiscue-ice.webp	figures/eiscue-ice-back.webp	standees/v3/eiscue-ice.webp	eiscue-ice
+Eiscue Noice	figures/eiscue-noice.webp	figures/eiscue-noice-back.webp	standees/v3/eiscue-noice.webp	eiscue-noice
+Eldegoss	figures/eldegoss.webp	figures/eldegoss-back.webp	standees/v3/eldegoss.webp	eldegoss
+Electivire	figures/electivire.webp	figures/electivire-back.webp	standees/v3/electivire.webp	electivire
+Electrode	figures/electrode.webp	figures/electrode-back.webp	standees/v3/electrode.webp	electrode
+Electrode Hisui	figures/electrode-hisui.webp	figures/electrode-hisui-back.webp	standees/v3/electrode-hisui.webp	electrode-hisui
+Emboar	figures/emboar.webp	figures/emboar-back.webp	standees/v3/emboar.webp	emboar
+Emboar Mega	figures/emboar-mega.webp	figures/emboar-mega-back.webp	standees/v3/emboar-mega.webp	emboar-mega
+Emolga	figures/emolga.webp	figures/emolga-back.webp	standees/v3/emolga.webp	emolga
+Empoleon	figures/empoleon.webp	figures/empoleon-back.webp	standees/v3/empoleon.webp	empoleon
+Enamorus I	figures/enamorus-i.webp	figures/enamorus-i-back.webp	standees/v3/enamorus-i.webp	enamorus-incarnate
+Enamorus T	figures/enamorus-t.webp	figures/enamorus-t-back.webp	standees/v3/enamorus-t.webp	enamorus-therian
+Entei	figures/entei.webp	figures/entei-back.webp	standees/v3/entei.webp	entei
+Escavalier	figures/escavalier.webp	figures/escavalier-back.webp	standees/v3/escavalier.webp	escavalier
+Espathra	figures/espathra.webp	figures/espathra-back.webp	standees/v3/espathra.webp	espathra
+Espeon	figures/espeon.webp	figures/espeon-back.webp	standees/v3/espeon.webp	espeon
+Excadrill	figures/excadrill.webp	figures/excadrill-back.webp	standees/v3/excadrill.webp	excadrill
+Excadrill Mega	figures/excadrill-mega.webp	figures/excadrill-mega-back.webp	standees/v3/excadrill-mega.webp	excadrill-mega
+Exeggutor	figures/exeggutor.webp	figures/exeggutor-back.webp	standees/v3/exeggutor.webp	exeggutor
+Exeggutor Alola	figures/exeggutor-alola.webp	figures/exeggutor-alola-back.webp	standees/v3/exeggutor-alola.webp	exeggutor-alola
+Exploud	figures/exploud.webp	figures/exploud-back.webp	standees/v3/exploud.webp	exploud
+Falinks	figures/falinks.webp	figures/falinks-back.webp	standees/v3/falinks.webp	falinks
+Falinks Mega	figures/falinks-mega.webp	figures/falinks-mega-back.webp	standees/v3/falinks-mega.webp	falinks-mega
+Farigiraf	figures/farigiraf.webp	figures/farigiraf-back.webp	standees/v3/farigiraf.webp	farigiraf
+Fearow	figures/fearow.webp	figures/fearow-back.webp	standees/v3/fearow.webp	fearow
+Feraligatr	figures/feraligatr.webp	figures/feraligatr-back.webp	standees/v3/feraligatr.webp	feraligatr
+Feraligatr Mega	figures/feraligatr-mega.webp	figures/feraligatr-mega-back.webp	standees/v3/feraligatr-mega.webp	feraligatr-mega
+Ferrothorn	figures/ferrothorn.webp	figures/ferrothorn-back.webp	standees/v3/ferrothorn.webp	ferrothorn
+Fezandipiti	figures/fezandipiti.webp	figures/fezandipiti-back.webp	standees/v3/fezandipiti.webp	fezandipiti
+Flamigo	figures/flamigo.webp	figures/flamigo-back.webp	standees/v3/flamigo.webp	flamigo
+Flapple	figures/flapple.webp	figures/flapple-back.webp	standees/v3/flapple.webp	flapple
+Flareon	figures/flareon.webp	figures/flareon-back.webp	standees/v3/flareon.webp	flareon
+Floatzel	figures/floatzel.webp	figures/floatzel-back.webp	standees/v3/floatzel.webp	floatzel
+Floette Eternal	figures/floette-eternal.webp	figures/floette-eternal-back.webp	standees/v3/floette-eternal.webp	floette-eternal
+Floette Mega	figures/floette-mega.webp	figures/floette-mega-back.webp	standees/v3/floette-mega.webp	floette-mega
+Florges	figures/florges.webp	figures/florges-back.webp	standees/v3/florges.webp	florges
+Flutter Mane	figures/flutter-mane.webp	figures/flutter-mane-back.webp	standees/v3/flutter-mane.webp	flutter-mane
+Flygon	figures/flygon.webp	figures/flygon-back.webp	standees/v3/flygon.webp	flygon
+Forretress	figures/forretress.webp	figures/forretress-back.webp	standees/v3/forretress.webp	forretress
+Froslass	figures/froslass.webp	figures/froslass-back.webp	standees/v3/froslass.webp	froslass
+Froslass Mega	figures/froslass-mega.webp	figures/froslass-mega-back.webp	standees/v3/froslass-mega.webp	froslass-mega
+Frosmoth	figures/frosmoth.webp	figures/frosmoth-back.webp	standees/v3/frosmoth.webp	frosmoth
+Furfrou	figures/furfrou.webp	figures/furfrou-back.webp	standees/v3/furfrou.webp	furfrou
+Furret	figures/furret.webp	figures/furret-back.webp	standees/v3/furret.webp	furret
+Gallade	figures/gallade.webp	figures/gallade-back.webp	standees/v3/gallade.webp	gallade
+Gallade Mega	figures/gallade-mega.webp	figures/gallade-mega-back.webp	standees/v3/gallade-mega.webp	gallade-mega
+Galvantula	figures/galvantula.webp	figures/galvantula-back.webp	standees/v3/galvantula.webp	galvantula
+Garbodor	figures/garbodor.webp	figures/garbodor-back.webp	standees/v3/garbodor.webp	garbodor
+Garchomp	figures/garchomp.webp	figures/garchomp-back.webp	standees/v3/garchomp.webp	garchomp
+Garchomp Mega	figures/garchomp-mega.webp	figures/garchomp-mega-back.webp	standees/v3/garchomp-mega.webp	garchomp-mega
+Garchomp Mega Z	figures/garchomp-mega-z.webp	figures/garchomp-mega-z-back.webp	standees/v3/garchomp-mega-z.webp	garchomp-mega-z
+Gardevoir	figures/gardevoir.webp	figures/gardevoir-back.webp	standees/v3/gardevoir.webp	gardevoir
+Gardevoir Mega	figures/gardevoir-mega.webp	figures/gardevoir-mega-back.webp	standees/v3/gardevoir-mega.webp	gardevoir-mega
+Garganacl	figures/garganacl.webp	figures/garganacl-back.webp	standees/v3/garganacl.webp	garganacl
+Gastrodon	figures/gastrodon.webp	figures/gastrodon-back.webp	standees/v3/gastrodon.webp	gastrodon
+Genesect	figures/genesect.webp	figures/genesect-back.webp	standees/v3/genesect.webp	genesect
+Gengar	figures/gengar.webp	figures/gengar-back.webp	standees/v3/gengar.webp	gengar
+Gengar Mega	figures/gengar-mega.webp	figures/gengar-mega-back.webp	standees/v3/gengar-mega.webp	gengar-mega
+Gholdengo	figures/gholdengo.webp	figures/gholdengo-back.webp	standees/v3/gholdengo.webp	gholdengo
+Gigalith	figures/gigalith.webp	figures/gigalith-back.webp	standees/v3/gigalith.webp	gigalith
+Glaceon	figures/glaceon.webp	figures/glaceon-back.webp	standees/v3/glaceon.webp	glaceon
+Glalie	figures/glalie.webp	figures/glalie-back.webp	standees/v3/glalie.webp	glalie
+Glalie Mega	figures/glalie-mega.webp	figures/glalie-mega-back.webp	standees/v3/glalie-mega.webp	glalie-mega
+Glastrier	figures/glastrier.webp	figures/glastrier-back.webp	standees/v3/glastrier.webp	glastrier
+Glimmora	figures/glimmora.webp	figures/glimmora-back.webp	standees/v3/glimmora.webp	glimmora
+Glimmora Mega	figures/glimmora-mega.webp	figures/glimmora-mega-back.webp	standees/v3/glimmora-mega.webp	glimmora-mega
+Gliscor	figures/gliscor.webp	figures/gliscor-back.webp	standees/v3/gliscor.webp	gliscor
+Gogoat	figures/gogoat.webp	figures/gogoat-back.webp	standees/v3/gogoat.webp	gogoat
+Golduck	figures/golduck.webp	figures/golduck-back.webp	standees/v3/golduck.webp	golduck
+Golem	figures/golem.webp	figures/golem-back.webp	standees/v3/golem.webp	golem
+Golem Alola	figures/golem-alola.webp	figures/golem-alola-back.webp	standees/v3/golem-alola.webp	golem-alola
+Golisopod	figures/golisopod.webp	figures/golisopod-back.webp	standees/v3/golisopod.webp	golisopod
+Golisopod Mega	figures/golisopod-mega.webp	figures/golisopod-mega-back.webp	standees/v3/golisopod-mega.webp	golisopod-mega
+Golurk	figures/golurk.webp	figures/golurk-back.webp	standees/v3/golurk.webp	golurk
+Golurk Mega	figures/golurk-mega.webp	figures/golurk-mega-back.webp	standees/v3/golurk-mega.webp	golurk-mega
+Goodra	figures/goodra.webp	figures/goodra-back.webp	standees/v3/goodra.webp	goodra
+Goodra Hisui	figures/goodra-hisui.webp	figures/goodra-hisui-back.webp	standees/v3/goodra-hisui.webp	goodra-hisui
+Gorebyss	figures/gorebyss.webp	figures/gorebyss-back.webp	standees/v3/gorebyss.webp	gorebyss
+Gothitelle	figures/gothitelle.webp	figures/gothitelle-back.webp	standees/v3/gothitelle.webp	gothitelle
+Gouging Fire	figures/gouging-fire.webp	figures/gouging-fire-back.webp	standees/v3/gouging-fire.webp	gouging-fire
+Gourgeist	figures/gourgeist.webp	figures/gourgeist-back.webp	standees/v3/gourgeist.webp	gourgeist-average
+Gourgeist Large	figures/gourgeist-large.webp	figures/gourgeist-large-back.webp	standees/v3/gourgeist-large.webp	gourgeist-large
+Gourgeist Small	figures/gourgeist-small.webp	figures/gourgeist-small-back.webp	standees/v3/gourgeist-small.webp	gourgeist-small
+Gourgeist Super	figures/gourgeist-super.webp	figures/gourgeist-super-back.webp	standees/v3/gourgeist-super.webp	gourgeist-super
+Grafaiai	figures/grafaiai.webp	figures/grafaiai-back.webp	standees/v3/grafaiai.webp	grafaiai
+Granbull	figures/granbull.webp	figures/granbull-back.webp	standees/v3/granbull.webp	granbull
+Grapploct	figures/grapploct.webp	figures/grapploct-back.webp	standees/v3/grapploct.webp	grapploct
+Great Tusk	figures/great-tusk.webp	figures/great-tusk-back.webp	standees/v3/great-tusk.webp	great-tusk
+Greedant	figures/greedant.webp	figures/greedant-back.webp	standees/v3/greedant.webp	greedent
+Greninja	figures/greninja.webp	figures/greninja-back.webp	standees/v3/greninja.webp	greninja
+Greninja Mega	figures/greninja-mega.webp	figures/greninja-mega-back.webp	standees/v3/greninja-mega.webp	greninja-mega
+Grimmsnarl	figures/grimmsnarl.webp	figures/grimmsnarl-back.webp	standees/v3/grimmsnarl.webp	grimmsnarl
+Grumpig	figures/grumpig.webp	figures/grumpig-back.webp	standees/v3/grumpig.webp	grumpig
+Gumshoos	figures/gumshoos.webp	figures/gumshoos-back.webp	standees/v3/gumshoos.webp	gumshoos
+Guzzlord	figures/guzzlord.webp	figures/guzzlord-back.webp	standees/v3/guzzlord.webp	guzzlord
+Gyarados	figures/gyarados.webp	figures/gyarados-back.webp	standees/v3/gyarados.webp	gyarados
+Gyarados Mega	figures/gyarados-mega.webp	figures/gyarados-mega-back.webp	standees/v3/gyarados-mega.webp	gyarados-mega
+Hariyama	figures/hariyama.webp	figures/hariyama-back.webp	standees/v3/hariyama.webp	hariyama
+Hatterene	figures/hatterene.webp	figures/hatterene-back.webp	standees/v3/hatterene.webp	hatterene
+Hawlucha	figures/hawlucha.webp	figures/hawlucha-back.webp	standees/v3/hawlucha.webp	hawlucha
+Hawlucha Mega	figures/hawlucha-mega.webp	figures/hawlucha-mega-back.webp	standees/v3/hawlucha-mega.webp	hawlucha-mega
+Haxorus	figures/haxorus.webp	figures/haxorus-back.webp	standees/v3/haxorus.webp	haxorus
+Heatmor	figures/heatmor.webp	figures/heatmor-back.webp	standees/v3/heatmor.webp	heatmor
+Heatran	figures/heatran.webp	figures/heatran-back.webp	standees/v3/heatran.webp	heatran
+Heatran Mega	figures/heatran-mega.webp	figures/heatran-mega-back.webp	standees/v3/heatran-mega.webp	heatran-mega
+Heliolisk	figures/heliolisk.webp	figures/heliolisk-back.webp	standees/v3/heliolisk.webp	heliolisk
+Heracross	figures/heracross.webp	figures/heracross-back.webp	standees/v3/heracross.webp	heracross
+Heracross Mega	figures/heracross-mega.webp	figures/heracross-mega-back.webp	standees/v3/heracross-mega.webp	heracross-mega
+Hippowdon	figures/hippowdon.webp	figures/hippowdon-back.webp	standees/v3/hippowdon.webp	hippowdon
+Hitmonchan	figures/hitmonchan.webp	figures/hitmonchan-back.webp	standees/v3/hitmonchan.webp	hitmonchan
+Hitmonlee	figures/hitmonlee.webp	figures/hitmonlee-back.webp	standees/v3/hitmonlee.webp	hitmonlee
+Hitmontop	figures/hitmontop.webp	figures/hitmontop-back.webp	standees/v3/hitmontop.webp	hitmontop
+Honchkrow	figures/honchkrow.webp	figures/honchkrow-back.webp	standees/v3/honchkrow.webp	honchkrow
+Hoopa Confined	figures/hoopa-confined.webp	figures/hoopa-confined-back.webp	standees/v3/hoopa-confined.webp	hoopa
+Houndoom	figures/houndoom.webp	figures/houndoom-back.webp	standees/v3/houndoom.webp	houndoom
+Houndoom Mega	figures/houndoom-mega.webp	figures/houndoom-mega-back.webp	standees/v3/houndoom-mega.webp	houndoom-mega
+Houndstone	figures/houndstone.webp	figures/houndstone-back.webp	standees/v3/houndstone.webp	houndstone
+Huntail	figures/huntail.webp	figures/huntail-back.webp	standees/v3/huntail.webp	huntail
+Hydrapple	figures/hydrapple.webp	figures/hydrapple-back.webp	standees/v3/hydrapple.webp	hydrapple
+Hydreigon	figures/hydreigon.webp	figures/hydreigon-back.webp	standees/v3/hydreigon.webp	hydreigon
+Hypno	figures/hypno.webp	figures/hypno-back.webp	standees/v3/hypno.webp	hypno
+Illumise	figures/illumise.webp	figures/illumise-back.webp	standees/v3/illumise.webp	illumise
+Incineroar	figures/incineroar.webp	figures/incineroar-back.webp	standees/v3/incineroar.webp	incineroar
+Indeedee Female	figures/indeedee-female.webp	figures/indeedee-female-back.webp	standees/v3/indeedee-female.webp	indeedee-female
+Indeedee Male	figures/indeedee-male.webp	figures/indeedee-male-back.webp	standees/v3/indeedee-male.webp	indeedee-male
+Infernape	figures/infernape.webp	figures/infernape-back.webp	standees/v3/infernape.webp	infernape
+Inteleon	figures/inteleon.webp	figures/inteleon-back.webp	standees/v3/inteleon.webp	inteleon
+Iron Boulder	figures/iron-boulder.webp	figures/iron-boulder-back.webp	standees/v3/iron-boulder.webp	iron-boulder
+Iron Bundle	figures/iron-bundle.webp	figures/iron-bundle-back.webp	standees/v3/iron-bundle.webp	iron-bundle
+Iron Crown	figures/iron-crown.webp	figures/iron-crown-back.webp	standees/v3/iron-crown.webp	iron-crown
+Iron Hands	figures/iron-hands.webp	figures/iron-hands-back.webp	standees/v3/iron-hands.webp	iron-hands
+Iron Jugulis	figures/iron-jugulis.webp	figures/iron-jugulis-back.webp	standees/v3/iron-jugulis.webp	iron-jugulis
+Iron Leaves	figures/iron-leaves.webp	figures/iron-leaves-back.webp	standees/v3/iron-leaves.webp	iron-leaves
+Iron Moth	figures/iron-moth.webp	figures/iron-moth-back.webp	standees/v3/iron-moth.webp	iron-moth
+Iron Thorns	figures/iron-thorns.webp	figures/iron-thorns-back.webp	standees/v3/iron-thorns.webp	iron-thorns
+Iron Treads	figures/iron-treads.webp	figures/iron-treads-back.webp	standees/v3/iron-treads.webp	iron-treads
+Iron Valiant	figures/iron-valiant.webp	figures/iron-valiant-back.webp	standees/v3/iron-valiant.webp	iron-valiant
+Jellicent	figures/jellicent.webp	figures/jellicent-back.webp	standees/v3/jellicent.webp	jellicent-male
+Jirachi	figures/jirachi.webp	figures/jirachi-back.webp	standees/v3/jirachi.webp	jirachi
+Jolteon	figures/jolteon.webp	figures/jolteon-back.webp	standees/v3/jolteon.webp	jolteon
+Jumpluff	figures/jumpluff.webp	figures/jumpluff-back.webp	standees/v3/jumpluff.webp	jumpluff
+Jynx	figures/jynx.webp	figures/jynx-back.webp	standees/v3/jynx.webp	jynx
+Kabutops	figures/kabutops.webp	figures/kabutops-back.webp	standees/v3/kabutops.webp	kabutops
+Kangaskhan	figures/kangaskhan.webp	figures/kangaskhan-back.webp	standees/v3/kangaskhan.webp	kangaskhan
+Kangaskhan Mega	figures/kangaskhan-mega.webp	figures/kangaskhan-mega-back.webp	standees/v3/kangaskhan-mega.webp	kangaskhan-mega
+Kartana	figures/kartana.webp	figures/kartana-back.webp	standees/v3/kartana.webp	kartana
+Kecleon	figures/kecleon.webp	figures/kecleon-back.webp	standees/v3/kecleon.webp	kecleon
+Keldeo	figures/keldeo.webp	figures/keldeo-back.webp	standees/v3/keldeo.webp	keldeo-ordinary
+Kilowattrel	figures/kilowattrel.webp	figures/kilowattrel-back.webp	standees/v3/kilowattrel.webp	kilowattrel
+Kingambit	figures/kingambit.webp	figures/kingambit-back.webp	standees/v3/kingambit.webp	kingambit
+Kingdra	figures/kingdra.webp	figures/kingdra-back.webp	standees/v3/kingdra.webp	kingdra
+Kingler	figures/kingler.webp	figures/kingler-back.webp	standees/v3/kingler.webp	kingler
+Klawf	figures/klawf.webp	figures/klawf-back.webp	standees/v3/klawf.webp	klawf
+Kleavor	figures/kleavor.webp	figures/kleavor-back.webp	standees/v3/kleavor.webp	kleavor
+Klefki	figures/klefki.webp	figures/klefki-back.webp	standees/v3/klefki.webp	klefki
+Klinklang	figures/klinklang.webp	figures/klinklang-back.webp	standees/v3/klinklang.webp	klinklang
+Komala	figures/komala.webp	figures/komala-back.webp	standees/v3/komala.webp	komala
+Kommo-O	figures/kommo-o.webp	figures/kommo-o-back.webp	standees/v3/kommo-o.webp	kommo-o
+Kricketune	figures/kricketune.webp	figures/kricketune-back.webp	standees/v3/kricketune.webp	kricketune
+Krookodile	figures/krookodile.webp	figures/krookodile-back.webp	standees/v3/krookodile.webp	krookodile
+Landorus I	figures/landorus-i.webp	figures/landorus-i-back.webp	standees/v3/landorus-i.webp	landorus-incarnate
+Landorus T	figures/landorus-t.webp	figures/landorus-t-back.webp	standees/v3/landorus-t.webp	landorus-therian
+Lanturn	figures/lanturn.webp	figures/lanturn-back.webp	standees/v3/lanturn.webp	lanturn
+Lapras	figures/lapras.webp	figures/lapras-back.webp	standees/v3/lapras.webp	lapras
+Latias	figures/latias.webp	figures/latias-back.webp	standees/v3/latias.webp	latias
+Latios	figures/latios.webp	figures/latios-back.webp	standees/v3/latios.webp	latios
+Leafeon	figures/leafeon.webp	figures/leafeon-back.webp	standees/v3/leafeon.webp	leafeon
+Leavanny	figures/leavanny.webp	figures/leavanny-back.webp	standees/v3/leavanny.webp	leavanny
+Ledian	figures/ledian.webp	figures/ledian-back.webp	standees/v3/ledian.webp	ledian
+Lickilicky	figures/lickilicky.webp	figures/lickilicky-back.webp	standees/v3/lickilicky.webp	lickilicky
+Liepard	figures/liepard.webp	figures/liepard-back.webp	standees/v3/liepard.webp	liepard
+Lilligant	figures/lilligant.webp	figures/lilligant-back.webp	standees/v3/lilligant.webp	lilligant
+Lilligant Hisui	figures/lilligant-hisui.webp	figures/lilligant-hisui-back.webp	standees/v3/lilligant-hisui.webp	lilligant-hisui
+Linoone	figures/linoone.webp	figures/linoone-back.webp	standees/v3/linoone.webp	linoone
+Lokix	figures/lokix.webp	figures/lokix-back.webp	standees/v3/lokix.webp	lokix
+Lopunny	figures/lopunny.webp	figures/lopunny-back.webp	standees/v3/lopunny.webp	lopunny
+Lopunny Mega	figures/lopunny-mega.webp	figures/lopunny-mega-back.webp	standees/v3/lopunny-mega.webp	lopunny-mega
+Lucario	figures/lucario.webp	figures/lucario-back.webp	standees/v3/lucario.webp	lucario
+Lucario Mega	figures/lucario-mega.webp	figures/lucario-mega-back.webp	standees/v3/lucario-mega.webp	lucario-mega
+Lucario Mega Z	figures/lucario-mega-z.webp	figures/lucario-mega-z-back.webp	standees/v3/lucario-mega-z.webp	lucario-mega-z
+Ludicolo	figures/ludicolo.webp	figures/ludicolo-back.webp	standees/v3/ludicolo.webp	ludicolo
+Lumineon	figures/lumineon.webp	figures/lumineon-back.webp	standees/v3/lumineon.webp	lumineon
+Lunatone	figures/lunatone.webp	figures/lunatone-back.webp	standees/v3/lunatone.webp	lunatone
+Lurantis	figures/lurantis.webp	figures/lurantis-back.webp	standees/v3/lurantis.webp	lurantis
+Luvdisc	figures/luvdisc.webp	figures/luvdisc-back.webp	standees/v3/luvdisc.webp	luvdisc
+Luxray	figures/luxray.webp	figures/luxray-back.webp	standees/v3/luxray.webp	luxray
+Lycanroc Dusk	figures/lycanroc-dusk.webp	figures/lycanroc-dusk-back.webp	standees/v3/lycanroc-dusk.webp	lycanroc-dusk
+Lycanroc Midday	figures/lycanroc-midday.webp	figures/lycanroc-midday-back.webp	standees/v3/lycanroc-midday.webp	lycanroc-midday
+Lycanroc Midnight	figures/lycanroc-midnight.webp	figures/lycanroc-midnight-back.webp	standees/v3/lycanroc-midnight.webp	lycanroc-midnight
+Mabostiff	figures/mabostiff.webp	figures/mabostiff-back.webp	standees/v3/mabostiff.webp	mabosstiff
+Machamp	figures/machamp.webp	figures/machamp-back.webp	standees/v3/machamp.webp	machamp
+Magcargo	figures/magcargo.webp	figures/magcargo-back.webp	standees/v3/magcargo.webp	magcargo
+Magearna	figures/magearna.webp	figures/magearna-back.webp	standees/v3/magearna.webp	magearna
+Magearna Mega	figures/magearna-mega.webp	figures/magearna-mega-back.webp	standees/v3/magearna-mega.webp	magearna-mega
+Magmortar	figures/magmortar.webp	figures/magmortar-back.webp	standees/v3/magmortar.webp	magmortar
+Magnezone	figures/magnezone.webp	figures/magnezone-back.webp	standees/v3/magnezone.webp	magnezone
+Malamar	figures/malamar.webp	figures/malamar-back.webp	standees/v3/malamar.webp	malamar
+Malamar Mega	figures/malamar-mega.webp	figures/malamar-mega-back.webp	standees/v3/malamar-mega.webp	malamar-mega
+Mamoswine	figures/mamoswine.webp	figures/mamoswine-back.webp	standees/v3/mamoswine.webp	mamoswine
+Manaphy	figures/manaphy.webp	figures/manaphy-back.webp	standees/v3/manaphy.webp	manaphy
+Mandibuzz	figures/mandibuzz.webp	figures/mandibuzz-back.webp	standees/v3/mandibuzz.webp	mandibuzz
+Manectric	figures/manectric.webp	figures/manectric-back.webp	standees/v3/manectric.webp	manectric
+Manectric Mega	figures/manectric-mega.webp	figures/manectric-mega-back.webp	standees/v3/manectric-mega.webp	manectric-mega
+Mantine	figures/mantine.webp	figures/mantine-back.webp	standees/v3/mantine.webp	mantine
+Maractus	figures/maractus.webp	figures/maractus-back.webp	standees/v3/maractus.webp	maractus
+Marowak	figures/marowak.webp	figures/marowak-back.webp	standees/v3/marowak.webp	marowak
+Marowak Alola	figures/marowak-alola.webp	figures/marowak-alola-back.webp	standees/v3/marowak-alola.webp	marowak-alola
+Marshadow	figures/marshadow.webp	figures/marshadow-back.webp	standees/v3/marshadow.webp	marshadow
+Masquerain	figures/masquerain.webp	figures/masquerain-back.webp	standees/v3/masquerain.webp	masquerain
+Maushold	figures/maushold.webp	figures/maushold-back.webp	standees/v3/maushold.webp	maushold-family-of-four
+Mawile	figures/mawile.webp	figures/mawile-back.webp	standees/v3/mawile.webp	mawile
+Mawile Mega	figures/mawile-mega.webp	figures/mawile-mega-back.webp	standees/v3/mawile-mega.webp	mawile-mega
+Medicham	figures/medicham.webp	figures/medicham-back.webp	standees/v3/medicham.webp	medicham
+Medicham Mega	figures/medicham-mega.webp	figures/medicham-mega-back.webp	standees/v3/medicham-mega.webp	medicham-mega
+Meganium	figures/meganium.webp	figures/meganium-back.webp	standees/v3/meganium.webp	meganium
+Meganium Mega	figures/meganium-mega.webp	figures/meganium-mega-back.webp	standees/v3/meganium-mega.webp	meganium-mega
+Melmetal	figures/melmetal.webp	figures/melmetal-back.webp	standees/v3/melmetal.webp	melmetal
+Meloetta Aria	figures/meloetta-aria.webp	figures/meloetta-aria-back.webp	standees/v3/meloetta-aria.webp	meloetta-aria
+Meloetta Pirouette	figures/meloetta-pirouette.webp	figures/meloetta-pirouette-back.webp	standees/v3/meloetta-pirouette.webp	meloetta-pirouette
+Meowscarada	figures/meowscarada.webp	figures/meowscarada-back.webp	standees/v3/meowscarada.webp	meowscarada
+Meowstic Mega	figures/meowstic-mega.webp	figures/meowstic-mega-back.webp	standees/v3/meowstic-mega.webp	meowstic-male-mega
+Meowstic-F	figures/meowstic-f.webp	figures/meowstic-f-back.webp	standees/v3/meowstic-f.webp	meowstic-female
+Meowstic-M	figures/meowstic-m.webp	figures/meowstic-m-back.webp	standees/v3/meowstic-m.webp	meowstic-male
+Mesprit	figures/mesprit.webp	figures/mesprit-back.webp	standees/v3/mesprit.webp	mesprit
+Metagross	figures/metagross.webp	figures/metagross-back.webp	standees/v3/metagross.webp	metagross
+Metagross Mega	figures/metagross-mega.webp	figures/metagross-mega-back.webp	standees/v3/metagross-mega.webp	metagross-mega
+Mew	figures/mew.webp	figures/mew-back.webp	standees/v3/mew.webp	mew
+Mienshao	figures/mienshao.webp	figures/mienshao-back.webp	standees/v3/mienshao.webp	mienshao
+Mightyena	figures/mightyena.webp	figures/mightyena-back.webp	standees/v3/mightyena.webp	mightyena
+Milotic	figures/milotic.webp	figures/milotic-back.webp	standees/v3/milotic.webp	milotic
+Miltank	figures/miltank.webp	figures/miltank-back.webp	standees/v3/miltank.webp	miltank
+Mimikyu	figures/mimikyu.webp	figures/mimikyu-back.webp	standees/v3/mimikyu.webp	mimikyu-disguised
+Minior Core	figures/minior-core.webp	figures/minior-core-back.webp	standees/v3/minior-core.webp	minior-red
+Minior Meteor	figures/minior-meteor.webp	figures/minior-meteor-back.webp	standees/v3/minior-meteor.webp	minior-red-meteor
+Minun	figures/minun.webp	figures/minun-back.webp	standees/v3/minun.webp	minun
+Mismagius	figures/mismagius.webp	figures/mismagius-back.webp	standees/v3/mismagius.webp	mismagius
+Moltres	figures/moltres.webp	figures/moltres-back.webp	standees/v3/moltres.webp	moltres
+Moltres Galar	figures/moltres-galar.webp	figures/moltres-galar-back.webp	standees/v3/moltres-galar.webp	moltres-galar
+Morpeko Full Belly	figures/morpeko-full-belly.webp	figures/morpeko-full-belly-back.webp	standees/v3/morpeko-full-belly.webp	morpeko-full-belly
+Morpeko Hangry	figures/morpeko-hangry.webp	figures/morpeko-hangry-back.webp	standees/v3/morpeko-hangry.webp	morpeko-hangry
+Mothim	figures/mothim.webp	figures/mothim-back.webp	standees/v3/mothim.webp	mothim
+Mr. Mime	figures/mr-mime.webp	figures/mr-mime-back.webp	standees/v3/mr-mime.webp	mr-mime
+Mr. Rime	figures/mr-rime.webp	figures/mr-rime-back.webp	standees/v3/mr-rime.webp	mr-rime
+Mudsdale	figures/mudsdale.webp	figures/mudsdale-back.webp	standees/v3/mudsdale.webp	mudsdale
+Muk	figures/muk.webp	figures/muk-back.webp	standees/v3/muk.webp	muk
+Muk Alola	figures/muk-alola.webp	figures/muk-alola-back.webp	standees/v3/muk-alola.webp	muk-alola
+Munkidori	figures/munkidori.webp	figures/munkidori-back.webp	standees/v3/munkidori.webp	munkidori
+Musharna	figures/musharna.webp	figures/musharna-back.webp	standees/v3/musharna.webp	musharna
+Naganadel	figures/naganadel.webp	figures/naganadel-back.webp	standees/v3/naganadel.webp	naganadel
+Nidoking	figures/nidoking.webp	figures/nidoking-back.webp	standees/v3/nidoking.webp	nidoking
+Nidoqueen	figures/nidoqueen.webp	figures/nidoqueen-back.webp	standees/v3/nidoqueen.webp	nidoqueen
+Nihilego	figures/nihilego.webp	figures/nihilego-back.webp	standees/v3/nihilego.webp	nihilego
+Ninetales	figures/ninetales.webp	figures/ninetales-back.webp	standees/v3/ninetales.webp	ninetales
+Ninetales Alola	figures/ninetales-alola.webp	figures/ninetales-alola-back.webp	standees/v3/ninetales-alola.webp	ninetales-alola
+Ninjask	figures/ninjask.webp	figures/ninjask-back.webp	standees/v3/ninjask.webp	ninjask
+Noctowl	figures/noctowl.webp	figures/noctowl-back.webp	standees/v3/noctowl.webp	noctowl
+Noivern	figures/noivern.webp	figures/noivern-back.webp	standees/v3/noivern.webp	noivern
+Obstagoon	figures/obstagoon.webp	figures/obstagoon-back.webp	standees/v3/obstagoon.webp	obstagoon
+Octillery	figures/octillery.webp	figures/octillery-back.webp	standees/v3/octillery.webp	octillery
+Ogerpon	figures/ogerpon.webp	figures/ogerpon-back.webp	standees/v3/ogerpon.webp	ogerpon
+Oinkologne	figures/oinkologne.webp	figures/oinkologne-back.webp	standees/v3/oinkologne.webp	oinkologne-male
+Okidogi	figures/okidogi.webp	figures/okidogi-back.webp	standees/v3/okidogi.webp	okidogi
+Omastar	figures/omastar.webp	figures/omastar-back.webp	standees/v3/omastar.webp	omastar
+Oranguru	figures/oranguru.webp	figures/oranguru-back.webp	standees/v3/oranguru.webp	oranguru
+Orbeetle	figures/orbeetle.webp	figures/orbeetle-back.webp	standees/v3/orbeetle.webp	orbeetle
+Oricorio Baile	figures/oricorio-baile.webp	figures/oricorio-baile-back.webp	standees/v3/oricorio-baile.webp	oricorio-baile
+Oricorio Pa'u	figures/oricorio-pau.webp	figures/oricorio-pau-back.webp	standees/v3/oricorio-pau.webp	oricorio-pau
+Oricorio Pom-Pom	figures/oricorio-pom-pom.webp	figures/oricorio-pom-pom-back.webp	standees/v3/oricorio-pom-pom.webp	oricorio-pom-pom
+Oricorio Sensu	figures/oricorio-sensu.webp	figures/oricorio-sensu-back.webp	standees/v3/oricorio-sensu.webp	oricorio-sensu
+Orthworm	figures/orthworm.webp	figures/orthworm-back.webp	standees/v3/orthworm.webp	orthworm
+Overqwil	figures/overqwil.webp	figures/overqwil-back.webp	standees/v3/overqwil.webp	overqwil
+Pachirisu	figures/pachirisu.webp	figures/pachirisu-back.webp	standees/v3/pachirisu.webp	pachirisu
+Palafin Hero	figures/palafin-hero.webp	figures/palafin-hero-back.webp	standees/v3/palafin-hero.webp	palafin-hero
+Palafin Zero	figures/palafin-zero.webp	figures/palafin-zero-back.webp	standees/v3/palafin-zero.webp	palafin-zero
+Palossand	figures/palossand.webp	figures/palossand-back.webp	standees/v3/palossand.webp	palossand
+Pangoro	figures/pangoro.webp	figures/pangoro-back.webp	standees/v3/pangoro.webp	pangoro
+Parasect	figures/parasect.webp	figures/parasect-back.webp	standees/v3/parasect.webp	parasect
+Passimian	figures/passimian.webp	figures/passimian-back.webp	standees/v3/passimian.webp	passimian
+Pawmot	figures/pawmot.webp	figures/pawmot-back.webp	standees/v3/pawmot.webp	pawmot
+Pecharunt	figures/pecharunt.webp	figures/pecharunt-back.webp	standees/v3/pecharunt.webp	pecharunt
+Pelipper	figures/pelipper.webp	figures/pelipper-back.webp	standees/v3/pelipper.webp	pelipper
+Perserker	figures/perserker.webp	figures/perserker-back.webp	standees/v3/perserker.webp	perrserker
+Persian	figures/persian.webp	figures/persian-back.webp	standees/v3/persian.webp	persian
+Persian Alola	figures/persian-alola.webp	figures/persian-alola-back.webp	standees/v3/persian-alola.webp	persian-alola
+Pheromosa	figures/pheromosa.webp	figures/pheromosa-back.webp	standees/v3/pheromosa.webp	pheromosa
+Phione	figures/phione.webp	figures/phione-back.webp	standees/v3/phione.webp	phione
+Pidgeot	figures/pidgeot.webp	figures/pidgeot-back.webp	standees/v3/pidgeot.webp	pidgeot
+Pidgeot Mega	figures/pidgeot-mega.webp	figures/pidgeot-mega-back.webp	standees/v3/pidgeot-mega.webp	pidgeot-mega
+Pincurchin	figures/pincurchin.webp	figures/pincurchin-back.webp	standees/v3/pincurchin.webp	pincurchin
+Pinsir	figures/pinsir.webp	figures/pinsir-back.webp	standees/v3/pinsir.webp	pinsir
+Pinsir Mega	figures/pinsir-mega.webp	figures/pinsir-mega-back.webp	standees/v3/pinsir-mega.webp	pinsir-mega
+Plusle	figures/plusle.webp	figures/plusle-back.webp	standees/v3/plusle.webp	plusle
+Politoed	figures/politoed.webp	figures/politoed-back.webp	standees/v3/politoed.webp	politoed
+Poliwrath	figures/poliwrath.webp	figures/poliwrath-back.webp	standees/v3/poliwrath.webp	poliwrath
+Polteageist	figures/polteageist.webp	figures/polteageist-back.webp	standees/v3/polteageist.webp	polteageist
+Porygon-Z	figures/porygon-z.webp	figures/porygon-z-back.webp	standees/v3/porygon-z.webp	porygon-z
+Primarina	figures/primarina.webp	figures/primarina-back.webp	standees/v3/primarina.webp	primarina
+Primeape	figures/primeape.webp	figures/primeape-back.webp	standees/v3/primeape.webp	primeape
+Probopass	figures/probopass.webp	figures/probopass-back.webp	standees/v3/probopass.webp	probopass
+Purugly	figures/purugly.webp	figures/purugly-back.webp	standees/v3/purugly.webp	purugly
+Pyroar	figures/pyroar.webp	figures/pyroar-back.webp	standees/v3/pyroar.webp	pyroar-male
+Pyroar Mega	figures/pyroar-mega.webp	figures/pyroar-mega-back.webp	standees/v3/pyroar-mega.webp	pyroar-mega
+Pyukumuku	figures/pyukumuku.webp	figures/pyukumuku-back.webp	standees/v3/pyukumuku.webp	pyukumuku
+Quagsire	figures/quagsire.webp	figures/quagsire-back.webp	standees/v3/quagsire.webp	quagsire
+Quaquaval	figures/quaquaval.webp	figures/quaquaval-back.webp	standees/v3/quaquaval.webp	quaquaval
+Qwilfish	figures/qwilfish.webp	figures/qwilfish-back.webp	standees/v3/qwilfish.webp	qwilfish
+Rabsca	figures/rabsca.webp	figures/rabsca-back.webp	standees/v3/rabsca.webp	rabsca
+Raging Bolt	figures/raging-bolt.webp	figures/raging-bolt-back.webp	standees/v3/raging-bolt.webp	raging-bolt
+Raichu	figures/raichu.webp	figures/raichu-back.webp	standees/v3/raichu.webp	raichu
+Raichu Alola	figures/raichu-alola.webp	figures/raichu-alola-back.webp	standees/v3/raichu-alola.webp	raichu-alola
+Raichu Mega X	figures/raichu-mega-x.webp	figures/raichu-mega-x-back.webp	standees/v3/raichu-mega-x.webp	raichu-mega-x
+Raichu Mega Y	figures/raichu-mega-y.webp	figures/raichu-mega-y-back.webp	standees/v3/raichu-mega-y.webp	raichu-mega-y
+Raikou	figures/raikou.webp	figures/raikou-back.webp	standees/v3/raikou.webp	raikou
+Rampardos	figures/rampardos.webp	figures/rampardos-back.webp	standees/v3/rampardos.webp	rampardos
+Rapidash	figures/rapidash.webp	figures/rapidash-back.webp	standees/v3/rapidash.webp	rapidash
+Rapidash Galar	figures/rapidash-galar.webp	figures/rapidash-galar-back.webp	standees/v3/rapidash-galar.webp	rapidash-galar
+Raticate	figures/raticate.webp	figures/raticate-back.webp	standees/v3/raticate.webp	raticate
+Raticate Alola	figures/raticate-alola.webp	figures/raticate-alola-back.webp	standees/v3/raticate-alola.webp	raticate-alola
+Regice	figures/regice.webp	figures/regice-back.webp	standees/v3/regice.webp	regice
+Regidrago	figures/regidrago.webp	figures/regidrago-back.webp	standees/v3/regidrago.webp	regidrago
+Regileki	figures/regileki.webp	figures/regileki-back.webp	standees/v3/regileki.webp	regieleki
+Regirock	figures/regirock.webp	figures/regirock-back.webp	standees/v3/regirock.webp	regirock
+Registeel	figures/registeel.webp	figures/registeel-back.webp	standees/v3/registeel.webp	registeel
+Relicanth	figures/relicanth.webp	figures/relicanth-back.webp	standees/v3/relicanth.webp	relicanth
+Reuniclus	figures/reuniclus.webp	figures/reuniclus-back.webp	standees/v3/reuniclus.webp	reuniclus
+Revavroom	figures/revavroom.webp	figures/revavroom-back.webp	standees/v3/revavroom.webp	revavroom
+Rhyperior	figures/rhyperior.webp	figures/rhyperior-back.webp	standees/v3/rhyperior.webp	rhyperior
+Ribombee	figures/ribombee.webp	figures/ribombee-back.webp	standees/v3/ribombee.webp	ribombee
+Rillaboom	figures/rillaboom.webp	figures/rillaboom-back.webp	standees/v3/rillaboom.webp	rillaboom
+Roaring Moon	figures/roaring-moon.webp	figures/roaring-moon-back.webp	standees/v3/roaring-moon.webp	roaring-moon
+Roserade	figures/roserade.webp	figures/roserade-back.webp	standees/v3/roserade.webp	roserade
+Rotom	figures/rotom.webp	figures/rotom-back.webp	standees/v3/rotom.webp	rotom
+Rotom Fan	figures/rotom-fan.webp	figures/rotom-fan-back.webp	standees/v3/rotom-fan.webp	rotom-fan
+Rotom Frost	figures/rotom-frost.webp	figures/rotom-frost-back.webp	standees/v3/rotom-frost.webp	rotom-frost
+Rotom Heat	figures/rotom-heat.webp	figures/rotom-heat-back.webp	standees/v3/rotom-heat.webp	rotom-heat
+Rotom Mow	figures/rotom-mow.webp	figures/rotom-mow-back.webp	standees/v3/rotom-mow.webp	rotom-mow
+Rotom Wash	figures/rotom-wash.webp	figures/rotom-wash-back.webp	standees/v3/rotom-wash.webp	rotom-wash
+Runerigus	figures/runerigus.webp	figures/runerigus-back.webp	standees/v3/runerigus.webp	runerigus
+Sableye	figures/sableye.webp	figures/sableye-back.webp	standees/v3/sableye.webp	sableye
+Sableye Mega	figures/sableye-mega.webp	figures/sableye-mega-back.webp	standees/v3/sableye-mega.webp	sableye-mega
+Salamence	figures/salamence.webp	figures/salamence-back.webp	standees/v3/salamence.webp	salamence
+Salamence Mega	figures/salamence-mega.webp	figures/salamence-mega-back.webp	standees/v3/salamence-mega.webp	salamence-mega
+Salazzle	figures/salazzle.webp	figures/salazzle-back.webp	standees/v3/salazzle.webp	salazzle
+Samurott	figures/samurott.webp	figures/samurott-back.webp	standees/v3/samurott.webp	samurott
+Samurott Hisui	figures/samurott-hisui.webp	figures/samurott-hisui-back.webp	standees/v3/samurott-hisui.webp	samurott-hisui
+Sandaconda	figures/sandaconda.webp	figures/sandaconda-back.webp	standees/v3/sandaconda.webp	sandaconda
+Sandslash	figures/sandslash.webp	figures/sandslash-back.webp	standees/v3/sandslash.webp	sandslash
+Sandslash Alola	figures/sandslash-alola.webp	figures/sandslash-alola-back.webp	standees/v3/sandslash-alola.webp	sandslash-alola
+Sandy Shocks	figures/sandy-shocks.webp	figures/sandy-shocks-back.webp	standees/v3/sandy-shocks.webp	sandy-shocks
+Sawk	figures/sawk.webp	figures/sawk-back.webp	standees/v3/sawk.webp	sawk
+Sawsbuck	figures/sawsbuck.webp	figures/sawsbuck-back.webp	standees/v3/sawsbuck.webp	sawsbuck
+Sceptile	figures/sceptile.webp	figures/sceptile-back.webp	standees/v3/sceptile.webp	sceptile
+Sceptile Mega	figures/sceptile-mega.webp	figures/sceptile-mega-back.webp	standees/v3/sceptile-mega.webp	sceptile-mega
+Scizor	figures/scizor.webp	figures/scizor-back.webp	standees/v3/scizor.webp	scizor
+Scizor Mega	figures/scizor-mega.webp	figures/scizor-mega-back.webp	standees/v3/scizor-mega.webp	scizor-mega
+Scolipede	figures/scolipede.webp	figures/scolipede-back.webp	standees/v3/scolipede.webp	scolipede
+Scolipede Mega	figures/scolipede-mega.webp	figures/scolipede-mega-back.webp	standees/v3/scolipede-mega.webp	scolipede-mega
+Scovillain	figures/scovillain.webp	figures/scovillain-back.webp	standees/v3/scovillain.webp	scovillain
+Scovillain Mega	figures/scovillain-mega.webp	figures/scovillain-mega-back.webp	standees/v3/scovillain-mega.webp	scovillain-mega
+Scrafty	figures/scrafty.webp	figures/scrafty-back.webp	standees/v3/scrafty.webp	scrafty
+Scrafty Mega	figures/scrafty-mega.webp	figures/scrafty-mega-back.webp	standees/v3/scrafty-mega.webp	scrafty-mega
+Scream Tail	figures/scream-tail.webp	figures/scream-tail-back.webp	standees/v3/scream-tail.webp	scream-tail
+Seaking	figures/seaking.webp	figures/seaking-back.webp	standees/v3/seaking.webp	seaking
+Seismitoad	figures/seismitoad.webp	figures/seismitoad-back.webp	standees/v3/seismitoad.webp	seismitoad
+Serperior	figures/serperior.webp	figures/serperior-back.webp	standees/v3/serperior.webp	serperior
+Seviper	figures/seviper.webp	figures/seviper-back.webp	standees/v3/seviper.webp	seviper
+Sharpedo	figures/sharpedo.webp	figures/sharpedo-back.webp	standees/v3/sharpedo.webp	sharpedo
+Sharpedo Mega	figures/sharpedo-mega.webp	figures/sharpedo-mega-back.webp	standees/v3/sharpedo-mega.webp	sharpedo-mega
+Shaymin Land	figures/shaymin-land.webp	figures/shaymin-land-back.webp	standees/v3/shaymin-land.webp	shaymin-land
+Shaymin Sky	figures/shaymin-sky.webp	figures/shaymin-sky-back.webp	standees/v3/shaymin-sky.webp	shaymin-sky
+Shiftry	figures/shiftry.webp	figures/shiftry-back.webp	standees/v3/shiftry.webp	shiftry
+Shiinotic	figures/shiinotic.webp	figures/shiinotic-back.webp	standees/v3/shiinotic.webp	shiinotic
+Shuckle	figures/shuckle.webp	figures/shuckle-back.webp	standees/v3/shuckle.webp	shuckle
+Sigilyph	figures/sigilyph.webp	figures/sigilyph-back.webp	standees/v3/sigilyph.webp	sigilyph
+Silvally	figures/silvally.webp	figures/silvally-back.webp	standees/v3/silvally.webp	silvally
+Simipour	figures/simipour.webp	figures/simipour-back.webp	standees/v3/simipour.webp	simipour
+Simisage	figures/simisage.webp	figures/simisage-back.webp	standees/v3/simisage.webp	simisage
+Simisear	figures/simisear.webp	figures/simisear-back.webp	standees/v3/simisear.webp	simisear
+Sinistcha	figures/sinistcha.webp	figures/sinistcha-back.webp	standees/v3/sinistcha.webp	sinistcha
+Sirfetch'd	figures/sirfetchd.webp	figures/sirfetchd-back.webp	standees/v3/sirfetchd.webp	sirfetchd
+Skarmory	figures/skarmory.webp	figures/skarmory-back.webp	standees/v3/skarmory.webp	skarmory
+Skarmory Mega	figures/skarmory-mega.webp	figures/skarmory-mega-back.webp	standees/v3/skarmory-mega.webp	skarmory-mega
+Skeledirge	figures/skeledirge.webp	figures/skeledirge-back.webp	standees/v3/skeledirge.webp	skeledirge
+Skuntank	figures/skuntank.webp	figures/skuntank-back.webp	standees/v3/skuntank.webp	skuntank
+Slaking	figures/slaking.webp	figures/slaking-back.webp	standees/v3/slaking.webp	slaking
+Slitherwing	figures/slitherwing.webp	figures/slitherwing-back.webp	standees/v3/slitherwing.webp	slither-wing
+Slowbro	figures/slowbro.webp	figures/slowbro-back.webp	standees/v3/slowbro.webp	slowbro
+Slowbro Galar	figures/slowbro-galar.webp	figures/slowbro-galar-back.webp	standees/v3/slowbro-galar.webp	slowbro-galar
+Slowbro Mega	figures/slowbro-mega.webp	figures/slowbro-mega-back.webp	standees/v3/slowbro-mega.webp	slowbro-mega
+Slowking	figures/slowking.webp	figures/slowking-back.webp	standees/v3/slowking.webp	slowking
+Slowking Galar	figures/slowking-galar.webp	figures/slowking-galar-back.webp	standees/v3/slowking-galar.webp	slowking-galar
+Slurpuff	figures/slurpuff.webp	figures/slurpuff-back.webp	standees/v3/slurpuff.webp	slurpuff
+Sneasler	figures/sneasler.webp	figures/sneasler-back.webp	standees/v3/sneasler.webp	sneasler
+Snorlax	figures/snorlax.webp	figures/snorlax-back.webp	standees/v3/snorlax.webp	snorlax
+Solrock	figures/solrock.webp	figures/solrock-back.webp	standees/v3/solrock.webp	solrock
+Spectrier	figures/spectrier.webp	figures/spectrier-back.webp	standees/v3/spectrier.webp	spectrier
+Spidops	figures/spidops.webp	figures/spidops-back.webp	standees/v3/spidops.webp	spidops
+Spinda	figures/spinda.webp	figures/spinda-back.webp	standees/v3/spinda.webp	spinda
+Spiritomb	figures/spiritomb.webp	figures/spiritomb-back.webp	standees/v3/spiritomb.webp	spiritomb
+Stakataka	figures/stakataka.webp	figures/stakataka-back.webp	standees/v3/stakataka.webp	stakataka
+Staraptor	figures/staraptor.webp	figures/staraptor-back.webp	standees/v3/staraptor.webp	staraptor
+Staraptor Mega	figures/staraptor-mega.webp	figures/staraptor-mega-back.webp	standees/v3/staraptor-mega.webp	staraptor-mega
+Starmie	figures/starmie.webp	figures/starmie-back.webp	standees/v3/starmie.webp	starmie
+Starmie Mega	figures/starmie-mega.webp	figures/starmie-mega-back.webp	standees/v3/starmie-mega.webp	starmie-mega
+Steelix	figures/steelix.webp	figures/steelix-back.webp	standees/v3/steelix.webp	steelix
+Steelix Mega	figures/steelix-mega.webp	figures/steelix-mega-back.webp	standees/v3/steelix-mega.webp	steelix-mega
+Stonjourner	figures/stonjourner.webp	figures/stonjourner-back.webp	standees/v3/stonjourner.webp	stonjourner
+Stoutland	figures/stoutland.webp	figures/stoutland-back.webp	standees/v3/stoutland.webp	stoutland
+Stunfisk	figures/stunfisk.webp	figures/stunfisk-back.webp	standees/v3/stunfisk.webp	stunfisk
+Stunfisk Galar	figures/stunfisk-galar.webp	figures/stunfisk-galar-back.webp	standees/v3/stunfisk-galar.webp	stunfisk-galar
+Sudowoodo	figures/sudowoodo.webp	figures/sudowoodo-back.webp	standees/v3/sudowoodo.webp	sudowoodo
+Suicune	figures/suicune.webp	figures/suicune-back.webp	standees/v3/suicune.webp	suicune
+Sunflora	figures/sunflora.webp	figures/sunflora-back.webp	standees/v3/sunflora.webp	sunflora
+Swampert	figures/swampert.webp	figures/swampert-back.webp	standees/v3/swampert.webp	swampert
+Swampert Mega	figures/swampert-mega.webp	figures/swampert-mega-back.webp	standees/v3/swampert-mega.webp	swampert-mega
+Swanna	figures/swanna.webp	figures/swanna-back.webp	standees/v3/swanna.webp	swanna
+Swellow	figures/swellow.webp	figures/swellow-back.webp	standees/v3/swellow.webp	swellow
+Swoobat	figures/swoobat.webp	figures/swoobat-back.webp	standees/v3/swoobat.webp	swoobat
+Sylveon	figures/sylveon.webp	figures/sylveon-back.webp	standees/v3/sylveon.webp	sylveon
+Talonflame	figures/talonflame.webp	figures/talonflame-back.webp	standees/v3/talonflame.webp	talonflame
+Tangrowth	figures/tangrowth.webp	figures/tangrowth-back.webp	standees/v3/tangrowth.webp	tangrowth
+Tapu Bulu	figures/tapu-bulu.webp	figures/tapu-bulu-back.webp	standees/v3/tapu-bulu.webp	tapu-bulu
+Tapu Fini	figures/tapu-fini.webp	figures/tapu-fini-back.webp	standees/v3/tapu-fini.webp	tapu-fini
+Tapu Koko	figures/tapu-koko.webp	figures/tapu-koko-back.webp	standees/v3/tapu-koko.webp	tapu-koko
+Tapu Lele	figures/tapu-lele.webp	figures/tapu-lele-back.webp	standees/v3/tapu-lele.webp	tapu-lele
+Tatsugiri	figures/tatsugiri.webp	figures/tatsugiri-back.webp	standees/v3/tatsugiri.webp	tatsugiri-curly
+Tatsugiri Mega	figures/tatsugiri-mega.webp	figures/tatsugiri-mega-back.webp	standees/v3/tatsugiri-mega.webp	tatsugiri-curly-mega
+Tauros	figures/tauros.webp	figures/tauros-back.webp	standees/v3/tauros.webp	tauros
+Tauros Aqua	figures/tauros-aqua.webp	figures/tauros-aqua-back.webp	standees/v3/tauros-aqua.webp	tauros-paldea-aqua-breed
+Tauros Blaze	figures/tauros-blaze.webp	figures/tauros-blaze-back.webp	standees/v3/tauros-blaze.webp	tauros-paldea-blaze-breed
+Tauros Combat	figures/tauros-combat.webp	figures/tauros-combat-back.webp	standees/v3/tauros-combat.webp	tauros-paldea-combat-breed
+Tentacruel	figures/tentacruel.webp	figures/tentacruel-back.webp	standees/v3/tentacruel.webp	tentacruel
+Terrakion	figures/terrakion.webp	figures/terrakion-back.webp	standees/v3/terrakion.webp	terrakion
+Thievul	figures/thievul.webp	figures/thievul-back.webp	standees/v3/thievul.webp	thievul
+Throh	figures/throh.webp	figures/throh-back.webp	standees/v3/throh.webp	throh
+Thundurus I	figures/thundurus-i.webp	figures/thundurus-i-back.webp	standees/v3/thundurus-i.webp	thundurus-incarnate
+Thundurus T	figures/thundurus-t.webp	figures/thundurus-t-back.webp	standees/v3/thundurus-t.webp	thundurus-therian
+Ting-Lu	figures/ting-lu.webp	figures/ting-lu-back.webp	standees/v3/ting-lu.webp	ting-lu
+Tinkaton	figures/tinkaton.webp	figures/tinkaton-back.webp	standees/v3/tinkaton.webp	tinkaton
+Toedscruel	figures/toedscruel.webp	figures/toedscruel-back.webp	standees/v3/toedscruel.webp	toedscruel
+Togedemaru	figures/togedemaru.webp	figures/togedemaru-back.webp	standees/v3/togedemaru.webp	togedemaru
+Togekiss	figures/togekiss.webp	figures/togekiss-back.webp	standees/v3/togekiss.webp	togekiss
+Torkoal	figures/torkoal.webp	figures/torkoal-back.webp	standees/v3/torkoal.webp	torkoal
+Tornadus I	figures/tornadus-i.webp	figures/tornadus-i-back.webp	standees/v3/tornadus-i.webp	tornadus-incarnate
+Tornadus T	figures/tornadus-t.webp	figures/tornadus-t-back.webp	standees/v3/tornadus-t.webp	tornadus-therian
+Torterra	figures/torterra.webp	figures/torterra-back.webp	standees/v3/torterra.webp	torterra
+Toucannon	figures/toucannon.webp	figures/toucannon-back.webp	standees/v3/toucannon.webp	toucannon
+Toxapex	figures/toxapex.webp	figures/toxapex-back.webp	standees/v3/toxapex.webp	toxapex
+Toxicroak	figures/toxicroak.webp	figures/toxicroak-back.webp	standees/v3/toxicroak.webp	toxicroak
+Toxtricity	figures/toxtricity.webp	figures/toxtricity-back.webp	standees/v3/toxtricity.webp	toxtricity-amped
+Trevenant	figures/trevenant.webp	figures/trevenant-back.webp	standees/v3/trevenant.webp	trevenant
+Tropius	figures/tropius.webp	figures/tropius-back.webp	standees/v3/tropius.webp	tropius
+Tsareena	figures/tsareena.webp	figures/tsareena-back.webp	standees/v3/tsareena.webp	tsareena
+Turtonator	figures/turtonator.webp	figures/turtonator-back.webp	standees/v3/turtonator.webp	turtonator
+Typhlosion	figures/typhlosion.webp	figures/typhlosion-back.webp	standees/v3/typhlosion.webp	typhlosion
+Typhlosion Hisui	figures/typhlosion-hisui.webp	figures/typhlosion-hisui-back.webp	standees/v3/typhlosion-hisui.webp	typhlosion-hisui
+Tyranitar	figures/tyranitar.webp	figures/tyranitar-back.webp	standees/v3/tyranitar.webp	tyranitar
+Tyranitar Mega	figures/tyranitar-mega.webp	figures/tyranitar-mega-back.webp	standees/v3/tyranitar-mega.webp	tyranitar-mega
+Tyrantrum	figures/tyrantrum.webp	figures/tyrantrum-back.webp	standees/v3/tyrantrum.webp	tyrantrum
+Umbreon	figures/umbreon.webp	figures/umbreon-back.webp	standees/v3/umbreon.webp	umbreon
+Unfezant	figures/unfezant.webp	figures/unfezant-back.webp	standees/v3/unfezant.webp	unfezant
+Unown	figures/unown.webp	figures/unown-back.webp	standees/v3/unown.webp	unown
+Ursaluna	figures/ursaluna.webp	figures/ursaluna-back.webp	standees/v3/ursaluna.webp	ursaluna
+Ursaluna Bloodmoon	figures/ursaluna-bloodmoon.webp	figures/ursaluna-bloodmoon-back.webp	standees/v3/ursaluna-bloodmoon.webp	ursaluna-bloodmoon
+Ursaring	figures/ursaring.webp	figures/ursaring-back.webp	standees/v3/ursaring.webp	ursaring
+Urshifu Rapid Strike	figures/urshifu-rapid-strike.webp	figures/urshifu-rapid-strike-back.webp	standees/v3/urshifu-rapid-strike.webp	urshifu-rapid-strike
+Urshifu Single Strike	figures/urshifu-single-strike.webp	figures/urshifu-single-strike-back.webp	standees/v3/urshifu-single-strike.webp	urshifu-single-strike
+Uxie	figures/uxie.webp	figures/uxie-back.webp	standees/v3/uxie.webp	uxie
+Vanilluxe	figures/vanilluxe.webp	figures/vanilluxe-back.webp	standees/v3/vanilluxe.webp	vanilluxe
+Vaporeon	figures/vaporeon.webp	figures/vaporeon-back.webp	standees/v3/vaporeon.webp	vaporeon
+Veluza	figures/veluza.webp	figures/veluza-back.webp	standees/v3/veluza.webp	veluza
+Venomoth	figures/venomoth.webp	figures/venomoth-back.webp	standees/v3/venomoth.webp	venomoth
+Venusaur	figures/venusaur.webp	figures/venusaur-back.webp	standees/v3/venusaur.webp	venusaur
+Venusaur Mega	figures/venusaur-mega.webp	figures/venusaur-mega-back.webp	standees/v3/venusaur-mega.webp	venusaur-mega
+Vespiquen	figures/vespiquen.webp	figures/vespiquen-back.webp	standees/v3/vespiquen.webp	vespiquen
+Victini	figures/victini.webp	figures/victini-back.webp	standees/v3/victini.webp	victini
+Victreebel	figures/victreebel.webp	figures/victreebel-back.webp	standees/v3/victreebel.webp	victreebel
+Victreebel Mega	figures/victreebel-mega.webp	figures/victreebel-mega-back.webp	standees/v3/victreebel-mega.webp	victreebel-mega
+Vikavolt	figures/vikavolt.webp	figures/vikavolt-back.webp	standees/v3/vikavolt.webp	vikavolt
+Vileplume	figures/vileplume.webp	figures/vileplume-back.webp	standees/v3/vileplume.webp	vileplume
+Virizion	figures/virizion.webp	figures/virizion-back.webp	standees/v3/virizion.webp	virizion
+Vivillon	figures/vivillon.webp	figures/vivillon-back.webp	standees/v3/vivillon.webp	vivillon
+Volbeat	figures/volbeat.webp	figures/volbeat-back.webp	standees/v3/volbeat.webp	volbeat
+Volcanion	figures/volcanion.webp	figures/volcanion-back.webp	standees/v3/volcanion.webp	volcanion
+Volcarona	figures/volcarona.webp	figures/volcarona-back.webp	standees/v3/volcarona.webp	volcarona
+Wailord	figures/wailord.webp	figures/wailord-back.webp	standees/v3/wailord.webp	wailord
+Walking Wake	figures/walking-wake.webp	figures/walking-wake-back.webp	standees/v3/walking-wake.webp	walking-wake
+Walrein	figures/walrein.webp	figures/walrein-back.webp	standees/v3/walrein.webp	walrein
+Watchog	figures/watchog.webp	figures/watchog-back.webp	standees/v3/watchog.webp	watchog
+Weavile	figures/weavile.webp	figures/weavile-back.webp	standees/v3/weavile.webp	weavile
+Weezing	figures/weezing.webp	figures/weezing-back.webp	standees/v3/weezing.webp	weezing
+Weezing Galar	figures/weezing-galar.webp	figures/weezing-galar-back.webp	standees/v3/weezing-galar.webp	weezing-galar
+Whimsicott	figures/whimsicott.webp	figures/whimsicott-back.webp	standees/v3/whimsicott.webp	whimsicott
+Whiscash	figures/whiscash.webp	figures/whiscash-back.webp	standees/v3/whiscash.webp	whiscash
+Wigglytuff	figures/wigglytuff.webp	figures/wigglytuff-back.webp	standees/v3/wigglytuff.webp	wigglytuff
+Wishiwashi	figures/wishiwashi.webp	figures/wishiwashi-back.webp	standees/v3/wishiwashi.webp	wishiwashi-solo
+Wishiwashi (Single)	figures/wishiwashi-single.webp	figures/wishiwashi-single-back.webp	standees/v3/wishiwashi-single.webp	wishiwashi-solo
+Wo-Chien	figures/wo-chien.webp	figures/wo-chien-back.webp	standees/v3/wo-chien.webp	wo-chien
+Wormadam Hidden	figures/wormadam-hidden.webp	figures/wormadam-hidden-back.webp	standees/v3/wormadam-hidden.webp	placeholder: Dark-tinted
+Wormadam Mind	figures/wormadam-mind.webp	figures/wormadam-mind-back.webp	standees/v3/wormadam-mind.webp	placeholder: Ghost-tinted
+Wormadam Sand	figures/wormadam-sand.webp	figures/wormadam-sand-back.webp	standees/v3/wormadam-sand.webp	wormadam-sandy
+Wormadam Trash	figures/wormadam-trash.webp	figures/wormadam-trash-back.webp	standees/v3/wormadam-trash.webp	wormadam-trash
+Wugtrio	figures/wugtrio.webp	figures/wugtrio-back.webp	standees/v3/wugtrio.webp	wugtrio
+Wyrdeer	figures/wyrdeer.webp	figures/wyrdeer-back.webp	standees/v3/wyrdeer.webp	wyrdeer
+Xatu	figures/xatu.webp	figures/xatu-back.webp	standees/v3/xatu.webp	xatu
+Xurkitree	figures/xurkitree.webp	figures/xurkitree-back.webp	standees/v3/xurkitree.webp	xurkitree
+Yanmega	figures/yanmega.webp	figures/yanmega-back.webp	standees/v3/yanmega.webp	yanmega
+Zangoose	figures/zangoose.webp	figures/zangoose-back.webp	standees/v3/zangoose.webp	zangoose
+Zapdos	figures/zapdos.webp	figures/zapdos-back.webp	standees/v3/zapdos.webp	zapdos
+Zapdos Galar	figures/zapdos-galar.webp	figures/zapdos-galar-back.webp	standees/v3/zapdos-galar.webp	zapdos-galar
+Zarude	figures/zarude.webp	figures/zarude-back.webp	standees/v3/zarude.webp	zarude
+Zebstrika	figures/zebstrika.webp	figures/zebstrika-back.webp	standees/v3/zebstrika.webp	zebstrika
+Zeraora	figures/zeraora.webp	figures/zeraora-back.webp	standees/v3/zeraora.webp	zeraora
+Zeraora Mega	figures/zeraora-mega.webp	figures/zeraora-mega-back.webp	standees/v3/zeraora-mega.webp	zeraora-mega
+Zoroark	figures/zoroark.webp	figures/zoroark-back.webp	standees/v3/zoroark.webp	zoroark
+Zoroark Hisui	figures/zoroark-hisui.webp	figures/zoroark-hisui-back.webp	standees/v3/zoroark-hisui.webp	zoroark-hisui
+Zygarde 10%	figures/zygarde-10.webp	figures/zygarde-10-back.webp	standees/v3/zygarde-10.webp	zygarde-10

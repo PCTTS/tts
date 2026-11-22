@@ -56,10 +56,10 @@ CATALOGS = {
   abilities = { title = "Pokémon ability cards",
     deckBase = 5000, tag = "Ability" },
 }
-ROSTER_URL = BASE_URL .. "figures/index.json"
-CARDS_URL = BASE_URL .. "cards/index.json"
-STATS_URL = BASE_URL .. "data/pokemon.json"   -- every Pokémon's stats from the sheet (tools/build_stats.py)
-ARENAS_URL = BASE_URL .. "arenas/index.json"   -- the map picker's arenas (tools/build_arena_index.py)
+ROSTER_URL = BASE_URL .. "figures/index.txt"   -- (tools/fast_data.py, from the .json)
+CARDS_URL = BASE_URL .. "cards/index.txt"
+STATS_URL = BASE_URL .. "data/pokemon.txt"   -- every Pokémon's stats from the sheet (tools/build_stats.py)
+ARENAS_URL = BASE_URL .. "arenas/index.txt"   -- the map picker's arenas (tools/build_arena_index.py)
 
 -- Type colours, the same as the damage calculator sheets' type cells (their conditional formatting).
 TYPE_COLORS = {
@@ -135,9 +135,11 @@ listNames, builtLists = {}, {}             -- names in each full list as built, 
 ----------------------------------------------------------------------------------------------------
 -- Save / load
 ----------------------------------------------------------------------------------------------------
--- The downloads (roster, cards, stats) are kept as the text that came in and saved as that text: TTS saves the
--- game every few seconds for rewind, and turning these tables back into JSON took over a second each time
--- (the stutter). Each is decoded once per load: the fresh download, or the saved copy if the site can't be reached.
+-- The downloads (roster, cards, stats, arenas) are kept as the text that came in and saved as that text: TTS saves
+-- the game every few seconds for rewind, and turning these tables back into JSON took over a second each time
+-- (the stutter). Each is read once per load: the fresh download, or the saved copy if the site can't be reached.
+-- They come as plain text, one record per line (tools/fast_data.py): TTS's Lua decodes JSON at about 7 KB a
+-- second, so the JSON versions froze every load and rewind for close to a minute.
 DATA = {
   { key = "roster", url = ROSTER_URL, use = function(t) setCatalog("dex", t) end },
   { key = "cards", url = CARDS_URL, use = function(t) setCards(t) end },
@@ -174,6 +176,92 @@ local function readSavedState(saved)
   return texts
 end
 
+-- Plain-text data (tools/fast_data.py): split with plain find/sub only (no Lua patterns on big text).
+local function splitPlain(s, sep)
+  local out, i = {}, 1
+  while true do
+    local j = s:find(sep, i, true)
+    if not j then
+      out[#out + 1] = s:sub(i)
+      return out
+    end
+    out[#out + 1] = s:sub(i, j - 1)
+    i = j + #sep
+  end
+end
+
+local function orNil(s) return s ~= "" and s or nil end
+
+local function numbers(s, sep)
+  local out = {}
+  for i, v in ipairs(splitPlain(s, sep or ",")) do out[i] = tonumber(v) end
+  return out
+end
+
+DATA_HEAD = "PCTTS-DATA-1 "
+READERS = {
+  roster = function(rows)
+    local t = {}
+    for _, f in ipairs(rows) do
+      t[f[1]] = { front = orNil(f[2]), back = orNil(f[3]), standee = orNil(f[4]), source = orNil(f[5]) }
+    end
+    return t
+  end,
+  cards = function(rows)
+    local t = { backs = {}, abilities = {}, items = {}, skills = {} }
+    for _, f in ipairs(rows) do
+      if f[1] == "back" then
+        t.backs[f[2]] = f[3]
+      elseif f[1] == "card" and t[f[2]] then
+        t[f[2]][f[3]] = { class = orNil(f[4]), group = orNil(f[5]), face = orNil(f[6]), effect = orNil(f[7]) }
+      end
+    end
+    return t
+  end,
+  stats = function(rows)
+    local t = {}
+    for _, f in ipairs(rows) do
+      t[f[1]] = { hp = tonumber(f[2]), atk = tonumber(f[3]), def = tonumber(f[4]), spd = tonumber(f[5]),
+        rng = tonumber(f[6]), types = splitPlain(f[7] or "", ",") }
+    end
+    return t
+  end,
+  arenas = function(rows)
+    local t, cur = {}, nil
+    local NUM = { yaw = true, material = true, pair = true, tile = true, tiles = true }
+    for _, f in ipairs(rows) do
+      if f[1] == "arena" then
+        cur = { mesh = f[3], texture = f[4], table = f[5] or "", snaps = {}, pieces = {} }
+        t[f[2]] = cur
+      elseif f[1] == "snaps" and cur and (f[2] or "") ~= "" then
+        for i, p in ipairs(splitPlain(f[2], ";")) do cur.snaps[i] = numbers(p) end
+      elseif f[1] == "piece" and cur then
+        local p = {}
+        for k = 2, #f do
+          local eq = f[k]:find("=", 1, true)
+          local key, v = f[k]:sub(1, eq - 1), f[k]:sub(eq + 1)
+          if key == "pos" then p.pos = numbers(v)
+          elseif v == "true" or v == "false" then p[key] = (v == "true")
+          elseif NUM[key] then p[key] = tonumber(v)
+          else p[key] = v end
+        end
+        cur.pieces[#cur.pieces + 1] = p
+      end
+    end
+    return t
+  end,
+}
+
+-- A download (or its saved copy) as a table: the plain-text format, or JSON (an older saved copy; slow).
+function readData(key, text)
+  if text:sub(1, #DATA_HEAD) ~= DATA_HEAD then return JSON.decode(text) end
+  local rows = {}
+  for i, line in ipairs(splitPlain(text, "\n")) do
+    if i > 1 and line ~= "" then rows[#rows + 1] = splitPlain(line, "\t") end
+  end
+  return READERS[key](rows)
+end
+
 function onLoad(saved)
   local ok, texts = pcall(readSavedState, saved)
   if not ok then texts = {} end   -- a bad saved copy must never stop the load: the downloads still come in
@@ -186,7 +274,7 @@ function onLoad(saved)
       local fresh = text ~= nil
       if not fresh then text = rawData[d.key] end   -- offline: the saved copy
       local ok, data = false, nil
-      if text then ok, data = pcall(JSON.decode, text) end
+      if text then ok, data = pcall(readData, d.key, text) end
       if ok and type(data) == "table" and next(data) then
         if fresh then rememberData(d.key, text) end
         d.use(data)
