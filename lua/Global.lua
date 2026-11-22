@@ -12,7 +12,8 @@ card on the slope under each. Which stand is yours depends on your seat colour (
               type colour). One main status at a time; Confused and Flinched can stack on top.
               "Clear status" returns a Pokémon to normal.
   * Map:      pick which arena goes on the table (3D boards from arenas/index.json, with snap points and pieces).
-Flags on the board: right-click > Capture tints a flag to your seat colour; "Make neutral" resets it.
+Flags take the colour of the last Pokémon put down on their tile (left-click one to make it neutral); capture zones
+take the colour of the player with more Pokémon in them.
 HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
@@ -227,11 +228,20 @@ function unstretchCard(card)
 end
 
 -- The board, its backdrop and the pillars aren't interactive at all (pieceSetup). The team stands and the map's fixed
--- pieces still need clicks (HP signs, Capture, buttons), so players just can't delete or cut them; the map picker
+-- pieces still need clicks (HP signs, flags, buttons), so players just can't delete or cut them; the map picker
 -- replaces them by script, which isn't a player action.
 PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand" }
 
-function onPlayerAction(_, action, targets)
+function onPlayerAction(player, action, targets)
+  if action == Player.Action.Select or action == Player.Action.PickUp then
+    -- a left-click on a (locked) flag arrives as a selection (or a pick-up): it makes the flag neutral instead
+    local obj = targets and #targets == 1 and targets[1]
+    if obj and obj.hasTag("Flag") then
+      flagClicked(obj, player)
+      return false
+    end
+    return true
+  end
   if action ~= Player.Action.Delete and action ~= Player.Action.Cut then return true end
   for _, obj in ipairs(targets or {}) do
     for _, tag in ipairs(PROTECTED_TAGS) do
@@ -632,11 +642,11 @@ function spawnArenaPiece(p, origin, base)
   }
   local pos = origin + Vector(p.pos[1], p.pos[2], p.pos[3])
   if p.kind == "Flag" then
-    data.ColorDiffuse, data.Description = FLAG_NEUTRAL, flagDescription(nil)
+    data.ColorDiffuse, data.Description = NEUTRAL, FLAG_DESC
   elseif p.kind == "Portal" then
     data.ColorDiffuse, data.Memo = portalTint(p.pair or 1), JSON.encode({ pair = p.pair or 1 })
   elseif p.kind == "Zone" then
-    data.ColorDiffuse, data.Memo = FLAG_NEUTRAL, JSON.encode({ tiles = p.tiles or 2, tile = p.tile or BOARD_TILE })
+    data.ColorDiffuse, data.Memo = NEUTRAL, JSON.encode({ tiles = p.tiles or 2, tile = p.tile or BOARD_TILE })
   elseif p.kind == "Bridge" then
     data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, tile = p.tile or BOARD_TILE })
     pos = Vector(pos.x, pos.y - BRIDGE_DROP, pos.z)
@@ -990,30 +1000,10 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- Arena pieces (tools/place_pieces.py puts them on the board): bells, and flags that show who holds them.
--- A flag's cloth is white, so its tint is the holder's colour; its memo keeps the holder's seat colour.
+-- A flag takes the colour of the last Pokémon put down on its tile (its owner's seat colour) and keeps it until
+-- another one is put down there; a left-click makes it neutral again. Its cloth is white, so its tint is the
+-- holder's colour; its memo keeps the holder's seat colour.
 ----------------------------------------------------------------------------------------------------
-FLAG_NEUTRAL = { r = 0.6, g = 0.58, b = 0.54 }   -- an unclaimed flag
-
-function flagDescription(color)
-  return (color and ("Held by " .. color .. ".") or "Neutral.") .. " Right-click it to capture it for your colour."
-end
-
--- color = the seat colour that now holds the flag (nil = neutral)
-function setFlagHolder(obj, color)
-  if color then obj.setColorTint(Color.fromString(color)) else obj.setColorTint(FLAG_NEUTRAL) end
-  obj.memo = color or ""
-  obj.setDescription(flagDescription(color))
-end
-
-function flagMenu(obj)
-  if not (obj and obj.hasTag("Flag")) then return end
-  obj.clearContextMenu()
-  obj.addContextMenuItem("Capture", function(color)
-    if color ~= "Grey" then setFlagHolder(obj, color) end   -- spectators can't capture
-  end)
-  obj.addContextMenuItem("Make neutral", function() setFlagHolder(obj, nil) end)
-end
-
 local function piecesTagged(tag)
   local list = {}
   for _, o in ipairs(getAllObjects()) do
@@ -1021,6 +1011,47 @@ local function piecesTagged(tag)
   end
   table.sort(list, function(a, b) return a.guid < b.guid end)
   return list
+end
+
+NEUTRAL = { r = 0.6, g = 0.58, b = 0.54 }   -- an unclaimed flag or capture zone
+FLAG_DESC = "Flag. It takes the colour of the last Pokémon put down on its tile; left-click it to make it neutral."
+FLAG_INSET = 0.38   -- tools/place_pieces.py: a flag's pole stands this far from the two edges of its tile's corner
+
+-- color = the seat colour that now holds the flag (nil = neutral)
+function setFlagHolder(obj, color)
+  obj.setColorTint(color and Color.fromString(color) or NEUTRAL)
+  obj.memo = color or ""
+end
+
+-- The flag whose tile a position is on, if any. A flag stands in the corner of its tile farthest from the board's
+-- centre, so its tile's centre is half a tile (less the inset) back toward the centre.
+function flagAt(pos)
+  local back = BOARD_TILE / 2 - FLAG_INSET
+  for _, flag in ipairs(piecesTagged("Flag")) do
+    local f = flag.getPosition()
+    local cx = f.x - (f.x >= BOARD_SPOT[1] and back or -back)
+    local cz = f.z - (f.z >= BOARD_SPOT[3] and back or -back)
+    if math.abs(pos.x - cx) < BOARD_TILE / 2 and math.abs(pos.z - cz) < BOARD_TILE / 2 and math.abs(pos.y - f.y) < 3 then
+      return flag
+    end
+  end
+end
+
+-- A Pokémon put down: the flag on its tile (if any) takes its owner's colour.
+function flagTaken(obj)
+  local flag = obj and flagAt(obj.getPosition())
+  local owner = flag and figureState(obj).owner
+  if owner then setFlagHolder(flag, owner) end
+end
+
+local lastClear = {}   -- flag guid -> when it was last cleared (one click can arrive as a selection and a pick-up)
+function flagClicked(flag, player)
+  local hover = player and player.getHoverObject and player.getHoverObject()
+  if hover and hover ~= flag then return end   -- a box selection, not a click on it
+  local now = os.clock()
+  if lastClear[flag.guid] and now - lastClear[flag.guid] < 0.4 then return end
+  lastClear[flag.guid] = now
+  setFlagHolder(flag, nil)
 end
 
 local function memoTable(obj)
@@ -1203,7 +1234,7 @@ function refreshZones()
       st.holder = leader
       zone.memo = JSON.encode(st)
     end
-    zone.setColorTint(leader and Color.fromString(leader) or FLAG_NEUTRAL)
+    zone.setColorTint(leader and Color.fromString(leader) or NEUTRAL)
   end
 end
 
@@ -1221,8 +1252,9 @@ function pieceSetup(obj)
     obj.interactable = false
     return
   end
-  flagMenu(obj)
-  if obj.hasTag("Portal") then
+  if obj.hasTag("Flag") then
+    obj.setDescription(FLAG_DESC)
+  elseif obj.hasTag("Portal") then
     local pair = memoTable(obj).pair or 1
     setPortalPair(obj, PORTAL_COLORS[pair] and pair or 1)
     obj.UI.setCustomAssets({ { name = "die", url = BASE_URL .. PIECE_ICONS.die } })
@@ -1362,12 +1394,13 @@ function plainStandee(obj)
   end
 end
 
--- Pokémon put down, picked up or removed: the signs follow (after it has settled or left).
+-- Pokémon put down, picked up or removed: the signs, zones and flags follow (after it has settled or left).
 function onObjectDrop(color, obj)
   if obj.hasTag("Pokemon") then
     claimPokemon(obj, color)
     Wait.time(refreshPedestals, 0.5)
     Wait.time(refreshZones, 0.5)
+    Wait.time(function() flagTaken(obj) end, 0.5)
   end
 end
 

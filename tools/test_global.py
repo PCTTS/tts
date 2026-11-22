@@ -615,28 +615,44 @@ def main():
     """)
     check(g.oldFig.reloaded and str(g.oldFig.newMesh).endswith("models/standee-v1.obj"), "a standee with the old sign goes back to the plain model")
 
-    # flags: a spawned flag gets the menu; Capture tints it to the player's colour, Make neutral resets it
+    # flags: a flag takes the colour of the last Pokemon put down on its tile (its owner's), keeps it when the Pokemon
+    # leaves, and a left-click on it makes it neutral. Its pole stands in the tile's corner farthest from the centre.
     lua.execute(r"""
-      flagObj = { memo = "", menu = {} }
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") or o.hasTag("Pokemon") then o.destroyed = true end end
+      flagObj = { memo = "", guid = "fl1", pos = Vector(4.8838 + 1.24438, 1.38, 4.8638 + 1.24438) }   -- tile centre (4.8838, 4.8638)
       flagObj.hasTag = function(t) return t == "Flag" or t == "ArenaPiece" end
-      flagObj.clearContextMenu = function() flagObj.menu = {} end
-      flagObj.addContextMenuItem = function(label, fn) flagObj.menu[#flagObj.menu + 1] = { label = label, fn = fn } end
+      flagObj.getPosition = function() return flagObj.pos end
       flagObj.setColorTint = function(c) flagObj.tint = c end
       flagObj.setDescription = function(d) flagObj.desc = d end
+      objects[#objects + 1] = flagObj
       onObjectSpawn(flagObj)
-      onObjectSpawn(board)   -- not a flag: no menu, no error
+      onObjectSpawn(board)   -- not a flag: no error
+      function flagMon(name, owner, x, z)
+        local m = { tags = { "Pokemon" }, pos = Vector(x, 1.4, z) }
+        m.memo = JSON.encode({ pokemon = name, owner = owner, hp = 100, maxHp = 100 })
+        m.hasTag = function(t) return t == "Pokemon" end
+        m.getPosition = function() return m.pos end
+        m.getName = function() return name end
+        m.UI = { getXml = function() return "" end, setXml = function() end }
+        objects[#objects + 1] = m
+        return m
+      end
+      function clicker(color, hover) return { color = color, getHoverObject = function() return hover end } end
     """)
     f = g.flagObj
-    check([f.menu[i].label for i in (1, 2)] == ["Capture", "Make neutral"], "a spawned flag gets Capture and Make neutral")
-    f.menu[1].fn("Red")
-    check(f.tint.r > 0.8 and f.tint.g < 0.2 and f.memo == "Red" and f.desc.startswith("Held by Red."),
-          f"Capture by Red tints it red and records Red ({f.desc})")
-    f.menu[1].fn("Grey")
-    check(f.memo == "Red", "a spectator can't capture it")
-    f.menu[1].fn("Blue")
-    check(f.memo == "Blue" and f.tint.b == 1, "Blue can take it over")
-    f.menu[2].fn("Blue")
-    check(f.memo == "" and f.tint.r == 0.6 and f.desc.startswith("Neutral."), "Make neutral resets it")
+    check(f.desc.startswith("Flag. It takes the colour"), "a spawned flag says how it works")
+    lua.execute('onObjectDrop("Red", flagMon("Gengar", "Red", 4.0, 5.9))')
+    check(f.tint.r > 0.8 and f.tint.g < 0.2 and f.memo == "Red", "a Red Pokemon put down on the flag's tile: the flag turns red")
+    lua.execute('onObjectDrop("Blue", flagMon("Onix", "Blue", 4.9, 2.2))')
+    check(f.memo == "Red", "a Pokemon put down on the next tile doesn't touch it")
+    lua.execute('gengar = flagMon("Absol", "Blue", 5.5, 4.5); onObjectDrop("Blue", gengar)')
+    check(f.memo == "Blue" and f.tint.b == 1, "the last Pokemon put down there wins: Blue")
+    lua.execute('gengar.pos = Vector(-9, 1.4, -9); onObjectDrop("Blue", gengar)')
+    check(f.memo == "Blue", "it keeps the colour when that Pokemon moves away")
+    lua.execute('boxed = onPlayerAction(clicker("Green", board), Player.Action.Select, { flagObj })')
+    check(g.boxed is False and f.memo == "Blue", "a box selection that catches the flag doesn't clear it")
+    lua.execute('clicked = onPlayerAction(clicker("Red", flagObj), Player.Action.Select, { flagObj })')
+    check(g.clicked is False and f.memo == "" and f.tint.r == 0.6, "a left-click on it makes it neutral (and doesn't select it)")
 
     # capture zones: the frame takes the colour of whoever has more (not fainted) Pokemon in it; ties are neutral.
     # A Pokemon without an owner belongs to the first seated player to put it down.
@@ -749,12 +765,14 @@ def main():
       delFlag = onPlayerAction(nil, Player.Action.Delete, { pCard, pFlag })
       cutStand = onPlayerAction(nil, Player.Action.Cut, { pStand })
       delTree = onPlayerAction(nil, Player.Action.Delete, { pTree, pCard })
-      pickFlag = onPlayerAction(nil, Player.Action.PickUp, { pFlag })
+      pickCard = onPlayerAction(nil, Player.Action.PickUp, { pCard })
+      pickTree = onPlayerAction(nil, Player.Action.PickUp, { pTree })
     """)
     check(g.pBoard.interactable is False and g.pPillar.interactable is False,
           "the board and the pillars can't be clicked, selected or deleted (not interactive)")
     check(g.delFlag is False and g.cutStand is False, "deleting a flag or cutting a stand is refused")
-    check(g.delTree is True and g.pickFlag is True, "a tree or a card can still be deleted; other actions aren't blocked")
+    check(g.delTree is True and g.pickCard is True and g.pickTree is True,
+          "a tree or a card can still be deleted; other actions aren't blocked")
 
     # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them.
     # TTS's Lua (MoonSharp) fails "pattern too complex" on patterns over text this size (real Lua doesn't), so the
