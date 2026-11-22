@@ -443,29 +443,28 @@ def both_ways(a, t):
 
 
 def draw_pair(im, text, cx, cy, size, fill, **style):
-    """A painted number as N/N centred on (cx, cy), the second one upside down: each player reads the number on
-    their left, and it looks the same from either end of the board. Each piece is centred on its ink, so the
-    upside-down number lines up with the upright one."""
+    """A painted number as a diagonal fraction centred on (cx, cy): upright at the top left (135 degrees), upside
+    down at the bottom right (-45 degrees), a diagonal stroke between them. Each player reads the number on their
+    top left, and it looks the same from either end of the board. Each number is centred on its ink, so the two
+    line up."""
     f = font(size)
     sw = style.get("stroke_width", 0)
-
-    def ink(s):   # (left, top, right, bottom) of the drawn text
-        return f.getbbox(s, anchor="ls", stroke_width=sw)
-
-    w = ink(text)[2] - ink(text)[0]
-    slash = ink("/")[2] - ink("/")[0]
-    d = (w + slash) / 2 + size * 0.06   # centre of each number from the slash's centre
+    left, top, right, bottom = f.getbbox(text, anchor="ls", stroke_width=sw)
+    k = size * 0.42   # each number's centre, this far left/up (or right/down) of the centre
     pad = round(size)
-
-    def put(s, x, turn):
-        left, top, right, bottom = ink(s)
-        layer = Image.new("RGBA", (2 * pad, 2 * pad), (0, 0, 0, 0))
-        ImageDraw.Draw(layer).text((pad - (left + right) / 2, pad - (top + bottom) / 2), s, font=f, fill=fill,
-                                   anchor="ls", **style)
-        im.alpha_composite(layer.rotate(turn) if turn else layer, (round(x - pad), round(cy - pad)))
-    put(text, cx - d, 0)
-    put("/", cx, 0)
-    put(text, cx + d, 180)
+    layer = Image.new("RGBA", (2 * pad, 2 * pad), (0, 0, 0, 0))
+    ImageDraw.Draw(layer).text((pad - (left + right) / 2, pad - (top + bottom) / 2), text, font=f, fill=fill,
+                               anchor="ls", **style)
+    im.alpha_composite(layer, (round(cx - k - pad), round(cy - k - pad)))
+    im.alpha_composite(layer.rotate(180), (round(cx + k - pad), round(cy + k - pad)))
+    stroke = Image.new("RGBA", (2 * pad, 2 * pad), (0, 0, 0, 0))
+    o = ImageDraw.Draw(stroke)
+    reach = size * 0.55   # the stroke, bottom left to top right
+    ends = [(pad - reach, pad + reach), (pad + reach, pad - reach)]
+    if sw:
+        o.line(ends, fill=style.get("stroke_fill"), width=round(size * 0.09) + 2 * sw)
+    o.line(ends, fill=fill, width=round(size * 0.09))
+    im.alpha_composite(stroke, (round(cx - pad), round(cy - pad)))
 
 
 def draw_marker(im, marker, x0, y0, p, both=False):

@@ -63,12 +63,12 @@
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
     "mesh": "board-v1.obj",
-    "texture": "board-v2.jpg",
+    "texture": "board-v3.jpg",
     "geometry": "board-v1.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/court-placeholder-v1.jpg",
-  "_numbers": "How the passage numbers read: \"both\" = N/N, the second one upside down, so either player reads it from their side (without it, numbers turn to face the nearer side edge).",
+  "_numbers": "How the passage numbers read: \"both\" = a diagonal fraction N/N, upright top left, upside down bottom right, so either player reads it from their side (without it, numbers turn to face the nearer side edge).",
   "numbers": "both",
   "_textures": "Placeholders from tools/draw_placeholders.py, a shadowy temple garden at dusk (the user's OK): dark mossy slate ground (Chrysalia's), dark violet temple stone on the high ground, black-green water, the surprise boxes' floor with faint glowing violet runes, dark stone edges.",
   "textures": {
