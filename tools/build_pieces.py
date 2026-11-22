@@ -16,6 +16,8 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/tree-v1.obj, props/tree-v1.jpg, props/tree-collider-v1.obj
   props/gift-v1.obj, props/gift-v1.jpg  (also its own collider)
   props/backdrop-v1.obj  (also its own collider)
+  props/zoneframe2-raised-v1.obj, props/zoneframe4-raised-v1.obj  (frames for a zone raised above everything round
+  it, its edges sloping down RAISED_SLANT: drawn that much farther in, on the flat top; same texture)
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
@@ -91,6 +93,7 @@ BOARD_TILE = 3.24875
 PORTAL_R, PORTAL_H = 1.3, 0.05           # radius, thickness (it lies on the tile; a Pokemon stands on it)
 BRIDGE_W, BRIDGE_D = 2.7, 0.22           # deck width (across) and thickness
 ZONE_W, ZONE_H, ZONE_INSET = 0.16, 0.035, 0.05   # zone frame: band width, thickness, gap inside the zone's border
+RAISED_SLANT = 0.8                       # a raised zone's slopes (map.json "slant"): its frame sits that much farther in
 TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, teeth around its rim
 TREE_BASE, TREE_BASE_H = 1.6, 0.1        # tree tile: base width (fits the flat top of a sloped tile) and thickness
 GIFT = 0.9                               # gift box size
@@ -377,10 +380,11 @@ def bridge_texture():
 
 
 # ------------------------------------------------------------------------------------------------ zone frame
-def zone_frame(tiles=2):
-    """A square ring `tiles` tiles across, centred, lying on y = 0."""
+def zone_frame(tiles=2, inset=0.0):
+    """A square ring `tiles` tiles across, centred, lying on y = 0. inset: drawn in that much farther (a raised
+    zone whose edges slope down: the ring sits on the flat top, inside the slopes)."""
     m = PieceMesh()
-    o = tiles * BOARD_TILE / 2 - ZONE_INSET
+    o = tiles * BOARD_TILE / 2 - ZONE_INSET - inset
     i = o - ZONE_W
     for x0, x1, z0, z1 in ((-o, o, i, o), (-o, o, -o, -i), (i, o, -i, i), (-o, -i, -i, i)):
         box(m, x0, x1, 0, ZONE_H, z0, z1)
@@ -625,6 +629,8 @@ def main():
         "gift-v1.obj": lambda p: gift().write(p),
         "gift-v1.jpg": lambda p: gift_texture().save(p, quality=92),
         "backdrop-v1.obj": lambda p: backdrop().write(p),
+        "zoneframe2-raised-v1.obj": lambda p: zone_frame(2, RAISED_SLANT).write(p),
+        "zoneframe4-raised-v1.obj": lambda p: zone_frame(4, RAISED_SLANT).write(p),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

@@ -8757,9 +8757,9 @@
     "desc": "",
     "tiles": 4,
     "tile": 3.24875,
-    "mesh": "props/zoneframe4-v1.obj",
+    "mesh": "props/zoneframe4-raised-v1.obj",
     "diffuse": "props/zoneframe-v1.jpg",
-    "collider": "props/zoneframe4-v1.obj",
+    "collider": "props/zoneframe4-raised-v1.obj",
     "convex": false,
     "material": 3
    },

@@ -19,7 +19,8 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
   trap: a trap piece on the tile; right-click > Spring trap removes it once it's been used (Global.lua).
   tree / gift: a tree tile (Yaksha) or a gift box on the tile, NOT locked: players lift it off / move it themselves.
   zone (capture zone tiles): a frame around each square group of them (2x2), which takes the colour of the player
-        with more Pokemon inside (Global.lua).
+        with more Pokemon inside (Global.lua). A zone raised above every tile round it, with sloping edges, gets
+        the frame drawn in on its flat top (Yaksha's centre).
   bridge tiles (legend "bridge": true, sky with no board): each run of them between two islands is one rope
         bridge, 1 or 2 tiles long, carrying its own snap points; it starts dropped (closed) and the arrows on it
         raise or drop all the bridges (Global.lua).
@@ -51,6 +52,9 @@ TRAP = {"mesh": "props/trap-v1.obj", "diffuse": "props/trap-v1.jpg", "collider":
         "convex": True, "material": 2}
 ZONES = {n: {"mesh": f"props/zoneframe{n}-v1.obj", "diffuse": "props/zoneframe-v1.jpg", "collider": f"props/zoneframe{n}-v1.obj",
              "convex": False, "material": 3} for n in (2, 4)}
+RAISED_SLANT = 0.8   # tools/build_pieces.py: the raised zone frames sit this far inside the zone's border
+RAISED_ZONES = {n: {**ZONES[n], "mesh": f"props/zoneframe{n}-raised-v1.obj", "collider": f"props/zoneframe{n}-raised-v1.obj"}
+                for n in (2, 4)}
 TREE = {"mesh": "props/tree-v1.obj", "diffuse": "props/tree-v1.jpg", "collider": "props/tree-collider-v1.obj",
         "convex": True, "material": 1}
 GIFT = {"mesh": "props/gift-v1.obj", "diffuse": "props/gift-v1.jpg", "collider": "props/gift-v1.obj",
@@ -84,8 +88,23 @@ def zones(data, info):
         top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0)
         cx = sum((c + 0.5 - C / 2) * T for _, c in group) / len(group)
         cz = sum((R / 2 - r - 0.5) * T for r, _ in group) / len(group)
-        out.append((size, (cx, top, cz)))
+        # raised above every tile round it, with sloping edges: the frame that sits inside the slopes
+        around = [(r + dr, c + dc) for r, c in group for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1))
+                  if (r + dr, c + dc) not in cells]
+        lower = [n for n in around if (level_at(data, *n) or -1) < tile.get("level", 0)]
+        raised = tile.get("slant") and len(lower) == len(around)
+        if raised and tile["slant"] != RAISED_SLANT:
+            sys.exit(f"capture zone {sorted(group)}: a raised zone's frame fits slant {RAISED_SLANT} only")
+        out.append((size, (cx, top, cz), bool(raised)))
     return out
+
+
+def level_at(data, r, c):
+    """A grid tile's level, or None outside the grid or on void."""
+    if 0 <= r < len(data["grid"]) and 0 <= c < len(data["grid"][0]):
+        t = data["legend"][data["grid"][r][c]]
+        return None if t.get("void") else t.get("level", 0)
+    return None
 
 
 def bridges(data, grid, info):
@@ -164,8 +183,8 @@ def pieces(arena, info):
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
                 yaw = math.degrees(math.atan2(-sz, sx)) + 180   # TTS yaw that turns the model's +x toward (-sx, -sz)
                 out.append({"kind": "Flag", "name": "Flag", "model": FLAG, "pos": pos, "yaw": yaw % 360, "desc": ""})
-    for size, pos in zones(data, info):
-        out.append({"kind": "Zone", "name": "Capture zone", "model": ZONES[size], "pos": list(pos), "yaw": 0,
+    for size, pos, raised in zones(data, info):
+        out.append({"kind": "Zone", "name": "Capture zone", "model": (RAISED_ZONES if raised else ZONES)[size], "pos": list(pos), "yaw": 0,
                     "desc": "", "tiles": size, "tile": round(T, 5)})
     for tiles, pos, yaw in bridges(data, grid, info):
         out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[tiles], "pos": list(pos), "yaw": yaw,
