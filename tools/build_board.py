@@ -968,6 +968,8 @@ def contact_edges(a, r, c):
             for side in contact:
                 ends = ("W", "E") if side in "NS" else ("N", "S")   # the sides at its start and its end
                 rounds = [not ((side_level(e) or -1) > own and e not in contact) for e in ends]   # not at a side wall
+                if follow:   # a bevel ends where the stair ends; it only rounds into the next bevel
+                    rounds = [e in contact for e in ends]
                 pieces = []   # (start, end) in tiles along the side, bottom at each
                 if follow:    # the whole edge: down each cut at its ends, the landing between
                     lo, hi = (tc, tc + 1) if side in "NS" else (tr, tr + 1)
