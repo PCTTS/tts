@@ -19,7 +19,7 @@
     "####.1~~~1^..^1...1.#GGG",
     "####..~~~..11.......#hGG"
   ],
-  "_legend": "level = height step (0 = lowest). surface picks the look from the palette. slant = slopes down to lower land over this many world units, inside the tile. sink = the surface sits this many world units lower (a look only: the water counts as ground level). marker = something on the tile (painted, or a 3D piece with piece: true). zone: capture zone tiles (a frame per square group that takes the colour of the player with more Pokemon in it). tree / gift: a tree tile or a gift box, NOT locked (players move them). passage-inN: a secret passage's entrance in a surprise box; passage-outN: where passage N comes out (one way).",
+  "_legend": "level = height step (0 = lowest). surface picks the look from the palette. slant = slopes down to lower land over this many world units, inside the tile. sink = the surface sits this many world units lower (a look only: the water counts as ground level). marker = something on the tile (painted, or a 3D piece with piece: true). zone: capture zone tiles (the big centre one, Z, a level above the terrace round it) (a frame per square group that takes the colour of the player with more Pokemon in it). tree / gift: a tree tile or a gift box, NOT locked (players move them). passage-inN: a secret passage's entrance in a surprise box; passage-outN: where passage N comes out (one way).",
   "legend": {
     "#": { "void": true
     },
@@ -27,7 +27,7 @@
     },
     "^": { "level": 1, "surface": "high", "slant": 0.8
     },
-    "Z": { "level": 1, "surface": "high", "slant": 0.8, "marker": "zone", "paint": false, "piece": true
+    "Z": { "level": 2, "surface": "high", "slant": 0.8, "marker": "zone", "paint": false, "piece": true
     },
     "Y": { "level": 1, "surface": "high", "slant": 0.8, "marker": "tree", "paint": false, "piece": true
     },
@@ -62,9 +62,9 @@
   },
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
-    "mesh": "board-v1.obj",
-    "texture": "board-v3.jpg",
-    "geometry": "board-v1.json"
+    "mesh": "board-v2.obj",
+    "texture": "board-v4.jpg",
+    "geometry": "board-v2.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/court-placeholder-v1.jpg",

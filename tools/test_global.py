@@ -355,7 +355,7 @@ def main():
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
     free =[s for s in new if s.data.Tags[1] in ("Tree", "Gift")]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/yaksha/board-v1.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/yaksha/board-v2.obj")
           and len(zones) == 3 and sum(z.data.CustomMesh.MeshURL.endswith("zoneframe4-v1.obj") for z in zones) == 1
           and kinds.count("Tree") == 6 and kinds.count("Gift") == 14 and all(not s.data.Locked for s in free)
           and all(s.data.Locked for s in new if s.data.Tags[1] in ("Board3D", "Zone")),
