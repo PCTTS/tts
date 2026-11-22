@@ -14,7 +14,6 @@ card on the slope under each. Which stand is yours depends on your seat colour (
   * Map:      pick which arena goes on the table (3D boards from arenas/index.json, with snap points and pieces).
 Flags on the board: right-click > Capture tints a flag to your seat colour; "Make neutral" resets it.
 HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
-Chat:  !spawn garchomp   !item sitrus   !skill belief   !ability levitate   spawn the best match (or list close alternatives).
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
 game loads, so new Pokémon and changed cards appear without editing the mod. The last copies are kept in the
@@ -48,12 +47,12 @@ CARD_KINDS = { "items", "skills", "abilities" }   -- the stand's card rows, top 
 LIST_KINDS = { items = true, skills = true, abilities = true }
 LIST_ROWS = 10
 CATALOGS = {
-  dex = { title = "Spawn a Pokémon", noun = "Pokémon", hint = "Click a result to put it on your next free pedestal." },
-  items = { title = "Item cards", noun = "item", hint = "Click a card to place it, or type to search.",
+  dex = { title = "Spawn a Pokémon" },
+  items = { title = "Item cards",
     deckBase = 1000, tag = "Item" },
-  skills = { title = "Warrior skill cards", noun = "warrior skill", hint = "Click a card to place it, or type to search.",
+  skills = { title = "Warrior skill cards",
     deckBase = 3000, tag = "WarriorSkill" },
-  abilities = { title = "Pokémon ability cards", noun = "ability", hint = "Click a card to place it, or type to search.",
+  abilities = { title = "Pokémon ability cards",
     deckBase = 5000, tag = "Ability" },
 }
 ROSTER_URL = BASE_URL .. "figures/index.json"
@@ -87,7 +86,6 @@ for _, s in ipairs(STATUSES) do
   STATUS_ROWS[#STATUS_ROWS + 1] = s
 end
 STATUS_ROWS[#STATUS_ROWS + 1] = { key = "clear", label = "Clear status", color = "#9E9E9E" }
-STATUS_HINT = "Pick a status, then pick up a Pokémon."
 
 STANDEE_MESH = "models/standee-v1.obj"  -- a Pokémon: art on a round base with a facing arrow (build_standee.py)
 FIGURE_SCALE = 1.5   -- ImageScalar for the old flat figurines (only used if the roster has no standees)
@@ -96,8 +94,8 @@ RESULTS = 8          -- search results shown at once
 MAX_MAPS = 16        -- rows in the map panel
 ROW_TEXT = "#111111" -- result rows: dark text on light grey (TTS can reset text colour when a row's text changes)
 ROW_STEP = 32        -- height of one result row plus spacing
-SEARCH_BASE = 108    -- search panel height with no results (title, search box, hint)
-MAPS_BASE = 70       -- map panel height with no rows (title, hint)
+SEARCH_BASE = 86     -- search panel height with no results (title, search box)
+MAPS_BASE = 48       -- map and status panel height with no rows (title)
 NO_SEAT_SPOT = { -35, 4, 22 }  -- where things appear for players without a seat: the strip left of the board
 -- Which team stand each seat uses: the near (south, z < 0) or far (north) long side of the table.
 SEAT_SIDE = { White = "south", Brown = "south", Red = "south", Orange = "south", Pink = "south",
@@ -140,8 +138,8 @@ listNames, builtLists = {}, {}             -- names in each full list as built, 
 -- game every few seconds for rewind, and turning these tables back into JSON took over a second each time
 -- (the stutter). Each is decoded once per load: the fresh download, or the saved copy if the site can't be reached.
 DATA = {
-  { key = "roster", url = ROSTER_URL, use = function(t) setCatalog("dex", t, "downloaded") end },
-  { key = "cards", url = CARDS_URL, use = function(t) setCards(t, "downloaded") end },
+  { key = "roster", url = ROSTER_URL, use = function(t) setCatalog("dex", t) end },
+  { key = "cards", url = CARDS_URL, use = function(t) setCards(t) end },
   { key = "stats", url = STATS_URL, use = function(t) stats = t; refreshPedestals() end },
   { key = "arenas", url = ARENAS_URL, use = function(t) arenas = t end },
 }
@@ -177,25 +175,19 @@ end
 
 function onLoad(saved)
   local ok, texts = pcall(readSavedState, saved)
-  if not ok then   -- a bad saved copy must never stop the load: the downloads still come in
-    log("Couldn't read the saved copies (" .. tostring(texts) .. "); downloading fresh ones.")
-    texts = {}
-  end
+  if not ok then texts = {} end   -- a bad saved copy must never stop the load: the downloads still come in
   for key, text in pairs(texts) do
     if key ~= "legacy" then rememberData(key, text) end
   end
   for _, d in ipairs(DATA) do
     WebRequest.get(d.url, function(req)
       local text = (not req.is_error and req.text and req.text ~= "") and req.text or nil
-      local from = "downloaded"
-      if not text then
-        log("Couldn't download the " .. d.key .. " (" .. tostring(req.error) .. "); using the saved copy.")
-        text, from = rawData[d.key], "saved copy"
-      end
+      local fresh = text ~= nil
+      if not fresh then text = rawData[d.key] end   -- offline: the saved copy
       local ok, data = false, nil
       if text then ok, data = pcall(JSON.decode, text) end
       if ok and type(data) == "table" and next(data) then
-        if from == "downloaded" then rememberData(d.key, text) end
+        if fresh then rememberData(d.key, text) end
         d.use(data)
       elseif texts.legacy and texts.legacy[d.key] then
         d.use(texts.legacy[d.key])
@@ -329,16 +321,11 @@ function ensureHandZones()
       end
     end
   end, 10)
-  log("Hand zones put back just past the table's edge.")
   return true
 end
 
 function onSave()
   return savedState
-end
-
-function log(msg)
-  print("[PCTTS] " .. msg)
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -349,7 +336,7 @@ local function norm(s)
   return (s:gsub("[^%w]", ""))
 end
 
-function setCatalog(kind, index, from)
+function setCatalog(kind, index)
   local list, keys = {}, {}
   for name in pairs(index) do
     local words = {}
@@ -360,7 +347,6 @@ function setCatalog(kind, index, from)
   for i, e in ipairs(list) do keys[e.name] = (CATALOGS[kind].deckBase or 0) + i end
   catalog[kind] = { index = index, list = list, keys = keys }
   if kind == "dex" then roster = index end
-  log(CATALOGS[kind].title .. ": " .. #list .. " (" .. from .. ")")
   -- the scrolling lists are part of the UI: rebuild it if this catalogue's names changed since it was built
   if LIST_KINDS[kind] and builtLists[kind] and builtLists[kind] ~= listSignature(kind) then buildUI() end
 end
@@ -371,11 +357,11 @@ function listSignature(kind)
   return table.concat(names, "\n")
 end
 
-function setCards(data, from)
+function setCards(data)
   cardBacks = data.backs or {}
-  if data.items then setCatalog("items", data.items, from) end
-  if data.skills then setCatalog("skills", data.skills, from) end
-  if data.abilities then setCatalog("abilities", data.abilities, from) end
+  if data.items then setCatalog("items", data.items) end
+  if data.skills then setCatalog("skills", data.skills) end
+  if data.abilities then setCatalog("abilities", data.abilities) end
 end
 
 -- Best matches for a typed query: whole-name prefix first, then a word prefix, then anywhere; shorter names first.
@@ -684,7 +670,7 @@ local function toolbarXml()
 end
 
 PANEL_W, PANEL_PAD = 290, 8
-LIST_TOP = 100  -- a search panel's first result row, below its top: padding, title, search box, hint and gaps
+LIST_TOP = 78   -- a search panel's first result row, below its top: padding, title, search box and gaps
 LIST_BAR = 20   -- room at a full list's right for its scrollbar, which lies over the list
 LIST_HBAR = 20  -- TTS always gives a scroll list a sideways scrollbar along its bottom, even with nothing to scroll:
                 -- the list is this much taller and a strip in the panel's colour covers the bar
@@ -699,19 +685,20 @@ local function dockXml()
     .. 'color="#00000000" raycastTarget="false">\n', -(w + 4), PANEL_W, h)
 end
 
-local function panelXml(kind, c, title, height, body)
+local function panelXml(kind, c, title, height, body, noClose)
   return string.format([[
 <VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="UpperRight" width="%d" height="%d"
        color="#141414F2" outline="#303030" outlineSize="1 1" padding="%d %d %d %d" spacing="4"
        childForceExpandHeight="false" childForceExpandWidth="true">
   <HorizontalLayout preferredHeight="28" flexibleHeight="0" childForceExpandWidth="false" spacing="4">
     <Text class="title" flexibleWidth="1">%s</Text>
-    <Button class="close" preferredWidth="28" onClick="closePanel" text="X"/>
+    %s
   </HorizontalLayout>
   %s
   <Panel flexibleHeight="1"/>
 </VerticalLayout>
-]], kind, c, c, PANEL_W, height, PANEL_PAD, PANEL_PAD, PANEL_PAD, PANEL_PAD, title, body)
+]], kind, c, c, PANEL_W, height, PANEL_PAD, PANEL_PAD, PANEL_PAD, PANEL_PAD, title,
+    noClose and "" or '<Button class="close" preferredWidth="28" onClick="closePanel" text="X"/>', body)
 end
 
 local function xmlText(s)
@@ -760,7 +747,6 @@ function buildUI()
           colors="#E4E4E4|#B3D1FF|#8DB8F7|#E4E4E4" preferredHeight="28" flexibleHeight="0"/>
   <Button class="close" fontSize="14" textColor="#FFFFFF" colors="#2a2a2a|#c0392b|#962d22|#2a2a2a"/>
   <Text class="title" fontSize="16" fontStyle="Bold" color="#FFFFFF" alignment="MiddleLeft"/>
-  <Text class="hint" fontSize="12" color="#AAAAAA" alignment="MiddleLeft" preferredHeight="18" flexibleHeight="0"/>
   <InputField class="search" fontSize="16" preferredHeight="34" flexibleHeight="0" characterLimit="40"/>
 </Defaults>
 ]], string.format('<Panel id="hud" rectAlignment="UpperRight" width="100%%" height="%s" color="#00000000" raycastTarget="false">\n',
@@ -770,7 +756,6 @@ function buildUI()
       local cat = CATALOGS[kind]
       local rows = {
         string.format('<InputField id="%sIn_%s" class="search" placeholder="Type part of a name..." onValueChanged="searchChanged"/>', kind, c),
-        string.format('<Text id="%sMsg_%s" class="hint">%s</Text>', kind, c, cat.hint),
       }
       for i = 1, RESULTS do
         rows[#rows + 1] = string.format('<Button id="%sRes_%s_%d" class="row" active="false" onClick="searchPick" text=" "/>', kind, c, i)
@@ -778,14 +763,14 @@ function buildUI()
       xml[#xml + 1] = panelXml(kind, c, cat.title, panelHeight(kind, 0), table.concat(rows, "\n  "))
     end
 
-    local rows = { string.format('<Text id="mapMsg_%s" class="hint">Click a map to put it on the table.</Text>', c) }
+    local rows = {}
     for i = 1, MAX_MAPS do
       rows[#rows + 1] = string.format('<Button id="mapRes_%s_%d" class="row" active="false" onClick="mapPick" text=" "/>', c, i)
     end
-    xml[#xml + 1] = panelXml("maps", c, "Choose the map", MAPS_BASE, table.concat(rows, "\n  "))
+    xml[#xml + 1] = panelXml("maps", c, "Choose the map", MAPS_BASE, table.concat(rows, "\n  "), true)
 
     -- statuses: a square in the status's colour, then the row (the clear row gets an empty square's space)
-    rows = { string.format('<Text id="statusMsg_%s" class="hint">%s</Text>', c, STATUS_HINT) }
+    rows = {}
     for _, s in ipairs(STATUS_ROWS) do
       local swatch = s.key == "clear" and "#00000000" or s.color
       rows[#rows + 1] = string.format('<HorizontalLayout preferredHeight="28" flexibleHeight="0" spacing="6" childForceExpandWidth="false">'
@@ -853,7 +838,7 @@ function searchChanged(player, value, id)
   local c, kind = player.color, id:match("^(%a+)In_")
   value = value or ""
   queries[c .. kind] = value
-  local names, hits = search(kind, value, RESULTS)
+  local names = search(kind, value, RESULTS)
   searchHits[c] = { kind = kind, names = names }
   for i = 1, RESULTS do
     local rid = kind .. "Res_" .. c .. "_" .. i
@@ -865,23 +850,10 @@ function searchChanged(player, value, id)
   end
   UI.setAttribute(kind .. "_" .. c, "height", panelHeight(kind, #names))
   setListShown(c, kind, value == "" and openPanel[c] == kind)
-  local msg
-  if value == "" then
-    msg = CATALOGS[kind].hint
-  elseif #names == 0 then
-    msg = "No " .. CATALOGS[kind].noun .. " matches \"" .. value .. "\"."
-  elseif #hits > RESULTS then
-    msg = #hits .. " matches, showing the best " .. RESULTS .. "."
-  else
-    msg = #hits .. (#hits == 1 and " match." or " matches.")
-  end
-  UI.setValue(kind .. "Msg_" .. c, msg)
 end
 
 local function placed(kind, c, name)
-  if name and spawnFrom(kind, name, c) then
-    UI.setValue(kind .. "Msg_" .. c, "Placed " .. name .. ".")
-  end
+  if name then spawnFrom(kind, name, c) end
 end
 
 function searchPick(player, _, id)
@@ -903,14 +875,13 @@ function refreshMaps(c)
   for i = 1, MAX_MAPS do
     local id, m = "mapRes_" .. c .. "_" .. i, list[i]
     if m then
-      UI.setAttribute(id, "text", m.current and (m.name .. "   (on the board)") or m.name)
+      UI.setAttribute(id, "text", m.name)
       UI.setAttribute(id, "textColor", ROW_TEXT)
       UI.setAttribute(id, "colors", m.current and "#8DB8F7|#8DB8F7|#6FA3F0|#8DB8F7" or "#E4E4E4|#B3D1FF|#8DB8F7|#E4E4E4")
     end
     UI.setAttribute(id, "active", m and "true" or "false")
   end
   UI.setAttribute("maps_" .. c, "height", MAPS_BASE + math.min(#list, MAX_MAPS) * ROW_STEP)
-  UI.setValue("mapMsg_" .. c, #list > 0 and "Click a map to put it on the table." or "The map list hasn't downloaded yet.")
 end
 
 function mapPick(player, _, id)
@@ -918,7 +889,6 @@ function mapPick(player, _, id)
   local m = mapRows[c] and mapRows[c][tonumber(id:match("_(%d+)$"))]
   if not m or m.current then return end
   if not loadArena(m.name) then return end
-  printToAll((player.steam_name or c) .. " put " .. m.name .. " on the table.", { 0.8, 0.9, 1 })
   Wait.frames(function()
     for _, other in ipairs(COLORS) do
       if openPanel[other] == "maps" then refreshMaps(other) end
@@ -955,7 +925,6 @@ function refreshStatus(c)
   for _, s in ipairs(STATUS_ROWS) do
     UI.setAttribute("statusRes_" .. c .. "_" .. s.key, "colors", statusRowColors(s.color, armed[c] == s.key))
   end
-  UI.setValue("statusMsg_" .. c, armed[c] and "Now pick up a Pokémon (click the status again to cancel)." or STATUS_HINT)
 end
 
 function statusPick(player, _, id)
@@ -997,21 +966,15 @@ end
 
 function applyStatus(obj, key)
   local st, def = figureState(obj), STATUS_BY_KEY[key]
-  local name, now = (st.pokemon ~= "" and st.pokemon) or "That Pokémon", false
   if key == "clear" then
     st.status, st.confused, st.flinched = nil, nil, nil
   elseif def.volatile then
     st[key] = (not st[key]) or nil   -- toggles
-    now = st[key]
   else
     st.status = (st.status ~= key) and key or nil  -- replaces the main status, or removes it if it's the same
-    now = st.status ~= nil
   end
   obj.memo = JSON.encode(st)
   paintFigure(obj, st)
-  local msg = key == "clear" and (name .. " is back to normal.")
-    or (name .. (now and " is now " or " is no longer ") .. def.label:lower() .. ".")
-  printToAll(msg, { 0.95, 0.88, 0.75 })
 end
 
 function onObjectPickUp(color, obj)
@@ -1036,38 +999,20 @@ function flagDescription(color)
   return (color and ("Held by " .. color .. ".") or "Neutral.") .. " Right-click it to capture it for your colour."
 end
 
--- color = the seat colour that now holds the flag (nil = neutral); by = the player who changed it
-function setFlagHolder(obj, color, by)
-  local was = obj.memo
-  if was == "" then was = nil end
+-- color = the seat colour that now holds the flag (nil = neutral)
+function setFlagHolder(obj, color)
   if color then obj.setColorTint(Color.fromString(color)) else obj.setColorTint(FLAG_NEUTRAL) end
   obj.memo = color or ""
   obj.setDescription(flagDescription(color))
-  if by and color ~= was then
-    local who = Player[by].steam_name or by
-    if color then
-      printToAll(who .. " captured a flag.", Color.fromString(color))
-    else
-      printToAll(who .. " made a flag neutral.", { 0.9, 0.9, 0.9 })
-    end
-  end
 end
 
 function flagMenu(obj)
   if not (obj and obj.hasTag("Flag")) then return end
   obj.clearContextMenu()
   obj.addContextMenuItem("Capture", function(color)
-    if color == "Grey" then
-      Player[color].broadcast("Take a seat to capture flags.", { 1, 0.6, 0.6 })
-    else
-      setFlagHolder(obj, color, color)
-    end
+    if color ~= "Grey" then setFlagHolder(obj, color) end   -- spectators can't capture
   end)
-  obj.addContextMenuItem("Make neutral", function(color) setFlagHolder(obj, nil, color) end)
-end
-
-local function playerName(color)
-  return (color and Player[color] and Player[color].steam_name) or color or "Someone"
+  obj.addContextMenuItem("Make neutral", function() setFlagHolder(obj, nil) end)
 end
 
 local function piecesTagged(tag)
@@ -1115,7 +1060,7 @@ function setPortalPair(obj, pair)
     .. "the portals.")
 end
 
-function shufflePortals(color)
+function shufflePortals()
   local portals = piecesTagged("Portal")
   if #portals < 2 then return end
   local order = {}
@@ -1125,11 +1070,10 @@ function shufflePortals(color)
     order[i], order[j] = order[j], order[i]
   end
   for k, i in ipairs(order) do setPortalPair(portals[i], math.floor((k + 1) / 2)) end
-  printToAll(playerName(color) .. " shuffled the portals.", { 0.85, 0.7, 1 })
 end
 
-function portalClicked(player)
-  shufflePortals(player and player.color)
+function portalClicked()
+  shufflePortals()
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -1187,33 +1131,19 @@ function setBridgeUp(obj, up)
 end
 
 -- Raise them all if any is down; otherwise drop them all except the ones with a Pokémon on them.
-function toggleBridges(color)
+function toggleBridges()
   local bridges, anyDown = piecesTagged("Bridge"), false
   for _, b in ipairs(bridges) do
     if not bridgeState(b).up then anyDown = true end
   end
   if #bridges == 0 then return end
-  if anyDown then
-    for _, b in ipairs(bridges) do setBridgeUp(b, true) end
-    printToAll(playerName(color) .. " raised the bridges.", { 0.9, 0.8, 0.6 })
-    return
-  end
-  local stay = {}
   for _, b in ipairs(bridges) do
-    local mon = pokemonOnBridge(b)
-    if mon then stay[#stay + 1] = figureState(mon).pokemon else setBridgeUp(b, false) end
+    if anyDown or not pokemonOnBridge(b) then setBridgeUp(b, anyDown) end
   end
-  local msg = playerName(color) .. " dropped the bridges."
-  if #stay == 1 then
-    msg = msg .. " The one under " .. stay[1] .. " stays up."
-  elseif #stay > 1 then
-    msg = msg .. " The ones under " .. table.concat(stay, ", ") .. " stay up."
-  end
-  printToAll(msg, { 0.9, 0.8, 0.6 })
 end
 
-function bridgeClicked(player)
-  toggleBridges(player and player.color)
+function bridgeClicked()
+  toggleBridges()
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -1273,11 +1203,6 @@ function refreshZones()
     if leader ~= st.holder then
       st.holder = leader
       zone.memo = JSON.encode(st)
-      if leader then
-        printToAll(playerName(leader) .. " holds a capture zone.", Color.fromString(leader))
-      else
-        printToAll("A capture zone is held by no one.", { 0.9, 0.9, 0.9 })
-      end
     end
     zone.setColorTint(leader and Color.fromString(leader) or FLAG_NEUTRAL)
   end
@@ -1342,12 +1267,8 @@ function pieceSetup(obj)
     obj.UI.setXml(pieceButtonXml("bridgeArrows", 0, BRIDGE_BUTTON.z, BRIDGE_BUTTON.y, "bridgeClicked",
       "Raise or drop the bridges", "updown"))
     obj.clearContextMenu()
-    obj.addContextMenuItem("Raise this bridge", function(color)
-      if setBridgeUp(obj, true) then printToAll(playerName(color) .. " raised a bridge.", { 0.9, 0.8, 0.6 }) end
-    end)
-    obj.addContextMenuItem("Drop this bridge", function(color)
-      if setBridgeUp(obj, false) then printToAll(playerName(color) .. " dropped a bridge.", { 0.9, 0.8, 0.6 }) end
-    end)
+    obj.addContextMenuItem("Raise this bridge", function() setBridgeUp(obj, true) end)
+    obj.addContextMenuItem("Drop this bridge", function() setBridgeUp(obj, false) end)
   end
 end
 
@@ -1503,33 +1424,9 @@ function hpEdited(player, value, id)
       if new and new ~= old then
         st.hp = new
         mon.memo = JSON.encode(st)
-        local name = st.pokemon ~= "" and st.pokemon or "That Pokémon"
-        local change = new - old
-        printToAll(string.format("%s: %d → %d HP (%s%d)%s", name, old, new, change > 0 and "+" or "", change,
-          new == 0 and (". " .. name .. " fainted!") or ""), new == 0 and { 1, 0.45, 0.45 } or { 0.85, 0.85, 0.85 })
       end
     end
   end
   refreshStand(stand)   -- shows the result, or puts back the number if the entry wasn't one
   refreshZones()        -- a fainted Pokémon no longer holds a zone
-end
-
-----------------------------------------------------------------------------------------------------
--- Chat commands: !spawn <pokemon>, !item <item>, !skill <warrior skill>, !ability <ability>
-----------------------------------------------------------------------------------------------------
-CHAT_KINDS = { spawn = "dex", item = "items", skill = "skills", ability = "abilities" }
-
-function onChat(message, player)
-  local cmd, query = message:match("^!(%a+)%s+(.+)$")
-  local kind = cmd and CHAT_KINDS[cmd:lower()]
-  if not kind then return true end
-  local names, hits = search(kind, query, 5)
-  if #names == 0 then
-    player.broadcast("No " .. CATALOGS[kind].noun .. " matches \"" .. query .. "\".", { 1, 0.5, 0.5 })
-  elseif hits[1].exact or #hits == 1 or hits[1].score < (hits[2] and hits[2].score or 3) then
-    spawnFrom(kind, names[1], player.color)
-  else
-    player.broadcast("Which one? " .. table.concat(names, ", "), { 1, 1, 0.6 })
-  end
-  return false  -- keep the command out of the chat log
 end

@@ -197,10 +197,13 @@ def main():
     except ET.ParseError as e:
         check(False, f"UI XML parses ({e})")
     check(len(list(calls.assets.values())) == 6, "six toolbar icons registered")
-    printed = [str(p) for p in calls.printed.values()]
-    check(any("Pokémon: 704" in p for p in printed), "roster downloaded (704 names)")
-    check(any("Item cards: 246" in p for p in printed) and any("Warrior skill cards: 67" in p for p in printed),
+    check(len(g.catalog.dex.list) == 704, "roster downloaded (704 names)")
+    check(len(g.catalog["items"].list) == 246 and len(g.catalog.skills.list) == 67,
           "cards downloaded (246 items, 67 warrior skills)")
+    check('class="hint"' not in xml and "Msg_" not in xml, "the panels have no hint lines")
+    maps_panel = xml[xml.index('id="maps_White"'):xml.index('</VerticalLayout>', xml.index('id="maps_White"'))]
+    check('onClick="closePanel"' not in maps_panel and 'onClick="closePanel"' in xml, "the map panel has no X (the others keep theirs)")
+    check(g.onChat is None, "no chat commands")
 
     # search
     names, _ = g.searchRoster("gard", 8)
@@ -237,8 +240,8 @@ def main():
           f"map list shows the six arenas, Pugilis on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
-          and calls.attrs["mapRes_White_4.text"] == "Pugilis   (on the board)",
-          "map button opens the map panel (and closes the search panel)")
+          and calls.attrs["mapRes_White_4.text"] == "Pugilis" and calls.attrs["mapRes_White_4.colors"].startswith("#8DB8F7"),
+          "map button opens the map panel (and closes the search panel); the map on the table is highlighted, no label")
     n = len(calls.spawned)
     g.mapPick(player, "-1", "mapRes_White_4")
     check(len(calls.spawned) == n, "picking the arena that's already on the table does nothing")
@@ -379,9 +382,8 @@ def main():
           and [b2.menu[i].label for i in (1, 2)] == ["Raise this bridge", "Drop this bridge"],
           "it gets the clear arrows button and the right-click menu")
     g.bridgeClicked(player)
-    check(all(abs(b.pos.y - 4.276) < 1e-6 and json.loads(b.memo)["up"] for b in tb.values())
-          and any(str(p) == "WhitePlayer raised the bridges." for p in calls.printed.values()),
-          "clicking the arrows raises every bridge, and says so")
+    check(all(abs(b.pos.y - 4.276) < 1e-6 and json.loads(b.memo)["up"] for b in tb.values()),
+          "clicking the arrows raises every bridge")
     lua.execute(r"""
       onBridge = { tags = { "Pokemon" }, memo = '{"pokemon":"Pikachu"}', getName = function() return "Pikachu" end }
       onBridge.hasTag = function(t) return t == "Pokemon" end
@@ -389,14 +391,12 @@ def main():
       objects[#objects + 1] = onBridge
     """)
     g.bridgeClicked(player)
-    check(abs(tb[1].pos.y - (4.276 - 1.6)) < 1e-6 and abs(tb[2].pos.y - 4.276) < 1e-6 and abs(tb[3].pos.y - (4.276 - 1.6)) < 1e-6
-          and any(str(p) == "WhitePlayer dropped the bridges. The one under Pikachu stays up." for p in calls.printed.values()),
+    check(abs(tb[1].pos.y - (4.276 - 1.6)) < 1e-6 and abs(tb[2].pos.y - 4.276) < 1e-6 and abs(tb[3].pos.y - (4.276 - 1.6)) < 1e-6,
           "clicking again drops them, except the one Pikachu is standing on")
     g.bridgeClicked(player)
     check(all(json.loads(b.memo)["up"] for b in tb.values()), "the next click raises them all again")
     tb[3].menu[2].fn("Red")
-    check(abs(tb[3].pos.y - (4.276 - 1.6)) < 1e-6 and abs(tb[1].pos.y - 4.276) < 1e-6
-          and any(str(p) == "RedPlayer dropped a bridge." for p in calls.printed.values()), "right-click > Drop this bridge drops just that one")
+    check(abs(tb[3].pos.y - (4.276 - 1.6)) < 1e-6 and abs(tb[1].pos.y - 4.276) < 1e-6, "right-click > Drop this bridge drops just that one")
 
     # portals: the die gives every portal a new partner at random (three pairs, each its own colour)
     lua.execute(r"""
@@ -426,7 +426,7 @@ def main():
         ok = ok and sorted(pr) == [1, 1, 2, 2, 3, 3] and all(
             (p.tint.r, p.tint.g, p.tint.b) == tuple(g.portalTint(json.loads(p.memo)["pair"])[k] for k in "rgb") for p in tp.values())
         seen.add(frozenset(frozenset(i for i, x in enumerate(pr) if x == k) for k in (1, 2, 3)))
-    check(ok and len(seen) > 3 and any(str(p) == "WhitePlayer shuffled the portals." for p in calls.printed.values()),
+    check(ok and len(seen) > 3,
           f"the die re-pairs all six at random: always three colour pairs ({len(seen)} different pairings in 30 shuffles)")
 
     # statuses: arm one, pick up a figure, check tint/description/memo; toggles and clearing
@@ -456,7 +456,6 @@ def main():
     check(fig.desc == "Status: Paralyzed, Confused", "a new main status replaces the old one")
     g.statusPick(player, "-1", "statusRes_White_clear"); g.onObjectPickUp("White", fig)
     check(fig.desc == "" and fig.tint.r == 1 and fig.tint.b == 1, "Clear status returns it to normal (no statuses, no tint)")
-    check(any("is back to normal" in str(p) for p in calls.printed.values()), "clearing says it's back to normal")
     g.statusPick(player, "-1", "statusRes_White_drowsy"); g.toolClick(player, "-1", "tool_dex")
     check(g.armed["White"] is None, "switching panels cancels a waiting status")
 
@@ -529,7 +528,7 @@ def main():
     g.searchChanged(player, "sitrus", "itemsIn_White")
     check(calls.attrs["itemsList.visibility"] == "Green" and calls.attrs["itemsRes_White_1.active"] == "true",
           "typing hides the list for White only, and shows White's search results")
-    check(calls.attrs["items_White.height"] == 108 + 10 * 32 + 20, f"the item panel keeps its full size while typing ({calls.attrs['items_White.height']})")
+    check(calls.attrs["items_White.height"] == 86 + 10 * 32 + 20, f"the item panel keeps its full size while typing ({calls.attrs['items_White.height']})")
     g.searchChanged(player, "", "itemsIn_White")
     check(calls.attrs["itemsList.visibility"] == "White|Green", "clearing the search box brings the list back")
     g.closePanel(green); g.closePanel(player)
@@ -578,16 +577,14 @@ def main():
     def hp():
         return json.loads(h.memo)["hp"]
     g.hpEdited(player, "-35", "hpIn_s0uth1_1_F")
-    check(hp() == gmax - 35 and sign()[0]["hpIn_s0uth1_1_B"].get("text") == str(gmax - 35)
-          and any(str(p) == f"Gengar: {gmax} → {gmax - 35} HP (-35)" for p in calls.printed.values()),
-          "typing -35 on the sign takes 35 HP from that Pokemon, updates both faces and says so in chat")
+    check(hp() == gmax - 35 and sign()[0]["hpIn_s0uth1_1_B"].get("text") == str(gmax - 35),
+          "typing -35 on the sign takes 35 HP from that Pokemon and updates both faces")
     g.hpEdited(player, "+500", "hpIn_s0uth1_1_B")
     check(hp() == gmax, "+500 heals only up to the max")
     g.hpEdited(player, "120/230", "hpIn_s0uth1_1_F")
     check(hp() == 120, "typing a number sets it (a trailing /max is ignored)")
     g.hpEdited(player, "0", "hpIn_s0uth1_1_F")
-    check(hp() == 0 and sign()[0]["hpIn_s0uth1_1_F"].get("textColor") == "#FF6B6B"
-          and any("Gengar fainted!" in str(p) for p in calls.printed.values()), "0 HP turns the number red and says it fainted")
+    check(hp() == 0 and sign()[0]["hpIn_s0uth1_1_F"].get("textColor") == "#FF6B6B", "0 HP turns the number red")
     g.hpEdited(player, "lots", "hpIn_s0uth1_1_F")
     check(hp() == 0 and sign()[0]["hpIn_s0uth1_1_F"].get("text") == "0", "something that isn't a number changes nothing")
 
@@ -624,9 +621,8 @@ def main():
     f.menu[1].fn("Red")
     check(f.tint.r > 0.8 and f.tint.g < 0.2 and f.memo == "Red" and f.desc.startswith("Held by Red."),
           f"Capture by Red tints it red and records Red ({f.desc})")
-    check(any(str(p) == "RedPlayer captured a flag." for p in calls.printed.values()), "capturing is announced")
     f.menu[1].fn("Grey")
-    check(f.memo == "Red" and "Take a seat" in str(calls.broadcast), "a spectator can't capture it")
+    check(f.memo == "Red", "a spectator can't capture it")
     f.menu[1].fn("Blue")
     check(f.memo == "Blue" and f.tint.b == 1, "Blue can take it over")
     f.menu[2].fn("Blue")
@@ -660,9 +656,8 @@ def main():
     g.zoneMon("Gengar", "Red", -1.6, 1.6); g.zoneMon("Onix", "Red", 1.6, -1.6); b = g.zoneMon("Absol", "Blue", 1.6, 1.6)
     g.zoneMon("Eevee", "Blue", 5.0, 0)   # outside the zone
     g.refreshZones()
-    check(z.tint.r > 0.8 and z.tint.b < 0.2 and json.loads(z.memo).get("holder") == "Red"
-          and any(str(p) == "RedPlayer holds a capture zone." for p in calls.printed.values()),
-          "two Red Pokemon to one Blue: the frame turns red (and chat says so)")
+    check(z.tint.r > 0.8 and z.tint.b < 0.2 and json.loads(z.memo).get("holder") == "Red",
+          "two Red Pokemon to one Blue: the frame turns red")
     lua.execute('zoneMon("Pidgey", "Blue", -1.6, -1.6); refreshZones()')
     check(abs(z.tint.r - 0.6) < 1e-6 and json.loads(z.memo).get("holder") is None, "two each: a tie, back to neutral")
     lua.execute('zoneMon("Rattata", "Blue", 0.5, 0.5, 0); refreshZones()')
@@ -763,9 +758,10 @@ def main():
       stats = {}
     """)
     g.onLoad(saved)
-    check(len(g.catalog.dex.list) == 704 and g.stats["Gengar"] is not None
-          and any("using the saved copy" in str(p) for p in calls.printed.values()),
+    check(len(g.catalog.dex.list) == 704 and g.stats["Gengar"] is not None,
           "offline, a load falls back to the saved copies (roster, stats)")
+    printed = [str(p) for p in calls.printed.values()]
+    check(not printed, f"nothing was printed to the console ({printed[:3]})")
 
     print("\nall checks passed" if not failures else f"\n{len(failures)} check(s) failed")
     sys.exit(1 if failures else 0)
