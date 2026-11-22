@@ -52,9 +52,9 @@ TRAP = {"mesh": "props/trap-v1.obj", "diffuse": "props/trap-v1.jpg", "collider":
         "convex": True, "material": 2}
 ZONES = {n: {"mesh": f"props/zoneframe{n}-v1.obj", "diffuse": "props/zoneframe-v1.jpg", "collider": f"props/zoneframe{n}-v1.obj",
              "convex": False, "material": 3} for n in (2, 4)}
-RAISED_SLANT = 0.8   # tools/build_pieces.py: the raised zone frames sit this far inside the zone's border
-RAISED_ZONES = {n: {**ZONES[n], "mesh": f"props/zoneframe{n}-raised-v1.obj", "collider": f"props/zoneframe{n}-raised-v1.obj"}
-                for n in (2, 4)}
+RAISED_SLANTS = {0.8: "raised", 0.352: "raised70"}   # tools/build_pieces.py: a raised zone's slope -> its frames
+RAISED_ZONES = {s: {n: {**ZONES[n], "mesh": f"props/zoneframe{n}-{name}-v1.obj", "collider": f"props/zoneframe{n}-{name}-v1.obj"}
+                    for n in (2, 4)} for s, name in RAISED_SLANTS.items()}
 TREE = {"mesh": "props/tree-v1.obj", "diffuse": "props/tree-v1.jpg", "collider": "props/tree-collider-v1.obj",
         "convex": True, "material": 1}
 GIFT = {"mesh": "props/gift-v1.obj", "diffuse": "props/gift-v1.jpg", "collider": "props/gift-v1.obj",
@@ -93,9 +93,9 @@ def zones(data, info):
                   if (r + dr, c + dc) not in cells]
         lower = [n for n in around if (level_at(data, *n) or -1) < tile.get("level", 0)]
         raised = tile.get("slant") and len(lower) == len(around)
-        if raised and tile["slant"] != RAISED_SLANT:
-            sys.exit(f"capture zone {sorted(group)}: a raised zone's frame fits slant {RAISED_SLANT} only")
-        out.append((size, (cx, top, cz), bool(raised)))
+        if raised and tile["slant"] not in RAISED_SLANTS:
+            sys.exit(f"capture zone {sorted(group)}: raised zone frames exist for slants {list(RAISED_SLANTS)} only")
+        out.append((size, (cx, top, cz), tile["slant"] if raised else None))
     return out
 
 
@@ -183,8 +183,8 @@ def pieces(arena, info):
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
                 yaw = math.degrees(math.atan2(-sz, sx)) + 180   # TTS yaw that turns the model's +x toward (-sx, -sz)
                 out.append({"kind": "Flag", "name": "Flag", "model": FLAG, "pos": pos, "yaw": yaw % 360, "desc": ""})
-    for size, pos, raised in zones(data, info):
-        out.append({"kind": "Zone", "name": "Capture zone", "model": (RAISED_ZONES if raised else ZONES)[size], "pos": list(pos), "yaw": 0,
+    for size, pos, slant in zones(data, info):
+        out.append({"kind": "Zone", "name": "Capture zone", "model": (RAISED_ZONES[slant] if slant else ZONES)[size], "pos": list(pos), "yaw": 0,
                     "desc": "", "tiles": size, "tile": round(T, 5)})
     for tiles, pos, yaw in bridges(data, grid, info):
         out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[tiles], "pos": list(pos), "yaw": yaw,
