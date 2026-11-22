@@ -111,7 +111,10 @@ STAND = {
             skills = { y = 1.5272, z = -6.9252 },
             abilities = { y = 0.8345, z = -9.2648 } },
   tilt = 16.492, length = 42.3,
-  cardScale = { 1.0, 1.5 },  -- (across, along) the card: shorter than TTS's standard card so three rows fit
+  -- The card's scale. TTS shapes a one-card custom deck to its image, and the card images are 400 x 840 (narrower
+  -- than TTS's standard card), so at scale 1 a card is 1.46 x 3.06: scaled evenly by 1.5 it's 2.19 x 4.59, short
+  -- enough for three rows. (Scaling (1.0, 1.5) stretched the art 1.5x along the card.)
+  cardScale = { 1.5, 1.5 },
   snapLift = 0.55,  -- card snap points float this far off the slope, so a card held flat clears the rising slope
 }
 CARD_YAW = 270  -- cards lie landscape: turned a quarter so the name reads left-to-right for the stand's player
@@ -212,9 +215,83 @@ function onLoad(saved)
         plainStandee(obj)
       elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap") then
         pieceSetup(obj)
+      elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
+        unstretchCard(obj)
       end
     end
+    ensureHandZones()
   end, 2)
+end
+
+-- A card spawned before the fix (scaled 1.0 across, 1.5 along: the art stretched) gets the even scale.
+function unstretchCard(card)
+  local s = card.getScale()
+  if math.abs(s.x - STAND.cardScale[1]) > 0.01 and math.abs(s.z - STAND.cardScale[2]) < 0.01 then
+    card.setScale({ STAND.cardScale[1], s.y, STAND.cardScale[2] })
+    return true
+  end
+  return false
+end
+
+-- Hand zones: eight, just past the table's edge (so cards on the team stands never fall into a hand), one pair on
+-- each side; they also set each seat's spacebar camera. A save or reload can bring back TTS's default zones (which
+-- reach over the stands), so the layout is checked on every load and put back if it differs.
+HAND_SIZE = { w = 9.48, h = 6.7, d = 3.56, y = 2.85, gap = 0.5 }
+HAND_LAYOUT = {   -- side: near (-z), far (+z), left (-x), right (+x); at: offset along that side
+  { c = "Red", side = "near", at = -9.48 }, { c = "White", side = "near", at = 9.48 },
+  { c = "Blue", side = "far", at = -9.48 }, { c = "Green", side = "far", at = 9.48 },
+  { c = "Orange", side = "left", at = -9.48 }, { c = "Yellow", side = "left", at = 9.48 },
+  { c = "Pink", side = "right", at = -9.48 }, { c = "Purple", side = "right", at = 9.48 },
+}
+
+-- Where each hand zone goes: { c, x, z, yaw }, from the table's size.
+function handTargets()
+  local ok, b = pcall(function() return Tables.getTableObject().getBounds() end)
+  if not ok or not b then return nil end
+  local hx, hz, out = b.size.x / 2, b.size.z / 2, {}
+  local off = HAND_SIZE.d / 2 + HAND_SIZE.gap
+  for _, h in ipairs(HAND_LAYOUT) do
+    local t = { c = h.c }
+    if h.side == "near" then t.x, t.z, t.yaw = h.at, -(hz + off), 0
+    elseif h.side == "far" then t.x, t.z, t.yaw = h.at, hz + off, 180
+    elseif h.side == "left" then t.x, t.z, t.yaw = -(hx + off), h.at, 90
+    else t.x, t.z, t.yaw = hx + off, h.at, 270 end
+    out[#out + 1] = t
+  end
+  return out
+end
+
+-- Put the hand zones back to the layout if they differ from it (returns true if it changed them).
+function ensureHandZones()
+  if not (Hands and Hands.getHands) then return false end
+  local targets = handTargets()
+  if not targets then return false end
+  local hands, byColor = Hands.getHands(), {}
+  for _, h in ipairs(hands) do byColor[h.getValue() or ""] = h end
+  local same = #hands == #targets
+  for _, t in ipairs(targets) do
+    local h = byColor[t.c]
+    if not h then
+      same = false
+    else
+      local p, s = h.getPosition(), h.getScale()
+      if math.abs(p.x - t.x) > 0.1 or math.abs(p.z - t.z) > 0.1 or math.abs(s.x - HAND_SIZE.w) > 0.05
+        or math.abs(s.z - HAND_SIZE.d) > 0.05 then same = false end
+    end
+  end
+  if same then return false end
+  for _, h in ipairs(hands) do h.destruct() end
+  for _, t in ipairs(targets) do
+    local col = Color.fromString(t.c)
+    spawnObjectData({ data = {
+      Name = "HandTrigger", FogColor = t.c, Locked = true,
+      ColorDiffuse = { r = col.r, g = col.g, b = col.b, a = 0 },
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0,
+        scaleX = HAND_SIZE.w, scaleY = HAND_SIZE.h, scaleZ = HAND_SIZE.d },
+    }, position = { t.x, HAND_SIZE.y, t.z }, rotation = { 0, t.yaw, 0 } })
+  end
+  log("Hand zones put back just past the table's edge.")
+  return true
 end
 
 function onSave()

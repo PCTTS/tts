@@ -59,6 +59,8 @@ local function stub(o)
   o.getStates = o.getStates or function() return nil end            -- every real TTS object has these
   o.getCustomObject = o.getCustomObject or function() return {} end
   o.getRotation = o.getRotation or function() return Vector(0, 0, 0) end
+  o.getScale = o.getScale or function() return o.scale or Vector(1, 1, 1) end
+  o.setScale = o.setScale or function(v) o.scale = Vector(v[1], v[2], v[3]) end
   o.destruct = o.destruct or function() o.destroyed = true end
   o.clearContextMenu = o.clearContextMenu or function() end
   o.addContextMenuItem = o.addContextMenuItem or function() end
@@ -462,8 +464,17 @@ def main():
     lift_z = 0.15 * __import__("math").sin(__import__("math").radians(16.492))
     check(abs(card.position.x - (-17.625)) < 0.01 and abs(card.position.z - (-26.4 - 4.5856 - lift_z)) < 0.01
           and card.rotation.y == 270 and abs(card.rotation.z - 16.492) < 0.01 and card.data.SidewaysCard
-          and (card.data.Transform.scaleX, card.data.Transform.scaleZ) == (1.0, 1.5),
-          "the item card lies landscape in the first item slot on White's stand, tilted to the slope, short (1.0 x 1.5)")
+          and (card.data.Transform.scaleX, card.data.Transform.scaleZ) == (1.5, 1.5),
+          "the item card lies landscape in the first item slot on White's stand, tilted to the slope, scaled evenly (1.5)")
+    lua.execute(r"""
+      oldCard = { type = "Card", scale = Vector(1.0, 1, 1.5) }
+      oldCard.getScale = function() return oldCard.scale end
+      oldCard.setScale = function(v) oldCard.scale = Vector(v[1], v[2], v[3]) end
+      fixedOld = unstretchCard(oldCard)
+      fixedAgain = unstretchCard(oldCard)
+    """)
+    check(g.fixedOld and not g.fixedAgain and g.oldCard.scale.x == 1.5 and g.oldCard.scale.z == 1.5,
+          "a card spawned before the fix (1.0 x 1.5, art stretched) is rescaled to 1.5 x 1.5, once")
     check("1/2 hp" in card.data.Description, "the card's description is its effect")
     g.searchChanged(player, "belief", "skillsIn_White")
     g.searchPick(player, "-1", "skillsRes_White_1")
@@ -653,6 +664,46 @@ def main():
       onObjectDrop("Grey", zoneMon("Ditto", nil, 9, 9))
     """)
     check(json.loads(g.stray.memo).get("owner") == "Green", "an ownerless Pokemon belongs to the first seated player to put it down")
+
+    # hand zones: TTS's default ones (10, over the stands) are replaced with the 8 just past the table's edge; a correct
+    # layout is left alone
+    lua.execute(r"""
+      handObjs = {}
+      local function hand(c, x, z, sx, sz)
+        local h = { color = c, pos = Vector(x, 3.29, z), scale = Vector(sx, 11.9, sz) }
+        h.getValue = function() return h.color end
+        h.getPosition = function() return h.pos end
+        h.getScale = function() return h.scale end
+        h.destruct = function() h.gone = true end
+        handObjs[#handObjs + 1] = h
+      end
+      for _, c in ipairs({ "Red", "Brown", "White" }) do hand(c, 0, -34.43, 15.33, 6.35) end
+      for _, c in ipairs({ "Blue", "Teal", "Green", "Orange", "Yellow", "Pink", "Purple" }) do hand(c, 0, 34.43, 15.33, 6.35) end
+      Hands = { getHands = function()
+        local live = {}
+        for _, h in ipairs(handObjs) do if not h.gone then live[#live + 1] = h end end
+        return live
+      end }
+      Tables.getTableObject = function() return { getBounds = function() return { size = Vector(110.3, 1, 75.3) } end } end
+      spawnedHands = {}
+      local realSpawn = spawnObjectData
+      spawnObjectData = function(t)
+        if t.data.Name == "HandTrigger" then
+          spawnedHands[#spawnedHands + 1] = t
+          hand(t.data.FogColor, t.position[1], t.position[3], t.data.Transform.scaleX, t.data.Transform.scaleZ)
+          return
+        end
+        return realSpawn(t)
+      end
+    """)
+    changed = g.ensureHandZones()
+    sh = {h.data.FogColor: h for h in g.spawnedHands.values()}
+    red, pink = sh.get("Red"), sh.get("Pink")
+    check(changed and len(sh) == 8 and "Brown" not in sh and "Teal" not in sh
+          and abs(red.position[3] - -(75.3 / 2 + 3.56 / 2 + 0.5)) < 1e-6 and red.position[2] == 2.85 and red.position[1] == -9.48
+          and abs(pink.position[1] - (110.3 / 2 + 3.56 / 2 + 0.5)) < 1e-6 and pink.rotation[2] == 270,
+          "TTS's default hand zones are replaced by the 8 just past the table's edge (no Brown/Teal)")
+    check(not g.ensureHandZones() and len(list(g.spawnedHands.values())) == 8, "a correct layout is left alone")
 
     # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them.
     # TTS's Lua (MoonSharp) fails "pattern too complex" on patterns over text this size (real Lua doesn't), so the

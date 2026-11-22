@@ -29,7 +29,8 @@ LENGTH = SLOTS * SLOT_W
 TOP_H, TOP_D = 2.6, 3.2          # top surface height above the table, and its depth
 RUN, LOW_H = 7.6, 0.35           # slope: horizontal run toward the player, height at its bottom
 LIP_H, LIP_W = 0.22, 0.25        # lip at the bottom of the slope
-CARD_SCALE = (1.0, 1.5)          # cards lie landscape, scaled (across, along) their 2.19 x 3.06: thin, so 3 rows fit
+CARD_SCALE = (1.0, 1.5)          # card SIZE as (across, along) multiples of TTS's 2.19 x 3.06: 2.19 x 4.59, thin, so 3
+                                 # rows fit. (In TTS it's a 400x840 image card at an even scale of 1.5: see Global.lua.)
 CARD_ALONG = 2.19 * CARD_SCALE[0]   # card size down the slope
 CARD_GAP = 0.25                  # between the rows
 SNAP_LIFT = 0.55                 # card snap points float this far off the slope: a card held flat clears it
