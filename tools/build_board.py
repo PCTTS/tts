@@ -226,7 +226,7 @@ def draw_texture(a):
             o.line([(x0, y0t + p - 3 * SS), (x0 + p, y0t + p - 3 * SS)], fill=(0, 0, 0, 55), width=2 * SS)
             o.line([(x0 + p - 3 * SS, y0t), (x0 + p - 3 * SS, y0t + p)], fill=(0, 0, 0, 55), width=2 * SS)
             o.rectangle([x0, y0t, x0 + p - 1, y0t + p - 1], outline=(40, 28, 18, 110), width=SS)
-            if t.get("surface") == "stairs":
+            if t.get("surface") == "stairs" and not t.get("steps"):   # carved steps show it themselves
                 draw_steps(o, a, r, c, x0, y0t, p)
             if t.get("outline"):
                 draw_outline(over, a, r, c, x0, y0t, p)
@@ -401,17 +401,6 @@ def draw_steps(o, a, r, c, x0, y0, p):
     if len(horiz) > 1 or len(vert) > 1:
         return
     dark, light = (60, 40, 25, 18), (255, 245, 225, 10)  # faint, so the surface texture shows through
-    if a.tile(r, c).get("ramp") and horiz and vert:   # a corner ramp runs diagonally: so do its step lines
-        cx = x0 + p if vert[0] == "E" else x0          # the low corner
-        cy = y0 + p if horiz[0] == "S" else y0
-        sx, sy = (-1 if vert[0] == "E" else 1), (-1 if horiz[0] == "S" else 1)   # from it into the tile
-        for k in (0.5, 1.0, 1.5):
-            dd = k * p                                 # points whose two distances from the low sides add to dd
-            ax, ay = (cx + sx * dd, cy) if dd <= p else (cx + sx * p, cy + sy * (dd - p))
-            bx, by = (cx, cy + sy * dd) if dd <= p else (cx + sx * (dd - p), cy + sy * p)
-            o.line([(ax, ay), (bx, by)], fill=dark, width=3 * SS)
-            o.line([(ax, ay + 3 * SS), (bx, by + 3 * SS)], fill=light, width=2 * SS)
-        return
     for k in (0.28, 0.52, 0.76):
         d = round(k * p)
         yc = (y0 + d if horiz[0] == "N" else y0 + p - d) if horiz else None
@@ -714,17 +703,19 @@ def build_mesh(a):
 
     def surface_at(r, c, px, pz):   # a tile's surface height at a point on its edge (or inside it)
         t = a.tile(r, c)
-        rp = ramp(a, r, c)
-        if rp:
-            return ramp_height(rp, (x(c), x(c + 1), z(r), z(r + 1)), px, pz)
+        st = stair_steps(a, r, c)
+        if st:
+            return step_height(st, (x(c), x(c + 1), z(r), z(r + 1)), px, pz)
         sl, inn = lows(r, c)
         if not sl and not inn:
             return a.top(t)
         return surface_height(a.top(t), (x(c), x(c + 1), z(r), z(r + 1)), sl, inn, t["slant"], px, pz)
 
     def edge_breaks(r, c):   # where a tile's surface can bend along any of its edges (fractions of the edge)
-        if a.tile(r, c).get("ramp"):
-            return [0.0, 0.5, 1.0]   # straight along each edge, but not level: the walls must follow it
+        st = stair_steps(a, r, c)
+        if st:   # the step edges: the surface jumps there
+            return sorted({0.0, 1.0} | {k * st["depth"] / TILE for k in range(1, st["n"])}
+                          | {1.0 - k * st["depth"] / TILE for k in range(1, st["n"])})
         sl, inn = lows(r, c)
         if not sl and not inn:
             return [0.0, 1.0]
@@ -745,15 +736,10 @@ def build_mesh(a):
 
             def tuv(px, pz):   # the tile's texture seen from above, so the slopes show its edge band
                 return u0 + (px - x0) / (x1 - x0) * (u1 - u0), v0 + (z0 - pz) / (z0 - z1) * (v1 - v0)
-            rp = ramp(a, r, c)
-            if rp:   # one tilted plane
-                box = (x0, x1, z0, z1)
-                corners = [(x0, z0), (x1, z0), (x1, z1), (x0, z1)]
-                gx = (ramp_height(rp, box, x1, z0) - ramp_height(rp, box, x0, z0)) / (x1 - x0)
-                gz = (ramp_height(rp, box, x0, z0) - ramp_height(rp, box, x0, z1)) / (z0 - z1)
-                ln = math.sqrt(gx * gx + 1 + gz * gz)
-                m.quad([(px, ramp_height(rp, box, px, pz), pz) for px, pz in corners],
-                       [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (-gx / ln, 1 / ln, -gz / ln))
+            st = stair_steps(a, r, c)
+            if st:   # flat treads at each step's height, risers between them
+                step_surface(m, st, (x0, x1, z0, z1), tuv,
+                             lambda f, y: wall_uv((a.C // 2 + (r * 5 + c * 3) % (a.C // 2)) * PX + f * (PX - 1), y))
             elif not sloped and not inner:
                 m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
                        [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
@@ -820,17 +806,14 @@ def slopes(a, r, c):
     if not w:
         return {}
     level, out = t.get("level", 0), {}
-    to = t.get("slant_to")   # "slant_to": [surfaces]: slope only toward lower neighbours with those (Pugilis's floor
-    for side, (dr, dc, _) in DIRS.items():   # slopes down to its stairs, not into the pit)
+    for side, (dr, dc, _) in DIRS.items():
         nb = a.tile(r + dr, c + dc)
         where = f"slanted tile row {r} col {c}"
-        if to and (nb is None or (nb.get("level", 0) < level and nb.get("surface") not in to)):
-            continue
         if nb is None:
             sys.exit(f"{where}: slopes next to the sky aren't supported")
         if nb.get("level", 0) < level:
             out[side] = a.level_top(nb)
-        elif nb.get("level", 0) == level and (nb.get("slant", 0) != w or nb.get("slant_to") != to):
+        elif nb.get("level", 0) == level and nb.get("slant", 0) != w:
             sys.exit(f"{where}: neighbours at the same level need the same slant")
     if len(set(out.values()) | set(inner_corners(a, r, c).values())) > 1:
         sys.exit(f"slanted tile row {r} col {c}: all its lower neighbours must be one level")
@@ -843,12 +826,10 @@ def inner_corners(a, r, c):
     t = a.tile(r, c)
     if not (t and t.get("slant")):
         return {}
-    level, out, to = t.get("level", 0), {}, t.get("slant_to")
+    level, out = t.get("level", 0), {}
     for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
         diag = a.tile(r + dr, c + dc)
         beside = (a.tile(r + dr, c), a.tile(r, c + dc))
-        if diag and to and diag.get("surface") not in to:
-            continue
         if diag and diag.get("level", 0) < level and all(b and b.get("level", 0) >= level for b in beside):
             out[("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")] = a.level_top(diag)
     return out
@@ -861,7 +842,9 @@ def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
     (ax, az), (bx, bz) = edge
     pts = [(f, ax + (bx - ax) * f, az + (bz - az) * f) for f in fs]
     for (f0, x0, z0), (f1, x1, z1) in zip(pts, pts[1:]):
-        h0, h1, l0, l1 = mine(x0, z0), mine(x1, z1), theirs(x0, z0), theirs(x1, z1)
+        nx, nz = (x1 - x0) * 1e-4, (z1 - z0) * 1e-4   # just inside this piece (a step's height jumps at its ends)
+        h0, h1 = mine(x0 + nx, z0 + nz), mine(x1 - nx, z1 - nz)
+        l0, l1 = theirs(x0 + nx, z0 + nz), theirs(x1 - nx, z1 - nz)
         d0, d1 = h0 - l0, h1 - l1
         if d0 <= eps and d1 <= eps:
             continue
@@ -881,32 +864,81 @@ def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
             m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1)], [uv(f0, h0), uv(f1, h1), uv(f1, l1)], normal)
 
 
-def ramp(a, r, c):
-    """A tile with "ramp": true (Pugilis's stairs) is one plane from the level above down to the level below,
-    descending toward its lower neighbours: one low side (a straight ramp from the opposite side) or two adjacent
-    ones (a corner ramp, running diagonally from the opposite corner). Its middle sits at its own level, where its
-    snap point is; walls close its sides against higher ground. Returns {"low": {side: bottom}, "high": top of the
-    ramp} or None."""
+def stair_steps(a, r, c):
+    """A tile with "steps": n (Pugilis's stairs) keeps a flat landing at its own level in the middle (where its snap
+    point is; standing flat on a tile is how players read its height) and has n steps carved into each end along
+    the way through: n - 1 treads, "step_depth" deep each, rising to the level above at the end next to it and
+    falling to the level below at the end next to that. Which way it goes: down toward its lower neighbours (one
+    side, or two round a corner) and up toward the sides opposite them; its other sides are plain walls.
+    Returns {"n", "depth", "top", "up": {side: level above}, "down": {side: level below}} or None."""
     t = a.tile(r, c)
-    if not (t and t.get("ramp")):
+    if not (t and t.get("steps")):
         return None
     level = t.get("level", 0)
-    low = {s: a.level_top(nb) for s, (dr, dc, _) in DIRS.items()
-           if (nb := a.tile(r + dr, c + dc)) and nb.get("level", 0) < level}
     opposite = {"N": "S", "S": "N", "E": "W", "W": "E"}
-    if not (len(low) == 1 or (len(low) == 2 and set(low) not in ({"N", "S"}, {"E", "W"}))) or len(set(low.values())) > 1:
-        sys.exit(f"ramp row {r} col {c}: needs lower ground on one side or on two sides round a corner")
-    bottom = next(iter(low.values()))
-    return {"low": low, "high": bottom + 2 * (a.level_top(t) - bottom), "up": [opposite[s] for s in low]}
+    down, up = {}, {}
+    for side, (dr, dc, _) in DIRS.items():
+        nb = a.tile(r + dr, c + dc)
+        if nb and nb.get("level", 0) < level:
+            down[side] = a.level_top(nb)
+    for side in down:
+        dr, dc, _ = DIRS[opposite[side]]
+        nb = a.tile(r + dr, c + dc)
+        if nb and nb.get("level", 0) > level:
+            up[opposite[side]] = a.level_top(nb)
+    if not down or (len(down) == 2 and set(down) in ({"N", "S"}, {"E", "W"})) or len(down) > 2:
+        sys.exit(f"stairs row {r} col {c}: need lower ground on one side, or on two sides round a corner")
+    n, depth = t["steps"], t.get("step_depth", 0.28)
+    if 2 * (n - 1) * depth >= TILE:
+        sys.exit(f"stairs row {r} col {c}: the steps leave no landing")
+    return {"n": n, "depth": depth, "top": a.level_top(t), "up": up, "down": down}
 
 
-def ramp_height(rp, box, px, pz):
-    """A ramp's surface height at (px, pz): its bottom along its low side(s), its top along the far side(s)."""
+def step_height(st, box, px, pz):
+    """A carved stair tile's height at (px, pz): the landing, raised by the steps up at the ends next to higher
+    ground and lowered by the steps down at the ends next to lower ground (where they meet, the lower wins)."""
     x0, x1, z0, z1 = box
     d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}
-    s = sum(d[side] / (x1 - x0) for side in rp["low"]) / len(rp["low"])   # 0 at the bottom, 1 at the top
-    bottom = next(iter(rp["low"].values()))
-    return bottom + (rp["high"] - bottom) * s
+    n, depth, top = st["n"], st["depth"], st["top"]
+    h = top
+    for side, high in st["up"].items():
+        k = int(d[side] // depth)   # 0 = the tread at the edge
+        if k < n - 1:
+            h = max(h, top + (high - top) * (n - 1 - k) / n)
+    for side, low in st["down"].items():
+        k = int(d[side] // depth)
+        if k < n - 1:
+            h = min(h, top - (top - low) * (n - 1 - k) / n)
+    return h
+
+
+def step_surface(m, st, box, tuv, riser_uv):
+    """A carved stair tile's top: a flat quad per cell of the step grid, and a riser wherever two cells meet at
+    different heights (facing the lower one). The tile's outer walls follow its edges (profile_wall)."""
+    x0, x1, z0, z1 = box
+    n, depth = st["n"], st["depth"]
+    cuts = [k * depth for k in range(1, n)]
+    xs = sorted({x0, x1} | {x0 + c for c in cuts} | {x1 - c for c in cuts})
+    zs = sorted({z0, z1} | {z0 - c for c in cuts} | {z1 + c for c in cuts}, reverse=True)
+    hs = [[step_height(st, box, (xs[i] + xs[i + 1]) / 2, (zs[j] + zs[j + 1]) / 2) for i in range(len(xs) - 1)]
+          for j in range(len(zs) - 1)]
+    for j in range(len(zs) - 1):
+        for i in range(len(xs) - 1):
+            h = hs[j][i]
+            cell = [(xs[i], zs[j]), (xs[i + 1], zs[j]), (xs[i + 1], zs[j + 1]), (xs[i], zs[j + 1])]
+            m.quad([(px, h, pz) for px, pz in cell], [tuv(px, pz) for px, pz in cell], (0, 1, 0))
+            if i + 1 < len(xs) - 1 and hs[j][i + 1] != h:   # riser on the line x = xs[i + 1]
+                lo, hi = sorted((h, hs[j][i + 1]))
+                normal = (1, 0, 0) if h > hs[j][i + 1] else (-1, 0, 0)
+                px = xs[i + 1]
+                m.quad([(px, hi, zs[j]), (px, hi, zs[j + 1]), (px, lo, zs[j + 1]), (px, lo, zs[j])],
+                       [riser_uv(0, hi), riser_uv(1, hi), riser_uv(1, lo), riser_uv(0, lo)], normal)
+            if j + 1 < len(zs) - 1 and hs[j + 1][i] != h:   # riser on the line z = zs[j + 1]
+                lo, hi = sorted((h, hs[j + 1][i]))
+                normal = (0, 0, -1) if h > hs[j + 1][i] else (0, 0, 1)
+                pz = zs[j + 1]
+                m.quad([(xs[i], hi, pz), (xs[i + 1], hi, pz), (xs[i + 1], lo, pz), (xs[i], lo, pz)],
+                       [riser_uv(0, hi), riser_uv(1, hi), riser_uv(1, lo), riser_uv(0, lo)], normal)
 
 
 def surface_height(top, box, sloped, inner, w, px, pz):
