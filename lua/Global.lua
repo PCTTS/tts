@@ -206,7 +206,7 @@ function onLoad(saved)
       elseif obj.hasTag("Pokemon") then
         plainStandee(obj)
       elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap")
-        or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") then
+        or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") or obj.hasTag("Pillar") then
         pieceSetup(obj)
       elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
         unstretchCard(obj)
@@ -226,9 +226,9 @@ function unstretchCard(card)
   return false
 end
 
--- The board and its backdrop aren't interactive at all (pieceSetup). The team stands and the map's fixed pieces still
--- need clicks (HP signs, Capture, buttons), so players just can't delete or cut them; the map picker replaces them by
--- script, which isn't a player action.
+-- The board, its backdrop and the pillars aren't interactive at all (pieceSetup). The team stands and the map's fixed
+-- pieces still need clicks (HP signs, Capture, buttons), so players just can't delete or cut them; the map picker
+-- replaces them by script, which isn't a player action.
 PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand" }
 
 function onPlayerAction(_, action, targets)
@@ -1242,7 +1242,10 @@ end
 -- kept by a save).
 function pieceSetup(obj)
   if not obj then return end
-  if obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") then obj.interactable = false return end   -- unselectable
+  if obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") or obj.hasTag("Pillar") then   -- unselectable
+    obj.interactable = false
+    return
+  end
   flagMenu(obj)
   if obj.hasTag("Portal") then
     local pair = memoTable(obj).pair or 1

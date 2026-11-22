@@ -733,13 +733,16 @@ def main():
         return o
       end
       pBoard, pFlag, pStand, pCard, pTree = obj({ "Board3D" }), obj({ "Flag", "ArenaPiece" }), obj({ "Stand" }), obj({ "Item" }), obj({ "Tree", "ArenaPiece" })
+      pPillar = obj({ "Pillar" })
       pieceSetup(pBoard)
+      pieceSetup(pPillar)
       delFlag = onPlayerAction(nil, Player.Action.Delete, { pCard, pFlag })
       cutStand = onPlayerAction(nil, Player.Action.Cut, { pStand })
       delTree = onPlayerAction(nil, Player.Action.Delete, { pTree, pCard })
       pickFlag = onPlayerAction(nil, Player.Action.PickUp, { pFlag })
     """)
-    check(g.pBoard.interactable is False, "the board can't be clicked, selected or deleted (not interactive)")
+    check(g.pBoard.interactable is False and g.pPillar.interactable is False,
+          "the board and the pillars can't be clicked, selected or deleted (not interactive)")
     check(g.delFlag is False and g.cutStand is False, "deleting a flag or cutting a stand is refused")
     check(g.delTree is True and g.pickFlag is True, "a tree or a card can still be deleted; other actions aren't blocked")
 
