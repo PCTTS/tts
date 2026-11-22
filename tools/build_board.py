@@ -228,12 +228,13 @@ def draw_texture(a):
                 draw_steps(o, a, r, c, x0, y0t, p)
             if t.get("paint", True) and t.get("marker"):
                 turn = marker_turn(a, r, c, t)
+                both = both_ways(a, t)
                 if turn:   # drawn upright on its own layer, then turned so its bottom points the right way
                     layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
-                    draw_marker(ImageDraw.Draw(layer), t.get("marker"), 0, 0, p)
+                    draw_marker(layer, t.get("marker"), 0, 0, p, both)
                     over.alpha_composite(layer.rotate(turn), (x0, y0t))
                 else:
-                    draw_marker(o, t.get("marker"), x0, y0t, p)
+                    draw_marker(over, t.get("marker"), x0, y0t, p, both)
     for r in range(a.R):   # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope
         for c in range(a.C):
             sloped = slopes(a, r, c) if a.tile(r, c) else {}
@@ -426,14 +427,52 @@ def marker_turn(a, r, c, t):
         return 0
     if marker.startswith("spawn2"):
         return 180
+    if both_ways(a, t):   # N/N reads the same from either player's end: not turned
+        return 0
     if t.get("orient") == "away-from-pit" and a.away_from_pit(r, c):
         return MARKER_TURN[a.away_from_pit(r, c)]
     return MARKER_TURN[(0, -1) if c < a.C / 2 else (0, 1)]
 
 
-def draw_marker(o, marker, x0, y0, p):
+NUMBERED = ("passage-in", "passage-out", "trapdoor")   # markers that carry a number
+
+
+def both_ways(a, t):
+    """With the map's "numbers": "both", a numbered marker shows its number as N/N (see draw_pair)."""
+    return a.data.get("numbers") == "both" and t.get("marker", "").startswith(NUMBERED)
+
+
+def draw_pair(im, text, cx, cy, size, fill, **style):
+    """A painted number as N/N centred on (cx, cy), the second one upside down: each player reads the number on
+    their left, and it looks the same from either end of the board. Each piece is centred on its ink, so the
+    upside-down number lines up with the upright one."""
+    f = font(size)
+    sw = style.get("stroke_width", 0)
+
+    def ink(s):   # (left, top, right, bottom) of the drawn text
+        return f.getbbox(s, anchor="ls", stroke_width=sw)
+
+    w = ink(text)[2] - ink(text)[0]
+    slash = ink("/")[2] - ink("/")[0]
+    d = (w + slash) / 2 + size * 0.06   # centre of each number from the slash's centre
+    pad = round(size)
+
+    def put(s, x, turn):
+        left, top, right, bottom = ink(s)
+        layer = Image.new("RGBA", (2 * pad, 2 * pad), (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text((pad - (left + right) / 2, pad - (top + bottom) / 2), s, font=f, fill=fill,
+                                   anchor="ls", **style)
+        im.alpha_composite(layer.rotate(turn) if turn else layer, (round(x - pad), round(cy - pad)))
+    put(text, cx - d, 0)
+    put("/", cx, 0)
+    put(text, cx + d, 180)
+
+
+def draw_marker(im, marker, x0, y0, p, both=False):
+    """Paints a marker on the image im, upright in the tile at (x0, y0). both: its number as N/N (draw_pair)."""
     if not marker:
         return
+    o = ImageDraw.Draw(im)
     cx, cy, u = x0 + p / 2, y0 + p / 2, p / 128  # u = one design pixel
     ink = (45, 32, 22, 255)
     if marker.startswith("spawn"):   # spawn1, spawn2, spawn2-star (a controlled spawn: a star above the number)
@@ -471,12 +510,18 @@ def draw_marker(o, marker, x0, y0, p):
         r = 42 * u
         o.ellipse([cx - r - 4 * u, cy - r - 4 * u, cx + r + 4 * u, cy + r + 4 * u], outline=(150, 90, 210, 90), width=round(6 * u))
         o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(14, 10, 20, 255), outline=(176, 116, 236, 255), width=round(5 * u))
-        o.text((cx, cy + 2 * u), n, font=font(round(40 * u)), fill=(206, 160, 250, 255), anchor="mm")
+        if both:
+            draw_pair(im, n, cx, cy, round(34 * u), (206, 160, 250, 255))
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(40 * u)), fill=(206, 160, 250, 255), anchor="mm")
     elif marker.startswith("passage-out"):   # where a passage comes out (one way): a violet ring, its number, chevrons out
         n = marker[len("passage-out"):]
         r = 36 * u
         o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(60, 30, 90, 90), outline=(176, 116, 236, 255), width=round(4 * u))
-        o.text((cx, cy + 2 * u), n, font=font(round(34 * u)), fill=(214, 176, 250, 255), anchor="mm")
+        if both:
+            draw_pair(im, n, cx, cy, round(30 * u), (214, 176, 250, 255))
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(34 * u)), fill=(214, 176, 250, 255), anchor="mm")
         for k in range(4):   # chevrons pointing outward: you come out here, you can't go back in
             a = k * math.pi / 2 + math.pi / 4
             px, py = cx + math.cos(a) * 50 * u, cy + math.sin(a) * 50 * u
@@ -493,8 +538,12 @@ def draw_marker(o, marker, x0, y0, p):
         for sx in (-1, 1):       # hinges
             o.rectangle([cx + sx * 22 * u - 6 * u, cy - h - 3 * u, cx + sx * 22 * u + 6 * u, cy - h + 12 * u],
                         fill=(58, 58, 62, 255))
-        o.text((cx, cy + 2 * u), marker[len("trapdoor"):], font=font(round(40 * u)), fill=(246, 232, 200, 255),
-               anchor="mm", stroke_width=round(3 * u), stroke_fill=dark_wood)
+        if both:
+            draw_pair(im, marker[len("trapdoor"):], cx, cy, round(34 * u), (246, 232, 200, 255),
+                      stroke_width=round(3 * u), stroke_fill=dark_wood)
+        else:
+            o.text((cx, cy + 2 * u), marker[len("trapdoor"):], font=font(round(40 * u)), fill=(246, 232, 200, 255),
+                   anchor="mm", stroke_width=round(3 * u), stroke_fill=dark_wood)
     elif marker.startswith("bell"):
         gold, deep = (226, 178, 60, 255), (150, 105, 30, 255)
         o.ellipse([cx - 26 * u, cy - 44 * u, cx + 26 * u, cy - 6 * u], fill=gold, outline=ink, width=round(3 * u))
