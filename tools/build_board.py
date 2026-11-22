@@ -994,6 +994,12 @@ def contact_edges(a, r, c):
                         (ca, ra), (cb, rb) = (col, u0), (col, u1)
                     gap_c = max(0.0, min(ca, cb) - (c + 1), c - max(ca, cb))   # from this tile, in tiles
                     gap_r = max(0.0, min(ra, rb) - (r + 1), r - max(ra, rb))
+                    lo_t, hi_t = (c, c + 1) if side in "NS" else (r, r + 1)   # this tile along the edge
+                    s0, s1 = (ca, cb) if side in "NS" else (ra, rb)
+                    start_ok = rounds[0] if k == 0 else True
+                    end_ok = rounds[1] if k == len(pieces) - 1 else True
+                    if (not start_ok and hi_t <= s0 + 1e-9) or (not end_ok and lo_t >= s1 - 1e-9):
+                        continue   # wholly past an end that stops at a wall: not this tile's slope
                     if math.hypot(gap_c, gap_r) < wg:   # near enough to shape it
                         out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), b0, b1,
                                     rounds[0] if k == 0 else True, rounds[1] if k == len(pieces) - 1 else True))
