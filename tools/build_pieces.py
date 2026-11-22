@@ -16,6 +16,7 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/zoneframe4-v1.obj  (a 4x4 zone's frame, same texture as the 2x2 one)
   props/tree-v1.obj, props/tree-v1.jpg, props/tree-collider-v1.obj
   props/gift-v1.obj, props/gift-v1.jpg  (also its own collider)
+  props/backdrop-v1.obj  (also its own collider)
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
@@ -97,6 +98,7 @@ BALL_R = 0.55                            # Pokimari ball radius
 TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, teeth around its rim
 TREE_BASE, TREE_BASE_H = 1.6, 0.1        # tree tile: base width (fits the flat top of a sloped tile) and thickness
 GIFT = 0.9                               # gift box size
+BACKDROP_W, BACKDROP_D = 87.9078, 51.9810    # the custom table's play area (its image), measured in TTS
 
 
 def norm(v):
@@ -570,6 +572,18 @@ def gift_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
 
 
+# ------------------------------------------------------------------------------------------------ backdrop
+def backdrop():
+    """A flat panel the size of the table's play area: an arena's surroundings are shown on it instead of on the
+    table (changing the table's image reloads the table, and TTS then puts back its default hand zones, which reach
+    over the team stands and pull in their cards). The image's top is the far side (player 2), its left player 1's
+    left. Its own frame: y = 0, centred."""
+    m = PieceMesh()
+    w, d = BACKDROP_W / 2, BACKDROP_D / 2
+    m.face4([(-w, 0, d), (w, 0, d), (w, 0, -d), (-w, 0, -d)], [(0, 1), (1, 1), (1, 0), (0, 0)], [(0, 1, 0)] * 4)
+    return m
+
+
 # ------------------------------------------------------------------------------------------------ bell stand
 def prism(m, quad, z0, z1, grain, base):
     """A wooden member: a 4-corner outline in the x-y plane, from z0 to z1, textured with the team stands' wood
@@ -655,6 +669,7 @@ def main():
         "tree-collider-v1.obj": lambda p: tree_collider().write(p),
         "gift-v1.obj": lambda p: gift().write(p),
         "gift-v1.jpg": lambda p: gift_texture().save(p, quality=92),
+        "backdrop-v1.obj": lambda p: backdrop().write(p),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

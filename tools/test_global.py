@@ -47,7 +47,8 @@ function print(s) calls.printed[#calls.printed + 1] = s end
 function printToAll(s) calls.printed[#calls.printed + 1] = s end
 Wait = { frames = function(f) f() end, time = function(f) f() end }
 Player = setmetatable({}, { __index = function(_, c)
-  return { color = c, steam_name = c .. "Player", broadcast = function(msg) calls.broadcast = msg end }
+  return { color = c, steam_name = c .. "Player", broadcast = function(msg) calls.broadcast = msg end,
+    getHandObjects = function() return (handHeld or {})[c] or {} end }
 end })
 Color = { fromString = function(c)
   return ({ Red = { r = 0.856, g = 0.1, b = 0.094 }, Blue = { r = 0.118, g = 0.53, b = 1 } })[c] or { r = 1, g = 1, b = 1 }
@@ -93,8 +94,10 @@ southStand, northStand = makeStand(-26.4, 0), makeStand(26.4, 180)
 function spawnObjectData(t)
   calls.spawned[#calls.spawned + 1] = t
   local kind = t.data.Name == "CardCustom" and "Card" or ((t.data.Name == "Figurine_Custom" or (t.data.CustomMesh and t.data.CustomMesh.TypeIndex == 1)) and "Figurine" or "Generic")
+  local cm = t.data.CustomMesh
   return stub({ tags = t.data.Tags, type = kind, getName = function() return t.data.Nickname end,
-    getPosition = function() return t.position end })
+    getPosition = function() return t.position end,
+    getCustomObject = function() return cm and { mesh = cm.MeshURL, diffuse = cm.DiffuseURL } or {} end })
 end
 
 -- the 3D board on the table (Pugilis)
@@ -156,6 +159,13 @@ def main():
         print(("ok    " if ok else "FAIL  ") + what)
         if not ok:
             failures.append(what)
+
+    def backdrop(spawned, image):
+        """The arena's surroundings went onto one locked backdrop panel showing `image`, and only one is on the table."""
+        bd = [x for x in spawned if x.data.Tags and x.data.Tags[1] == "ArenaBackdrop"]
+        live = [o for o in g.getAllObjects().values() if o.hasTag("ArenaBackdrop")]
+        return (len(bd) == 1 and bd[0].data.Locked and bd[0].data.CustomMesh.DiffuseURL.endswith(image)
+                and bd[0].data.CustomMesh.MeshURL.endswith("props/backdrop-v1.obj") and len(live) == 1)
 
     # UI: well-formed XML, unique ids, icons registered
     xml = calls.xml
@@ -241,7 +251,8 @@ def main():
           and brd.CustomMesh.MeshURL.endswith("arenas/pugilis/board-v14.obj") and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
           and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v18.jpg") and not brd.CustomMesh.Convex,
           "picking Pugilis puts its 3D board on the table (its own mesh as collider)")
-    check(len(flags) == 4 and str(calls.tableURL).endswith("misc/table-placeholder-v1.jpg"), "with its 4 flags and its table image")
+    check(len(flags) == 4 and backdrop(new, "misc/table-placeholder-v1.jpg") and calls.tableURL is None,
+          "with its 4 flags and its surroundings on the backdrop panel (the table itself untouched)")
 
     # Illusio: floating islands with 6 flags, 6 portals in their starting colours, 6 bridges that start dropped
     n = len(calls.spawned)
@@ -251,7 +262,7 @@ def main():
     kinds = [s.data.Tags[1] for s in new]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v2.obj")
           and kinds.count("Flag") == 6 and kinds.count("Portal") == 6 and kinds.count("Bridge") == 6
-          and str(calls.tableURL).endswith("misc/sky-placeholder-v1.jpg"),
+          and backdrop(new, "misc/sky-placeholder-v1.jpg"),
           "picking Illusio: its board, 6 flags, 6 portals, 6 bridges and the sky under the table")
     portals = [s for s in new if s.data.Tags[1] == "Portal"]
     pairs = sorted(json.loads(p.data.Memo)["pair"] for p in portals)
@@ -271,8 +282,8 @@ def main():
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/ingis/board-v2.obj")
-          and len(zones) == 3 and len(kinds) == 4 and all(abs(z.data.ColorDiffuse.r - 0.6) < 1e-6 for z in zones)
-          and str(calls.tableURL).endswith("misc/volcano-placeholder-v1.jpg"),
+          and len(zones) == 3 and len(kinds) == 5 and all(abs(z.data.ColorDiffuse.r - 0.6) < 1e-6 for z in zones)
+          and backdrop(new, "misc/volcano-placeholder-v1.jpg"),
           "picking Ingis: its board, 3 neutral capture zone frames and the volcanic table")
     idx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Ingis"]
     lava = [p for p in idx["snaps"] if abs(p[1] - (0.415 - 0.1 + 0.02)) < 0.01]
@@ -290,8 +301,8 @@ def main():
     walls = sum(row.count("#") for row in vmap["grid"])
     vidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Viperia"]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/viperia/board-v1.obj")
-          and kinds.count("Flag") == 3 and len(kinds) == 4 and len(vidx["snaps"]) == 16 * 15 - walls
-          and str(calls.tableURL).endswith("misc/jungle-placeholder-v1.jpg"),
+          and kinds.count("Flag") == 3 and len(kinds) == 5 and len(vidx["snaps"]) == 16 * 15 - walls
+          and backdrop(new, "misc/jungle-placeholder-v1.jpg"),
           f"picking Viperia: its board, 3 flags, snap points on all {16 * 15 - walls} tiles but the {walls} walls, the jungle table")
 
     # Chrysalia: its pitch, 3 capture zone frames, 2 traps and a bag of Pokimari balls beside the board
@@ -305,7 +316,7 @@ def main():
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/chrysalia/board-v1.obj")
           and kinds.count("Zone") == 3 and kinds.count("Trap") == 2 and bag is not None and bag.data.Name == "Infinite_Bag"
           and ball.Nickname == "Pokimari ball" and ball.CustomMesh.ColliderURL.endswith("props/ball-collider-v1.obj")
-          and abs(bag.position.x - 34.01) < 0.01 and str(calls.tableURL).endswith("misc/mulch-placeholder-v2.jpg"),
+          and abs(bag.position.x - 34.01) < 0.01 and backdrop(new, "misc/mulch-placeholder-v2.jpg"),
           "picking Chrysalia: its board, 3 zone frames, 2 traps, an endless bag of Pokimari balls beside it, the mulch table")
     lua.execute(r"""
       trapObj = { tags = { "Trap", "ArenaPiece" }, menu = {} }
@@ -665,20 +676,29 @@ def main():
     """)
     check(json.loads(g.stray.memo).get("owner") == "Green", "an ownerless Pokemon belongs to the first seated player to put it down")
 
-    # hand zones: TTS's default ones (10, over the stands) are replaced with the 8 just past the table's edge; a correct
-    # layout is left alone
+    # hand zones: TTS's default ones (10, over the stands) are moved to the 8 just past the table's edge (Brown and Teal
+    # removed, a missing one spawned), and the cards a player held are put back into their hand; a correct layout is
+    # left alone
     lua.execute(r"""
       handObjs = {}
       local function hand(c, x, z, sx, sz)
-        local h = { color = c, pos = Vector(x, 3.29, z), scale = Vector(sx, 11.9, sz) }
+        local h = { color = c, pos = Vector(x, 3.29, z), scale = Vector(sx, 11.9, sz), rot = Vector(0, 0, 0) }
         h.getValue = function() return h.color end
         h.getPosition = function() return h.pos end
         h.getScale = function() return h.scale end
+        h.setPosition = function(v) h.pos = Vector(v[1], v[2], v[3]) end
+        h.setRotation = function(v) h.rot = Vector(v[1], v[2], v[3]) end
+        h.setScale = function(v) h.scale = Vector(v[1], v[2], v[3]) end
         h.destruct = function() h.gone = true end
         handObjs[#handObjs + 1] = h
+        return h
       end
       for _, c in ipairs({ "Red", "Brown", "White" }) do hand(c, 0, -34.43, 15.33, 6.35) end
-      for _, c in ipairs({ "Blue", "Teal", "Green", "Orange", "Yellow", "Pink", "Purple" }) do hand(c, 0, 34.43, 15.33, 6.35) end
+      for _, c in ipairs({ "Blue", "Teal", "Orange", "Yellow", "Pink", "Purple" }) do hand(c, 0, 34.43, 15.33, 6.35) end
+      handByColor = function(c) for _, h in ipairs(handObjs) do if h.color == c and not h.gone then return h end end end
+      heldCard = { pos = Vector(0, 3, -34.4) }
+      heldCard.setPosition = function(v) heldCard.pos = Vector(v[1], v[2], v[3]) end
+      handHeld = { Red = { heldCard } }
       Hands = { getHands = function()
         local live = {}
         for _, h in ipairs(handObjs) do if not h.gone then live[#live + 1] = h end end
@@ -697,13 +717,17 @@ def main():
       end
     """)
     changed = g.ensureHandZones()
-    sh = {h.data.FogColor: h for h in g.spawnedHands.values()}
-    red, pink = sh.get("Red"), sh.get("Pink")
-    check(changed and len(sh) == 8 and "Brown" not in sh and "Teal" not in sh
-          and abs(red.position[3] - -(75.3 / 2 + 3.56 / 2 + 0.5)) < 1e-6 and red.position[2] == 2.85 and red.position[1] == -9.48
-          and abs(pink.position[1] - (110.3 / 2 + 3.56 / 2 + 0.5)) < 1e-6 and pink.rotation[2] == 270,
-          "TTS's default hand zones are replaced by the 8 just past the table's edge (no Brown/Teal)")
-    check(not g.ensureHandZones() and len(list(g.spawnedHands.values())) == 8, "a correct layout is left alone")
+    live = {h.color: h for h in g.Hands.getHands().values()}
+    red, pink = live.get("Red"), live.get("Pink")
+    edge_z, edge_x = 75.3 / 2 + 3.56 / 2 + 0.5, 110.3 / 2 + 3.56 / 2 + 0.5
+    check(changed and sorted(live) == sorted(["Red", "White", "Blue", "Green", "Orange", "Yellow", "Pink", "Purple"])
+          and [h.data.FogColor for h in g.spawnedHands.values()] == ["Green"]
+          and abs(red.pos.z + edge_z) < 1e-6 and red.pos.y == 2.85 and red.pos.x == -9.48 and red.scale.z == 3.56
+          and abs(pink.pos.x - edge_x) < 1e-6 and pink.rot.y == 270,
+          "TTS's default hand zones are moved just past the table's edge (Brown/Teal removed, missing Green spawned)")
+    hc = g.heldCard.pos
+    check(abs(hc.x + 9.48) < 1e-6 and abs(hc.z + edge_z) < 1e-6, "a card Red was holding is put back into Red's moved hand")
+    check(not g.ensureHandZones(), "a correct layout is left alone")
 
     # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them.
     # TTS's Lua (MoonSharp) fails "pattern too complex" on patterns over text this size (real Lua doesn't), so the

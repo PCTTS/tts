@@ -213,7 +213,8 @@ function onLoad(saved)
         setupStand(obj)
       elseif obj.hasTag("Pokemon") then
         plainStandee(obj)
-      elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap") then
+      elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap")
+        or obj.hasTag("ArenaBackdrop") then
         pieceSetup(obj)
       elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
         unstretchCard(obj)
@@ -280,16 +281,39 @@ function ensureHandZones()
     end
   end
   if same then return false end
-  for _, h in ipairs(hands) do h.destruct() end
+  -- a zone that moves drops what it holds: note each player's cards first and give them back after
+  local held, wanted = {}, {}
   for _, t in ipairs(targets) do
-    local col = Color.fromString(t.c)
-    spawnObjectData({ data = {
-      Name = "HandTrigger", FogColor = t.c, Locked = true,
-      ColorDiffuse = { r = col.r, g = col.g, b = col.b, a = 0 },
-      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0,
-        scaleX = HAND_SIZE.w, scaleY = HAND_SIZE.h, scaleZ = HAND_SIZE.d },
-    }, position = { t.x, HAND_SIZE.y, t.z }, rotation = { 0, t.yaw, 0 } })
+    wanted[t.c] = true
+    local ok, objs = pcall(function() return Player[t.c].getHandObjects() end)
+    held[t.c] = ok and objs or {}
   end
+  for _, h in ipairs(hands) do
+    if not wanted[h.getValue() or ""] then h.destruct() end   -- seats without a zone in the layout (Brown, Teal)
+  end
+  for _, t in ipairs(targets) do
+    local h = byColor[t.c]
+    if h then
+      h.setPosition({ t.x, HAND_SIZE.y, t.z })
+      h.setRotation({ 0, t.yaw, 0 })
+      h.setScale({ HAND_SIZE.w, HAND_SIZE.h, HAND_SIZE.d })
+    else
+      local col = Color.fromString(t.c)
+      spawnObjectData({ data = {
+        Name = "HandTrigger", FogColor = t.c, Locked = true,
+        ColorDiffuse = { r = col.r, g = col.g, b = col.b, a = 0 },
+        Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0,
+          scaleX = HAND_SIZE.w, scaleY = HAND_SIZE.h, scaleZ = HAND_SIZE.d },
+      }, position = { t.x, HAND_SIZE.y, t.z }, rotation = { 0, t.yaw, 0 } })
+    end
+  end
+  Wait.frames(function()   -- into the hand's new place: a card dropped in a hand zone joins that hand
+    for _, t in ipairs(targets) do
+      for k, obj in ipairs(held[t.c]) do
+        obj.setPosition({ t.x + (k - 1) * 0.3, HAND_SIZE.y, t.z })
+      end
+    end
+  end, 10)
   log("Hand zones put back just past the table's edge.")
   return true
 end
@@ -513,6 +537,10 @@ end
 -- snap point over every tile (position only), its pieces (flags…) and the table image around it.
 ----------------------------------------------------------------------------------------------------
 BOARD_SPOT = { 0.01, 0.961, -0.01 }   -- where a board sits: on the table, no rotation
+-- An arena's surroundings are shown on a flat panel over the table's play area (props/backdrop-v1.obj), not as the
+-- table's own image: changing that reloads the table, and TTS then puts back its default hand zones, which reach over
+-- the team stands and pull in the cards on them.
+BACKDROP = { mesh = "props/backdrop-v1.obj", pos = { 0.0092, 0.9615, -0.0071 } }
 BOARD_SHADER = { SpecularColor = { r = 1, g = 1, b = 1 }, SpecularIntensity = 0, SpecularSharpness = 2, FresnelStrength = 0 }
 
 function currentBoard()
@@ -557,10 +585,33 @@ function loadArena(name, entry, base)
     callback_function = function(board) board.setSnapPoints(snaps) end,
   })
   for _, p in ipairs(a.pieces or {}) do spawnArenaPiece(p, spot, base) end
-  if a.table and a.table ~= "" and Tables.getCustomURL() ~= base .. a.table then
-    Tables.setCustomURL(base .. a.table)
-  end
+  if a.table and a.table ~= "" then setBackdrop(base .. a.table, base) end
   return true
+end
+
+function currentBackdrop()
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("ArenaBackdrop") then return o end
+  end
+end
+
+-- Show an image round the board on the backdrop panel (kept if it already shows it). Locked and not clickable.
+function setBackdrop(image, base)
+  local old = currentBackdrop()
+  if old then
+    if (old.getCustomObject() or {}).diffuse == image then return old end
+    old.destruct()
+  end
+  return spawnObjectData({
+    data = {
+      Name = "Custom_Model", Nickname = "", Tags = { "ArenaBackdrop" }, Locked = true,
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      CustomMesh = { MeshURL = base .. BACKDROP.mesh, DiffuseURL = image, NormalURL = "", ColliderURL = base .. BACKDROP.mesh,
+        Convex = false, MaterialIndex = 3, TypeIndex = 0, CastShadows = false, CustomShader = BOARD_SHADER },
+    },
+    position = { BACKDROP.pos[1], BACKDROP.pos[2], BACKDROP.pos[3] }, rotation = { 0, 0, 0 },
+    callback_function = function(obj) obj.interactable = false end,
+  })
 end
 
 -- One arena piece from the index (pos: in the board's frame; origin: where the board sits), locked.
@@ -1248,6 +1299,7 @@ end
 -- kept by a save).
 function pieceSetup(obj)
   if not obj then return end
+  if obj.hasTag("ArenaBackdrop") then obj.interactable = false return end   -- clicks go through to the table
   flagMenu(obj)
   if obj.hasTag("Portal") then
     local pair = memoTable(obj).pair or 1
