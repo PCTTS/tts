@@ -467,6 +467,24 @@ def draw_marker(o, marker, x0, y0, p):
         for k, (dx, dy, rr) in enumerate(((-12, -10, 9), (8, 6, 13), (-4, 14, 6))):   # ripples
             o.arc([cx + (dx - rr) * u, cy + (dy - rr) * u, cx + (dx + rr) * u, cy + (dy + rr) * u], 200, 340,
                   fill=(190, 225, 245, 200), width=round(2 * u))
+    elif marker.startswith("passage-in"):   # a secret passage's entrance: a dark hole, glowing violet rim, its number
+        n = marker[len("passage-in"):]
+        r = 42 * u
+        o.ellipse([cx - r - 4 * u, cy - r - 4 * u, cx + r + 4 * u, cy + r + 4 * u], outline=(150, 90, 210, 90), width=round(6 * u))
+        o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(14, 10, 20, 255), outline=(176, 116, 236, 255), width=round(5 * u))
+        o.text((cx, cy + 2 * u), n, font=font(round(40 * u)), fill=(206, 160, 250, 255), anchor="mm")
+    elif marker.startswith("passage-out"):   # where a passage comes out (one way): a violet ring, its number, chevrons out
+        n = marker[len("passage-out"):]
+        r = 36 * u
+        o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(60, 30, 90, 90), outline=(176, 116, 236, 255), width=round(4 * u))
+        o.text((cx, cy + 2 * u), n, font=font(round(34 * u)), fill=(214, 176, 250, 255), anchor="mm")
+        for k in range(4):   # chevrons pointing outward: you come out here, you can't go back in
+            a = k * math.pi / 2 + math.pi / 4
+            px, py = cx + math.cos(a) * 50 * u, cy + math.sin(a) * 50 * u
+            for side in (-1, 1):
+                b2 = a + math.pi + side * 0.6
+                o.line([(px, py), (px + math.cos(b2) * 9 * u, py + math.sin(b2) * 9 * u)], fill=(196, 146, 246, 255),
+                       width=round(3 * u))
     elif marker.startswith("trapdoor"):   # a wooden hatch with its pair's number
         h = 40 * u
         wood, dark_wood = (128, 92, 56, 255), (70, 48, 28, 255)

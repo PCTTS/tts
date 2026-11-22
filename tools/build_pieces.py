@@ -13,6 +13,9 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/zoneframe2-v1.obj, props/zoneframe-v1.jpg  (also its own collider)
   props/ball-v1.obj, props/ball-v1.jpg, props/ball-collider-v1.obj
   props/trap-v1.obj, props/trap-v1.jpg, props/trap-collider-v1.obj
+  props/zoneframe4-v1.obj  (a 4x4 zone's frame, same texture as the 2x2 one)
+  props/tree-v1.obj, props/tree-v1.jpg, props/tree-collider-v1.obj
+  props/gift-v1.obj, props/gift-v1.jpg  (also its own collider)
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
@@ -25,6 +28,10 @@ Pokimari ball (Chrysalia): a cream ball with stitched seams; its collider is a f
 where it's put instead of rolling. Its own frame: y = 0 is the bottom.
 Trap (Chrysalia): a low metal plate ringed with teeth; only the plate is solid (a Pokemon stands on it). Its own
 frame: y = 0 is the tile top.
+Tree tile (Yaksha): a gnarled dark tree on a square stone tile; players lift it off when it's destroyed. Its own
+frame: y = 0 is the bottom of the tile.
+Gift box: a wrapped box with a ribbon cross and bow; players move it (gifts dropped by fainted Pokemon, and the
+Yaksha surprise boxes). Its own frame: y = 0 is the bottom.
 
 Bell: the board's bell icon turned around its axis: a dome, a straight flaring skirt, a darker rim band and a ball
 clapper hanging in the open mouth; hollow and dark inside. Its own frame: y = 0 is the bottom of the rim, centred on
@@ -88,6 +95,8 @@ BRIDGE_W, BRIDGE_D = 2.7, 0.22           # deck width (across) and thickness
 ZONE_W, ZONE_H, ZONE_INSET = 0.16, 0.035, 0.05   # zone frame: band width, thickness, gap inside the zone's border
 BALL_R = 0.55                            # Pokimari ball radius
 TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, teeth around its rim
+TREE_BASE, TREE_BASE_H = 1.6, 0.1        # tree tile: base width (fits the flat top of a sloped tile) and thickness
+GIFT = 0.9                               # gift box size
 
 
 def norm(v):
@@ -457,6 +466,110 @@ def trap_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
 
 
+# ------------------------------------------------------------------------------------------------ tree tile
+TREE_TEX = 256   # texture: base stone (left), bark (middle), leaves (right)
+
+
+def tree():
+    """A square stone tile with a gnarled trunk (bending as it rises) and a clumped canopy of dark leaves."""
+    m = PieceMesh()
+    h = TREE_BASE / 2
+    box(m, -h, h, 0, TREE_BASE_H, -h, h, uv=(0.15, 0.5))
+    rng = np.random.default_rng(7)
+    # trunk: rings that drift sideways as they rise, getting thinner
+    rings = []
+    for k in range(7):
+        t = k / 6
+        rings.append((0.38 - 0.24 * t, TREE_BASE_H + 2.0 * t, 0.25 * math.sin(t * 2.4), 0.18 * math.sin(t * 3.1 + 1)))
+    seg = 10
+    for (r0, y0, x0, z0), (r1, y1, x1, z1) in zip(rings, rings[1:]):
+        for k in range(seg):
+            a0, a1 = 2 * math.pi * k / seg, 2 * math.pi * (k + 1) / seg
+            pts = [(x0 + r0 * math.cos(a0), y0, z0 + r0 * math.sin(a0)), (x0 + r0 * math.cos(a1), y0, z0 + r0 * math.sin(a1)),
+                   (x1 + r1 * math.cos(a1), y1, z1 + r1 * math.sin(a1)), (x1 + r1 * math.cos(a0), y1, z1 + r1 * math.sin(a0))]
+            ns = [(math.cos(a), 0.2, math.sin(a)) for a in (a0, a1, a1, a0)]
+            m.face4(pts, [(0.5, 0.2), (0.5, 0.2), (0.5, 0.8), (0.5, 0.8)], ns)
+    # canopy: a few lumpy spheres around the top of the trunk
+    top = rings[-1]
+    for k in range(6):
+        a = k * 2 * math.pi / 6 + rng.uniform(-0.3, 0.3)
+        cx, cz = top[2] + math.cos(a) * 0.55, top[3] + math.sin(a) * 0.55
+        cy, r = top[1] + rng.uniform(-0.05, 0.35), rng.uniform(0.5, 0.7)
+        _sphere(m, (cx, cy, cz), r, 0.83)
+    _sphere(m, (top[2], top[1] + 0.45, top[3]), 0.75, 0.88)
+    return m
+
+
+def _sphere(m, centre, r, u, seg=12, rows=8):
+    cx, cy, cz = centre
+    for i in range(rows):
+        p0, p1 = math.pi * i / rows - math.pi / 2, math.pi * (i + 1) / rows - math.pi / 2
+        for k in range(seg):
+            a0, a1 = 2 * math.pi * k / seg, 2 * math.pi * (k + 1) / seg
+            def pt(p, a):
+                return (cx + r * math.cos(p) * math.cos(a), cy + r * math.sin(p), cz + r * math.cos(p) * math.sin(a))
+            def nm(p, a):
+                return (math.cos(p) * math.cos(a), math.sin(p), math.cos(p) * math.sin(a))
+            corners = [pt(p0, a0), pt(p0, a1), pt(p1, a1), pt(p1, a0)]
+            m.face4(corners, [(u, 0.1 + 0.8 * i / rows)] * 2 + [(u, 0.1 + 0.8 * (i + 1) / rows)] * 2,
+                    [nm(p0, a0), nm(p0, a1), nm(p1, a1), nm(p1, a0)])
+
+
+def tree_collider():
+    m = PieceMesh()
+    h = TREE_BASE / 2
+    box(m, -h, h, 0, TREE_BASE_H, -h, h)
+    box(m, -0.35, 0.35, 0, 2.6, -0.35, 0.35)
+    return m
+
+
+def tree_texture():
+    rng = np.random.default_rng(41)
+    s = TREE_TEX
+    img = np.zeros((s, s, 3), np.float32)
+    img[:, :77] = (58, 56, 60)                                    # base: dark stone
+    img[:, 77:180] = (54, 40, 32)                                 # bark
+    img[:, 180:] = (34, 58, 36)                                   # leaves: dark green
+    img[:, 77:180] *= (0.8 + 0.3 * np.abs(np.sin(np.arange(103) / 3.0)))[None, :, None].astype(np.float32)
+    img[:, 180:] *= (0.75 + 0.5 * rng.random((s, s - 180, 1))).astype(np.float32)
+    img[rng.random((s, s)) < 0.02] = (90, 60, 110)                # a few violet glints in the leaves (dark energy)
+    img[:, :180] *= (0.9 + 0.15 * rng.random((s, 180, 1))).astype(np.float32)
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.8))
+
+
+# ------------------------------------------------------------------------------------------------ gift box
+def gift():
+    """A wrapped box (a lid slightly wider than the box), a ribbon band each way and a bow of two loops."""
+    m = PieceMesh()
+    g, lid = GIFT / 2, GIFT / 2 + 0.04
+    box(m, -g, g, 0, GIFT * 0.78, -g, g, uv=(0.25, 0.5))
+    box(m, -lid, lid, GIFT * 0.74, GIFT * 0.92, -lid, lid, uv=(0.25, 0.5))
+    b = 0.08
+    for x0, x1, z0, z1 in ((-b, b, -lid - 0.01, lid + 0.01), (-lid - 0.01, lid + 0.01, -b, b)):   # ribbons
+        box(m, x0, x1, -0.005, GIFT * 0.925, z0, z1, uv=(0.75, 0.5))
+    for sx in (-1, 1):   # bow loops: flattened rings on the lid
+        for k in range(8):
+            a0, a1 = 2 * math.pi * k / 8, 2 * math.pi * (k + 1) / 8
+            cx = sx * 0.16
+            pts = [(cx + 0.14 * math.cos(a0) * 1.4, GIFT * 0.93 + 0.1 + 0.1 * math.sin(a0), -0.03),
+                   (cx + 0.14 * math.cos(a1) * 1.4, GIFT * 0.93 + 0.1 + 0.1 * math.sin(a1), -0.03),
+                   (cx + 0.14 * math.cos(a1) * 1.4, GIFT * 0.93 + 0.1 + 0.1 * math.sin(a1), 0.03),
+                   (cx + 0.14 * math.cos(a0) * 1.4, GIFT * 0.93 + 0.1 + 0.1 * math.sin(a0), 0.03)]
+            n = (math.cos((a0 + a1) / 2), math.sin((a0 + a1) / 2), 0)
+            m.face4(pts, [(0.75, 0.5)] * 4, [n] * 4)
+    return m
+
+
+def gift_texture():
+    rng = np.random.default_rng(43)
+    img = np.zeros((64, 64, 3), np.float32)
+    img[:, :32] = (176, 46, 58)                    # wrapping: deep red
+    img[::8, :32] = (204, 160, 70)                 # thin gold stripes in the paper
+    img[:, 32:] = (232, 196, 92)                   # ribbon: gold
+    img *= (0.94 + 0.08 * rng.random((64, 64, 1))).astype(np.float32)
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+
+
 # ------------------------------------------------------------------------------------------------ bell stand
 def prism(m, quad, z0, z1, grain, base):
     """A wooden member: a 4-corner outline in the x-y plane, from z0 to z1, textured with the team stands' wood
@@ -536,6 +649,12 @@ def main():
         "trap-v1.obj": lambda p: trap().write(p),
         "trap-v1.jpg": lambda p: trap_texture().save(p, quality=92),
         "trap-collider-v1.obj": lambda p: trap_collider().write(p),
+        "zoneframe4-v1.obj": lambda p: zone_frame(4).write(p),
+        "tree-v1.obj": lambda p: tree().write(p),
+        "tree-v1.jpg": lambda p: tree_texture().save(p, quality=92),
+        "tree-collider-v1.obj": lambda p: tree_collider().write(p),
+        "gift-v1.obj": lambda p: gift().write(p),
+        "gift-v1.jpg": lambda p: gift_texture().save(p, quality=92),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

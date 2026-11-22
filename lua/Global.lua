@@ -493,7 +493,7 @@ function spawnArenaPiece(p, origin, base)
   if p.kind == "BallBag" then return spawnBallBag(p, origin, base) end
   local data = {
     Name = "Custom_Model", Nickname = p.name, Description = p.desc or "", Tags = { p.kind, "ArenaPiece" },
-    Locked = true, ColorDiffuse = { r = 1, g = 1, b = 1 }, Memo = "",
+    Locked = not p.free, ColorDiffuse = { r = 1, g = 1, b = 1 }, Memo = "",   -- free pieces (trees, gifts): players move them
     Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
     CustomMesh = { MeshURL = base .. p.mesh, DiffuseURL = base .. p.diffuse, NormalURL = "",
       ColliderURL = base .. p.collider, Convex = p.convex, MaterialIndex = p.material, TypeIndex = 0,

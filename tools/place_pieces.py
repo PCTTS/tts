@@ -17,6 +17,7 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
   portal: a round tile lying on the tile, in its starting pair's colour ("pair" in the legend); a die on it
         shuffles every portal's pair (Global.lua).
   trap: a trap piece on the tile; right-click > Spring trap removes it once it's been used (Global.lua).
+  tree / gift: a tree tile (Yaksha) or a gift box on the tile, NOT locked: players lift it off / move it themselves.
   map.json "extras": pieces that belong to no tile, e.g. {"kind": "BallBag", "pos": [x, y, z]} — a bag of
         Pokimari balls beside the board (players draw balls, roll for the spot and move them by hand).
   zone (capture zone tiles): a frame around each square group of them (2x2), which takes the colour of the player
@@ -52,8 +53,12 @@ TRAP = {"mesh": "props/trap-v1.obj", "diffuse": "props/trap-v1.jpg", "collider":
         "convex": True, "material": 2}
 BALL = {"mesh": "props/ball-v1.obj", "diffuse": "props/ball-v1.jpg", "collider": "props/ball-collider-v1.obj",
         "convex": True, "material": 3}
-ZONES = {2: {"mesh": "props/zoneframe2-v1.obj", "diffuse": "props/zoneframe-v1.jpg", "collider": "props/zoneframe2-v1.obj",
-             "convex": False, "material": 3}}
+ZONES = {n: {"mesh": f"props/zoneframe{n}-v1.obj", "diffuse": "props/zoneframe-v1.jpg", "collider": f"props/zoneframe{n}-v1.obj",
+             "convex": False, "material": 3} for n in (2, 4)}
+TREE = {"mesh": "props/tree-v1.obj", "diffuse": "props/tree-v1.jpg", "collider": "props/tree-collider-v1.obj",
+        "convex": True, "material": 1}
+GIFT = {"mesh": "props/gift-v1.obj", "diffuse": "props/gift-v1.jpg", "collider": "props/gift-v1.obj",
+        "convex": True, "material": 3}
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
 
 
@@ -78,7 +83,7 @@ def zones(data, info):
         rows, cols = sorted({r for r, _ in group}), sorted({c for _, c in group})
         size = len(rows)
         if len(cols) != size or len(group) != size * size or size not in ZONES:
-            sys.exit(f"capture zone tiles {sorted(group)}: only square 2x2 zones have a frame")
+            sys.exit(f"capture zone tiles {sorted(group)}: only square 2x2 or 4x4 zones have a frame")
         tile = data["legend"][data["grid"][rows[0]][cols[0]]]
         top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0)
         cx = sum((c + 0.5 - C / 2) * T for _, c in group) / len(group)
@@ -135,11 +140,15 @@ def pieces(arena, info):
         for c, ch in enumerate(row):
             tile = data["legend"].get(ch, {})
             marker = tile.get("marker", "")
-            if tile.get("void") or not tile.get("piece") or not (marker in BELLS or marker in ("flag", "portal", "trap")):
+            if tile.get("void") or not tile.get("piece") or not (marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift")):
                 continue
             cx, cz = (c + 0.5 - C / 2) * T, (R / 2 - r - 0.5) * T
             top = info["floor0"] + tile["level"] * info["level_height"] - tile.get("sink", 0.0)
-            if marker == "trap":
+            if marker in ("tree", "gift"):
+                name, model = ("Tree", TREE) if marker == "tree" else ("Gift", GIFT)
+                out.append({"kind": name, "name": name if marker == "tree" else "Gift box", "model": model,
+                            "pos": [cx, top, cz], "yaw": 0, "desc": "", "free": True})
+            elif marker == "trap":
                 out.append({"kind": "Trap", "name": "Trap", "model": TRAP, "pos": [cx, top, cz], "yaw": 0, "desc": ""})
             elif marker == "portal":
                 out.append({"kind": "Portal", "name": "Portal", "model": PORTAL, "pos": [cx, top, cz], "yaw": 0,

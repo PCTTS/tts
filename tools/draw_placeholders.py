@@ -30,6 +30,10 @@ Writes (only files that are missing: bump a version when what a file holds chang
   misc/mulch-placeholder-v1.jpg                  table image around it: more mulch, a little darker
   arenas/chrysalia/textures/mulch-clover1.png, -clover2.png  the mulch with small clover patches and sprouts
   misc/mulch-placeholder-v2.jpg                  the table's mulch with clovers too
+  arenas/yaksha/textures/temple-stone.png        Yaksha's high ground: dark charcoal-violet stone blocks, faint violet veins
+  arenas/yaksha/textures/dark-water.png          Yaksha's water: black-green, faint ripples
+  arenas/yaksha/textures/box-floor.png           the surprise boxes: dark stone with faint glowing violet runes
+  (Yaksha's ground and edges reuse Chrysalia's slate1/2 and slate-edge)
 """
 from pathlib import Path
 
@@ -554,8 +558,49 @@ def mulch_table_clover():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.3))
 
 
+def temple_stone():
+    """Dark charcoal-violet stone in big blocks, with faint glowing violet veins."""
+    rng = np.random.default_rng(161)
+    img = stone_blocks(N, N, rng, 2, base=(54, 48, 60))
+    veins = np.abs(np.sin((fbm(N, N, rng, 3, 4) * 6 + np.arange(N)[:, None] / N) * np.pi))
+    glow = np.clip((0.06 - veins) / 0.06, 0, 1) * (fbm(N, N, rng, 4, 3) > 0.5)
+    img = img + (np.array((150, 90, 200), np.float32) - img) * (0.6 * glow)[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.5))
+
+
+def dark_water():
+    rng = np.random.default_rng(163)
+    t = fbm(N, N, rng, 3, 5)
+    rip = 0.5 + 0.5 * np.sin((t * 6 + fbm(N, N, rng, 2) * 2) * 2 * np.pi)
+    img = mix((10, 26, 24), (26, 52, 46), 0.6 * t + 0.4 * rip)
+    img = img + (np.array((90, 130, 120), np.float32) - img) * (0.25 * np.clip((rip - 0.88) / 0.12, 0, 1))[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
+
+
+def box_floor():
+    """The surprise boxes' floor: dark stone with a faint glowing violet rune circle."""
+    rng = np.random.default_rng(167)
+    img = mix((30, 26, 36), (48, 42, 56), fbm(N, N, rng, 4, 4))
+    out = to_img(img).convert("RGBA")
+    glow = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+    d = ImageDraw.Draw(glow)
+    c = N / 2
+    for r, w in ((N * 0.42, 6), (N * 0.34, 3)):
+        d.ellipse([c - r, c - r, c + r, c + r], outline=(170, 110, 230, 200), width=w)
+    for k in range(8):   # little rune strokes between the rings
+        a = k * np.pi / 4 + 0.2
+        x, y = c + np.cos(a) * N * 0.38, c + np.sin(a) * N * 0.38
+        d.line([(x - 8, y - 8), (x + 6, y + 2), (x - 4, y + 10)], fill=(190, 140, 240, 210), width=3)
+    out.alpha_composite(glow.filter(ImageFilter.GaussianBlur(3)))
+    out.alpha_composite(glow)
+    return out.convert("RGB")
+
+
 def main():
     files = {
+        "arenas/yaksha/textures/temple-stone.png": lambda p: temple_stone().save(p),
+        "arenas/yaksha/textures/dark-water.png": lambda p: dark_water().save(p),
+        "arenas/yaksha/textures/box-floor.png": lambda p: box_floor().save(p),
         "arenas/chrysalia/textures/mulch-clover1.png": lambda p: mulch_clover(141).save(p),
         "arenas/chrysalia/textures/mulch-clover2.png": lambda p: mulch_clover(142).save(p),
         "misc/mulch-placeholder-v2.jpg": lambda p: mulch_table_clover().save(p, quality=90),

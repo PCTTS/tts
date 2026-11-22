@@ -1,0 +1,93 @@
+{
+  "name": "Yaksha",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the old map image (maps/yaksha.jpg): the 16x16 arena (columns 4-19), a cross of high ground round the big capture zone and a U of high ground before each team's spawns, water, trees, two side capture zones; and each player's 3x3 surprise box with its gifts. The boxes sit to the right of the arena, a gap away (player 2's top-left box would have landed on the table's top pillar: it's mirrored onto the right so its passages still face the arena).",
+  "grid": [
+    "####.......22..~~~..#fGG",
+    "####.2...2^..^2~~~2.#GGG",
+    "####...b..^^^^......#eGG",
+    "####..a~~~..........####",
+    "####...~~..^^....~~~####",
+    "####...~~Y^^^^Y..~~~####",
+    "####t....^ZZZZ^...~~####",
+    "####zz..^^ZZZZ^^..zz####",
+    "####zz..^^ZZZZ^^..zz####",
+    "####~~...^ZZZZ^~~..t####",
+    "####~~~..Y^^^^Y~~...####",
+    "####~~~....^^.~~~c..####",
+    "####............d...####",
+    "####......^^^^......#gGG",
+    "####.1~~~1^..^1...1.#GGG",
+    "####..~~~..11.......#hGG"
+  ],
+  "_legend": "level = height step (0 = lowest). surface picks the look from the palette. slant = slopes down to lower land over this many world units, inside the tile. sink = the surface sits this many world units lower (a look only: the water counts as ground level). marker = something on the tile (painted, or a 3D piece with piece: true). zone: capture zone tiles (a frame per square group that takes the colour of the player with more Pokemon in it). tree / gift: a tree tile or a gift box, NOT locked (players move them). passage-inN: a secret passage's entrance in a surprise box; passage-outN: where passage N comes out (one way).",
+  "legend": {
+    "#": { "void": true
+    },
+    ".": { "level": 0, "surface": "floor"
+    },
+    "^": { "level": 1, "surface": "high", "slant": 0.8
+    },
+    "Z": { "level": 1, "surface": "high", "slant": 0.8, "marker": "zone", "paint": false, "piece": true
+    },
+    "Y": { "level": 1, "surface": "high", "slant": 0.8, "marker": "tree", "paint": false, "piece": true
+    },
+    "~": { "level": 0, "surface": "water", "sink": 0.1
+    },
+    "z": { "level": 0, "surface": "floor", "marker": "zone", "paint": false, "piece": true
+    },
+    "t": { "level": 0, "surface": "floor", "marker": "tree", "paint": false, "piece": true
+    },
+    "1": { "level": 0, "surface": "floor", "marker": "spawn1"
+    },
+    "2": { "level": 0, "surface": "floor", "marker": "spawn2"
+    },
+    "a": { "level": 0, "surface": "floor", "marker": "passage-out1"
+    },
+    "b": { "level": 0, "surface": "floor", "marker": "passage-out2"
+    },
+    "c": { "level": 0, "surface": "floor", "marker": "passage-out3"
+    },
+    "d": { "level": 0, "surface": "floor", "marker": "passage-out4"
+    },
+    "G": { "level": 0, "surface": "box", "marker": "gift", "paint": false, "piece": true
+    },
+    "e": { "level": 0, "surface": "box", "marker": "passage-in3"
+    },
+    "f": { "level": 0, "surface": "box", "marker": "passage-in4"
+    },
+    "g": { "level": 0, "surface": "box", "marker": "passage-in1"
+    },
+    "h": { "level": 0, "surface": "box", "marker": "passage-in2"
+    }
+  },
+  "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+  "board": {
+    "mesh": "board-v1.obj",
+    "texture": "board-v1.jpg",
+    "geometry": "board-v1.json"
+  },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/court-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py, a shadowy temple garden at dusk (the user's OK): dark mossy slate ground (Chrysalia's), dark violet temple stone on the high ground, black-green water, the surprise boxes' floor with faint glowing violet runes, dark stone edges.",
+  "textures": {
+    "floor": { "images": [   "textures/slate1.png",   "textures/slate2.png" ], "span": 1, "vary": true
+    },
+    "high": { "image": "textures/temple-stone.png", "span": 1, "vary": true
+    },
+    "water": { "image": "textures/dark-water.png", "span": 2, "vary": true
+    },
+    "box": { "image": "textures/box-floor.png", "span": 1
+    },
+    "walls": { "image": "textures/slate-edge.png", "outer": true
+    }
+  },
+  "palette": {
+    "floor": "#323A38",
+    "high": "#3A3440",
+    "water": "#1A3430",
+    "box": "#2A2430",
+    "cliff": "#343A38",
+    "base": "#222222",
+    "fall": "#D2392C"
+  }
+}
