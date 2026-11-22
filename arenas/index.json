@@ -2211,7 +2211,7 @@
  },
  "Ingis": {
   "mesh": "arenas/ingis/board-v2.obj",
-  "texture": "arenas/ingis/board-v3.jpg",
+  "texture": "arenas/ingis/board-v4.jpg",
   "table": "misc/volcano-placeholder-v1.jpg",
   "snaps": [
    [

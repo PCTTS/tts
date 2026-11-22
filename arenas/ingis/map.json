@@ -31,7 +31,7 @@
   "_coords": "Paint the rock coordinates 1-16 along the board's edges (player 1's x and y; upside down on player 2's sides).",
   "coords": true,
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v2.obj", "texture": "board-v3.jpg", "geometry": "board-v2.json" },
+  "board": { "mesh": "board-v2.obj", "texture": "board-v4.jpg", "geometry": "board-v2.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/volcano-placeholder-v1.jpg",
   "_textures": "Placeholders from tools/draw_placeholders.py: hexagonal basalt column tops on the ground, volcanic sand on the ridge, basalt columns on the board's edge and the lava's rims, glowing lava.",

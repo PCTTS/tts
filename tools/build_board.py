@@ -295,24 +295,23 @@ FRINGE = {"reach": 0.42, "wobble": 0.3, "rough": 1.0, "tufts": 160}   # defaults
 
 def draw_coords(over, a, p):
     """Coordinates in the board's edge tiles: x = 1..C along both player edges (from player 1's left), y = 1..R up
-    both side edges (from player 1's side). Like every drawing on a board they face its sides, not a player: each
-    number's bottom points at the nearer left/right edge."""
+    both side edges (from player 1's side). Each number faces out from its own edge (its bottom toward that edge)."""
     f = font(round(p * 0.15))
     size = round(p * 0.28)
 
-    def label(text, cx, cy):
+    def label(text, cx, cy, edge):
         layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
         ImageDraw.Draw(layer).text((size / 2, size / 2), text, font=f, fill=(236, 226, 208, 190), anchor="mm",
                                    stroke_width=max(1, round(p * 0.012)), stroke_fill=(0, 0, 0, 150))
-        layer = layer.rotate(side_turn(a, cx, p))
+        layer = layer.rotate(MARKER_TURN[edge])
         over.alpha_composite(layer, (round(cx - size / 2), round(cy - size / 2)))
 
     for c in range(a.C):
-        label(str(c + 1), c * p + p / 2, (a.R - 1) * p + p * 0.85)     # along player 1's edge
-        label(str(c + 1), c * p + p / 2, p * 0.15)                      # along player 2's edge
+        label(str(c + 1), c * p + p / 2, (a.R - 1) * p + p * 0.85, (1, 0))     # player 1's edge
+        label(str(c + 1), c * p + p / 2, p * 0.15, (-1, 0))                     # player 2's edge
     for r in range(a.R):
-        label(str(a.R - r), p * 0.15, r * p + p / 2)                   # up the left edge
-        label(str(a.R - r), (a.C - 1) * p + p * 0.85, r * p + p / 2)    # up the right edge
+        label(str(a.R - r), p * 0.15, r * p + p / 2, (0, -1))                  # left edge
+        label(str(a.R - r), (a.C - 1) * p + p * 0.85, r * p + p / 2, (0, 1))   # right edge
 
 
 def grass_fringe(a, img, layers, p):
