@@ -63,7 +63,7 @@
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
     "mesh": "board-v4.obj",
-    "texture": "board-v6.jpg",
+    "texture": "board-v7.jpg",
     "geometry": "board-v4.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",

@@ -240,23 +240,28 @@ def draw_texture(a):
                     over.alpha_composite(layer.rotate(turn), (x0, y0t))
                 else:
                     draw_marker(over, painted, x0, y0t, p, both)
-    for r in range(a.R):   # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope
+    # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope. The shading is laid over
+    # what's painted there, so the grid lines (each tile's edge lines) run on down the slopes.
+    for r in range(a.R):
         for c in range(a.C):
             sloped = slopes(a, r, c) if a.tile(r, c) else {}
             if not sloped:
                 continue
             band = a.tile(r, c)["slant"] / TILE * p
             x0, y0t = c * p, r * p
+            dim = Image.new("RGBA", (p, p), (0, 0, 0, 0))
+            sd = ImageDraw.Draw(dim)
             for i in range(round(band)):
                 alpha = round(70 * (i / band) ** 1.5)   # i = distance down the slope from its top edge
                 if "N" in sloped:
-                    o.line([(x0, y0t + band - i), (x0 + p, y0t + band - i)], fill=(30, 18, 8, alpha))
+                    sd.line([(0, band - i), (p, band - i)], fill=(30, 18, 8, alpha))
                 if "S" in sloped:
-                    o.line([(x0, y0t + p - band + i), (x0 + p, y0t + p - band + i)], fill=(30, 18, 8, alpha))
+                    sd.line([(0, p - band + i), (p, p - band + i)], fill=(30, 18, 8, alpha))
                 if "W" in sloped:
-                    o.line([(x0 + band - i, y0t), (x0 + band - i, y0t + p)], fill=(30, 18, 8, alpha))
+                    sd.line([(band - i, 0), (band - i, p)], fill=(30, 18, 8, alpha))
                 if "E" in sloped:
-                    o.line([(x0 + p - band + i, y0t), (x0 + p - band + i, y0t + p)], fill=(30, 18, 8, alpha))
+                    sd.line([(p - band + i, 0), (p - band + i, p)], fill=(30, 18, 8, alpha))
+            over.alpha_composite(dim, (x0, y0t))
     for r in range(a.R):   # inner corners: the same darkening around the corner point
         for c in range(a.C):
             inner = inner_corners(a, r, c) if a.tile(r, c) else {}
@@ -271,11 +276,10 @@ def draw_texture(a):
                 yy, xx = np.mgrid[by0:by0 + size, bx0:bx0 + size].astype(np.float32) + 0.5
                 t = np.clip(1 - np.hypot(xx - cx, yy - cy) / band, 0, 1)
                 alpha = np.round(70 * t ** 1.5).astype(np.uint8)
-                region = np.array(over.crop((bx0, by0, bx0 + size, by0 + size)))
-                on = alpha > 0
-                region[on] = np.concatenate([np.broadcast_to(np.array([30, 18, 8], np.uint8), (int(on.sum()), 3)),
-                                             alpha[on][:, None]], axis=1)
-                over.paste(Image.fromarray(region, "RGBA"), (bx0, by0))
+                dim = np.zeros((size, size, 4), np.uint8)
+                dim[..., :3] = (30, 18, 8)
+                dim[..., 3] = alpha
+                over.alpha_composite(Image.fromarray(dim, "RGBA"), (bx0, by0))
     for r, c, text in a.data.get("spots", []):   # numbered spots, painted like field markings, facing the sides
         layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
         ld = ImageDraw.Draw(layer)
