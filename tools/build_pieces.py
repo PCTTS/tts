@@ -18,7 +18,8 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/backdrop-v1.obj  (also its own collider)
   props/zoneframe2-raised-v1.obj, props/zoneframe4-raised-v1.obj  (frames for a zone raised above everything round
   it, its edges sloping down: drawn in by the slope's run, on the flat top; same texture) for slant 0.8 (a 50 degree
-  slope), props/zoneframe2-raised70-v1.obj, -4- for slant 0.352 (70 degrees); RAISED_SLANTS lists them
+  slope), props/zoneframe2-raised60-v1.obj, -4- for slant 0.559 (60 degrees),
+  props/zoneframe2-raised70-v1.obj, -4- for slant 0.352 (70 degrees); RAISED_SLANTS lists them
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
@@ -94,7 +95,7 @@ BOARD_TILE = 3.24875
 PORTAL_R, PORTAL_H = 1.3, 0.05           # radius, thickness (it lies on the tile; a Pokemon stands on it)
 BRIDGE_W, BRIDGE_D = 2.7, 0.22           # deck width (across) and thickness
 ZONE_W, ZONE_H, ZONE_INSET = 0.16, 0.035, 0.05   # zone frame: band width, thickness, gap inside the zone's border
-RAISED_SLANTS = {0.8: "raised", 0.352: "raised70"}   # a raised zone's slope (map.json "slant") -> its frames' name
+RAISED_SLANTS = {0.8: "raised", 0.559: "raised60", 0.352: "raised70"}   # a raised zone's slope (map.json "slant") -> its frames' name
                                          # (the frame sits that much farther in)
 TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, teeth around its rim
 TREE_BASE, TREE_BASE_H = 1.6, 0.1        # tree tile: base width (fits the flat top of a sloped tile) and thickness

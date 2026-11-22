@@ -52,7 +52,7 @@ TRAP = {"mesh": "props/trap-v1.obj", "diffuse": "props/trap-v1.jpg", "collider":
         "convex": True, "material": 2}
 ZONES = {n: {"mesh": f"props/zoneframe{n}-v1.obj", "diffuse": "props/zoneframe-v1.jpg", "collider": f"props/zoneframe{n}-v1.obj",
              "convex": False, "material": 3} for n in (2, 4)}
-RAISED_SLANTS = {0.8: "raised", 0.352: "raised70"}   # tools/build_pieces.py: a raised zone's slope -> its frames
+RAISED_SLANTS = {0.8: "raised", 0.559: "raised60", 0.352: "raised70"}   # tools/build_pieces.py: a raised zone's slope -> its frames
 RAISED_ZONES = {s: {n: {**ZONES[n], "mesh": f"props/zoneframe{n}-{name}-v1.obj", "collider": f"props/zoneframe{n}-{name}-v1.obj"}
                     for n in (2, 4)} for s, name in RAISED_SLANTS.items()}
 TREE = {"mesh": "props/tree-v1.obj", "diffuse": "props/tree-v1.jpg", "collider": "props/tree-collider-v1.obj",

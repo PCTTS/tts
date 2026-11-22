@@ -355,8 +355,8 @@ def main():
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
     free =[s for s in new if s.data.Tags[1] in ("Tree", "Gift")]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/yaksha/board-v3.obj")
-          and len(zones) == 3 and sum(z.data.CustomMesh.MeshURL.endswith("zoneframe4-raised70-v1.obj") for z in zones) == 1
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/yaksha/board-v4.obj")
+          and len(zones) == 3 and sum(z.data.CustomMesh.MeshURL.endswith("zoneframe4-raised60-v1.obj") for z in zones) == 1
           and kinds.count("Tree") == 6 and kinds.count("Gift") == 14 and all(not s.data.Locked for s in free)
           and all(s.data.Locked for s in new if s.data.Tags[1] in ("Board3D", "Zone")),
           "picking Yaksha: its board, a 4x4 (raised: drawn in on its flat top) and two 2x2 zone frames, 6 trees and 14 gifts that players can move")
