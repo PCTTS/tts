@@ -1375,8 +1375,8 @@
   ]
  },
  "Illusio": {
-  "mesh": "arenas/illusio/board-v2.obj",
-  "texture": "arenas/illusio/board-v5.jpg",
+  "mesh": "arenas/illusio/board-v6.obj",
+  "texture": "arenas/illusio/board-v6.jpg",
   "table": "misc/sky-placeholder-v1.jpg",
   "snaps": [
    [
@@ -2210,8 +2210,8 @@
   ]
  },
  "Ingis": {
-  "mesh": "arenas/ingis/board-v2.obj",
-  "texture": "arenas/ingis/board-v4.jpg",
+  "mesh": "arenas/ingis/board-v5.obj",
+  "texture": "arenas/ingis/board-v5.jpg",
   "table": "misc/volcano-placeholder-v1.jpg",
   "snaps": [
    [
@@ -3553,8 +3553,8 @@
   ]
  },
  "Pugilis": {
-  "mesh": "arenas/pugilis/board-v14.obj",
-  "texture": "arenas/pugilis/board-v18.jpg",
+  "mesh": "arenas/pugilis/board-v19.obj",
+  "texture": "arenas/pugilis/board-v19.jpg",
   "table": "misc/table-placeholder-v1.jpg",
   "snaps": [
    [

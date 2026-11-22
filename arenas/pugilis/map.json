@@ -19,17 +19,17 @@
     "####........####",
     "#####1.1.1.#####"
   ],
-  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. marker = something on the tile (painted on the board, and for flags/bells a 3D piece from tools/place_pieces.py). paint: false = don't paint the marker. orient: away-from-pit = turn the painted marker so its bottom points away from the neighbouring lower tiles. piece: true = also put a 3D piece there (tools/place_pieces.py: flags, bells).",
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. slant = the edges slope down over this many world units (0.559: 60 degrees); slant_to = only toward neighbours with those surfaces (the floor slopes down onto the stairs, not into the pit). surface picks the look from the palette. marker = something on the tile (painted on the board, and for flags/bells a 3D piece from tools/place_pieces.py). paint: false = don't paint the marker. orient: away-from-pit = turn the painted marker so its bottom points away from the neighbouring lower tiles. piece: true = also put a 3D piece there (tools/place_pieces.py: flags, bells).",
   "legend": {
     "#": { "void": true },
-    ".": { "level": 2, "surface": "floor" },
+    ".": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor" },
     "p": { "level": 0, "surface": "pit" },
-    "s": { "level": 1, "surface": "stairs" },
-    "1": { "level": 2, "surface": "floor", "marker": "spawn1" },
-    "2": { "level": 2, "surface": "floor", "marker": "spawn2" },
-    "F": { "level": 2, "surface": "floor", "marker": "flag", "paint": false, "piece": true },
-    "A": { "level": 2, "surface": "floor", "marker": "bell-attack", "orient": "away-from-pit" },
-    "D": { "level": 2, "surface": "floor", "marker": "bell-defense", "orient": "away-from-pit" }
+    "s": { "level": 1, "surface": "stairs", "slant": 0.559 },
+    "1": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor", "marker": "spawn1" },
+    "2": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor", "marker": "spawn2" },
+    "F": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor", "marker": "flag", "paint": false, "piece": true },
+    "A": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor", "marker": "bell-attack", "orient": "away-from-pit" },
+    "D": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor", "marker": "bell-defense", "orient": "away-from-pit" }
   },
   "_edges": "Marked tile edges: [row, col, side N/E/S/W]. fall = taking damage next to this edge knocks a Pokemon into the pit.",
   "edges": {
@@ -41,7 +41,7 @@
     ]
   },
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v14.obj", "texture": "board-v18.jpg", "geometry": "board-v14.json" },
+  "board": { "mesh": "board-v19.obj", "texture": "board-v19.jpg", "geometry": "board-v19.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/table-placeholder-v1.jpg",
   "_textures": "Image textures for surfaces (paths relative to this folder; images = pick one at random per copy). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour (or a named palette entry). walls = the inner walls (where ground drops inside the board); outer = the board's outer edge too.",

@@ -253,8 +253,8 @@ def main():
     brd = new[0].data if new else None
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
     check(brd is not None and brd.Nickname == "Pugilis" and brd.Tags[1] == "Board3D" and brd.Locked
-          and brd.CustomMesh.MeshURL.endswith("arenas/pugilis/board-v14.obj") and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
-          and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v18.jpg") and not brd.CustomMesh.Convex,
+          and brd.CustomMesh.MeshURL.endswith("arenas/pugilis/board-v19.obj") and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
+          and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v19.jpg") and not brd.CustomMesh.Convex,
           "picking Pugilis puts its 3D board on the table (its own mesh as collider)")
     check(len(flags) == 4 and backdrop(new, "misc/table-placeholder-v1.jpg") and calls.tableURL is None,
           "with its 4 flags and its surroundings on the backdrop panel (the table itself untouched)")
@@ -265,7 +265,7 @@ def main():
     g.mapPick(player, "-1", "mapRes_White_2")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v2.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v6.obj")
           and kinds.count("Flag") == 6 and kinds.count("Portal") == 6 and kinds.count("Bridge") == 6
           and backdrop(new, "misc/sky-placeholder-v1.jpg"),
           "picking Illusio: its board, 6 flags, 6 portals, 6 bridges and the sky under the table")
@@ -286,7 +286,7 @@ def main():
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/ingis/board-v2.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/ingis/board-v5.obj")
           and len(zones) == 3 and len(kinds) == 5 and all(abs(z.data.ColorDiffuse.r - 0.6) < 1e-6 for z in zones)
           and backdrop(new, "misc/volcano-placeholder-v1.jpg"),
           "picking Ingis: its board, 3 neutral capture zone frames and the volcanic table")

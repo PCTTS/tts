@@ -639,6 +639,21 @@ class Mesh:
         self.f[-2] = tuple((vi, ti, ni) for vi, ti in self.f[-2])
         self.f[-1] = tuple((vi, ti, ni) for vi, ti in self.f[-1])
 
+    def tri_facing(self, corners, uvs, normal):
+        """A flat triangle (TTS world space) wound so it faces along normal (like quad)."""
+        pts = [(-x, y, z) for x, y, z in corners]
+        n = (-normal[0], normal[1], normal[2])
+        e1 = [pts[1][i] - pts[0][i] for i in range(3)]
+        e2 = [pts[2][i] - pts[0][i] for i in range(3)]
+        cross = (e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0])
+        order = [0, 1, 2] if sum(cross[i] * n[i] for i in range(3)) > 0 else [0, 2, 1]
+        base_v, base_t = len(self.v), len(self.vt)
+        self.v += [pts[i] for i in order]
+        self.vt += [uvs[i] for i in order]
+        self.vn.append(n)
+        ni = len(self.vn)
+        self.f.append(tuple((base_v + k + 1, base_t + k + 1, ni) for k in range(3)))
+
     def tri(self, corners, uvs, down=True):
         """A flat triangle (TTS world space), facing down (or up), its normal from its corners."""
         p = [(-x, y, z) for x, y, z in corners]          # as written: x mirrored
@@ -678,6 +693,27 @@ def build_mesh(a):
 
     def wall_uv(u_px, y):
         return u_px / W, 1 - (a.R * PX + STRIP * (1 - y / y_span)) / H
+
+    features = {}
+
+    def lows(r, c):   # a tile's slopes and inner corners (cached)
+        if (r, c) not in features:
+            features[(r, c)] = (slopes(a, r, c), inner_corners(a, r, c))
+        return features[(r, c)]
+
+    def surface_at(r, c, px, pz):   # a tile's surface height at a point on its edge (or inside it)
+        t = a.tile(r, c)
+        sl, inn = lows(r, c)
+        if not sl and not inn:
+            return a.top(t)
+        return surface_height(a.top(t), (x(c), x(c + 1), z(r), z(r + 1)), sl, inn, t["slant"], px, pz)
+
+    def edge_breaks(r, c):   # where a tile's surface can bend along any of its edges (fractions of the edge)
+        sl, inn = lows(r, c)
+        if not sl and not inn:
+            return [0.0, 1.0]
+        f = a.tile(r, c)["slant"] / TILE
+        return [0.0, f, 1.0 - f, 1.0]
 
     for r in range(a.R):
         for c in range(a.C):
@@ -721,8 +757,6 @@ def build_mesh(a):
                 nb = a.tile(r + dr, c + dc)
                 low = a.top(nb) if nb else (a.rim() if a.float else 0.0)
                 wall_top = sloped.get(side, top)   # under a slope: the step from its bottom down to a sunken neighbour
-                if low >= wall_top:
-                    continue
                 if side == "N":
                     edge = [(x0, z0), (x1, z0)]
                 elif side == "S":
@@ -734,6 +768,14 @@ def build_mesh(a):
                 (ax, az), (bx, bz) = edge
                 half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
                 us = (((r * 5 + c * 3 + len(side)) % half) + (half if nb else 0)) * PX
+                fs = sorted(set(edge_breaks(r, c) + (edge_breaks(r + dr, c + dc) if nb else [])))
+                if len(fs) > 2:   # a slope along this edge, here or next door: the wall follows both surfaces
+                    profile_wall(m, edge, fs, lambda px, pz: surface_at(r, c, px, pz),
+                                 (lambda px, pz: surface_at(r + dr, c + dc, px, pz)) if nb else (lambda px, pz: low),
+                                 normal, lambda f, y: wall_uv(us + f * (PX - 1), y))
+                    continue
+                if low >= wall_top:
+                    continue
                 m.quad([(ax, wall_top, az), (bx, wall_top, bz), (bx, low, bz), (ax, low, az)],
                        [wall_uv(us, wall_top), wall_uv(us + PX - 1, wall_top), wall_uv(us + PX - 1, low), wall_uv(us, low)],
                        normal)
@@ -753,14 +795,17 @@ def slopes(a, r, c):
     if not w:
         return {}
     level, out = t.get("level", 0), {}
-    for side, (dr, dc, _) in DIRS.items():
+    to = t.get("slant_to")   # "slant_to": [surfaces]: slope only toward lower neighbours with those (Pugilis's floor
+    for side, (dr, dc, _) in DIRS.items():   # slopes down to its stairs, not into the pit)
         nb = a.tile(r + dr, c + dc)
         where = f"slanted tile row {r} col {c}"
+        if to and (nb is None or (nb.get("level", 0) < level and nb.get("surface") not in to)):
+            continue
         if nb is None:
             sys.exit(f"{where}: slopes next to the sky aren't supported")
         if nb.get("level", 0) < level:
             out[side] = a.level_top(nb)
-        elif nb.get("level", 0) == level and nb.get("slant", 0) != w:
+        elif nb.get("level", 0) == level and (nb.get("slant", 0) != w or nb.get("slant_to") != to):
             sys.exit(f"{where}: neighbours at the same level need the same slant")
     if len(set(out.values()) | set(inner_corners(a, r, c).values())) > 1:
         sys.exit(f"slanted tile row {r} col {c}: all its lower neighbours must be one level")
@@ -773,13 +818,55 @@ def inner_corners(a, r, c):
     t = a.tile(r, c)
     if not (t and t.get("slant")):
         return {}
-    level, out = t.get("level", 0), {}
+    level, out, to = t.get("level", 0), {}, t.get("slant_to")
     for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
         diag = a.tile(r + dr, c + dc)
         beside = (a.tile(r + dr, c), a.tile(r, c + dc))
+        if diag and to and diag.get("surface") not in to:
+            continue
         if diag and diag.get("level", 0) < level and all(b and b.get("level", 0) >= level for b in beside):
             out[("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")] = a.level_top(diag)
     return out
+
+
+def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
+    """The wall along a tile edge where this tile's surface stands above its neighbour's, both followed along the
+    edge (fs: fractions of the edge where either can bend): e.g. beside a slope whose neighbour at the same level
+    doesn't slope that way, or a slope coming down onto a lower slope. The neighbour builds its own higher parts."""
+    (ax, az), (bx, bz) = edge
+    pts = [(f, ax + (bx - ax) * f, az + (bz - az) * f) for f in fs]
+    for (f0, x0, z0), (f1, x1, z1) in zip(pts, pts[1:]):
+        h0, h1, l0, l1 = mine(x0, z0), mine(x1, z1), theirs(x0, z0), theirs(x1, z1)
+        d0, d1 = h0 - l0, h1 - l1
+        if d0 <= eps and d1 <= eps:
+            continue
+        if d0 < -eps or d1 < -eps:   # they cross: keep the part where this tile is higher
+            k = d0 / (d0 - d1)
+            fx, fz, fh = x0 + (x1 - x0) * k, z0 + (z1 - z0) * k, h0 + (h1 - h0) * k
+            if d0 > 0:
+                f1, x1, z1, h1, l1, d1 = f0 + (f1 - f0) * k, fx, fz, fh, fh, 0.0
+            else:
+                f0, x0, z0, h0, l0, d0 = f0 + (f1 - f0) * k, fx, fz, fh, fh, 0.0
+        if d0 > eps and d1 > eps:
+            m.quad([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1), (x0, l0, z0)],
+                   [uv(f0, h0), uv(f1, h1), uv(f1, l1), uv(f0, l0)], normal)
+        elif d0 > eps:
+            m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x0, l0, z0)], [uv(f0, h0), uv(f1, h1), uv(f0, l0)], normal)
+        else:
+            m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1)], [uv(f0, h0), uv(f1, h1), uv(f1, l1)], normal)
+
+
+def surface_height(top, box, sloped, inner, w, px, pz):
+    """A tile's surface height at (px, pz): the lowest that any of its low features allows (see slope_surface)."""
+    x0, x1, z0, z1 = box
+    h = top
+    for side, base in sloped.items():
+        d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
+        h = min(h, top - (top - base) * max(0.0, 1 - d / w))
+    for corner, base in inner.items():
+        cx, cz = {"NW": (x0, z0), "NE": (x1, z0), "SW": (x0, z1), "SE": (x1, z1)}[corner]
+        h = min(h, top - (top - base) * max(0.0, 1 - math.hypot(px - cx, pz - cz) / w))
+    return h
 
 
 def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4):
@@ -789,17 +876,9 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4):
     top of a slope falls on grid lines; each cell is split along whichever diagonal follows the surface better."""
     x0, x1, z0, z1 = box
     w = t["slant"]
-    corner_pts = {"NW": (x0, z0), "NE": (x1, z0), "SW": (x0, z1), "SE": (x1, z1)}
 
     def height(px, pz):
-        h = top
-        for side, base in sloped.items():
-            d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
-            h = min(h, top - (top - base) * max(0.0, 1 - d / w))
-        for corner, base in inner.items():
-            cx, cz = corner_pts[corner]
-            h = min(h, top - (top - base) * max(0.0, 1 - math.hypot(px - cx, pz - cz) / w))
-        return h
+        return surface_height(top, box, sloped, inner, w, px, pz)
 
     xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
     zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
