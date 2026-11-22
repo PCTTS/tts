@@ -881,7 +881,7 @@ def rises(a, r, c):
     level, out, to = t.get("level", 0), {}, t["rise"]
     for side, (dr, dc, _) in DIRS.items():
         nb = a.tile(r + dr, c + dc)
-        if nb and nb.get("level", 0) > level and (to is True or nb.get("surface") in to):
+        if nb and nb.get("level", 0) > level and (to is True or nb.get("surface") in to) and not nb.get("plain"):
             if nb.get("level", 0) > level + 1:
                 sys.exit(f"rising tile row {r} col {c}: higher ground more than one level up")
             out[side] = a.level_top(nb)
@@ -898,7 +898,7 @@ def rise_corners(a, r, c):
     for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
         diag = a.tile(r + dr, c + dc)
         beside = (a.tile(r + dr, c), a.tile(r, c + dc))
-        if (diag and diag.get("level", 0) == level + 1 and (to is True or diag.get("surface") in to)
+        if (diag and diag.get("level", 0) == level + 1 and (to is True or diag.get("surface") in to) and not diag.get("plain")
                 and all(b and b.get("level", 0) <= level for b in beside)):
             out[("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")] = a.level_top(diag)
     return out
@@ -941,7 +941,8 @@ def contact_edges(a, r, c):
         for dc in (-1, 0, 1):
             tr, tc = r + dr, c + dc
             nb = a.tile(tr, tc)
-            if (dr, dc) == (0, 0) or not nb or nb.get("surface") not in to or nb.get("level", 0) >= level:
+            if ((dr, dc) == (0, 0) or not nb or nb.get("surface") not in to or nb.get("level", 0) >= level
+                    or nb.get("plain")):   # "plain": true: a stair left with sheer sides
                 continue
             cut = slopes(a, tr, tc)   # its own slopes down: its flat top ends short of those sides
             c0, c1 = tc + (wg if "W" in cut else 0), tc + 1 - (wg if "E" in cut else 0)
