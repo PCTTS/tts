@@ -267,13 +267,17 @@ def draw_texture(a):
             px = (c + xx / p - a.C / 2) * TILE            # each pixel's world position
             pz = (a.R / 2 - (r + yy / p)) * TILE
             dist = np.full((p, p), np.inf, np.float32)
-            for (ax, az), (bx, bz), _, _, round_a, round_b in segs:
+            for (ax, az), (bx, bz), _, _, round_a, round_b, taper in segs:
                 dx, dz = bx - ax, bz - az
                 ll = dx * dx + dz * dz
                 kr = np.zeros_like(px) if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
                 k = np.clip(kr, 0, 1)
                 d = np.hypot(px - (ax + k * dx), pz - (az + k * dz))
-                d = np.where(((kr < 0) & (not round_a)) | ((kr > 1) & (not round_b)), np.inf, d)
+                if taper:   # a plane (see edge_distance)
+                    along = (kr if taper == 2 else 1 - kr) * math.sqrt(ll)
+                    d = np.where((kr < 0) | (kr > 1), np.inf, d + along)
+                else:
+                    d = np.where(((kr < 0) & (not round_a)) | ((kr > 1) & (not round_b)), np.inf, d)
                 dist = np.minimum(dist, d)
             alpha = np.where(dist < w, np.round(70 * np.clip(1 - dist / w, 0, 1) ** 1.5), 0).astype(np.uint8)
             dim = np.zeros((p, p, 4), np.uint8)
@@ -770,7 +774,8 @@ def build_mesh(a):
 
     def edge_breaks(r, c):   # where a tile's surface can bend along any of its edges (fractions of the edge)
         sl, inn = lows(r, c)
-        if not sl and not inn and not rises(a, r, c) and not rise_corners(a, r, c) and not contact_edges(a, r, c):
+        segs = contact_edges(a, r, c)
+        if not sl and not inn and not rises(a, r, c) and not rise_corners(a, r, c) and not segs:
             return [0.0, 1.0]
         f = a.tile(r, c)["slant"] / TILE
         return [0.0, f, 1.0 - f, 1.0]
@@ -970,18 +975,24 @@ def contact_edges(a, r, c):
                 rounds = [not ((side_level(e) or -1) > own and e not in contact) for e in ends]   # not at a side wall
                 if follow:   # a bevel ends where the stair ends; it only rounds into the next bevel
                     rounds = [e in contact for e in ends]
-                pieces = []   # (start, end) in tiles along the side, bottom at each
+                pieces = []   # (start, end) in tiles along the side, bottom at each, taper
+                sdr, sdc, _ = DIRS[side]
+
+                def walled(e):   # higher ground just past this end of the bevel (beside the slope's own tile)
+                    edr, edc, _ = DIRS[e]
+                    past = a.tile(tr + sdr + edr, tc + sdc + edc)
+                    return past is not None and past.get("level", 0) > own
                 if follow:    # the whole edge: down each cut at its ends, the landing between
                     lo, hi = (tc, tc + 1) if side in "NS" else (tr, tr + 1)
                     a0, a1 = lo + (wg if ends[0] in cut else 0), hi - (wg if ends[1] in cut else 0)
-                    if ends[0] in cut:
-                        pieces.append((lo, a0, cut[ends[0]], flat))
-                    pieces.append((a0, a1, flat, flat))
+                    if ends[0] in cut:   # against a wall there, it narrows to nothing at the wall's corner
+                        pieces.append((lo, a0, cut[ends[0]], flat, 1 if not rounds[0] and walled(ends[0]) else 0))
+                    pieces.append((a0, a1, flat, flat, 0))
                     if ends[1] in cut:
-                        pieces.append((a1, hi, flat, cut[ends[1]]))
+                        pieces.append((a1, hi, flat, cut[ends[1]], 2 if not rounds[1] and walled(ends[1]) else 0))
                 else:
-                    pieces.append(((c0, c1) if side in "NS" else (r0, r1)) + (flat, flat))
-                for k, (u0, u1, b0, b1) in enumerate(pieces):
+                    pieces.append(((c0, c1) if side in "NS" else (r0, r1)) + (flat, flat, 0))
+                for k, (u0, u1, b0, b1, taper) in enumerate(pieces):
                     if side in "NS":
                         row = tr if side == "N" else tr + 1
                         if not follow:
@@ -1001,8 +1012,9 @@ def contact_edges(a, r, c):
                     if (not start_ok and hi_t <= s0 + 1e-9) or (not end_ok and lo_t >= s1 - 1e-9):
                         continue   # wholly past an end that stops at a wall: not this tile's slope
                     if math.hypot(gap_c, gap_r) < wg:   # near enough to shape it
-                        out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), b0, b1,
-                                    rounds[0] if k == 0 else True, rounds[1] if k == len(pieces) - 1 else True))
+                        start_round = rounds[0] if k == 0 else pieces[k - 1][4] == 0
+                        end_round = rounds[1] if k == len(pieces) - 1 else pieces[k + 1][4] == 0
+                        out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), b0, b1, start_round, end_round, taper))
     return out
 
 
@@ -1011,11 +1023,19 @@ OPPOSITE = {"N": "S", "S": "N", "E": "W", "W": "E"}
 
 def edge_distance(seg, px, pz):
     """(distance, bottom there) from (px, pz) to a contact edge (see contact_edges); past an end that doesn't
-    round off (a side wall there), no distance: infinite."""
-    (ax, az), (bx, bz), b0, b1, round_a, round_b = seg
+    round off (a side wall there), no distance: infinite. A tapering piece (taper 1: it narrows to nothing at its
+    start, 2: at its end, where it meets higher ground) is one flat plane: its foot level with the landing at
+    its wide end, its top running straight to the wall's top corner at its narrow end; given here as the
+    distance that puts the same plane through the usual slope formula (see surface_height)."""
+    (ax, az), (bx, bz), b0, b1, round_a, round_b, taper = seg
     dx, dz = bx - ax, bz - az
     ll = dx * dx + dz * dz
     k = 0.0 if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
+    if taper:
+        if k < 0 or k > 1:
+            return math.inf, b0
+        d = math.hypot(px - (ax + k * dx), pz - (az + k * dz))
+        return (d + k * math.sqrt(ll), b0) if taper == 2 else (d + (1 - k) * math.sqrt(ll), b1)
     if (k < 0 and not round_a) or (k > 1 and not round_b):
         return math.inf, b0
     k = max(0.0, min(1.0, k))
