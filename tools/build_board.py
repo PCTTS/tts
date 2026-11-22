@@ -401,6 +401,17 @@ def draw_steps(o, a, r, c, x0, y0, p):
     if len(horiz) > 1 or len(vert) > 1:
         return
     dark, light = (60, 40, 25, 18), (255, 245, 225, 10)  # faint, so the surface texture shows through
+    if a.tile(r, c).get("ramp") and horiz and vert:   # a corner ramp runs diagonally: so do its step lines
+        cx = x0 + p if vert[0] == "E" else x0          # the low corner
+        cy = y0 + p if horiz[0] == "S" else y0
+        sx, sy = (-1 if vert[0] == "E" else 1), (-1 if horiz[0] == "S" else 1)   # from it into the tile
+        for k in (0.5, 1.0, 1.5):
+            dd = k * p                                 # points whose two distances from the low sides add to dd
+            ax, ay = (cx + sx * dd, cy) if dd <= p else (cx + sx * p, cy + sy * (dd - p))
+            bx, by = (cx, cy + sy * dd) if dd <= p else (cx + sx * (dd - p), cy + sy * p)
+            o.line([(ax, ay), (bx, by)], fill=dark, width=3 * SS)
+            o.line([(ax, ay + 3 * SS), (bx, by + 3 * SS)], fill=light, width=2 * SS)
+        return
     for k in (0.28, 0.52, 0.76):
         d = round(k * p)
         yc = (y0 + d if horiz[0] == "N" else y0 + p - d) if horiz else None
@@ -703,12 +714,17 @@ def build_mesh(a):
 
     def surface_at(r, c, px, pz):   # a tile's surface height at a point on its edge (or inside it)
         t = a.tile(r, c)
+        rp = ramp(a, r, c)
+        if rp:
+            return ramp_height(rp, (x(c), x(c + 1), z(r), z(r + 1)), px, pz)
         sl, inn = lows(r, c)
         if not sl and not inn:
             return a.top(t)
         return surface_height(a.top(t), (x(c), x(c + 1), z(r), z(r + 1)), sl, inn, t["slant"], px, pz)
 
     def edge_breaks(r, c):   # where a tile's surface can bend along any of its edges (fractions of the edge)
+        if a.tile(r, c).get("ramp"):
+            return [0.0, 0.5, 1.0]   # straight along each edge, but not level: the walls must follow it
         sl, inn = lows(r, c)
         if not sl and not inn:
             return [0.0, 1.0]
@@ -729,7 +745,16 @@ def build_mesh(a):
 
             def tuv(px, pz):   # the tile's texture seen from above, so the slopes show its edge band
                 return u0 + (px - x0) / (x1 - x0) * (u1 - u0), v0 + (z0 - pz) / (z0 - z1) * (v1 - v0)
-            if not sloped and not inner:
+            rp = ramp(a, r, c)
+            if rp:   # one tilted plane
+                box = (x0, x1, z0, z1)
+                corners = [(x0, z0), (x1, z0), (x1, z1), (x0, z1)]
+                gx = (ramp_height(rp, box, x1, z0) - ramp_height(rp, box, x0, z0)) / (x1 - x0)
+                gz = (ramp_height(rp, box, x0, z0) - ramp_height(rp, box, x0, z1)) / (z0 - z1)
+                ln = math.sqrt(gx * gx + 1 + gz * gz)
+                m.quad([(px, ramp_height(rp, box, px, pz), pz) for px, pz in corners],
+                       [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (-gx / ln, 1 / ln, -gz / ln))
+            elif not sloped and not inner:
                 m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
                        [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
             elif inner:   # a finer surface: straight slopes along low sides, a rounded dip into each inner corner
@@ -854,6 +879,34 @@ def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
             m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x0, l0, z0)], [uv(f0, h0), uv(f1, h1), uv(f0, l0)], normal)
         else:
             m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1)], [uv(f0, h0), uv(f1, h1), uv(f1, l1)], normal)
+
+
+def ramp(a, r, c):
+    """A tile with "ramp": true (Pugilis's stairs) is one plane from the level above down to the level below,
+    descending toward its lower neighbours: one low side (a straight ramp from the opposite side) or two adjacent
+    ones (a corner ramp, running diagonally from the opposite corner). Its middle sits at its own level, where its
+    snap point is; walls close its sides against higher ground. Returns {"low": {side: bottom}, "high": top of the
+    ramp} or None."""
+    t = a.tile(r, c)
+    if not (t and t.get("ramp")):
+        return None
+    level = t.get("level", 0)
+    low = {s: a.level_top(nb) for s, (dr, dc, _) in DIRS.items()
+           if (nb := a.tile(r + dr, c + dc)) and nb.get("level", 0) < level}
+    opposite = {"N": "S", "S": "N", "E": "W", "W": "E"}
+    if not (len(low) == 1 or (len(low) == 2 and set(low) not in ({"N", "S"}, {"E", "W"}))) or len(set(low.values())) > 1:
+        sys.exit(f"ramp row {r} col {c}: needs lower ground on one side or on two sides round a corner")
+    bottom = next(iter(low.values()))
+    return {"low": low, "high": bottom + 2 * (a.level_top(t) - bottom), "up": [opposite[s] for s in low]}
+
+
+def ramp_height(rp, box, px, pz):
+    """A ramp's surface height at (px, pz): its bottom along its low side(s), its top along the far side(s)."""
+    x0, x1, z0, z1 = box
+    d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}
+    s = sum(d[side] / (x1 - x0) for side in rp["low"]) / len(rp["low"])   # 0 at the bottom, 1 at the top
+    bottom = next(iter(rp["low"].values()))
+    return bottom + (rp["high"] - bottom) * s
 
 
 def surface_height(top, box, sloped, inner, w, px, pz):
