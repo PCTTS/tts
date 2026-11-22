@@ -267,7 +267,7 @@ def draw_texture(a):
             px = (c + xx / p - a.C / 2) * TILE            # each pixel's world position
             pz = (a.R / 2 - (r + yy / p)) * TILE
             dist = np.full((p, p), np.inf, np.float32)
-            for (ax, az), (bx, bz), _, round_a, round_b in segs:
+            for (ax, az), (bx, bz), _, _, round_a, round_b in segs:
                 dx, dz = bx - ax, bz - az
                 ll = dx * dx + dz * dz
                 kr = np.zeros_like(px) if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
@@ -930,7 +930,10 @@ def contact_edges(a, r, c):
     to the pit has a smaller flat top, so its edges end short of the tile's corners and the funnels move in with
     them. Only at the top of a stair's run (its sides opposite its lower ground): the ground beside a straight
     stair stays a sheer side wall, and the slope ends against it without rounding off (a channel: slope,
-    landing, slope). Returns [((x0, z0), (x1, z0), bottom, round_start, round_end)] in world units, or []."""
+    landing, slope). A stair with "follow": true instead has the slope come down onto all its higher sides, its
+    foot following the stair's own surface along each edge (level with the landing, then down its cut to the pit):
+    one bevel along the whole side, nothing to round off. Returns [((x0, z0), (x1, z1), bottom at the start,
+    bottom at the end, round_start, round_end)] in world units, or []."""
     t = a.tile(r, c)
     if not (t and t.get("slant") and t.get("slant_to")):
         return []
@@ -959,16 +962,39 @@ def contact_edges(a, r, c):
                 o = a.tile(tr + sdr, tc + sdc)
                 return None if o is None else o.get("level", 0)
             lower = {sd for sd in DIRS if (side_level(sd) if side_level(sd) is not None else own) < own}
-            contact = {sd for sd in DIRS if (side_level(sd) or -1) > own and OPPOSITE[sd] in lower}
+            follow = nb.get("follow")
+            contact = {sd for sd in DIRS if (side_level(sd) or -1) > own and (follow or OPPOSITE[sd] in lower)}
+            flat = a.level_top(nb)
             for side in contact:
-                (ca, ra), (cb, rb) = {"N": ((c0, r0), (c1, r0)), "S": ((c0, r1), (c1, r1)),
-                                      "W": ((c0, r0), (c0, r1)), "E": ((c1, r0), (c1, r1))}[side]
                 ends = ("W", "E") if side in "NS" else ("N", "S")   # the sides at its start and its end
                 rounds = [not ((side_level(e) or -1) > own and e not in contact) for e in ends]   # not at a side wall
-                gap_c = max(0.0, min(ca, cb) - (c + 1), c - max(ca, cb))   # from this tile, in tiles
-                gap_r = max(0.0, min(ra, rb) - (r + 1), r - max(ra, rb))
-                if math.hypot(gap_c, gap_r) < wg:   # near enough to shape it
-                    out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), a.level_top(nb), rounds[0], rounds[1]))
+                pieces = []   # (start, end) in tiles along the side, bottom at each
+                if follow:    # the whole edge: down each cut at its ends, the landing between
+                    lo, hi = (tc, tc + 1) if side in "NS" else (tr, tr + 1)
+                    a0, a1 = lo + (wg if ends[0] in cut else 0), hi - (wg if ends[1] in cut else 0)
+                    if ends[0] in cut:
+                        pieces.append((lo, a0, cut[ends[0]], flat))
+                    pieces.append((a0, a1, flat, flat))
+                    if ends[1] in cut:
+                        pieces.append((a1, hi, flat, cut[ends[1]]))
+                else:
+                    pieces.append(((c0, c1) if side in "NS" else (r0, r1)) + (flat, flat))
+                for k, (u0, u1, b0, b1) in enumerate(pieces):
+                    if side in "NS":
+                        row = tr if side == "N" else tr + 1
+                        if not follow:
+                            row = r0 if side == "N" else r1
+                        (ca, ra), (cb, rb) = (u0, row), (u1, row)
+                    else:
+                        col = tc if side == "W" else tc + 1
+                        if not follow:
+                            col = c0 if side == "W" else c1
+                        (ca, ra), (cb, rb) = (col, u0), (col, u1)
+                    gap_c = max(0.0, min(ca, cb) - (c + 1), c - max(ca, cb))   # from this tile, in tiles
+                    gap_r = max(0.0, min(ra, rb) - (r + 1), r - max(ra, rb))
+                    if math.hypot(gap_c, gap_r) < wg:   # near enough to shape it
+                        out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), b0, b1,
+                                    rounds[0] if k == 0 else True, rounds[1] if k == len(pieces) - 1 else True))
     return out
 
 
@@ -976,16 +1002,16 @@ OPPOSITE = {"N": "S", "S": "N", "E": "W", "W": "E"}
 
 
 def edge_distance(seg, px, pz):
-    """Distance from (px, pz) to a contact edge ((x0, z0), (x1, z0), _, round_start, round_end); past an end that
-    doesn't round off (a side wall there), none: infinite."""
-    (ax, az), (bx, bz) = seg[0], seg[1]
+    """(distance, bottom there) from (px, pz) to a contact edge (see contact_edges); past an end that doesn't
+    round off (a side wall there), no distance: infinite."""
+    (ax, az), (bx, bz), b0, b1, round_a, round_b = seg
     dx, dz = bx - ax, bz - az
     ll = dx * dx + dz * dz
     k = 0.0 if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
-    if (k < 0 and not seg[3]) or (k > 1 and not seg[4]):
-        return math.inf
+    if (k < 0 and not round_a) or (k > 1 and not round_b):
+        return math.inf, b0
     k = max(0.0, min(1.0, k))
-    return math.hypot(px - (ax + k * dx), pz - (az + k * dz))
+    return math.hypot(px - (ax + k * dx), pz - (az + k * dz)), b0 + (b1 - b0) * k
 
 
 def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
@@ -1034,7 +1060,8 @@ def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None
         cx, cz = {"NW": (x0, z0), "NE": (x1, z0), "SW": (x0, z1), "SE": (x1, z1)}[corner]
         h = min(h, top - (top - base) * max(0.0, 1 - math.hypot(px - cx, pz - cz) / w))
     for seg in segments or ():
-        h = min(h, top - (top - seg[2]) * max(0.0, 1 - edge_distance(seg, px, pz) / w))
+        dist, base = edge_distance(seg, px, pz)
+        h = min(h, top - (top - base) * max(0.0, 1 - dist / w))
     return h
 
 
