@@ -257,6 +257,26 @@ def draw_texture(a):
                     o.line([(x0 + band - i, y0t), (x0 + band - i, y0t + p)], fill=(30, 18, 8, alpha))
                 if "E" in sloped:
                     o.line([(x0 + p - band + i, y0t), (x0 + p - band + i, y0t + p)], fill=(30, 18, 8, alpha))
+    for r in range(a.R):   # slopes down onto stairs (see contact_edges()): darkening toward the bottom
+        for c in range(a.C):
+            segs = contact_edges(a, r, c) if a.tile(r, c) else []
+            if not segs:
+                continue
+            w = a.tile(r, c)["slant"]
+            yy, xx = np.mgrid[0:p, 0:p].astype(np.float32) + 0.5
+            px = (c + xx / p - a.C / 2) * TILE            # each pixel's world position
+            pz = (a.R / 2 - (r + yy / p)) * TILE
+            dist = np.full((p, p), np.inf, np.float32)
+            for (ax, az), (bx, bz), _ in segs:
+                dx, dz = bx - ax, bz - az
+                ll = dx * dx + dz * dz
+                k = np.zeros_like(px) if ll == 0 else np.clip(((px - ax) * dx + (pz - az) * dz) / ll, 0, 1)
+                dist = np.minimum(dist, np.hypot(px - (ax + k * dx), pz - (az + k * dz)))
+            alpha = np.where(dist < w, np.round(70 * np.clip(1 - dist / w, 0, 1) ** 1.5), 0).astype(np.uint8)
+            dim = np.zeros((p, p, 4), np.uint8)
+            dim[..., :3] = (30, 18, 8)
+            dim[..., 3] = alpha
+            over.alpha_composite(Image.fromarray(dim, "RGBA"), (c * p, r * p))
     for r in range(a.R):   # rising bands (see rises()): darkening toward their foot, inside the tile
         for c in range(a.C):
             risen = rises(a, r, c) if a.tile(r, c) else {}
@@ -739,15 +759,15 @@ def build_mesh(a):
     def surface_at(r, c, px, pz):   # a tile's surface height at a point on its edge (or inside it)
         t = a.tile(r, c)
         sl, inn = lows(r, c)
-        risen, rcorners = rises(a, r, c), rise_corners(a, r, c)
-        if not sl and not inn and not risen and not rcorners:
+        risen, rcorners, segs = rises(a, r, c), rise_corners(a, r, c), contact_edges(a, r, c)
+        if not sl and not inn and not risen and not rcorners and not segs:
             return a.top(t)
         return surface_height(a.top(t), (x(c), x(c + 1), z(r), z(r + 1)), sl, inn, t["slant"], px, pz, risen,
-                              rcorners)
+                              rcorners, segs)
 
     def edge_breaks(r, c):   # where a tile's surface can bend along any of its edges (fractions of the edge)
         sl, inn = lows(r, c)
-        if not sl and not inn and not rises(a, r, c) and not rise_corners(a, r, c):
+        if not sl and not inn and not rises(a, r, c) and not rise_corners(a, r, c) and not contact_edges(a, r, c):
             return [0.0, 1.0]
         f = a.tile(r, c)["slant"] / TILE
         return [0.0, f, 1.0 - f, 1.0]
@@ -769,6 +789,8 @@ def build_mesh(a):
             if rises(a, r, c) or rise_corners(a, r, c):   # slopes up to higher ground (and maybe down too): the fine surface
                 slope_surface(m, t, top, (x0, x1, z0, z1), sloped, inner, tuv, risen=rises(a, r, c),
                               rcorners=rise_corners(a, r, c))
+            elif contact_edges(a, r, c):   # sloping down onto nearby stairs (see contact_edges)
+                slope_surface(m, t, top, (x0, x1, z0, z1), {}, {}, tuv, segments=contact_edges(a, r, c))
             elif not sloped and not inner:
                 m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
                        [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
@@ -832,20 +854,17 @@ def slopes(a, r, c):
     raised areas whose tiles all share the same slant, one level step, not next to the sky (else the build stops)."""
     t = a.tile(r, c)
     w = t.get("slant", 0)
-    if not w:
+    if not w or t.get("slant_to"):   # "slant_to" tiles: see contact_edges()
         return {}
     level, out = t.get("level", 0), {}
-    to = t.get("slant_to")   # "slant_to": [surfaces]: slope down only toward lower neighbours with those (Pugilis's
-    for side, (dr, dc, _) in DIRS.items():   # floor slopes down onto its stairs, not into the pit)
+    for side, (dr, dc, _) in DIRS.items():
         nb = a.tile(r + dr, c + dc)
         where = f"slanted tile row {r} col {c}"
-        if to and (nb is None or (nb.get("level", 0) < level and nb.get("surface") not in to)):
-            continue
         if nb is None:
             sys.exit(f"{where}: slopes next to the sky aren't supported")
         if nb.get("level", 0) < level:
             out[side] = a.level_top(nb)
-        elif nb.get("level", 0) == level and (nb.get("slant", 0) != w or nb.get("slant_to") != to):
+        elif nb.get("level", 0) == level and (nb.get("slant", 0) != w or nb.get("slant_to")):
             sys.exit(f"{where}: neighbours at the same level need the same slant")
     if len(set(out.values()) | set(inner_corners(a, r, c).values())) > 1:
         sys.exit(f"slanted tile row {r} col {c}: all its lower neighbours must be one level")
@@ -887,30 +906,66 @@ def rise_corners(a, r, c):
 
 def inner_corners(a, r, c):
     """A slanted tile's inner (concave) corners: {"NE"/"NW"/"SE"/"SW": the bottom of the dip}, where the diagonal
-    neighbour is lower but both sides beside it are not. With "slant_to", a dip toward a diagonal target also where a
-    side beside it is lower ground that isn't one (the pit beside Pugilis's stairs): the slope down onto the stairs
-    flows round that corner instead of ending in a sheer wall. It bottoms at the target's own height at that corner
-    (lower if the target slopes away there)."""
+    neighbour is lower but both sides beside it are not."""
     t = a.tile(r, c)
-    if not (t and t.get("slant")):
+    if not (t and t.get("slant")) or t.get("slant_to"):
         return {}
-    level, out, to = t.get("level", 0), {}, t.get("slant_to")
+    level, out = t.get("level", 0), {}
     for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
         diag = a.tile(r + dr, c + dc)
         beside = (a.tile(r + dr, c), a.tile(r, c + dc))
-        if not diag or diag.get("level", 0) >= level:
-            continue
-        key = ("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")
-        if not to:
-            if all(b and b.get("level", 0) >= level for b in beside):
-                out[key] = a.level_top(diag)
-        elif diag.get("surface") in to and all(b and (b.get("level", 0) >= level or b.get("surface") not in to)
-                                                 for b in beside):
-            # the diagonal's corner here: its sides that meet at it may slope away (down to lower ground)
-            near = ("S" if dr < 0 else "N", "E" if dc < 0 else "W")
-            sl = slopes(a, r + dr, c + dc)
-            out[key] = min([a.level_top(diag)] + [sl[s] for s in near if s in sl])
+        if diag and diag.get("level", 0) < level and all(b and b.get("level", 0) >= level for b in beside):
+            out[("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")] = a.level_top(diag)
     return out
+
+
+def contact_edges(a, r, c):
+    """A tile with "slant" and "slant_to": [surfaces] (Pugilis's floor) slopes down onto nearby tiles with those
+    surfaces (its stairs), by its distance to the edges of their flat tops where higher ground meets them: a
+    straight slope along an edge, rounding off past the edge's ends (a dip in a corner tile, the "funnel" of the
+    user's stair model, that carries the slope round onto the stair's corner). A stair that itself slopes down
+    to the pit has a smaller flat top, so its edges end short of the tile's corners and the funnels move in with
+    them. Returns [((x0, z0), (x1, z0), bottom)] in world units, or []."""
+    t = a.tile(r, c)
+    if not (t and t.get("slant") and t.get("slant_to")):
+        return []
+    to, level, wg = t["slant_to"], t.get("level", 0), t["slant"] / TILE
+
+    def wx(col):
+        return (col - a.C / 2) * TILE
+
+    def wz(row):
+        return (a.R / 2 - row) * TILE
+    out = []
+    for dr in (-1, 0, 1):
+        for dc in (-1, 0, 1):
+            tr, tc = r + dr, c + dc
+            nb = a.tile(tr, tc)
+            if (dr, dc) == (0, 0) or not nb or nb.get("surface") not in to or nb.get("level", 0) >= level:
+                continue
+            cut = slopes(a, tr, tc)   # its own slopes down: its flat top ends short of those sides
+            c0, c1 = tc + (wg if "W" in cut else 0), tc + 1 - (wg if "E" in cut else 0)
+            r0, r1 = tr + (wg if "N" in cut else 0), tr + 1 - (wg if "S" in cut else 0)
+            for side, (sdr, sdc, _) in DIRS.items():
+                up = a.tile(tr + sdr, tc + sdc)
+                if not (up and up.get("level", 0) > nb.get("level", 0)):
+                    continue   # only where higher ground comes down onto it
+                (ca, ra), (cb, rb) = {"N": ((c0, r0), (c1, r0)), "S": ((c0, r1), (c1, r1)),
+                                      "W": ((c0, r0), (c0, r1)), "E": ((c1, r0), (c1, r1))}[side]
+                gap_c = max(0.0, min(ca, cb) - (c + 1), c - max(ca, cb))   # from this tile, in tiles
+                gap_r = max(0.0, min(ra, rb) - (r + 1), r - max(ra, rb))
+                if math.hypot(gap_c, gap_r) < wg:   # near enough to shape it
+                    out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), a.level_top(nb)))
+    return out
+
+
+def edge_distance(seg, px, pz):
+    """Distance from (px, pz) to a segment ((x0, z0), (x1, z0), _)."""
+    (ax, az), (bx, bz) = seg[0], seg[1]
+    dx, dz = bx - ax, bz - az
+    ll = dx * dx + dz * dz
+    k = 0.0 if ll == 0 else max(0.0, min(1.0, ((px - ax) * dx + (pz - az) * dz) / ll))
+    return math.hypot(px - (ax + k * dx), pz - (az + k * dz))
 
 
 def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
@@ -940,7 +995,7 @@ def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
             m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1)], [uv(f0, h0), uv(f1, h1), uv(f1, l1)], normal)
 
 
-def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None):
+def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None, segments=None):
     """A tile's surface height at (px, pz): raised by any wedges up to higher ground (risen, and rcorners round a
     corner), then the lowest that any of its low features allows (see slope_surface)."""
     x0, x1, z0, z1 = box
@@ -958,10 +1013,12 @@ def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None
     for corner, base in inner.items():
         cx, cz = {"NW": (x0, z0), "NE": (x1, z0), "SW": (x0, z1), "SE": (x1, z1)}[corner]
         h = min(h, top - (top - base) * max(0.0, 1 - math.hypot(px - cx, pz - cz) / w))
+    for seg in segments or ():
+        h = min(h, top - (top - seg[2]) * max(0.0, 1 - edge_distance(seg, px, pz) / w))
     return h
 
 
-def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorners=None):
+def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorners=None, segments=None):
     """A slanted tile as a grid of triangles: the height at a point is the lowest that any of its low features
     allows: straight slopes inward from each low side, a round dip (a quarter cone) around each inner corner, each
     reaching the top `slant` in. The grid has lines `steps` apart across each slope band, so a hip crease or the
@@ -970,7 +1027,7 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorn
     w = t["slant"]
 
     def height(px, pz):
-        return surface_height(top, box, sloped, inner, w, px, pz, risen, rcorners)
+        return surface_height(top, box, sloped, inner, w, px, pz, risen, rcorners, segments)
 
     xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
     zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
