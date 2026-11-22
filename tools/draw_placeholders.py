@@ -25,6 +25,9 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                  dark slate flagstones, moss creeping in from the edges
   arenas/chrysalia/textures/slate-edge.png       board edge and pool rims: dark stone courses, seamless left-right
   misc/court-placeholder-v1.jpg                  table image around it: larger dark mossy flagstones
+  arenas/chrysalia/textures/mulch1.png, mulch2.png  the user's pick after the slate: a mulch bed, dark wood chips
+  arenas/chrysalia/textures/mulch-edge.png       board edge and pool rims: chips on top of dark soil, seamless left-right
+  misc/mulch-placeholder-v1.jpg                  table image around it: more mulch, a little darker
 """
 from pathlib import Path
 
@@ -445,8 +448,68 @@ def court_table():
     return out.filter(ImageFilter.GaussianBlur(0.8))
 
 
+MULCH = [(84, 52, 30), (64, 40, 24), (98, 62, 34), (48, 30, 19), (112, 74, 42), (74, 46, 27), (58, 36, 22)]
+
+
+def chips(d, rng, w, h, count, scale=1.0, wrap=False):
+    """Bark chips: chunky irregular pieces (5-7 jittered corners round a stretched oval) at random angles, each
+    with a dark shadow and a faint lighter grain line along it."""
+    for _ in range(count):
+        x, y = rng.random() * w, rng.random() * h
+        ln, wd = rng.uniform(10, 26) * scale, rng.uniform(5, 13) * scale
+        a = rng.random() * np.pi
+        ca, sa = np.cos(a), np.sin(a)
+        col = MULCH[rng.integers(0, len(MULCH))]
+        k = rng.uniform(0.8, 1.1)
+        col = tuple(int(min(255, v * k)) for v in col)
+        n = int(rng.integers(5, 8))
+        pts = [(ln / 2 * np.cos(t) * rng.uniform(0.7, 1.0), wd / 2 * np.sin(t) * rng.uniform(0.6, 1.0))
+               for t in np.sort(rng.uniform(0, 2 * np.pi, n))]
+        for dx in ((-w, 0, w) if wrap else (0,)):
+            poly = [(x + dx + px * ca - py * sa, y + px * sa + py * ca) for px, py in pts]
+            d.polygon([(px + 1.5 * scale, py + 2 * scale) for px, py in poly], fill=(14, 9, 6, 170))   # shadow
+            d.polygon(poly, fill=col + (255,))
+            d.line([(x + dx - ln * 0.3 * ca, y - ln * 0.3 * sa), (x + dx + ln * 0.3 * ca, y + ln * 0.3 * sa)],
+                   fill=tuple(min(255, v + 22) for v in col) + (110,), width=1)
+
+
+def mulch(seed, n=N, count=2600, dark=0.9):
+    rng = np.random.default_rng(seed)
+    soil = mix((30, 21, 15), (48, 34, 24), fbm(n, n, rng, 6, 4)) * dark
+    out = to_img(soil).convert("RGBA")
+    chips(ImageDraw.Draw(out, "RGBA"), rng, n, n, count)
+    img = np.asarray(out.convert("RGB"), np.float32) * dark
+    img *= (0.88 + 0.2 * fbm(n, n, rng, 3, 3))[..., None]      # damp patches
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.4))
+
+
+def mulch_edge():
+    rng = np.random.default_rng(131)
+    h, w = 1024, N
+    soil = mix((34, 24, 17), (54, 38, 26), fbm(h, w, rng, 8, 4, wrap_x=True))
+    out = to_img(soil).convert("RGBA")
+    top = Image.new("RGBA", (w, 64), (0, 0, 0, 0))
+    chips(ImageDraw.Draw(top, "RGBA"), rng, w, 64, 260, scale=0.8, wrap=True)
+    out.alpha_composite(top, (0, 0))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.4))
+
+
+def mulch_table():
+    rng = np.random.default_rng(137)
+    h, w = 1211, 2048
+    soil = mix((26, 18, 13), (42, 30, 21), fbm(h, w, rng, 8, 4))
+    out = to_img(soil).convert("RGBA")
+    chips(ImageDraw.Draw(out, "RGBA"), rng, w, h, 30000, scale=1.3)
+    img = np.asarray(out.convert("RGB"), np.float32) * 0.82 * (0.88 + 0.2 * fbm(h, w, rng, 4, 3))[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
 def main():
     files = {
+        "arenas/chrysalia/textures/mulch1.png": lambda p: mulch(141).save(p),
+        "arenas/chrysalia/textures/mulch2.png": lambda p: mulch(142).save(p),
+        "arenas/chrysalia/textures/mulch-edge.png": lambda p: mulch_edge().save(p),
+        "misc/mulch-placeholder-v1.jpg": lambda p: mulch_table().save(p, quality=90),
         "arenas/chrysalia/textures/slate1.png": lambda p: slate(121).save(p),
         "arenas/chrysalia/textures/slate2.png": lambda p: slate(122).save(p),
         "arenas/chrysalia/textures/slate-edge.png": lambda p: slate_edge().save(p),
