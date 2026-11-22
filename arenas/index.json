@@ -1,8 +1,8 @@
 {
  "Chrysalia": {
   "mesh": "arenas/chrysalia/board-v1.obj",
-  "texture": "arenas/chrysalia/board-v1.jpg",
-  "table": "misc/pitch-placeholder-v1.jpg",
+  "texture": "arenas/chrysalia/board-v2.jpg",
+  "table": "misc/court-placeholder-v1.jpg",
   "snaps": [
    [
     -24.3656,

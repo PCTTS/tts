@@ -21,6 +21,10 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/chrysalia/textures/ice.png              ice: pale blue, cracks and glints
   arenas/chrysalia/textures/water.png            water: blue with ripples
   misc/pitch-placeholder-v1.jpg                  table image around the pitch: more striped grass
+  arenas/chrysalia/textures/slate1.png, slate2.png  darker ground (user: the pitch looked like a golf course):
+                                                 dark slate flagstones, moss creeping in from the edges
+  arenas/chrysalia/textures/slate-edge.png       board edge and pool rims: dark stone courses, seamless left-right
+  misc/court-placeholder-v1.jpg                  table image around it: larger dark mossy flagstones
 """
 from pathlib import Path
 
@@ -403,8 +407,50 @@ def water():
     return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
 
 
+def slate(seed, n=N):
+    """A dark slate flagstone: blue-green grey with faint veins, worn lighter in patches, moss at its edges."""
+    rng = np.random.default_rng(seed)
+    img = mix((34, 40, 40), (58, 64, 62), fbm(n, n, rng, 4, 5))
+    veins = np.abs(np.sin((fbm(n, n, rng, 3, 4) * 7 + np.arange(n)[None, :] / n * 2) * np.pi))
+    img *= (0.9 + 0.1 * veins)[..., None]
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+    edge = np.minimum.reduce([xx, yy, n - 1 - xx, n - 1 - yy]) / n          # 0 at the stone's edge
+    moss = np.clip((0.09 - edge) / 0.09, 0, 1) * np.clip((fbm(n, n, rng, 10, 3) - 0.35) * 2.5, 0, 1)
+    img = img + (mix((36, 62, 30), (58, 88, 40), fbm(n, n, rng, 16, 2)) - img) * (0.9 * moss)[..., None]
+    img *= (1 + rng.normal(0, 0.04, (n, n, 1))).astype(np.float32)
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.5))
+
+
+def slate_edge():
+    rng = np.random.default_rng(119)
+    img = stone_blocks(1024, N, rng, 6, base=(52, 58, 56))
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.5))
+
+
+def court_table():
+    """Around the arena: bigger dark flagstones (8 x 5 of them), mossy joints."""
+    h, w = 1211, 2048
+    out = Image.new("RGB", (w, h))
+    cols, rows = 8, 5
+    cw, ch = w // cols + 1, h // rows + 1
+    for i in range(cols):
+        for j in range(rows):
+            stone = slate(200 + i * rows + j, 256).resize((cw, ch), Image.BICUBIC)
+            out.paste(stone.point(lambda v: int(v * 0.8)), (i * cw - i, j * ch - j))
+    d = ImageDraw.Draw(out)
+    for i in range(1, cols):
+        d.line([(i * (cw - 1), 0), (i * (cw - 1), h)], fill=(22, 30, 20), width=5)
+    for j in range(1, rows):
+        d.line([(0, j * (ch - 1)), (w, j * (ch - 1))], fill=(22, 30, 20), width=5)
+    return out.filter(ImageFilter.GaussianBlur(0.8))
+
+
 def main():
     files = {
+        "arenas/chrysalia/textures/slate1.png": lambda p: slate(121).save(p),
+        "arenas/chrysalia/textures/slate2.png": lambda p: slate(122).save(p),
+        "arenas/chrysalia/textures/slate-edge.png": lambda p: slate_edge().save(p),
+        "misc/court-placeholder-v1.jpg": lambda p: court_table().save(p, quality=90),
         "arenas/chrysalia/textures/pitch.png": lambda p: pitch(2048, 2048, 16, np.random.default_rng(107)).save(p),
         "arenas/chrysalia/textures/turf-edge.png": lambda p: turf_edge().save(p),
         "arenas/chrysalia/textures/ice.png": lambda p: ice().save(p),

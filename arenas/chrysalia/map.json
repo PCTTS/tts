@@ -1,6 +1,6 @@
 {
   "name": "Chrysalia",
-  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the user's chalk drawing (mapstomake/chrysilia.webp, straightened from the photo): a mown grass pitch with water, lava, poison, ice, three capture zones, two traps and twenty numbered ball drop spots.",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the user's chalk drawing (mapstomake/chrysilia.webp, straightened from the photo): a dark slate court with water, lava, poison, ice, three capture zones, two traps and twenty numbered ball drop spots.",
   "grid": [
     ".2.2~~~~~2.2.2..",
     "....~~~~~.......",
@@ -73,14 +73,14 @@
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
     "mesh": "board-v1.obj",
-    "texture": "board-v1.jpg",
+    "texture": "board-v2.jpg",
     "geometry": "board-v1.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
-  "table": "misc/pitch-placeholder-v1.jpg",
-  "_textures": "Placeholders from tools/draw_placeholders.py: a mown grass pitch (one stripe per column) over the whole board, ice, water, turf-over-soil edges; lava from Ingis, poison from Viperia.",
+  "table": "misc/court-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py: dark slate flagstones with moss at their edges (the user found the striped pitch too much like a golf course), ice, water, dark stone edges; lava from Ingis, poison from Viperia.",
   "textures": {
-    "floor": { "image": "textures/pitch.png", "span": 16
+    "floor": { "images": [   "textures/slate1.png",   "textures/slate2.png" ], "span": 1, "vary": true
     },
     "ice": { "image": "textures/ice.png", "span": 2, "vary": true
     },
@@ -90,16 +90,16 @@
     },
     "poison": { "image": "textures/poison.png", "span": 2, "vary": true
     },
-    "walls": { "image": "textures/turf-edge.png", "outer": true
+    "walls": { "image": "textures/slate-edge.png", "outer": true
     }
   },
   "palette": {
-    "floor": "#4E8C3A",
+    "floor": "#323A38",
     "water": "#2E6EB4",
     "lava": "#F07A1E",
     "poison": "#7E3C96",
     "ice": "#C8E6F6",
-    "cliff": "#6E5236",
+    "cliff": "#343A38",
     "base": "#3A2C1E",
     "fall": "#D2392C"
   }
