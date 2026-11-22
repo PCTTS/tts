@@ -309,19 +309,16 @@ def main():
           and backdrop(new, "misc/jungle-placeholder-v1.jpg"),
           f"picking Viperia: its board, 3 flags, snap points on all {16 * 15 - walls} tiles but the {walls} walls, the jungle table")
 
-    # Chrysalia: its pitch, 3 capture zone frames, 2 traps and a bag of Pokimari balls beside the board
+    # Chrysalia: its board, 3 capture zone frames and 2 traps
     n = len(calls.spawned)
     g.refreshMaps("White")
     g.mapPick(player, "-1", "mapRes_White_1")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
-    bag = next((s for s in new if s.data.Tags[1] == "BallBag"), None)
-    ball = bag.data.ContainedObjects[1] if bag else None
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/chrysalia/board-v1.obj")
-          and kinds.count("Zone") == 3 and kinds.count("Trap") == 2 and bag is not None and bag.data.Name == "Infinite_Bag"
-          and ball.Nickname == "Pokimari ball" and ball.CustomMesh.ColliderURL.endswith("props/ball-collider-v1.obj")
-          and abs(bag.position.x - 34.01) < 0.01 and backdrop(new, "misc/mulch-placeholder-v2.jpg"),
-          "picking Chrysalia: its board, 3 zone frames, 2 traps, an endless bag of Pokimari balls beside it, the mulch table")
+          and kinds.count("Zone") == 3 and kinds.count("Trap") == 2 and len(kinds) == 7   # + the backdrop
+          and backdrop(new, "misc/mulch-placeholder-v2.jpg"),
+          "picking Chrysalia: its board, 3 zone frames, 2 traps (no ball bag), the mulch table")
     lua.execute(r"""
       trapObj = { tags = { "Trap", "ArenaPiece" }, menu = {} }
       trapObj.hasTag = function(t) return t == "Trap" or t == "ArenaPiece" end

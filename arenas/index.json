@@ -1319,22 +1319,6 @@
     "material": 2
    },
    {
-    "kind": "BallBag",
-    "name": "Pokimari balls",
-    "pos": [
-     34,
-     2.5,
-     0
-    ],
-    "yaw": 0,
-    "desc": "",
-    "mesh": "props/ball-v1.obj",
-    "diffuse": "props/ball-v1.jpg",
-    "collider": "props/ball-collider-v1.obj",
-    "convex": true,
-    "material": 3
-   },
-   {
     "kind": "Zone",
     "name": "Capture zone",
     "pos": [

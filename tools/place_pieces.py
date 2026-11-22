@@ -18,8 +18,6 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
         shuffles every portal's pair (Global.lua).
   trap: a trap piece on the tile; right-click > Spring trap removes it once it's been used (Global.lua).
   tree / gift: a tree tile (Yaksha) or a gift box on the tile, NOT locked: players lift it off / move it themselves.
-  map.json "extras": pieces that belong to no tile, e.g. {"kind": "BallBag", "pos": [x, y, z]} — a bag of
-        Pokimari balls beside the board (players draw balls, roll for the spot and move them by hand).
   zone (capture zone tiles): a frame around each square group of them (2x2), which takes the colour of the player
         with more Pokemon inside (Global.lua).
   bridge tiles (legend "bridge": true, sky with no board): each run of them between two islands is one rope
@@ -51,8 +49,6 @@ BRIDGES = {n: {"mesh": f"props/bridge{n}-v1.obj", "diffuse": "props/bridge-v1.jp
                "collider": f"props/bridge-collider{n}-v1.obj", "convex": True, "material": 1} for n in (1, 2)}
 TRAP = {"mesh": "props/trap-v1.obj", "diffuse": "props/trap-v1.jpg", "collider": "props/trap-collider-v1.obj",
         "convex": True, "material": 2}
-BALL = {"mesh": "props/ball-v1.obj", "diffuse": "props/ball-v1.jpg", "collider": "props/ball-collider-v1.obj",
-        "convex": True, "material": 3}
 ZONES = {n: {"mesh": f"props/zoneframe{n}-v1.obj", "diffuse": "props/zoneframe-v1.jpg", "collider": f"props/zoneframe{n}-v1.obj",
              "convex": False, "material": 3} for n in (2, 4)}
 TREE = {"mesh": "props/tree-v1.obj", "diffuse": "props/tree-v1.jpg", "collider": "props/tree-collider-v1.obj",
@@ -168,10 +164,6 @@ def pieces(arena, info):
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
                 yaw = math.degrees(math.atan2(-sz, sx)) + 180   # TTS yaw that turns the model's +x toward (-sx, -sz)
                 out.append({"kind": "Flag", "name": "Flag", "model": FLAG, "pos": pos, "yaw": yaw % 360, "desc": ""})
-    for extra in data.get("extras", []):
-        if extra.get("kind") == "BallBag":
-            out.append({"kind": "BallBag", "name": "Pokimari balls", "model": BALL, "pos": list(extra["pos"]),
-                        "yaw": extra.get("yaw", 0), "desc": ""})
     for size, pos in zones(data, info):
         out.append({"kind": "Zone", "name": "Capture zone", "model": ZONES[size], "pos": list(pos), "yaw": 0,
                     "desc": "", "tiles": size, "tile": round(T, 5)})

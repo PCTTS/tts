@@ -65,11 +65,6 @@
     [ 10, 15, 19 ],
     [ 9, 7, 20 ]
   ],
-  "_extras": "Pieces that belong to no tile: the bag of Pokimari balls on the table beside the board (board frame).",
-  "extras": [
-    { "kind": "BallBag", "pos": [   34,   2.5,   0 ]
-    }
-  ],
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
     "mesh": "board-v1.obj",

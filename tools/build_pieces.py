@@ -11,7 +11,6 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/portal-v1.obj, props/portal-v1.jpg  (also its own collider)
   props/bridge1-v1.obj, props/bridge2-v1.obj, props/bridge-v1.jpg, props/bridge-collider1-v1.obj, -collider2-
   props/zoneframe2-v1.obj, props/zoneframe-v1.jpg  (also its own collider)
-  props/ball-v1.obj, props/ball-v1.jpg, props/ball-collider-v1.obj
   props/trap-v1.obj, props/trap-v1.jpg, props/trap-collider-v1.obj
   props/zoneframe4-v1.obj  (a 4x4 zone's frame, same texture as the 2x2 one)
   props/tree-v1.obj, props/tree-v1.jpg, props/tree-collider-v1.obj
@@ -25,8 +24,6 @@ Bridge: a flat plank deck spanning 1 or 2 tiles of sky between two islands (alon
 Its own frame: y = 0 is the deck's top (level with the islands when the bridge is up), centred.
 Zone frame: a thin flat square ring just inside a 2x2 capture zone's border, white so a tint gives it the colour
 of the player holding the zone. Its own frame: y = 0 is the tile top, centred on the zone.
-Pokimari ball (Chrysalia): a cream ball with stitched seams; its collider is a flat-bottomed cylinder so it stays
-where it's put instead of rolling. Its own frame: y = 0 is the bottom.
 Trap (Chrysalia): a low metal plate ringed with teeth; only the plate is solid (a Pokemon stands on it). Its own
 frame: y = 0 is the tile top.
 Tree tile (Yaksha): a gnarled dark tree on a square stone tile; players lift it off when it's destroyed. Its own
@@ -94,7 +91,6 @@ BOARD_TILE = 3.24875
 PORTAL_R, PORTAL_H = 1.3, 0.05           # radius, thickness (it lies on the tile; a Pokemon stands on it)
 BRIDGE_W, BRIDGE_D = 2.7, 0.22           # deck width (across) and thickness
 ZONE_W, ZONE_H, ZONE_INSET = 0.16, 0.035, 0.05   # zone frame: band width, thickness, gap inside the zone's border
-BALL_R = 0.55                            # Pokimari ball radius
 TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, teeth around its rim
 TREE_BASE, TREE_BASE_H = 1.6, 0.1        # tree tile: base width (fits the flat top of a sloped tile) and thickness
 GIFT = 0.9                               # gift box size
@@ -397,44 +393,6 @@ def zone_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
 
 
-# ------------------------------------------------------------------------------------------------ ball
-BALL_TW, BALL_TH = 512, 256
-
-
-def ball():
-    m = PieceMesh()
-    lathe(m, sphere_profile(BALL_R, BALL_R, 24), lambda fu, y: (fu, 1 - (4 + 248 * (1 - y / (2 * BALL_R))) / BALL_TH), 48)
-    return m
-
-
-def ball_collider():
-    m = PieceMesh()
-    r = BALL_R * 0.9
-    lathe(m, [(0.0, 0.0), (r, 0.0), (r, 2 * BALL_R), (0.0, 2 * BALL_R)], lambda fu, y: (0.5, 0.5), 16)
-    return m
-
-
-def ball_texture():
-    """Cream leather in four panels: seams round the middle and down four sides, with stitches across them."""
-    rng = np.random.default_rng(31)
-    img = np.zeros((BALL_TH, BALL_TW, 3), np.float32)
-    img[:, :] = (236, 226, 200)
-    img *= (0.95 + 0.08 * rng.random((BALL_TH, BALL_TW, 1))).astype(np.float32)
-    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(1.2))
-    d = ImageDraw.Draw(out)
-    seam, stitch = (120, 84, 52), (196, 60, 48)
-    mid = 4 + 248 / 2
-    d.line([(0, mid), (BALL_TW, mid)], fill=seam, width=5)
-    for x in range(0, BALL_TW, 12):
-        d.line([(x, mid - 7), (x + 5, mid + 7)], fill=stitch, width=2)
-    for k in range(4):
-        x = k * BALL_TW / 4 + BALL_TW / 8
-        d.line([(x, 20), (x, BALL_TH - 20)], fill=seam, width=5)
-        for y in range(24, BALL_TH - 20, 12):
-            d.line([(x - 7, y), (x + 7, y + 5)], fill=stitch, width=2)
-    return out
-
-
 # ------------------------------------------------------------------------------------------------ trap
 def trap():
     m = PieceMesh()
@@ -657,9 +615,6 @@ def main():
         "bridge-v1.jpg": lambda p: bridge_texture().save(p, quality=92),
         "zoneframe2-v1.obj": lambda p: zone_frame(2).write(p),
         "zoneframe-v1.jpg": lambda p: zone_texture().save(p, quality=92),
-        "ball-v1.obj": lambda p: ball().write(p),
-        "ball-v1.jpg": lambda p: ball_texture().save(p, quality=92),
-        "ball-collider-v1.obj": lambda p: ball_collider().write(p),
         "trap-v1.obj": lambda p: trap().write(p),
         "trap-v1.jpg": lambda p: trap_texture().save(p, quality=92),
         "trap-collider-v1.obj": lambda p: trap_collider().write(p),
