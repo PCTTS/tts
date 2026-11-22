@@ -267,11 +267,14 @@ def draw_texture(a):
             px = (c + xx / p - a.C / 2) * TILE            # each pixel's world position
             pz = (a.R / 2 - (r + yy / p)) * TILE
             dist = np.full((p, p), np.inf, np.float32)
-            for (ax, az), (bx, bz), _ in segs:
+            for (ax, az), (bx, bz), _, round_a, round_b in segs:
                 dx, dz = bx - ax, bz - az
                 ll = dx * dx + dz * dz
-                k = np.zeros_like(px) if ll == 0 else np.clip(((px - ax) * dx + (pz - az) * dz) / ll, 0, 1)
-                dist = np.minimum(dist, np.hypot(px - (ax + k * dx), pz - (az + k * dz)))
+                kr = np.zeros_like(px) if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
+                k = np.clip(kr, 0, 1)
+                d = np.hypot(px - (ax + k * dx), pz - (az + k * dz))
+                d = np.where(((kr < 0) & (not round_a)) | ((kr > 1) & (not round_b)), np.inf, d)
+                dist = np.minimum(dist, d)
             alpha = np.where(dist < w, np.round(70 * np.clip(1 - dist / w, 0, 1) ** 1.5), 0).astype(np.uint8)
             dim = np.zeros((p, p, 4), np.uint8)
             dim[..., :3] = (30, 18, 8)
@@ -925,7 +928,9 @@ def contact_edges(a, r, c):
     straight slope along an edge, rounding off past the edge's ends (a dip in a corner tile, the "funnel" of the
     user's stair model, that carries the slope round onto the stair's corner). A stair that itself slopes down
     to the pit has a smaller flat top, so its edges end short of the tile's corners and the funnels move in with
-    them. Returns [((x0, z0), (x1, z0), bottom)] in world units, or []."""
+    them. Only at the top of a stair's run (its sides opposite its lower ground): the ground beside a straight
+    stair stays a sheer side wall, and the slope ends against it without rounding off (a channel: slope,
+    landing, slope). Returns [((x0, z0), (x1, z0), bottom, round_start, round_end)] in world units, or []."""
     t = a.tile(r, c)
     if not (t and t.get("slant") and t.get("slant_to")):
         return []
@@ -947,25 +952,39 @@ def contact_edges(a, r, c):
             cut = slopes(a, tr, tc)   # its own slopes down: its flat top ends short of those sides
             c0, c1 = tc + (wg if "W" in cut else 0), tc + 1 - (wg if "E" in cut else 0)
             r0, r1 = tr + (wg if "N" in cut else 0), tr + 1 - (wg if "S" in cut else 0)
-            for side, (sdr, sdc, _) in DIRS.items():
-                up = a.tile(tr + sdr, tc + sdc)
-                if not (up and up.get("level", 0) > nb.get("level", 0)):
-                    continue   # only where higher ground comes down onto it
+            own = nb.get("level", 0)
+
+            def side_level(side):
+                sdr, sdc, _ = DIRS[side]
+                o = a.tile(tr + sdr, tc + sdc)
+                return None if o is None else o.get("level", 0)
+            lower = {sd for sd in DIRS if (side_level(sd) if side_level(sd) is not None else own) < own}
+            contact = {sd for sd in DIRS if (side_level(sd) or -1) > own and OPPOSITE[sd] in lower}
+            for side in contact:
                 (ca, ra), (cb, rb) = {"N": ((c0, r0), (c1, r0)), "S": ((c0, r1), (c1, r1)),
                                       "W": ((c0, r0), (c0, r1)), "E": ((c1, r0), (c1, r1))}[side]
+                ends = ("W", "E") if side in "NS" else ("N", "S")   # the sides at its start and its end
+                rounds = [not ((side_level(e) or -1) > own and e not in contact) for e in ends]   # not at a side wall
                 gap_c = max(0.0, min(ca, cb) - (c + 1), c - max(ca, cb))   # from this tile, in tiles
                 gap_r = max(0.0, min(ra, rb) - (r + 1), r - max(ra, rb))
                 if math.hypot(gap_c, gap_r) < wg:   # near enough to shape it
-                    out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), a.level_top(nb)))
+                    out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), a.level_top(nb), rounds[0], rounds[1]))
     return out
 
 
+OPPOSITE = {"N": "S", "S": "N", "E": "W", "W": "E"}
+
+
 def edge_distance(seg, px, pz):
-    """Distance from (px, pz) to a segment ((x0, z0), (x1, z0), _)."""
+    """Distance from (px, pz) to a contact edge ((x0, z0), (x1, z0), _, round_start, round_end); past an end that
+    doesn't round off (a side wall there), none: infinite."""
     (ax, az), (bx, bz) = seg[0], seg[1]
     dx, dz = bx - ax, bz - az
     ll = dx * dx + dz * dz
-    k = 0.0 if ll == 0 else max(0.0, min(1.0, ((px - ax) * dx + (pz - az) * dz) / ll))
+    k = 0.0 if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
+    if (k < 0 and not seg[3]) or (k > 1 and not seg[4]):
+        return math.inf
+    k = max(0.0, min(1.0, k))
     return math.hypot(px - (ax + k * dx), pz - (az + k * dz))
 
 
