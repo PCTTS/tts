@@ -730,25 +730,23 @@ def main():
     check(abs(hc.x + 9.48) < 1e-6 and abs(hc.z + edge_z) < 1e-6, "a card Red was holding is put back into Red's moved hand")
     check(not g.ensureHandZones(), "a correct layout is left alone")
 
-    # players can't delete or cut the board, stands or fixed map pieces; other objects in the selection still go
+    # the board isn't interactive; players can't delete or cut the stands or fixed map pieces (other things they can)
     lua.execute(r"""
       local function obj(tags)
         local o = { tags = tags }
         o.hasTag = function(t) for _, x in ipairs(o.tags) do if x == t then return true end end return false end
-        o.destruct = function() o.gone = true end
         return o
       end
-      pBoard, pFlag, pCard, pTree = obj({ "Board3D" }), obj({ "Flag", "ArenaPiece" }), obj({ "Item" }), obj({ "Tree", "ArenaPiece" })
-      pPlayer = { color = "Red", broadcast = function(m) pPlayer.msg = m end }
-      delMixed = onPlayerAction(pPlayer, Player.Action.Delete, { pBoard, pCard })
-      cutFlag = onPlayerAction(pPlayer, Player.Action.Cut, { pFlag, pTree })
-      delTree = onPlayerAction(pPlayer, Player.Action.Delete, { pTree })
-      pickBoard = onPlayerAction(pPlayer, Player.Action.PickUp, { pBoard })
+      pBoard, pFlag, pStand, pCard, pTree = obj({ "Board3D" }), obj({ "Flag", "ArenaPiece" }), obj({ "Stand" }), obj({ "Item" }), obj({ "Tree", "ArenaPiece" })
+      pieceSetup(pBoard)
+      delFlag = onPlayerAction(nil, Player.Action.Delete, { pCard, pFlag })
+      cutStand = onPlayerAction(nil, Player.Action.Cut, { pStand })
+      delTree = onPlayerAction(nil, Player.Action.Delete, { pTree, pCard })
+      pickFlag = onPlayerAction(nil, Player.Action.PickUp, { pFlag })
     """)
-    check(g.delMixed is False and not g.pBoard.gone and g.pCard.gone and "map picker" in str(g.pPlayer.msg),
-          "deleting the board with a card selected: the board stays (with a note), the card is deleted")
-    check(g.cutFlag is False and not g.pFlag.gone and not g.pTree.gone, "cutting a flag (and a tree with it) is cancelled")
-    check(g.delTree is True and g.pickBoard is True, "a tree can still be deleted; other actions on the board aren't blocked")
+    check(g.pBoard.interactable is False, "the board can't be clicked, selected or deleted (not interactive)")
+    check(g.delFlag is False and g.cutStand is False, "deleting a flag or cutting a stand is refused")
+    check(g.delTree is True and g.pickFlag is True, "a tree or a card can still be deleted; other actions aren't blocked")
 
     # saving: the downloads are saved as the text that came in (cheap), and a load without internet uses them.
     # TTS's Lua (MoonSharp) fails "pattern too complex" on patterns over text this size (real Lua doesn't), so the

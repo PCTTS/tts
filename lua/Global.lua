@@ -214,7 +214,7 @@ function onLoad(saved)
       elseif obj.hasTag("Pokemon") then
         plainStandee(obj)
       elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap")
-        or obj.hasTag("ArenaBackdrop") then
+        or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") then
         pieceSetup(obj)
       elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
         unstretchCard(obj)
@@ -234,31 +234,19 @@ function unstretchCard(card)
   return false
 end
 
--- The board, its backdrop, the team stands and the map's fixed pieces can't be deleted or cut by players (right-click
--- menu or hotkeys); the map picker replaces boards by script, which isn't a player action. Anything else in the same
--- selection is still deleted.
-PROTECTED_TAGS = { "Board3D", "ArenaBackdrop", "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand" }
+-- The board and its backdrop aren't interactive at all (pieceSetup). The team stands and the map's fixed pieces still
+-- need clicks (HP signs, Capture, buttons), so players just can't delete or cut them; the map picker replaces them by
+-- script, which isn't a player action.
+PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand" }
 
-function isProtected(obj)
-  for _, tag in ipairs(PROTECTED_TAGS) do
-    if obj.hasTag(tag) then return true end
-  end
-  return false
-end
-
-function onPlayerAction(player, action, targets)
+function onPlayerAction(_, action, targets)
   if action ~= Player.Action.Delete and action ~= Player.Action.Cut then return true end
-  local kept, rest = 0, {}
   for _, obj in ipairs(targets or {}) do
-    if isProtected(obj) then kept = kept + 1 else rest[#rest + 1] = obj end
+    for _, tag in ipairs(PROTECTED_TAGS) do
+      if obj.hasTag(tag) then return false end
+    end
   end
-  if kept == 0 then return true end
-  if action == Player.Action.Delete then
-    for _, obj in ipairs(rest) do obj.destruct() end
-  end
-  player.broadcast("The map board, stands and map pieces can't be deleted. To change the map, use the map picker.",
-    { 1, 0.75, 0.5 })
-  return false
+  return true
 end
 
 -- Hand zones: eight, just past the table's edge-- Hand zones: eight, just past the table's edge (so cards on the team stands never fall into a hand), one pair on
@@ -609,7 +597,10 @@ function loadArena(name, entry, base)
         CustomShader = BOARD_SHADER },
     },
     position = spot, rotation = { 0, 0, 0 },
-    callback_function = function(board) board.setSnapPoints(snaps) end,
+    callback_function = function(board)
+      board.setSnapPoints(snaps)
+      board.interactable = false
+    end,
   })
   for _, p in ipairs(a.pieces or {}) do spawnArenaPiece(p, spot, base) end
   if a.table and a.table ~= "" then setBackdrop(base .. a.table, base) end
@@ -1326,7 +1317,7 @@ end
 -- kept by a save).
 function pieceSetup(obj)
   if not obj then return end
-  if obj.hasTag("ArenaBackdrop") then obj.interactable = false return end   -- clicks go through to the table
+  if obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") then obj.interactable = false return end   -- unselectable
   flagMenu(obj)
   if obj.hasTag("Portal") then
     local pair = memoTable(obj).pair or 1
