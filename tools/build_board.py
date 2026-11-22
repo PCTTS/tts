@@ -887,7 +887,10 @@ def rise_corners(a, r, c):
 
 def inner_corners(a, r, c):
     """A slanted tile's inner (concave) corners: {"NE"/"NW"/"SE"/"SW": the bottom of the dip}, where the diagonal
-    neighbour is lower but both sides beside it are not."""
+    neighbour is lower but both sides beside it are not. With "slant_to", a dip toward a diagonal target also where a
+    side beside it is lower ground that isn't one (the pit beside Pugilis's stairs): the slope down onto the stairs
+    flows round that corner instead of ending in a sheer wall. It bottoms at the target's own height at that corner
+    (lower if the target slopes away there)."""
     t = a.tile(r, c)
     if not (t and t.get("slant")):
         return {}
@@ -895,10 +898,18 @@ def inner_corners(a, r, c):
     for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
         diag = a.tile(r + dr, c + dc)
         beside = (a.tile(r + dr, c), a.tile(r, c + dc))
-        if diag and to and diag.get("surface") not in to:
+        if not diag or diag.get("level", 0) >= level:
             continue
-        if diag and diag.get("level", 0) < level and all(b and b.get("level", 0) >= level for b in beside):
-            out[("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")] = a.level_top(diag)
+        key = ("N" if dr < 0 else "S") + ("W" if dc < 0 else "E")
+        if not to:
+            if all(b and b.get("level", 0) >= level for b in beside):
+                out[key] = a.level_top(diag)
+        elif diag.get("surface") in to and all(b and (b.get("level", 0) >= level or b.get("surface") not in to)
+                                                 for b in beside):
+            # the diagonal's corner here: its sides that meet at it may slope away (down to lower ground)
+            near = ("S" if dr < 0 else "N", "E" if dc < 0 else "W")
+            sl = slopes(a, r + dr, c + dc)
+            out[key] = min([a.level_top(diag)] + [sl[s] for s in near if s in sl])
     return out
 
 
