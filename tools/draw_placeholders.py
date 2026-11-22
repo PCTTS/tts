@@ -34,6 +34,11 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/yaksha/textures/dark-water.png          Yaksha's water: black-green, faint ripples
   arenas/yaksha/textures/box-floor.png           the surprise boxes: dark stone with faint glowing violet runes
   (Yaksha's ground and edges reuse Chrysalia's slate1/2 and slate-edge)
+  arenas/violight/textures/steel1.png, steel2.png  Violight's floor: dark riveted steel plates, violet light in the seams
+  arenas/violight/textures/electric1.png, electric2.png  electric tiles: dark violet glass, yellow lightning
+  arenas/violight/textures/spire-top.png        the centre spire's top (2x2 tiles): coil rings round a glowing core
+  arenas/violight/textures/spire-wall.png       the spire's sides and the board's edge: steel panels, violet bands
+  misc/violight-placeholder-v1.jpg              table image around Violight: big dark steel deck plates
 """
 from pathlib import Path
 
@@ -596,8 +601,168 @@ def box_floor():
     return out.convert("RGB")
 
 
+VIOLET = (168, 104, 240)
+SPARK = (245, 212, 38)
+
+
+def steel_plate(seed, n=N, glow=0.45):
+    """A dark steel floor plate: brushed grain, worn patches, a bevel, a rivet in each corner, faint violet light
+    from the seam round it."""
+    rng = np.random.default_rng(seed)
+    img = mix((40, 40, 50), (62, 62, 74), fbm(n, n, rng, 3, 4))
+    streaks = np.asarray(Image.fromarray((rng.random((n, 20)) * 255).astype(np.uint8)).resize((n, n), Image.BILINEAR),
+                         np.float32) / 255
+    img *= (0.9 + 0.14 * streaks)[..., None]
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+    k = n / 512
+    img[(xx < 8 * k) | (yy < 8 * k)] *= 1.18                       # bevel: lit top/left, shaded bottom/right
+    img[(n - 1 - xx < 8 * k) | (n - 1 - yy < 8 * k)] *= 0.68
+    edge = np.minimum.reduce([xx, yy, n - 1 - xx, n - 1 - yy])
+    light = glow * np.exp(-edge / (12 * k))
+    img = img + (np.array(VIOLET, np.float32) - img) * light[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out)
+    for cx in (34 * k, n - 34 * k):
+        for cy in (34 * k, n - 34 * k):
+            r = 9 * k
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(70, 70, 82), outline=(22, 22, 28), width=max(1, round(2 * k)))
+            d.arc([cx - r * 0.6, cy - r * 0.6, cx + r * 0.6, cy + r * 0.6], 190, 280, fill=(150, 150, 164),
+                  width=max(1, round(2 * k)))
+    return out.filter(ImageFilter.GaussianBlur(0.5 * k))
+
+
+def bolt(rng, p0, p1, rough, depth):
+    """A jagged lightning path from p0 to p1 (midpoint displacement)."""
+    if depth == 0:
+        return [p0, p1]
+    mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
+    dx, dy = p1[0] - p0[0], p1[1] - p0[1]
+    off = rng.normal(0, rough)
+    mid = (mx - dy * off, my + dx * off)
+    return bolt(rng, p0, mid, rough, depth - 1)[:-1] + bolt(rng, mid, p1, rough, depth - 1)
+
+
+def draw_bolts(size, rng, count, margin, width, branches=2, rough=0.13):
+    """Lightning on a transparent layer: `count` jagged bolts across the middle, each with `branches` short side
+    forks; a soft yellow glow, a bright core."""
+    layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    paths = []
+    for _ in range(count):
+        a = rng.random() * np.pi
+        r = size / 2 - margin
+        p0 = (size / 2 + np.cos(a) * r * rng.uniform(0.75, 1), size / 2 + np.sin(a) * r * rng.uniform(0.75, 1))
+        p1 = (size / 2 - np.cos(a) * r * rng.uniform(0.75, 1), size / 2 - np.sin(a) * r * rng.uniform(0.75, 1))
+        path = bolt(rng, p0, p1, rough, 5)
+        paths.append((path, width))
+        for i in rng.choice(np.arange(4, len(path) - 4), branches, replace=False) if branches else []:
+            q0 = path[i]
+            ahead = np.arctan2(p1[1] - p0[1], p1[0] - p0[0]) + rng.choice((-1, 1)) * rng.uniform(0.4, 0.9)
+            ln = rng.uniform(0.12, 0.2) * size
+            q1 = (np.clip(q0[0] + np.cos(ahead) * ln, margin, size - margin),
+                  np.clip(q0[1] + np.sin(ahead) * ln, margin, size - margin))
+            paths.append((bolt(rng, q0, q1, rough * 1.3, 3), max(1, width * 0.5)))
+    for path, w in paths:
+        d.line(path, fill=SPARK + (255,), width=round(w * 2.2), joint="curve")
+    glow = layer.filter(ImageFilter.GaussianBlur(width * 3))
+    core = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    dc = ImageDraw.Draw(core)
+    for path, w in paths:
+        dc.line(path, fill=(255, 250, 220, 255), width=max(1, round(w * 0.8)), joint="curve")
+    out = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    for part in (glow, glow, layer, core):
+        out.alpha_composite(part)
+    return out
+
+
+def electric_panel(seed, n=N):
+    """An electrified floor panel: dark violet glass over a faint circuit grid, yellow lightning crackling in it."""
+    rng = np.random.default_rng(seed)
+    img = mix((16, 14, 30), (38, 30, 62), fbm(n, n, rng, 3, 4))
+    out = to_img(img).convert("RGBA")
+    grid = Image.new("RGBA", (n, n), (0, 0, 0, 0))
+    g = ImageDraw.Draw(grid)
+    for i in range(1, 8):
+        g.line([(i * n / 8, 0), (i * n / 8, n)], fill=SPARK + (34,), width=2)
+        g.line([(0, i * n / 8), (n, i * n / 8)], fill=SPARK + (34,), width=2)
+    out.alpha_composite(grid)
+    out.alpha_composite(draw_bolts(n, rng, int(rng.integers(1, 3)), n * 0.1, 7))
+    return out.convert("RGB")
+
+
+def spire_top(n=1024):
+    """The top of the centre spire (2x2 tiles): a power discharger, coil rings round a glowing core, arcs
+    crackling out from it."""
+    rng = np.random.default_rng(181)
+    out = steel_plate(183, n, glow=0.2).convert("RGBA")
+    d = ImageDraw.Draw(out)
+    c = n / 2
+    rings = Image.new("RGBA", (n, n), (0, 0, 0, 0))
+    dr = ImageDraw.Draw(rings)
+    for i, r in enumerate(np.linspace(0.44, 0.14, 7) * n):
+        d.ellipse([c - r, c - r, c + r, c + r], fill=(30 + 6 * i, 28 + 6 * i, 40 + 8 * i, 255), outline=(14, 12, 20, 255), width=6)
+        dr.ellipse([c - r + 10, c - r + 10, c + r - 10, c + r - 10], outline=VIOLET + (255,), width=5)
+    out.alpha_composite(rings.filter(ImageFilter.GaussianBlur(9)))
+    out.alpha_composite(rings)
+    core = Image.new("RGBA", (n, n), (0, 0, 0, 0))
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+    t = np.clip(1 - np.hypot(xx - c, yy - c) / (0.16 * n), 0, 1) ** 1.6
+    core_px = np.zeros((n, n, 4), np.uint8)
+    core_px[..., :3] = np.array((236, 214, 255), np.uint8)
+    core_px[..., 3] = (255 * t).astype(np.uint8)
+    out.alpha_composite(Image.fromarray(core_px, "RGBA"))
+    arcs = draw_bolts(n, rng, 3, n * 0.08, 6, branches=0, rough=0.2)
+    arcs = Image.fromarray(np.dstack([np.asarray(arcs)[..., :3] * 0 + np.array((220, 190, 255), np.uint8),
+                                      np.asarray(arcs)[..., 3]]), "RGBA")   # violet-white arcs, not yellow
+    out.alpha_composite(arcs)
+    return out.convert("RGB")
+
+
+def spire_wall():
+    """The spire's sides and the board's edge: dark steel panels, riveted seams, glowing violet bands (seamless
+    left-right)."""
+    rng = np.random.default_rng(185)
+    h, w = 1024, N
+    img = mix((34, 34, 44), (52, 52, 64), fbm(h, w, rng, 6, 4, wrap_x=True))
+    img *= np.linspace(1.0, 0.7, h, dtype=np.float32)[:, None, None]
+    for x in (0, w // 2):
+        img[:, max(0, x - 2):x + 3] *= 0.5
+    out = to_img(img).convert("RGBA")
+    bands = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    db = ImageDraw.Draw(bands)
+    for y in (0.16, 0.42, 0.68):
+        db.rectangle([0, y * h - 5, w, y * h + 5], fill=VIOLET + (255,))
+    out.alpha_composite(bands.filter(ImageFilter.GaussianBlur(10)))
+    out.alpha_composite(bands)
+    d = ImageDraw.Draw(out)
+    for x in (12, w // 2 + 12, w // 2 - 12, w - 12):
+        for y in range(40, h, 96):
+            d.ellipse([x - 5, y - 5, x + 5, y + 5], fill=(78, 78, 92, 255), outline=(20, 20, 26, 255))
+    return out.convert("RGB")
+
+
+def violight_table():
+    """Around Violight: big dark steel deck plates (8 x 5), violet light in the seams."""
+    h, w = 1211, 2048
+    out = Image.new("RGB", (w, h))
+    cols, rows = 8, 5
+    cw, ch = w // cols + 1, h // rows + 1
+    for i in range(cols):
+        for j in range(rows):
+            plate = steel_plate(300 + i * rows + j, 256, glow=0.55).resize((cw, ch), Image.BICUBIC)
+            out.paste(plate.point(lambda v: int(v * 0.7)), (i * cw - i, j * ch - j))
+    return out.filter(ImageFilter.GaussianBlur(0.6))
+
+
 def main():
     files = {
+        "arenas/violight/textures/steel1.png": lambda p: steel_plate(171).save(p),
+        "arenas/violight/textures/steel2.png": lambda p: steel_plate(172).save(p),
+        "arenas/violight/textures/electric1.png": lambda p: electric_panel(175).save(p),
+        "arenas/violight/textures/electric2.png": lambda p: electric_panel(176).save(p),
+        "arenas/violight/textures/spire-top.png": lambda p: spire_top().save(p),
+        "arenas/violight/textures/spire-wall.png": lambda p: spire_wall().save(p),
+        "misc/violight-placeholder-v1.jpg": lambda p: violight_table().save(p, quality=90),
         "arenas/yaksha/textures/temple-stone.png": lambda p: temple_stone().save(p),
         "arenas/yaksha/textures/dark-water.png": lambda p: dark_water().save(p),
         "arenas/yaksha/textures/box-floor.png": lambda p: box_floor().save(p),

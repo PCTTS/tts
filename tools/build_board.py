@@ -150,6 +150,7 @@ def surface_layers(a, p):
       "match": recolour so each image's typical (median) colour equals the surface's palette colour (e.g. the same
                dirt, darker in a pit); details darker or lighter than the base keep their contrast
       "recolor": [{"from", "to", "amount"}] first moves a colour part of the way toward another
+      "offset": [row, col] a copy's top-left corner lands on that tile (default the board's corner)
     Random choices are seeded by arena and surface, so rebuilds come out the same. Returns surface -> board image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
@@ -159,8 +160,9 @@ def surface_layers(a, p):
         choices = texture_choices(a, spec, surface, size, size)
         rnd = random.Random(f"{a.data.get('name')}/{surface}")
         layer = Image.new("RGB", (a.C * p, a.R * p))
-        for y in range(0, a.R * p, size):
-            for x in range(0, a.C * p, size):
+        oy, ox = (v * p % size for v in spec.get("offset", (0, 0)))
+        for y in range(oy - size if oy else 0, a.R * p, size):
+            for x in range(ox - size if ox else 0, a.C * p, size):
                 layer.paste(rnd.choice(rnd.choice(choices)), (x, y))
         layers[surface] = layer
     return layers
@@ -226,15 +228,18 @@ def draw_texture(a):
             o.rectangle([x0, y0t, x0 + p - 1, y0t + p - 1], outline=(40, 28, 18, 110), width=SS)
             if t.get("surface") == "stairs":
                 draw_steps(o, a, r, c, x0, y0t, p)
-            if t.get("paint", True) and t.get("marker"):
+            if t.get("outline"):
+                draw_outline(over, a, r, c, x0, y0t, p)
+            painted = painted_marker(t)
+            if painted:
                 turn = marker_turn(a, r, c, t)
                 both = both_ways(a, t)
                 if turn:   # drawn upright on its own layer, then turned so its bottom points the right way
                     layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
-                    draw_marker(layer, t.get("marker"), 0, 0, p, both)
+                    draw_marker(layer, painted, 0, 0, p, both)
                     over.alpha_composite(layer.rotate(turn), (x0, y0t))
                 else:
-                    draw_marker(over, t.get("marker"), x0, y0t, p, both)
+                    draw_marker(over, painted, x0, y0t, p, both)
     for r in range(a.R):   # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope
         for c in range(a.C):
             sloped = slopes(a, r, c) if a.tile(r, c) else {}
@@ -296,7 +301,13 @@ FRINGE = {"reach": 0.42, "wobble": 0.3, "rough": 1.0, "tufts": 160}   # defaults
 
 def draw_coords(over, a, p):
     """Coordinates in the board's edge tiles: x = 1..C along both player edges (from player 1's left), y = 1..R up
-    both side edges (from player 1's side). Each number faces out from its own edge (its bottom toward that edge)."""
+    both side edges (from player 1's side). Each number faces out from its own edge (its bottom toward that edge).
+    "coords": {"cols": [first, last], "rows": [first, last]} (tile indices) numbers only those columns/rows, from 1;
+    "inset": how far in from the edge a number's centre sits, in tiles (default 0.15)."""
+    spec = a.data["coords"]
+    cols = range(a.C) if spec is True else range(spec["cols"][0], spec["cols"][1] + 1)
+    rows = range(a.R) if spec is True else range(spec["rows"][0], spec["rows"][1] + 1)
+    k = spec.get("inset", 0.15) if isinstance(spec, dict) else 0.15
     f = font(round(p * 0.15))
     size = round(p * 0.28)
 
@@ -307,12 +318,12 @@ def draw_coords(over, a, p):
         layer = layer.rotate(MARKER_TURN[edge])
         over.alpha_composite(layer, (round(cx - size / 2), round(cy - size / 2)))
 
-    for c in range(a.C):
-        label(str(c + 1), c * p + p / 2, (a.R - 1) * p + p * 0.85, (1, 0))     # player 1's edge
-        label(str(c + 1), c * p + p / 2, p * 0.15, (-1, 0))                     # player 2's edge
-    for r in range(a.R):
-        label(str(a.R - r), p * 0.15, r * p + p / 2, (0, -1))                  # left edge
-        label(str(a.R - r), (a.C - 1) * p + p * 0.85, r * p + p / 2, (0, 1))   # right edge
+    for c in cols:
+        label(str(c - cols.start + 1), c * p + p / 2, (a.R - k) * p, (1, 0))     # player 1's edge
+        label(str(c - cols.start + 1), c * p + p / 2, p * k, (-1, 0))            # player 2's edge
+    for r in rows:
+        label(str(rows.stop - r), p * k, r * p + p / 2, (0, -1))                  # left edge
+        label(str(rows.stop - r), (a.C - k) * p, r * p + p / 2, (0, 1))           # right edge
 
 
 def grass_fringe(a, img, layers, p):
@@ -422,7 +433,7 @@ def marker_turn(a, r, c, t):
     spawn circles face their own player (spawn1 upright for player 1, spawn2 upside down for player 2); an
     explicit "orient" wins ("away-from-pit": bottom away from the lower neighbours); anything else has its bottom
     toward the nearer left/right edge."""
-    marker = t.get("marker", "")
+    marker = painted_marker(t) or ""
     if marker == "spawn1":
         return 0
     if marker.startswith("spawn2"):
@@ -434,12 +445,37 @@ def marker_turn(a, r, c, t):
     return MARKER_TURN[(0, -1) if c < a.C / 2 else (0, 1)]
 
 
-NUMBERED = ("passage-in", "passage-out", "trapdoor")   # markers that carry a number
+def painted_marker(t):
+    """What gets painted on a tile: its "decal" (painted even when the marker is a 3D piece, e.g. a capture zone
+    tile's number), else its marker unless "paint": false."""
+    return t.get("decal") or (t.get("marker") if t.get("paint", True) else None)
+
+
+NUMBERED = ("passage-in", "passage-out", "trapdoor", "button", "zone-number")   # markers that carry a number
 
 
 def both_ways(a, t):
     """With the map's "numbers": "both", a numbered marker shows its number as N/N (see draw_pair)."""
-    return a.data.get("numbers") == "both" and t.get("marker", "").startswith(NUMBERED)
+    return a.data.get("numbers") == "both" and (painted_marker(t) or "").startswith(NUMBERED)
+
+
+def draw_outline(over, a, r, c, x0, y0, p):
+    """Legend "outline": "#rrggbb": a glowing line round each group of tiles with that outline (drawn on the
+    tile's edges that face a tile without it), glowing inward."""
+    col = hex_rgb(a.tile(r, c)["outline"])
+    u = p / 128
+    layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    w = round(5 * u)
+    edges = {"N": [(0, w / 2), (p, w / 2)], "S": [(0, p - w / 2), (p, p - w / 2)],
+             "W": [(w / 2, 0), (w / 2, p)], "E": [(p - w / 2, 0), (p - w / 2, p)]}
+    for side, (dr, dc, _) in DIRS.items():
+        if (a.tile(r + dr, c + dc) or {}).get("outline") != a.tile(r, c)["outline"]:
+            d.line(edges[side], fill=col + (255,), width=w)
+    glow = layer.filter(ImageFilter.GaussianBlur(7 * u))
+    over.alpha_composite(glow, (x0, y0))
+    over.alpha_composite(glow, (x0, y0))
+    over.alpha_composite(layer, (x0, y0))
 
 
 def draw_pair(im, text, cx, cy, size, fill, **style):
@@ -543,6 +579,28 @@ def draw_marker(im, marker, x0, y0, p, both=False):
         else:
             o.text((cx, cy + 2 * u), marker[len("trapdoor"):], font=font(round(40 * u)), fill=(246, 232, 200, 255),
                    anchor="mm", stroke_width=round(3 * u), stroke_fill=dark_wood)
+    elif marker.startswith("button"):   # a round pressure plate in a dark recess, a glowing yellow ring, its number
+        n = marker[len("button"):]
+        yellow = (245, 212, 38, 255)
+        o.ellipse([cx - 48 * u, cy - 48 * u, cx + 48 * u, cy + 48 * u], fill=(16, 14, 22, 255))
+        o.ellipse([cx - 42 * u, cy - 42 * u, cx + 42 * u, cy + 42 * u], fill=(58, 56, 68, 255), outline=yellow,
+                  width=round(5 * u))
+        o.ellipse([cx - 33 * u, cy - 33 * u, cx + 33 * u, cy + 33 * u], fill=(78, 74, 92, 255),
+                  outline=(40, 38, 50, 255), width=round(2 * u))
+        o.arc([cx - 29 * u, cy - 29 * u, cx + 29 * u, cy + 29 * u], 200, 290, fill=(150, 146, 168, 255),
+              width=round(3 * u))
+        if both:
+            draw_pair(im, n, cx, cy, round(30 * u), yellow, stroke_width=round(2 * u), stroke_fill=(30, 26, 10, 255))
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(38 * u)), fill=yellow, anchor="mm", stroke_width=round(2 * u),
+                   stroke_fill=(30, 26, 10, 255))
+    elif marker.startswith("zone-number"):   # a capture zone's number, painted faintly on each of its tiles
+        n = marker[len("zone-number"):]
+        fill = (236, 226, 255, 120)
+        if both:
+            draw_pair(im, n, cx, cy, round(40 * u), fill)
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(52 * u)), fill=fill, anchor="mm")
     elif marker.startswith("bell"):
         gold, deep = (226, 178, 60, 255), (150, 105, 30, 255)
         o.ellipse([cx - 26 * u, cy - 44 * u, cx + 26 * u, cy - 6 * u], fill=gold, outline=ink, width=round(3 * u))

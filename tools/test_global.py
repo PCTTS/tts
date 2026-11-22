@@ -236,8 +236,9 @@ def main():
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Chrysalia", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True), ("Viperia", False), ("Yaksha", False)],
-          f"map list shows the six arenas, Pugilis on the table ({got})")
+    check(got == [("Chrysalia", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True), ("Violight", False),
+                  ("Viperia", False), ("Yaksha", False)],
+          f"map list shows the seven arenas, Pugilis on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
           and calls.attrs["mapRes_White_4.text"] == "Pugilis" and calls.attrs["mapRes_White_4.colors"].startswith("#8DB8F7"),
@@ -298,7 +299,7 @@ def main():
     # Viperia: 16 x 15, its 3 flags, no snap points on the walls, the jungle table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_5")
+    g.mapPick(player, "-1", "mapRes_White_6")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     vmap = json.loads((REPO / "arenas" / "viperia" / "map.json").read_text(encoding="utf-8"))
@@ -308,6 +309,18 @@ def main():
           and kinds.count("Flag") == 3 and len(kinds) == 5 and len(vidx["snaps"]) == 16 * 15 - walls
           and backdrop(new, "misc/jungle-placeholder-v1.jpg"),
           f"picking Viperia: its board, 3 flags, snap points on all {16 * 15 - walls} tiles but the {walls} walls, the jungle table")
+
+    # Violight: 4 capture zone frames round the spire, no snap points on the spire, the steel table
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", "mapRes_White_5")
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    lidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Violight"]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/violight/board-v1.obj")
+          and kinds.count("Zone") == 4 and len(kinds) == 6 and len(lidx["snaps"]) == 256 - 4
+          and backdrop(new, "misc/violight-placeholder-v1.jpg"),
+          "picking Violight: its board, 4 zone frames, snap points on every tile but the 4 of the spire, the steel table")
 
     # Chrysalia: its board, 3 capture zone frames and 2 traps
     n = len(calls.spawned)
@@ -337,11 +350,11 @@ def main():
     # Yaksha: a big 4x4 capture zone and two 2x2 ones, 6 tree tiles and 14 gift boxes that players move (not locked)
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_6")
+    g.mapPick(player, "-1", "mapRes_White_7")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
-    free = [s for s in new if s.data.Tags[1] in ("Tree", "Gift")]
+    free =[s for s in new if s.data.Tags[1] in ("Tree", "Gift")]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/yaksha/board-v1.obj")
           and len(zones) == 3 and sum(z.data.CustomMesh.MeshURL.endswith("zoneframe4-v1.obj") for z in zones) == 1
           and kinds.count("Tree") == 6 and kinds.count("Gift") == 14 and all(not s.data.Locked for s in free)
