@@ -257,6 +257,23 @@ def draw_texture(a):
                     o.line([(x0 + band - i, y0t), (x0 + band - i, y0t + p)], fill=(30, 18, 8, alpha))
                 if "E" in sloped:
                     o.line([(x0 + p - band + i, y0t), (x0 + p - band + i, y0t + p)], fill=(30, 18, 8, alpha))
+    for r in range(a.R):   # rising bands (see rises()): darkening toward their foot, inside the tile
+        for c in range(a.C):
+            risen = rises(a, r, c) if a.tile(r, c) else {}
+            if not risen:
+                continue
+            band = a.tile(r, c)["slant"] / TILE * p
+            x0, y0t = c * p, r * p
+            for i in range(round(band)):
+                alpha = round(70 * (i / band) ** 1.5)   # i = distance from the tile's edge (the top of the slope)
+                if "N" in risen:
+                    o.line([(x0, y0t + i), (x0 + p, y0t + i)], fill=(30, 18, 8, alpha))
+                if "S" in risen:
+                    o.line([(x0, y0t + p - i), (x0 + p, y0t + p - i)], fill=(30, 18, 8, alpha))
+                if "W" in risen:
+                    o.line([(x0 + i, y0t), (x0 + i, y0t + p)], fill=(30, 18, 8, alpha))
+                if "E" in risen:
+                    o.line([(x0 + p - i, y0t), (x0 + p - i, y0t + p)], fill=(30, 18, 8, alpha))
     for r in range(a.R):   # inner corners: the same darkening around the corner point
         for c in range(a.C):
             inner = inner_corners(a, r, c) if a.tile(r, c) else {}
@@ -707,9 +724,10 @@ def build_mesh(a):
         if st:
             return step_height(st, (x(c), x(c + 1), z(r), z(r + 1)), px, pz)
         sl, inn = lows(r, c)
-        if not sl and not inn:
+        risen = rises(a, r, c)
+        if not sl and not inn and not risen:
             return a.top(t)
-        return surface_height(a.top(t), (x(c), x(c + 1), z(r), z(r + 1)), sl, inn, t["slant"], px, pz)
+        return surface_height(a.top(t), (x(c), x(c + 1), z(r), z(r + 1)), sl, inn, t["slant"], px, pz, risen)
 
     def edge_breaks(r, c):   # where a tile's surface can bend along any of its edges (fractions of the edge)
         st = stair_steps(a, r, c)
@@ -717,7 +735,7 @@ def build_mesh(a):
             return sorted({0.0, 1.0} | {k * st["depth"] / TILE for k in range(1, st["n"])}
                           | {1.0 - k * st["depth"] / TILE for k in range(1, st["n"])})
         sl, inn = lows(r, c)
-        if not sl and not inn:
+        if not sl and not inn and not rises(a, r, c):
             return [0.0, 1.0]
         f = a.tile(r, c)["slant"] / TILE
         return [0.0, f, 1.0 - f, 1.0]
@@ -740,6 +758,8 @@ def build_mesh(a):
             if st:   # flat treads at each step's height, risers between them
                 step_surface(m, st, (x0, x1, z0, z1), tuv,
                              lambda f, y: wall_uv((a.C // 2 + (r * 5 + c * 3) % (a.C // 2)) * PX + f * (PX - 1), y))
+            elif rises(a, r, c):   # slopes up to higher ground (and maybe down too): the fine surface
+                slope_surface(m, t, top, (x0, x1, z0, z1), sloped, inner, tuv, risen=rises(a, r, c))
             elif not sloped and not inner:
                 m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
                        [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
@@ -817,6 +837,23 @@ def slopes(a, r, c):
             sys.exit(f"{where}: neighbours at the same level need the same slant")
     if len(set(out.values()) | set(inner_corners(a, r, c).values())) > 1:
         sys.exit(f"slanted tile row {r} col {c}: all its lower neighbours must be one level")
+    return out
+
+
+def rises(a, r, c):
+    """A tile with "slant" and "rise": true also slopes UP to its higher neighbours, inside its own edge band, so
+    their edges stay sharp (Pugilis's stairs: up to the floor, down to the pit, a flat landing between):
+    {side: the top of that slope}, which is the neighbour's level. One level up only."""
+    t = a.tile(r, c)
+    if not (t and t.get("rise") and t.get("slant")):
+        return {}
+    level, out = t.get("level", 0), {}
+    for side, (dr, dc, _) in DIRS.items():
+        nb = a.tile(r + dr, c + dc)
+        if nb and nb.get("level", 0) > level:
+            if nb.get("level", 0) > level + 1:
+                sys.exit(f"rising tile row {r} col {c}: higher ground more than one level up")
+            out[side] = a.level_top(nb)
     return out
 
 
@@ -941,10 +978,14 @@ def step_surface(m, st, box, tuv, riser_uv):
                        [riser_uv(0, hi), riser_uv(1, hi), riser_uv(1, lo), riser_uv(0, lo)], normal)
 
 
-def surface_height(top, box, sloped, inner, w, px, pz):
-    """A tile's surface height at (px, pz): the lowest that any of its low features allows (see slope_surface)."""
+def surface_height(top, box, sloped, inner, w, px, pz, risen=None):
+    """A tile's surface height at (px, pz): raised by any slopes up to higher ground (risen), then the lowest that
+    any of its low features allows (see slope_surface)."""
     x0, x1, z0, z1 = box
     h = top
+    for side, high in (risen or {}).items():
+        d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
+        h = max(h, top + (high - top) * max(0.0, 1 - d / w))
     for side, base in sloped.items():
         d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
         h = min(h, top - (top - base) * max(0.0, 1 - d / w))
@@ -954,7 +995,7 @@ def surface_height(top, box, sloped, inner, w, px, pz):
     return h
 
 
-def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4):
+def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None):
     """A slanted tile as a grid of triangles: the height at a point is the lowest that any of its low features
     allows: straight slopes inward from each low side, a round dip (a quarter cone) around each inner corner, each
     reaching the top `slant` in. The grid has lines `steps` apart across each slope band, so a hip crease or the
@@ -963,7 +1004,7 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4):
     w = t["slant"]
 
     def height(px, pz):
-        return surface_height(top, box, sloped, inner, w, px, pz)
+        return surface_height(top, box, sloped, inner, w, px, pz, risen)
 
     xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
     zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
