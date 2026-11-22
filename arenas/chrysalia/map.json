@@ -73,14 +73,14 @@
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
     "mesh": "board-v1.obj",
-    "texture": "board-v3.jpg",
+    "texture": "board-v4.jpg",
     "geometry": "board-v1.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
-  "table": "misc/mulch-placeholder-v1.jpg",
-  "_textures": "Placeholders from tools/draw_placeholders.py: a dark mulch bed of bark chips (the user's pick, after a striped pitch looked like a golf course and dark slate came before it), ice, water, chips-over-soil edges; lava from Ingis, poison from Viperia.",
+  "table": "misc/mulch-placeholder-v2.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py: a dark mulch bed of bark chips with small clover patches (the user's pick, after a striped pitch looked like a golf course and dark slate came before it), ice, water, chips-over-soil edges; lava from Ingis, poison from Viperia.",
   "textures": {
-    "floor": { "images": [   "textures/mulch1.png",   "textures/mulch2.png" ], "span": 1, "vary": true
+    "floor": { "images": [   "textures/mulch-clover1.png",   "textures/mulch-clover2.png" ], "span": 1, "vary": true
     },
     "ice": { "image": "textures/ice.png", "span": 2, "vary": true
     },

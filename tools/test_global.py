@@ -303,7 +303,7 @@ def main():
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/chrysalia/board-v1.obj")
           and kinds.count("Zone") == 3 and kinds.count("Trap") == 2 and bag is not None and bag.data.Name == "Infinite_Bag"
           and ball.Nickname == "Pokimari ball" and ball.CustomMesh.ColliderURL.endswith("props/ball-collider-v1.obj")
-          and abs(bag.position.x - 34.01) < 0.01 and str(calls.tableURL).endswith("misc/mulch-placeholder-v1.jpg"),
+          and abs(bag.position.x - 34.01) < 0.01 and str(calls.tableURL).endswith("misc/mulch-placeholder-v2.jpg"),
           "picking Chrysalia: its board, 3 zone frames, 2 traps, an endless bag of Pokimari balls beside it, the mulch table")
     lua.execute(r"""
       trapObj = { tags = { "Trap", "ArenaPiece" }, menu = {} }

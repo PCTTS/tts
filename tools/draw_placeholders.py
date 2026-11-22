@@ -28,6 +28,8 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/chrysalia/textures/mulch1.png, mulch2.png  the user's pick after the slate: a mulch bed, dark wood chips
   arenas/chrysalia/textures/mulch-edge.png       board edge and pool rims: chips on top of dark soil, seamless left-right
   misc/mulch-placeholder-v1.jpg                  table image around it: more mulch, a little darker
+  arenas/chrysalia/textures/mulch-clover1.png, -clover2.png  the mulch with small clover patches and sprouts
+  misc/mulch-placeholder-v2.jpg                  the table's mulch with clovers too
 """
 from pathlib import Path
 
@@ -473,6 +475,47 @@ def chips(d, rng, w, h, count, scale=1.0, wrap=False):
                    fill=tuple(min(255, v + 22) for v in col) + (110,), width=1)
 
 
+CLOVER = [(62, 118, 46), (78, 138, 54), (96, 156, 62), (52, 100, 40)]
+
+
+def clover(d, x, y, size, rot, col):
+    """A three-leaf clover from above: three heart-shaped leaflets round a centre, a lighter mark on each."""
+    dark = tuple(max(0, v - 28) for v in col) + (255,)
+    for k in range(3):
+        a = rot + k * 2 * np.pi / 3
+        lx, ly = x + np.cos(a) * size * 0.55, y + np.sin(a) * size * 0.55
+        for side in (-1, 1):   # a heart: two round lobes side by side
+            b = a + side * np.pi / 2
+            cx, cy = lx + np.cos(b) * size * 0.2 + np.cos(a) * size * 0.1, ly + np.sin(b) * size * 0.2 + np.sin(a) * size * 0.1
+            r = size * 0.32
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=col + (255,), outline=dark, width=1)
+        d.line([(x, y), (lx, ly)], fill=dark, width=1)
+        mx, my = x + np.cos(a) * size * 0.5, y + np.sin(a) * size * 0.5
+        d.ellipse([mx - size * 0.08, my - size * 0.08, mx + size * 0.08, my + size * 0.08],
+                  fill=tuple(min(255, v + 50) for v in col) + (200,))
+
+
+def clover_patches(d, rng, w, h, clusters, scale=1.0):
+    """Little patches of clover (3-7 each) and a few lone two-leaf sprouts, scattered over the mulch."""
+    for _ in range(clusters):
+        cx, cy = rng.random() * w, rng.random() * h
+        for _ in range(int(rng.integers(3, 8))):
+            x, y = cx + rng.normal(0, 22 * scale), cy + rng.normal(0, 22 * scale)
+            clover(d, x, y, rng.uniform(14, 22) * scale, rng.random() * 6.3, CLOVER[rng.integers(0, len(CLOVER))])
+    for _ in range(clusters * 2):
+        x, y, a = rng.random() * w, rng.random() * h, rng.random() * 6.3
+        col = CLOVER[rng.integers(0, len(CLOVER))] + (255,)
+        for side in (-1, 1):
+            leaf(d, x, y, rng.uniform(10, 16) * scale, a + side * 0.7, col)
+
+
+def mulch_clover(seed, n=N):
+    out = mulch(seed, n).convert("RGBA")
+    rng = np.random.default_rng(seed + 1000)
+    clover_patches(ImageDraw.Draw(out, "RGBA"), rng, n, n, int(rng.integers(2, 5)))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.3))
+
+
 def mulch(seed, n=N, count=2600, dark=0.9):
     rng = np.random.default_rng(seed)
     soil = mix((30, 21, 15), (48, 34, 24), fbm(n, n, rng, 6, 4)) * dark
@@ -504,8 +547,18 @@ def mulch_table():
     return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
 
 
+def mulch_table_clover():
+    out = Image.open(REPO / "misc/mulch-placeholder-v1.jpg").convert("RGBA")
+    rng = np.random.default_rng(151)
+    clover_patches(ImageDraw.Draw(out, "RGBA"), rng, out.width, out.height, 90, scale=1.1)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.3))
+
+
 def main():
     files = {
+        "arenas/chrysalia/textures/mulch-clover1.png": lambda p: mulch_clover(141).save(p),
+        "arenas/chrysalia/textures/mulch-clover2.png": lambda p: mulch_clover(142).save(p),
+        "misc/mulch-placeholder-v2.jpg": lambda p: mulch_table_clover().save(p, quality=90),
         "arenas/chrysalia/textures/mulch1.png": lambda p: mulch(141).save(p),
         "arenas/chrysalia/textures/mulch2.png": lambda p: mulch(142).save(p),
         "arenas/chrysalia/textures/mulch-edge.png": lambda p: mulch_edge().save(p),
