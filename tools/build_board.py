@@ -123,7 +123,7 @@ def texture_choices(a, spec, surface, w, h):
     """The copies a texture spec can use, as [per image: [copies]], each w x h. "vary" gives every orientation
     (four quarter-turns, each also mirrored); "match" recolours to the palette colour of `surface`, or of the
     palette entry it names (e.g. "match": "stairs")."""
-    choices = []
+    choices = []   # "vary": "mirror" gives just the image and its mirror image
     for path in spec.get("images") or [spec["image"]]:
         src = Image.open(a.folder / path).convert("RGB")
         for rule in spec.get("recolor", []):
@@ -135,7 +135,9 @@ def texture_choices(a, spec, surface, w, h):
             src = Image.merge("RGB", [band.point(lambda v, k=want[i] / max(1, typical[i]): min(255, round(v * k)))
                                       for i, band in enumerate(src.split())])
         variants = [src]
-        if spec.get("vary"):
+        if spec.get("vary") == "mirror":   # wall images: only mirrored, so their top stays up
+            variants = [src, src.transpose(Image.FLIP_LEFT_RIGHT)]
+        elif spec.get("vary"):
             variants = [v for t in (src, src.transpose(Image.FLIP_LEFT_RIGHT)) for v in
                         (t, t.transpose(Image.ROTATE_90), t.transpose(Image.ROTATE_180), t.transpose(Image.ROTATE_270))]
         choices.append([v.resize((w, h), Image.LANCZOS) for v in variants])
@@ -154,8 +156,8 @@ def surface_layers(a, p):
     Random choices are seeded by arena and surface, so rebuilds come out the same. Returns surface -> board image."""
     layers = {}
     for surface, spec in (a.data.get("textures") or {}).items():
-        if surface == "walls":
-            continue  # inner walls are textured in the wall strip (see draw_texture)
+        if surface == "walls" or surface.startswith("walls:"):
+            continue  # walls are textured in the wall strip (see draw_texture, own_walls)
         size = round(spec.get("span", max(a.R, a.C)) * p)
         choices = texture_choices(a, spec, surface, size, size)
         rnd = random.Random(f"{a.data.get('name')}/{surface}")
@@ -166,6 +168,63 @@ def surface_layers(a, p):
                 layer.paste(rnd.choice(rnd.choice(choices)), (x, y))
         layers[surface] = layer
     return layers
+
+
+def own_walls(a):
+    """Walls with their own image (map.json textures "walls:<surface>": the walls a tile of that surface stands on,
+    e.g. "walls:stairs" = the sides of the steps): {(surface, top): [wall strip slices]}, two slices (copies to pick
+    from) per height those tiles stand at, taken from the end of the strip; and how many slices that leaves the other
+    inner walls."""
+    half = a.C // 2
+    specs = a.data.get("textures") or {}
+    keys = sorted({(t.get("surface", "floor"), a.top(t)) for r in range(a.R) for c in range(a.C)
+                   for t in [a.tile(r, c)] if t and f"walls:{t.get('surface', 'floor')}" in specs})
+    own = {key: [2 * half - 1 - 2 * i, 2 * half - 2 - 2 * i] for i, key in enumerate(keys)}
+    if 2 * len(keys) >= half:
+        sys.exit("too many walls:<surface> heights for the wall strip")
+    return own, half - 2 * len(keys)
+
+
+def paint_own_walls(a, img, layers, p):
+    """The slices own_walls() hands out: the image fitted to one level, its top at the tiles' top, repeated a level
+    at a time below; "across" copies side by side per tile (default: the whole number nearest the image's own shape).
+    Above the top (a wedge's side, see rises()) the surface's own texture, at the same scale as on the walls."""
+    y0, rows = a.R * p, STRIP * SS
+    span = a.y_span()
+
+    def row(y):   # the strip row at height y (see wall_uv in build_mesh)
+        return y0 + (1 - y / span) * rows
+    own, _ = own_walls(a)
+    for (surface, top), slices in own.items():
+        spec = a.data["textures"][f"walls:{surface}"]
+        src = Image.open(a.folder / (spec.get("images") or [spec["image"]])[0])
+        across = spec.get("across") or max(1, round(TILE * src.height / (LEVEL_H * src.width)))
+        choices = [v for imgs in texture_choices(a, spec, surface, *src.size) for v in imgs]
+        rnd = random.Random(f"{a.data.get('name')}/walls:{surface}/{top:.4f}")
+        tall = round(rows * TILE / span)   # one tile of the surface's texture, scaled as on the walls
+        above = None
+        if surface in layers:
+            r, c = next((r, c) for r in range(a.R) for c in range(a.C)
+                        if a.tile(r, c) and a.tile(r, c).get("surface", "floor") == surface)
+            above = layers[surface].crop((c * p, r * p, (c + 1) * p, (r + 1) * p)).resize((p, tall), Image.LANCZOS)
+        for i in slices:
+            x0 = i * p
+            ytop = round(row(top))
+            if above is not None:   # its bottom row at the tiles' top
+                for k in range(ytop, y0, -tall):
+                    piece = above.crop((0, max(0, tall - (k - y0)), p, tall))
+                    img.paste(piece, (x0, k - piece.height))
+            elif ytop > y0:
+                ImageDraw.Draw(img).rectangle([x0, y0, x0 + p - 1, ytop - 1], fill=a.palette[surface])
+            level = top
+            while level > 1e-9:   # a level at a time down to the underside
+                ra, rb = round(row(level)), round(row(max(0.0, level - LEVEL_H)))
+                full = round(row(level - LEVEL_H)) - ra   # a partial last band shows the image's top part
+                for j in range(across):
+                    xa, xb = x0 + round(j * p / across), x0 + round((j + 1) * p / across)
+                    copy = rnd.choice(choices).resize((xb - xa, full), Image.LANCZOS)
+                    img.paste(copy.crop((0, 0, xb - xa, rb - ra)), (xa, ra))
+                level -= LEVEL_H
 
 
 def draw_texture(a):
@@ -208,6 +267,7 @@ def draw_texture(a):
             piece = rnd.choice(rnd.choice(choices))
             for k in range(0, STRIP * SS, tall):   # a tall board needs more than one copy down the strip
                 img.paste(piece.crop((0, 0, p, min(tall, STRIP * SS - k))), (i * p, y0 + k))
+    paint_own_walls(a, img, layers, p)   # the walls with their own image ("walls:<surface>")
     # fine grain everywhere
     noise = Image.effect_noise((W, H), 9).convert("RGB")
     img = ImageChops.add(img, noise, 1.0, -128)
@@ -781,6 +841,7 @@ def build_mesh(a):
         return u_px / W, 1 - (a.R * PX + STRIP * (1 - y / y_span)) / H
 
     features = {}
+    own, inner_n = own_walls(a)   # walls with their own image ("walls:<surface>") and the slices left for the rest
 
     def lows(r, c):   # a tile's slopes and inner corners (cached)
         if (r, c) not in features:
@@ -866,7 +927,12 @@ def build_mesh(a):
                     edge = [(x0, z1), (x0, z0)]
                 (ax, az), (bx, bz) = edge
                 half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
-                us = (((r * 5 + c * 3 + len(side)) % half) + (half if nb else 0)) * PX
+                pick = r * 5 + c * 3 + len(side)
+                key = (t.get("surface", "floor"), top)
+                if key in own:   # this tile's own wall image (see own_walls)
+                    us = own[key][pick % len(own[key])] * PX
+                else:
+                    us = ((pick % (inner_n if nb else half)) + (half if nb else 0)) * PX
                 fs = sorted(set(edge_breaks(r, c) + (edge_breaks(r + dr, c + dc) if nb else [])))
                 if len(fs) > 2:   # a slope along this edge, here or next door: the wall follows both surfaces
                     profile_wall(m, edge, fs, lambda px, pz: surface_at(r, c, px, pz),
