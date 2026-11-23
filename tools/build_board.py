@@ -286,7 +286,7 @@ def draw_texture(a):
             dim = np.zeros((p, p, 4), np.uint8)
             dim[..., :3] = (30, 18, 8)
             dim[..., 3] = alpha
-            over.alpha_composite(Image.fromarray(dim, "RGBA"), (c * p, r * p))
+            shade_over(over, dim, c * p, r * p)
     for r in range(a.R):   # rising bands (see rises()): darkening toward their foot, inside the tile
         for c in range(a.C):
             risen = rises(a, r, c) if a.tile(r, c) else {}
@@ -321,7 +321,7 @@ def draw_texture(a):
                 dim = np.zeros((size, size, 4), np.uint8)
                 dim[..., :3] = (30, 18, 8)
                 dim[..., 3] = alpha
-                over.alpha_composite(Image.fromarray(dim, "RGBA"), (bx0, by0))
+                shade_over(over, dim, bx0, by0)
     for r in range(a.R):   # inner corners: the same darkening around the corner point
         for c in range(a.C):
             inner = inner_corners(a, r, c) if a.tile(r, c) else {}
@@ -359,6 +359,16 @@ def draw_texture(a):
     img = Image.alpha_composite(img.convert("RGBA"), over).convert("RGB")
     img = grass_fringe(a, img, layers, p)
     return img.resize((W // SS, H // SS), Image.LANCZOS)
+
+
+def shade_over(over, dim, x, y):
+    """Lays a slope's shading (an RGBA array) on the overlay in place of what's painted there, like the straight
+    slopes' shading lines do: the grid lines don't run down a slope (the user's choice on Yaksha)."""
+    h, w = dim.shape[:2]
+    region = np.array(over.crop((x, y, x + w, y + h)))
+    on = dim[..., 3] > 0
+    region[on] = dim[on]
+    over.paste(Image.fromarray(region, "RGBA"), (x, y))
 
 
 FRINGE = {"reach": 0.42, "wobble": 0.3, "rough": 1.0, "tufts": 160}   # defaults (board v3's look)
