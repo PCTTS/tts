@@ -183,19 +183,24 @@ def wall_fit(a, t, spec):
 
 
 def own_key(a, t):
-    """The own_walls() key for a tile's inner walls, or None when its surface has no "walls:<surface>" image."""
+    """The own_walls() key for a tile's inner walls, or None when its surface has no "walls:<surface>" image:
+    (surface, the height of the image's top, the tile's top where another surface's image takes over above it
+    ("above", see paint_own_walls) or None)."""
     surface = t.get("surface", "floor")
     spec = (a.data.get("textures") or {}).get(f"walls:{surface}")
-    return (surface, wall_fit(a, t, spec)) if spec else None
+    if not spec:
+        return None
+    return surface, wall_fit(a, t, spec), (a.top(t) if spec.get("above") else None)
 
 
 def own_walls(a):
     """Inner walls with their own image (map.json textures "walls:<surface>": the inner walls a tile of that surface
     stands on, e.g. "walls:stairs" = the sides of the steps; the board's outer edge keeps "walls"):
-    {(surface, image top): [wall strip slices]}, two slices (copies to pick from) per height the image's top sits
-    at, taken from the end of the strip; and how many slices that leaves the other inner walls."""
+    {own_key(): [wall strip slices]}, two slices (copies to pick from) per key, taken from the end of the strip;
+    and how many slices that leaves the other inner walls."""
     half = a.C // 2
-    keys = sorted({own_key(a, t) for r in range(a.R) for c in range(a.C) for t in [a.tile(r, c)] if t} - {None})
+    keys = sorted({own_key(a, t) for r in range(a.R) for c in range(a.C) for t in [a.tile(r, c)] if t} - {None},
+                  key=lambda k: (k[0], k[1], -1.0 if k[2] is None else k[2]))
     own = {key: [2 * half - 1 - 2 * i, 2 * half - 2 - 2 * i] for i, key in enumerate(keys)}
     if 2 * len(keys) >= half:
         sys.exit("too many walls:<surface> heights for the wall strip")
@@ -207,19 +212,29 @@ def paint_own_walls(a, img, layers, p):
     ("levels": [lo, hi]: fitted from lo up to hi; "scale": "tile": its own shape, a tile wide like the tiles'
     textures, cut off wherever a wall ends), repeated below; "across" copies side by side per tile (default: the
     whole number nearest the image's own shape; 1 at "scale": "tile"). Above its top (a wedge's side, see rises())
-    the surface's own texture, at the wall scale. Each slice keeps a WALL_GUTTER each side, filled with the image's
-    own wrapped edge: the walls' UVs stay inside it, so texture filtering (and TTS's smaller mipmap copies) never
-    blends in the neighbouring slice, which showed as a dark line down one end of a wall."""
+    the surface's own texture, at the wall scale. "above": "<surface>" puts that surface's wall image above the
+    tiles' own top instead, placed as on that surface's walls, so a wedge's side lines up with the wall beside it
+    (Pugilis: the ground floor's cliff down to the step's top, then the step's own image). Each slice keeps a
+    WALL_GUTTER each side, filled with the image's own wrapped edge: the walls' UVs stay inside it, so texture
+    filtering (and TTS's smaller mipmap copies) never blends in the neighbouring slice, which showed as a dark line
+    down one end of a wall."""
     y0, rows = a.R * p, STRIP * SS
     span = a.y_span()
     g = WALL_GUTTER * SS
     iw = p - 2 * g   # the part of a slice the walls map a tile's width onto
+    textures = a.data["textures"]
 
     def row(y):   # the row at height y in a slice's column (see wall_uv in build_mesh)
         return (1 - y / span) * rows
-    own, _ = own_walls(a)
-    for (surface, top), slices in own.items():
-        spec = a.data["textures"][f"walls:{surface}"]
+
+    def first_tile(surface):
+        return next(a.tile(r, c) for r in range(a.R) for c in range(a.C)
+                    if a.tile(r, c) and a.tile(r, c).get("surface", "floor") == surface)
+
+    def image_column(surface, top, rnd):
+        """One slice's column: `surface`'s wall image with its top at height `top` and copies below; the surface's
+        own texture above it."""
+        spec = textures[f"walls:{surface}"]
         src = Image.open(a.folder / (spec.get("images") or [spec["image"]])[0])
         if spec.get("scale") == "tile" and not spec.get("levels"):   # its own shape, not squeezed to a wall
             across = spec.get("across") or 1
@@ -228,29 +243,40 @@ def paint_own_walls(a, img, layers, p):
             fit = (spec["levels"][1] - spec["levels"][0]) * LEVEL_H if spec.get("levels") else LEVEL_H
             across = spec.get("across") or max(1, round(TILE * src.height / (fit * src.width)))
         choices = [v for imgs in texture_choices(a, spec, surface, *src.size) for v in imgs]
-        rnd = random.Random(f"{a.data.get('name')}/walls:{surface}/{top:.4f}")
-        tall = round(rows * TILE / span)   # one tile of the surface's texture, scaled as on the walls
-        above = None
-        if surface in layers:
+        col = Image.new("RGB", (iw, rows), a.palette[surface])
+        ytop = round(row(top))
+        if surface in layers:   # its own texture above, its bottom row at the image's top
+            tall = round(rows * TILE / span)   # one tile of the surface's texture, scaled as on the walls
             r, c = next((r, c) for r in range(a.R) for c in range(a.C)
                         if a.tile(r, c) and a.tile(r, c).get("surface", "floor") == surface)
             above = layers[surface].crop((c * p, r * p, (c + 1) * p, (r + 1) * p)).resize((iw, tall), Image.LANCZOS)
+            for k in range(ytop, 0, -tall):
+                piece = above.crop((0, max(0, tall - k), iw, tall))
+                col.paste(piece, (0, k - piece.height))
+        level = top
+        while level > 1e-9:   # a copy's height at a time down to the underside
+            ra, rb = round(row(level)), round(row(max(0.0, level - fit)))
+            full = round(row(level - fit)) - ra   # a partial last band shows the image's top part
+            for j in range(across):
+                xa, xb = round(j * iw / across), round((j + 1) * iw / across)
+                copy = rnd.choice(choices).resize((xb - xa, full), Image.LANCZOS)
+                col.paste(copy.crop((0, 0, xb - xa, rb - ra)), (xa, ra))
+            level -= fit
+        return col
+
+    own, _ = own_walls(a)
+    for (surface, top, split), slices in own.items():
+        rnd = random.Random(f"{a.data.get('name')}/walls:{surface}/{top:.4f}")
+        other = textures[f"walls:{surface}"].get("above") if split is not None else None
+        if other and f"walls:{other}" not in textures:
+            other = None
+        ornd = random.Random(f"{a.data.get('name')}/walls:{surface}/above:{other}/{split}")
         for i in slices:
-            col = Image.new("RGB", (iw, rows), a.palette[surface])
-            ytop = round(row(top))
-            if above is not None:   # its bottom row at the tiles' top
-                for k in range(ytop, 0, -tall):
-                    piece = above.crop((0, max(0, tall - k), iw, tall))
-                    col.paste(piece, (0, k - piece.height))
-            level = top
-            while level > 1e-9:   # a copy's height at a time down to the underside
-                ra, rb = round(row(level)), round(row(max(0.0, level - fit)))
-                full = round(row(level - fit)) - ra   # a partial last band shows the image's top part
-                for j in range(across):
-                    xa, xb = round(j * iw / across), round((j + 1) * iw / across)
-                    copy = rnd.choice(choices).resize((xb - xa, full), Image.LANCZOS)
-                    col.paste(copy.crop((0, 0, xb - xa, rb - ra)), (xa, ra))
-                level -= fit
+            col = image_column(surface, top, rnd)
+            if other:   # the other surface's wall image down to the tiles' own top
+                cut = round(row(split))
+                upper = image_column(other, wall_fit(a, first_tile(other), textures[f"walls:{other}"]), ornd)
+                col.paste(upper.crop((0, 0, iw, cut)), (0, 0))
             x0 = i * p
             img.paste(col, (x0 + g, y0))
             img.paste(col.crop((iw - g, 0, iw, rows)), (x0, y0))       # the gutters: its edges wrapped round

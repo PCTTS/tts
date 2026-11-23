@@ -16,6 +16,8 @@ nothing pushed), then publish the one to keep.
             --natural        the image's own shape, a tile wide like the floor textures, cut off wherever a wall ends
             --top L          its top at level L's top on every wall (default: each tile's own top)
             --across N       copies across a tile (default: nearest the image's shape; 1 with --natural)
+            --above S=O      S's walls show O's wall image above S's own tiles' top (e.g. --above stairs=floor:
+                             the ground floor's cliff on the middle stairs' wedge ends, the step image below)
             --mirror         mirror copies at random (for images whose left and right edges don't meet; a seamless
                              image looks best unmirrored, so its pattern runs straight on from wall to wall)
             (default size: one level.) Settings already in map.json are kept unless given.
@@ -139,6 +141,8 @@ def wall_spec(data, surface, image, opts):
     if opts.get("top") is not None:
         spec["top"] = opts["top"]
         spec.pop("levels", None)
+    if surface in (opts.get("above") or {}):
+        spec["above"] = opts["above"][surface]
     if opts.get("mirror"):
         spec["vary"] = "mirror"
     else:
@@ -313,6 +317,7 @@ def main():
     ap.add_argument("--top", type=int)
     ap.add_argument("--natural", action="store_true")
     ap.add_argument("--mirror", action="store_true")
+    ap.add_argument("--above", action="append", default=[], metavar="SURFACE=OTHER")
     ap.add_argument("--watch", action="store_true")
     ap.add_argument("--publish", action="store_true")
     ap.add_argument("--reset", action="store_true")
@@ -328,7 +333,7 @@ def main():
         if not image.exists():
             sys.exit(f"no image at {image}")
     opts = {"across": args.across, "levels": args.levels, "top": args.top, "natural": args.natural,
-            "mirror": args.mirror}
+            "mirror": args.mirror, "above": dict(w.split("=", 1) for w in args.above)}
     job = (folder, walls, opts)
     if args.publish:
         publish(*job)
