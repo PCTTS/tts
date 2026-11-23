@@ -267,15 +267,18 @@ def draw_texture(a):
             px = (c + xx / p - a.C / 2) * TILE            # each pixel's world position
             pz = (a.R / 2 - (r + yy / p)) * TILE
             dist = np.full((p, p), np.inf, np.float32)
-            for (ax, az), (bx, bz), _, _, round_a, round_b, taper in segs:
+            for seg in segs:
+                (ax, az), (bx, bz), _, _, round_a, round_b, taper = seg
                 dx, dz = bx - ax, bz - az
                 ll = dx * dx + dz * dz
                 kr = np.zeros_like(px) if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
                 k = np.clip(kr, 0, 1)
                 d = np.hypot(px - (ax + k * dx), pz - (az + k * dz))
-                if taper:   # a plane (see edge_distance)
-                    along = (kr if taper == 2 else 1 - kr) * math.sqrt(ll)
-                    d = np.where((kr < 0) | (kr > 1), np.inf, d + along)
+                if taper:   # the twisted face (see taper_height): darker the lower it is
+                    top_h = a.top(a.tile(r, c))
+                    hw = seg[2] if taper == 2 else seg[3]
+                    down = np.clip((top_h - taper_height(seg, top_h, w, px, pz)) / max(1e-9, top_h - hw), 0, 1)
+                    d = np.where(down > 0, w * (1 - down), np.inf)
                 else:
                     d = np.where(((kr < 0) & (not round_a)) | ((kr > 1) & (not round_b)), np.inf, d)
                 dist = np.minimum(dist, d)
@@ -778,6 +781,8 @@ def build_mesh(a):
         if not sl and not inn and not rises(a, r, c) and not rise_corners(a, r, c) and not segs:
             return [0.0, 1.0]
         f = a.tile(r, c)["slant"] / TILE
+        if any(seg[6] for seg in segs):   # the finer grid by a taper (see slope_surface)
+            return sorted({0.0, f, 1.0 - f, 1.0} | {f / n for n in (8, 16, 32)} | {1.0 - f / n for n in (8, 16, 32)})
         return [0.0, f, 1.0 - f, 1.0]
 
     for r in range(a.R):
@@ -1024,18 +1029,13 @@ OPPOSITE = {"N": "S", "S": "N", "E": "W", "W": "E"}
 def edge_distance(seg, px, pz):
     """(distance, bottom there) from (px, pz) to a contact edge (see contact_edges); past an end that doesn't
     round off (a side wall there), no distance: infinite. A tapering piece (taper 1: it narrows to nothing at its
-    start, 2: at its end, where it meets higher ground) is one flat plane: its foot level with the landing at
-    its wide end, its top running straight to the wall's top corner at its narrow end; given here as the
-    distance that puts the same plane through the usual slope formula (see surface_height)."""
+    start, 2: at its end, where it meets higher ground) has its own shape: see taper_height."""
     (ax, az), (bx, bz), b0, b1, round_a, round_b, taper = seg
     dx, dz = bx - ax, bz - az
     ll = dx * dx + dz * dz
     k = 0.0 if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
-    if taper:
-        if k < 0 or k > 1:
-            return math.inf, b0
-        d = math.hypot(px - (ax + k * dx), pz - (az + k * dz))
-        return (d + k * math.sqrt(ll), b0) if taper == 2 else (d + (1 - k) * math.sqrt(ll), b1)
+    if taper:   # see taper_height
+        return math.inf, b0
     if (k < 0 and not round_a) or (k > 1 and not round_b):
         return math.inf, b0
     k = max(0.0, min(1.0, k))
@@ -1069,6 +1069,31 @@ def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
             m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1)], [uv(f0, h0), uv(f1, h1), uv(f1, l1)], normal)
 
 
+def taper_height(seg, top, w, px, pz):
+    """The surface of a tapering bevel end (see contact_edges; numpy arrays or numbers): one twisted four-sided
+    face, the same kind as a bevel's end beside a pit (the user's sketch). Its edges: the rung across the bevel
+    where the piece starts (the foot level with the landing, up to the top: green), the top running straight to
+    the wall's top corner (blue), the wall's vertical corner edge (red), and the stair's cut edge, from the landing
+    down to the base (orange). Straight lines join each point of green to the point of red at the same height
+    fraction (the face is ruled, like the middle stairs' ends). Outside it: the top."""
+    (ax, az), (bx, bz), b0, b1, _, _, taper = seg
+    px, pz = np.asarray(px, float), np.asarray(pz, float)
+    dx, dz = bx - ax, bz - az
+    ll = dx * dx + dz * dz
+    length = math.sqrt(ll)
+    k = ((px - ax) * dx + (pz - az) * dz) / ll
+    u = np.hypot(px - (ax + k * dx), pz - (az + k * dz))   # out from the stair's edge
+    if taper == 2:   # v: along from the narrow end (the wall); hw/hn: the foot at the wide/narrow end
+        v, hw, hn = (1 - k) * length, b0, b1
+    else:
+        v, hw, hn = k * length, b1, b0
+    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+        t = np.where(v > 1e-12, u * length / (np.maximum(v, 1e-12) * w), np.where(u > 1e-12, np.inf, 0.0))
+        sw = np.clip(v / length, 0, 1)
+        h = sw * (hw + t * (top - hw)) + (1 - sw) * (hn + t * (top - hn))
+        return np.where((k < 0) | (k > 1) | (t >= 1), top, h)
+
+
 def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None, segments=None):
     """A tile's surface height at (px, pz): raised by any wedges up to higher ground (risen, and rcorners round a
     corner), then the lowest that any of its low features allows (see slope_surface)."""
@@ -1088,6 +1113,9 @@ def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None
         cx, cz = {"NW": (x0, z0), "NE": (x1, z0), "SW": (x0, z1), "SE": (x1, z1)}[corner]
         h = min(h, top - (top - base) * max(0.0, 1 - math.hypot(px - cx, pz - cz) / w))
     for seg in segments or ():
+        if seg[6]:
+            h = min(h, float(taper_height(seg, top, w, px, pz)))
+            continue
         dist, base = edge_distance(seg, px, pz)
         h = min(h, top - (top - base) * max(0.0, 1 - dist / w))
     return h
@@ -1107,6 +1135,10 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorn
     xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
     zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
                 reverse=True)
+    if any(seg[6] for seg in segments or ()):   # a taper's face fans into the wall's corner: finer there
+        fine = [w / 8, w / 16, w / 32]
+        xs = sorted(set(xs) | {x0 + f for f in fine} | {x1 - f for f in fine})
+        zs = sorted(set(zs) | {z0 - f for f in fine} | {z1 + f for f in fine}, reverse=True)
     for i in range(len(xs) - 1):
         for j in range(len(zs) - 1):
             pts = [(xs[i], zs[j]), (xs[i + 1], zs[j]), (xs[i + 1], zs[j + 1]), (xs[i], zs[j + 1])]
