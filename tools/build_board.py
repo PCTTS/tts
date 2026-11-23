@@ -1317,6 +1317,13 @@ def underside(a, m, wall_uv, S=4):
                 m.tri([p for p, _ in tri], [uv for _, uv in tri])
 
 
+def set_tile(size):
+    """Build for tiles `size` world units wide (levels and the floor scale with them)."""
+    global TILE, LEVEL_H, FLOOR0
+    k = size / TILE
+    TILE, LEVEL_H, FLOOR0 = TILE * k, LEVEL_H * k, FLOOR0 * k
+
+
 def main(argv):
     if not argv:
         sys.exit(__doc__)
@@ -1324,9 +1331,7 @@ def main(argv):
     out = Path(argv[argv.index("--out") + 1]) if "--out" in argv else folder
     tag = argv[argv.index("--tag") + 1] if "--tag" in argv else "v1"
     if "--tile" in argv:
-        global TILE, LEVEL_H, FLOOR0
-        k = float(argv[argv.index("--tile") + 1]) / TILE
-        TILE, LEVEL_H, FLOOR0 = TILE * k, LEVEL_H * k, FLOOR0 * k
+        set_tile(float(argv[argv.index("--tile") + 1]))
     out.mkdir(parents=True, exist_ok=True)
     a = Arena(folder)
     mesh = build_mesh(a)

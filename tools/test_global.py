@@ -15,6 +15,12 @@ from lupa import LuaRuntime
 
 REPO = Path(__file__).resolve().parent.parent
 
+
+def board(arena, kind):
+    """The published board file (kind: mesh/texture) an arena's map.json names, as the arena index lists it."""
+    b = json.loads((REPO / "arenas" / arena / "map.json").read_text(encoding="utf-8"))["board"]
+    return f"arenas/{arena}/{b[kind]}"
+
 PRELUDE = r"""
 Vector = setmetatable({}, { __call = function(_, x, y, z) return Vector.new(x, y, z) end })
 local VM = {}
@@ -253,8 +259,8 @@ def main():
     brd = new[0].data if new else None
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
     check(brd is not None and brd.Nickname == "Pugilis" and brd.Tags[1] == "Board3D" and brd.Locked
-          and brd.CustomMesh.MeshURL.endswith("arenas/pugilis/board-v41.obj") and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
-          and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v41.jpg") and not brd.CustomMesh.Convex,
+          and brd.CustomMesh.MeshURL.endswith(board("pugilis", "mesh")) and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
+          and brd.CustomMesh.DiffuseURL.endswith(board("pugilis", "texture")) and not brd.CustomMesh.Convex,
           "picking Pugilis puts its 3D board on the table (its own mesh as collider)")
     check(len(flags) == 4 and backdrop(new, "misc/table-placeholder-v1.jpg") and calls.tableURL is None,
           "with its 4 flags and its surroundings on the backdrop panel (the table itself untouched)")
@@ -265,7 +271,7 @@ def main():
     g.mapPick(player, "-1", "mapRes_White_3")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v6.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("illusio", "mesh"))
           and kinds.count("Flag") == 6 and kinds.count("Portal") == 6 and kinds.count("Bridge") == 6
           and backdrop(new, "misc/sky-placeholder-v1.jpg"),
           "picking Illusio: its board, 6 flags, 6 portals, 6 bridges and the sky under the table")
@@ -286,7 +292,7 @@ def main():
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/ingis/board-v5.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("ingis", "mesh"))
           and len(zones) == 3 and len(kinds) == 5 and all(abs(z.data.ColorDiffuse.r - 0.6) < 1e-6 for z in zones)
           and backdrop(new, "misc/volcano-placeholder-v1.jpg"),
           "picking Ingis: its board, 3 neutral capture zone frames and the volcanic table")
@@ -305,7 +311,7 @@ def main():
     vmap = json.loads((REPO / "arenas" / "viperia" / "map.json").read_text(encoding="utf-8"))
     walls = sum(row.count("#") for row in vmap["grid"])
     vidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Viperia"]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/viperia/board-v1.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("viperia", "mesh"))
           and kinds.count("Flag") == 3 and len(kinds) == 5 and len(vidx["snaps"]) == 16 * 15 - walls
           and backdrop(new, "misc/jungle-placeholder-v1.jpg"),
           f"picking Viperia: its board, 3 flags, snap points on all {16 * 15 - walls} tiles but the {walls} walls, the jungle table")
@@ -317,7 +323,7 @@ def main():
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     lidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Violight"]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/violight/board-v1.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("violight", "mesh"))
           and kinds.count("Zone") == 4 and len(kinds) == 6 and len(lidx["snaps"]) == 256 - 4
           and backdrop(new, "misc/violight-placeholder-v1.jpg"),
           "picking Violight: its board, 4 zone frames, snap points on every tile but the 4 of the spire, the steel table")
@@ -328,7 +334,7 @@ def main():
     g.mapPick(player, "-1", "mapRes_White_1")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/chrysalia/board-v1.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("chrysalia", "mesh"))
           and kinds.count("Zone") == 3 and kinds.count("Trap") == 2 and len(kinds) == 7   # + the backdrop
           and backdrop(new, "misc/mulch-placeholder-v2.jpg"),
           "picking Chrysalia: its board, 3 zone frames, 2 traps (no ball bag), the mulch table")
@@ -355,7 +361,7 @@ def main():
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
     free =[s for s in new if s.data.Tags[1] in ("Tree", "Gift")]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/yaksha/board-v4.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("yaksha", "mesh"))
           and len(zones) == 3 and sum(z.data.CustomMesh.MeshURL.endswith("zoneframe4-raised60-v1.obj") for z in zones) == 1
           and kinds.count("Tree") == 6 and kinds.count("Gift") == 14 and all(not s.data.Locked for s in free)
           and all(s.data.Locked for s in new if s.data.Tags[1] in ("Board3D", "Zone")),
@@ -369,7 +375,7 @@ def main():
     kinds = [s.data.Tags[1] for s in new]
     fidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Fontaine"]
     gates = [s for s in new if s.data.Tags[1] == "Gate"]
-    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/fontaine/board-v1.obj")
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("fontaine", "mesh"))
           and kinds.count("Water") == 56 and kinds.count("GateFrame") == 8 and kinds.count("Gate") == 8
           and kinds.count("Fountain") == 4 and kinds.count("Zone") == 3 and len(fidx["snaps"]) == 256 - 4
           and all(json.loads(s.data.Memo)["open"] for s in gates) and backdrop(new, "misc/valley-placeholder-v1.jpg"),
