@@ -1418,7 +1418,8 @@ end
 -- Memos: Gear { gear (0: unnumbered), size, turn ("ccw"/"cw" seen from above), tile }; Door { door, open,
 -- x, y, z (where it stands closed), sx, sy, sz (the move that opens it) }.
 ----------------------------------------------------------------------------------------------------
-GEAR_TURN_FRAMES = 150   -- a turn takes this many frames (about two and a half seconds)
+GEAR_TURN_TIME = 2.5     -- seconds a turn takes (timed by the game clock: the frame rate varies a lot)
+GEAR_TURN_FRAMES = 150   -- without a game clock (offline tests), this many frames instead
 GEAR_T = 0.05            -- tools/build_pieces.py: a gear plate's thickness
 GEAR_BUTTON_IN = 0.55    -- its buttons sit this far in from two of its edges, in opposite corner tiles
 turningGears = {}        -- gear guid -> true while it turns
@@ -1465,17 +1466,18 @@ function turnGear(plate)
   local sign = st.turn == "cw" and -1 or 1
   turningGears[plate.guid] = true
   for _, r in ipairs(riders) do r.obj.setLock(true) end
-  local k = 0
+  local clock = Time and Time.time and function() return Time.time end
+  local k, t0 = 0, clock and clock()
   local function step()
     k = k + 1
-    local t = k / GEAR_TURN_FRAMES
+    local t = math.min(1, clock and (clock() - t0) / GEAR_TURN_TIME or k / GEAR_TURN_FRAMES)
     local a = sign * math.rad(270) * t * t * (3 - 2 * t)   -- eased in and out
     local ca, sa = math.cos(a), math.sin(a)
     plate.setRotation({ 0, (yaw0 - math.deg(a)) % 360, 0 })
     for _, r in ipairs(riders) do
       r.obj.setPosition({ c.x + r.dx * ca - r.dz * sa, r.y, c.z + r.dx * sa + r.dz * ca })
     end
-    if k < GEAR_TURN_FRAMES then
+    if t < 1 then
       Wait.frames(step, 1)
     else
       for _, r in ipairs(riders) do r.obj.setLock(false) end
