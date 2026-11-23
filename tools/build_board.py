@@ -357,7 +357,7 @@ def draw_texture(a):
     for r in range(a.R):
         for c in range(a.C):
             t = a.tile(r, c)
-            if not t:
+            if not t or t.get("blank"):   # "blank": just its colour (painted last, see below)
                 continue
             x0, y0t = c * p, r * p
             # slab bevel: light top/left, dark bottom/right; thin grout line
@@ -500,6 +500,12 @@ def draw_texture(a):
         o.rectangle(box, fill=a.palette["fall"] + (235,))
     img = Image.alpha_composite(img.convert("RGBA"), over).convert("RGB")
     img = grass_fringe(a, img, layers, p)
+    fill = ImageDraw.Draw(img)
+    for r in range(a.R):   # legend "blank": true: the tile's top is its plain palette colour, no grain or lines
+        for c in range(a.C):   # (Terrera's filler between the boards)
+            t = a.tile(r, c)
+            if t and t.get("blank"):
+                fill.rectangle([c * p, r * p, (c + 1) * p - 1, (r + 1) * p - 1], fill=a.palette[t.get("surface", "floor")])
     return img.resize((W // SS, H // SS), Image.LANCZOS)
 
 
