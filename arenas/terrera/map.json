@@ -1,23 +1,23 @@
 {
   "name": "Terrera Mountain",
-  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's three drawn boards (mapstomake/Terrera Mountain.webp, taken sideways: turned upright, each board perspective-straightened). Columns 9-16: the centre (8x16, both players' spawns, 2 flags). Columns 18-25: the two side floors (8x8 each), side by side with the centre like Yaksha's boxes (the pillars take the left strip): the top floor in rows 0-7, the bottom floor in rows 8-15. Columns 0-8 are empty so the centre sits in the middle of the table. Tunnels 1-4 link the centre with each floor (the d4 roll picks the exit).",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's three drawn boards (mapstomake/Terrera Mountain.webp, taken sideways: turned upright, each board perspective-straightened). Columns 0-7: the centre (8x16, both players' spawns, 2 flags). Columns 9-16: the two side floors (8x8 each), side by side with the centre like Yaksha's boxes (the pillars take the left strip): the top floor in rows 0-7, the bottom floor in rows 8-15. Column 8 is the gap between them; the board is centred on it, so the point where all three boards meet is the middle of the table (the user's choice). Tunnels 1-4 link the centre with each floor (the d4 roll picks the exit).",
   "grid": [
-    "---------...22...-GssssssH",
-    "---------.22..22.-e......w",
-    "---------........-e.ZZZZ.w",
-    "---------........-e.ZXXZ.w",
-    "---------R.F....S-e.ZXXZ.w",
-    "---------.dssssc.-e.ZZZZ.w",
-    "---------.eZZZZw.-e......w",
-    "---------.eZXXZw.-InnnnnnJ",
-    "---------.eZXXZw.-GssssssH",
-    "---------.eZZZZw.-e......w",
-    "---------.bnnnna.-e.ZZZZ.w",
-    "---------Q....F.P-e.ZXXZ.w",
-    "---------........-e.ZXXZ.w",
-    "---------........-e.ZZZZ.w",
-    "---------.11..11.-e......w",
-    "---------...11...-InnnnnnJ"
+    "...22...-GssssssH",
+    ".22..22.-e......w",
+    "........-e.ZZZZ.w",
+    "........-e.ZXXZ.w",
+    "R.F....S-e.ZXXZ.w",
+    ".dssssc.-e.ZZZZ.w",
+    ".eZZZZw.-e......w",
+    ".eZXXZw.-InnnnnnJ",
+    ".eZXXZw.-GssssssH",
+    ".eZZZZw.-e......w",
+    ".bnnnna.-e.ZZZZ.w",
+    "Q....F.P-e.ZXXZ.w",
+    "........-e.ZXXZ.w",
+    "........-e.ZZZZ.w",
+    ".11..11.-e......w",
+    "...11...-InnnnnnJ"
   ],
   "_legend": "level = height step (0 = lowest; \"raise\" lifts whole boards). surface picks the look. marker = something on the tile (painted, or a 3D piece with piece: true). n/s/e/w and a/b/c/d (nw/ne/sw/se) = quicksand, the arrow the way it drags a grounded Pokemon. P/Q/R/S = tunnel mouths 1-4; on the side floors the numbered corners are quicksand too (J 1 nw, I 2 ne, G 3 se, H 4 sw). Z = control zone (a 4x4 frame); X = its hatched middle (cracked: you fall through to the floor below). F = flag.",
   "legend": {
@@ -47,41 +47,19 @@
   },
   "_raise": "Heights, slightly different per board (the user): bottom floor at the table (level 0), the centre one level up, the top floor two.",
   "raise": [
-    { "rows": [
-        0, 15
-      ], "cols": [
-        9, 16
-      ], "by": 1 },
-    { "rows": [
-        0, 7
-      ], "cols": [
-        18, 25
-      ], "by": 2 }
+    { "rows": [0, 15], "cols": [0, 7], "by": 1 },
+    { "rows": [0, 7], "cols": [9, 16], "by": 2 }
   ],
   "numbers": "both",
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "board": { "mesh": "board-v2.obj", "texture": "board-v2.jpg", "geometry": "board-v2.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/cave-placeholder-v1.jpg",
   "_textures": "Placeholders from tools/draw_placeholders.py: hive earth, quicksand, layered earth cliffs.",
   "textures": {
-    "earth": {
-      "images": [
-        "textures/hive1.png",
-        "textures/hive2.png"
-      ],
-      "span": 1,
-      "vary": true
-    },
-    "sand": {
-      "image": "textures/quicksand.png",
-      "span": 1,
-      "vary": true
-    },
-    "walls": {
-      "image": "textures/strata.png",
-      "outer": true
-    }
+    "earth": { "images": ["textures/hive1.png", "textures/hive2.png"], "span": 1, "vary": true },
+    "sand": { "image": "textures/quicksand.png", "span": 1, "vary": true },
+    "walls": { "image": "textures/strata.png", "outer": true }
   },
   "palette": {
     "earth": "#6A5038",
