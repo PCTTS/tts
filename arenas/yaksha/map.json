@@ -19,17 +19,17 @@
     "####.1~~~1^..^1...1.#GGG",
     "####..~~~..11.......#hGG"
   ],
-  "_legend": "level = height step (0 = lowest). surface picks the look from the palette. No slants: the levels meet in sheer walls (the user's choice, 2026-11-22). sink = the surface sits this many world units lower (a look only: the water counts as ground level). marker = something on the tile (painted, or a 3D piece with piece: true). zone: capture zone tiles (the big centre one, Z, a level above the terrace round it) (a frame per square group that takes the colour of the player with more Pokemon in it). tree / gift: a tree tile or a gift box, NOT locked (players move them). passage-inN: a secret passage's entrance in a surprise box; passage-outN: where passage N comes out (one way).",
+  "_legend": "level = height step (0 = lowest). surface picks the look from the palette. slant = slopes down to lower land over this many world units, inside the tile (0.559: a 60 degree slope). sink = the surface sits this many world units lower (a look only: the water counts as ground level). marker = something on the tile (painted, or a 3D piece with piece: true). zone: capture zone tiles (the big centre one, Z, a level above the terrace round it) (a frame per square group that takes the colour of the player with more Pokemon in it). tree / gift: a tree tile or a gift box, NOT locked (players move them). passage-inN: a secret passage's entrance in a surprise box; passage-outN: where passage N comes out (one way).",
   "legend": {
     "#": { "void": true
     },
     ".": { "level": 0, "surface": "floor"
     },
-    "^": { "level": 1, "surface": "high"
+    "^": { "level": 1, "surface": "high", "slant": 0.559
     },
-    "Z": { "level": 2, "surface": "high", "marker": "zone", "paint": false, "piece": true
+    "Z": { "level": 2, "surface": "high", "slant": 0.559, "marker": "zone", "paint": false, "piece": true
     },
-    "Y": { "level": 1, "surface": "high", "marker": "tree", "paint": false, "piece": true
+    "Y": { "level": 1, "surface": "high", "slant": 0.559, "marker": "tree", "paint": false, "piece": true
     },
     "~": { "level": 0, "surface": "water", "sink": 0.1
     },
@@ -62,9 +62,9 @@
   },
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
-    "mesh": "board-v5.obj",
-    "texture": "board-v8.jpg",
-    "geometry": "board-v5.json"
+    "mesh": "board-v4.obj",
+    "texture": "board-v6.jpg",
+    "geometry": "board-v4.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/court-placeholder-v1.jpg",
