@@ -47,10 +47,34 @@ def font(size, names=("arialbd.ttf", "seguibl.ttf")):
     return ImageFont.load_default(size)
 
 
+def expand_regions(data):
+    """map.json "raise": [{"rows": [r0, r1], "cols": [c0, c1], "by": n}] lifts every tile in those rows and columns
+    by n levels: one legend serves several boards at different heights (Terrera's floors). Returns the map data with
+    each raised tile given its own legend entry (a private-use character), so everything after this sees plain
+    tiles. Every tool that reads a map.json calls it."""
+    regions = data.get("raise")
+    if not regions:
+        return data
+    grid, legend, made = [list(row) for row in data["grid"]], dict(data["legend"]), {}
+    for reg in regions:
+        (r0, r1), (c0, c1), by = reg["rows"], reg["cols"], reg["by"]
+        for r in range(r0, r1 + 1):
+            for c in range(c0, c1 + 1):
+                t = legend[grid[r][c]]
+                if t.get("void") or not by:
+                    continue
+                key = (grid[r][c], by)
+                if key not in made:
+                    made[key] = chr(0xE000 + len(made))
+                    legend[made[key]] = {**t, "level": t.get("level", 0) + by}
+                grid[r][c] = made[key]
+    return {**data, "grid": ["".join(row) for row in grid], "legend": legend}
+
+
 class Arena:
     def __init__(self, folder):
         self.folder = Path(folder)
-        self.data = json.loads((self.folder / "map.json").read_text(encoding="utf-8"))
+        self.data = expand_regions(json.loads((self.folder / "map.json").read_text(encoding="utf-8")))
         self.grid = self.data["grid"]
         self.R, self.C = len(self.grid), len(self.grid[0])
         self.legend = self.data["legend"]
@@ -675,8 +699,8 @@ def marker_turn(a, r, c, t):
     explicit "orient" wins ("away-from-pit": bottom away from the lower neighbours); anything else has its bottom
     toward the nearer left/right edge."""
     marker = painted_marker(t) or ""
-    if marker == "spawn1":
-        return 0
+    if marker == "spawn1" or marker.startswith("sand-") or marker == "cracked":   # quicksand arrows point the
+        return 0                                                                    # way they push
     if marker.startswith("spawn2"):
         return 180
     if both_ways(a, t):   # N/N reads the same from either player's end: not turned
@@ -692,7 +716,9 @@ def painted_marker(t):
     return t.get("decal") or (t.get("marker") if t.get("paint", True) else None)
 
 
-NUMBERED = ("passage-in", "passage-out", "trapdoor", "button", "zone-number", "blocker")   # markers that carry a number
+NUMBERED = ("passage-in", "passage-out", "trapdoor", "button", "zone-number", "blocker", "tunnel")   # markers that carry a number
+SAND_DIRS = {"n": (0, -1), "s": (0, 1), "e": (1, 0), "w": (-1, 0),   # quicksand pushes (image directions, y down)
+             "ne": (1, -1), "nw": (-1, -1), "se": (1, 1), "sw": (-1, 1)}
 
 
 def both_ways(a, t):
@@ -742,6 +768,19 @@ def draw_pair(im, text, cx, cy, size, fill, **style):
         o.line(ends, fill=style.get("stroke_fill"), width=round(size * 0.09) + 2 * sw)
     o.line(ends, fill=fill, width=round(size * 0.09))
     im.alpha_composite(stroke, (round(cx - pad), round(cy - pad)))
+
+
+def sand_arrow(o, cx, cy, u, way, scale=1.0, col=(66, 44, 24, 235)):
+    """An arrow centred on (cx, cy) pointing `way` (image direction, y down), for quicksand."""
+    dx, dy = way
+    n = math.hypot(dx, dy)
+    dx, dy = dx / n, dy / n
+    ln, head, w = 32 * u * scale, 20 * u * scale, max(1, round(8 * u * scale))
+    tip = (cx + dx * ln, cy + dy * ln)
+    neck = (tip[0] - dx * head, tip[1] - dy * head)
+    o.line([(cx - dx * ln, cy - dy * ln), neck], fill=col, width=w)
+    o.polygon([tip, (neck[0] - dy * head * 0.75, neck[1] + dx * head * 0.75),
+               (neck[0] + dy * head * 0.75, neck[1] - dx * head * 0.75)], fill=col)
 
 
 def draw_marker(im, marker, x0, y0, p, both=False, button=None):
@@ -851,6 +890,39 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None):
             draw_pair(im, n, cx, cy, round(40 * u), fill)
         else:
             o.text((cx, cy + 2 * u), n, font=font(round(52 * u)), fill=fill, anchor="mm")
+    elif marker.startswith("sand-"):   # quicksand (Terrera): an arrow the way it drags a Pokémon that ends its turn here
+        sand_arrow(o, cx, cy, u, SAND_DIRS[marker[len("sand-"):]])
+    elif marker.startswith("tunnel"):   # a tunnel's mouth (Terrera): a dark burrow, its number (the d4 roll) on it;
+        n, _, way = marker[len("tunnel"):].partition("-")   # "tunnel3-se": also quicksand pushing south-east
+        r = 34 * u
+        for k, col in ((1.18, (150, 118, 84, 255)), (1.0, (58, 40, 26, 255)), (0.78, (30, 20, 13, 255)),
+                       (0.55, (14, 9, 6, 255))):
+            o.ellipse([cx - r * k, cy - r * k * 0.86, cx + r * k, cy + r * k * 0.86], fill=col)
+        pale = (236, 220, 186, 255)
+        if both:
+            draw_pair(im, n, cx, cy, round(28 * u), pale, stroke_width=round(2 * u), stroke_fill=(20, 14, 8, 255))
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(34 * u)), fill=pale, anchor="mm", stroke_width=round(2 * u),
+                   stroke_fill=(20, 14, 8, 255))
+        if way:   # a small arrow in the inner corner
+            dx, dy = SAND_DIRS[way]
+            sand_arrow(o, cx + dx * 44 * u, cy + dy * 44 * u, u, (dx, dy), 0.45)
+    elif marker == "cracked":   # unstable ground (Terrera): hatched like the user's board, cracks through it
+        layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))   # its own tile-sized layer: the hatching stays in the tile
+        ld = ImageDraw.Draw(layer)
+        for k in range(-128, 129, 22):
+            ld.line([(k * u, p), ((k + 128) * u, 0)], fill=(52, 36, 24, 150), width=round(3 * u))
+        rnd = random.Random(f"{x0},{y0}")   # a different crack pattern on each tile
+        for _ in range(3):
+            x, y = rnd.uniform(0.15, 0.85) * p, rnd.uniform(0.15, 0.85) * p
+            pts = [(x, y)]
+            ang = rnd.uniform(0, 2 * math.pi)
+            for _ in range(5):
+                ang += rnd.uniform(-0.9, 0.9)
+                x, y = x + math.cos(ang) * 12 * u, y + math.sin(ang) * 12 * u
+                pts.append((x, y))
+            ld.line(pts, fill=(24, 16, 10, 220), width=round(3 * u))
+        im.alpha_composite(layer, (round(x0), round(y0)))
     elif marker.startswith("blocker"):   # where a blocker stands when closed (Valora): a dark slot in a hazard-striped
         n = marker[len("blocker"):]       # frame, the number of the gear that opens and closes it
         m0, band = 5 * u, 13 * u

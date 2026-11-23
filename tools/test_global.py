@@ -246,8 +246,9 @@ def main():
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
     check(got == [("Chrysalia", False), ("Fontaine", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True),
-                  ("Spectra", False), ("Valora", False), ("Violight", False), ("Viperia", False), ("Yaksha", False)],
-          f"map list shows the ten arenas, Pugilis on the table ({got})")
+                  ("Spectra", False), ("Terrera Mountain", False), ("Valora", False), ("Violight", False), ("Viperia", False),
+                  ("Yaksha", False)],
+          f"map list shows the eleven arenas, Pugilis on the table ({got})")
 
     def row(name):   # the map panel's row for an arena (alphabetical)
         return f"mapRes_White_{[m.name for m in g.mapList().values()].index(name) + 1}"
@@ -446,6 +447,22 @@ def main():
     lua.execute('gateClicked(nil, nil, "gate_1"); gateClicked(nil, nil, "gate_2")')
     check(abs(g.fEdge.pos.y - (0.41 - 1.16)) < 1e-6 and up(g.wEdge) and up(g.wInner),
           "opening them again sinks the blocks and fills the river")
+
+    # Terrera Mountain: the centre and two side floors at three heights, 2 flags, a control zone frame on each board
+    lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')   # the gate stand-ins
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", row("Terrera Mountain"))
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    tidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Terrera Mountain"]
+    zone_y = sorted(round(s.position.y - 0.961, 2) for s in new if s.data.Tags[1] == "Zone")
+    heights = sorted({round(p[1], 2) for p in tidx["snaps"]})
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("terrera", "mesh"))
+          and kinds.count("Flag") == 2 and kinds.count("Zone") == 3 and len(tidx["snaps"]) == 128 + 64 + 64
+          and len(heights) == 3 and zone_y == [0.41, 1.38, 2.35] and backdrop(new, "misc/cave-placeholder-v1.jpg"),
+          f"picking Terrera Mountain: its board (centre and two side floors at three heights {heights}), 2 flags, a zone "
+          f"on each floor at its height {zone_y}, the cave table")
 
     # Valora: 5 gear plates (3 numbered), 10 blockers (closed), 3 capture zones lifted onto the gear plates
     lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')   # the gate stand-ins

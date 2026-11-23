@@ -1,0 +1,93 @@
+{
+  "name": "Terrera Mountain",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's three drawn boards (mapstomake/Terrera Mountain.webp, taken sideways: turned upright, each board perspective-straightened). Columns 9-16: the centre (8x16, both players' spawns, 2 flags). Columns 18-25: the two side floors (8x8 each), side by side with the centre like Yaksha's boxes (the pillars take the left strip): the top floor in rows 0-7, the bottom floor in rows 8-15. Columns 0-8 are empty so the centre sits in the middle of the table. Tunnels 1-4 link the centre with each floor (the d4 roll picks the exit).",
+  "grid": [
+    "---------...22...-GssssssH",
+    "---------.22..22.-e......w",
+    "---------........-e.ZZZZ.w",
+    "---------........-e.ZXXZ.w",
+    "---------R.F....S-e.ZXXZ.w",
+    "---------.dssssc.-e.ZZZZ.w",
+    "---------.eZZZZw.-e......w",
+    "---------.eZXXZw.-InnnnnnJ",
+    "---------.eZXXZw.-GssssssH",
+    "---------.eZZZZw.-e......w",
+    "---------.bnnnna.-e.ZZZZ.w",
+    "---------Q....F.P-e.ZXXZ.w",
+    "---------........-e.ZXXZ.w",
+    "---------........-e.ZZZZ.w",
+    "---------.11..11.-e......w",
+    "---------...11...-InnnnnnJ"
+  ],
+  "_legend": "level = height step (0 = lowest; \"raise\" lifts whole boards). surface picks the look. marker = something on the tile (painted, or a 3D piece with piece: true). n/s/e/w and a/b/c/d (nw/ne/sw/se) = quicksand, the arrow the way it drags a grounded Pokemon. P/Q/R/S = tunnel mouths 1-4; on the side floors the numbered corners are quicksand too (J 1 nw, I 2 ne, G 3 se, H 4 sw). Z = control zone (a 4x4 frame); X = its hatched middle (cracked: you fall through to the floor below). F = flag.",
+  "legend": {
+    "-": { "void": true },
+    ".": { "level": 0, "surface": "earth" },
+    "1": { "level": 0, "surface": "earth", "marker": "spawn1" },
+    "2": { "level": 0, "surface": "earth", "marker": "spawn2" },
+    "F": { "level": 0, "surface": "earth", "marker": "flag", "paint": false, "piece": true },
+    "Z": { "level": 0, "surface": "earth", "marker": "zone", "paint": false, "piece": true },
+    "X": { "level": 0, "surface": "earth", "marker": "zone", "piece": true, "decal": "cracked" },
+    "n": { "level": 0, "surface": "sand", "marker": "sand-n" },
+    "s": { "level": 0, "surface": "sand", "marker": "sand-s" },
+    "e": { "level": 0, "surface": "sand", "marker": "sand-e" },
+    "w": { "level": 0, "surface": "sand", "marker": "sand-w" },
+    "a": { "level": 0, "surface": "sand", "marker": "sand-nw" },
+    "b": { "level": 0, "surface": "sand", "marker": "sand-ne" },
+    "c": { "level": 0, "surface": "sand", "marker": "sand-sw" },
+    "d": { "level": 0, "surface": "sand", "marker": "sand-se" },
+    "P": { "level": 0, "surface": "earth", "marker": "tunnel1" },
+    "Q": { "level": 0, "surface": "earth", "marker": "tunnel2" },
+    "R": { "level": 0, "surface": "earth", "marker": "tunnel3" },
+    "S": { "level": 0, "surface": "earth", "marker": "tunnel4" },
+    "J": { "level": 0, "surface": "sand", "marker": "tunnel1-nw" },
+    "I": { "level": 0, "surface": "sand", "marker": "tunnel2-ne" },
+    "G": { "level": 0, "surface": "sand", "marker": "tunnel3-se" },
+    "H": { "level": 0, "surface": "sand", "marker": "tunnel4-sw" }
+  },
+  "_raise": "Heights, slightly different per board (the user): bottom floor at the table (level 0), the centre one level up, the top floor two.",
+  "raise": [
+    { "rows": [
+        0, 15
+      ], "cols": [
+        9, 16
+      ], "by": 1 },
+    { "rows": [
+        0, 7
+      ], "cols": [
+        18, 25
+      ], "by": 2 }
+  ],
+  "numbers": "both",
+  "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/cave-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py: hive earth, quicksand, layered earth cliffs.",
+  "textures": {
+    "earth": {
+      "images": [
+        "textures/hive1.png",
+        "textures/hive2.png"
+      ],
+      "span": 1,
+      "vary": true
+    },
+    "sand": {
+      "image": "textures/quicksand.png",
+      "span": 1,
+      "vary": true
+    },
+    "walls": {
+      "image": "textures/strata.png",
+      "outer": true
+    }
+  },
+  "palette": {
+    "earth": "#6A5038",
+    "sand": "#B49668",
+    "cliff": "#4A382A",
+    "base": "#2E241C",
+    "fall": "#D2392C"
+  }
+}

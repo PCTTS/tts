@@ -56,6 +56,13 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 rivets, seamless left-right
   misc/foundry-placeholder-v1.jpg               table image around Valora: big riveted floor plates, grime, glowing
                                                 ore channels down the sides
+  arenas/terrera/textures/hive1.png, hive2.png  Terrera's floors: packed earth of the old Durant hive, grit, small
+                                                stones, claw scratches
+  arenas/terrera/textures/quicksand.png         quicksand: pale wet sand in curving ripples
+  arenas/terrera/textures/strata.png            cliffs and the boards' edges: layered earth and rock, seamless
+                                                left-right
+  misc/cave-placeholder-v1.jpg                  table image around Terrera: dark cave floor, loose rocks, the mouths
+                                                of Durant tunnels
 """
 from pathlib import Path
 
@@ -997,8 +1004,84 @@ def foundry_table():
     return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
 
 
+def pebble(d, x, y, r, rng):
+    g = rng.uniform(70, 120)
+    d.ellipse([x - r, y - r * 0.75, x + r, y + r * 0.75], fill=(int(g), int(g * 0.9), int(g * 0.8), 230),
+              outline=(30, 24, 18, 160))
+    d.ellipse([x - r * 0.5, y - r * 0.55, x, y - r * 0.1], fill=(190, 176, 156, 110))
+
+
+def hive_floor(seed):
+    """Terrera's floors: packed dark earth of the old Durant hive, grit and small stones, claw scratches."""
+    rng = np.random.default_rng(seed)
+    img = mix((88, 66, 46), (124, 98, 70), fbm(N, N, rng, 4, 4))
+    img *= (0.9 + 0.2 * fbm(N, N, rng, 20, 3))[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(1600):                                     # grit
+        x, y = rng.random() * N, rng.random() * N
+        d.point((x, y), fill=(40, 28, 18, 140) if rng.random() < 0.5 else (170, 140, 104, 140))
+    for _ in range(70):
+        pebble(d, rng.random() * N, rng.random() * N, rng.uniform(2, 6), rng)
+    for _ in range(9):                                        # claw scratches: three parallel strokes
+        x, y, a = rng.random() * N, rng.random() * N, rng.uniform(0, np.pi)
+        ln = rng.uniform(26, 50)
+        for k in (-6, 0, 6):
+            ox, oy = -np.sin(a) * k, np.cos(a) * k
+            d.line([(x + ox, y + oy), (x + ox + np.cos(a) * ln, y + oy + np.sin(a) * ln)], fill=(48, 34, 22, 150), width=2)
+    return out.filter(ImageFilter.GaussianBlur(0.5))
+
+
+def quicksand():
+    """Quicksand: pale wet sand in curving ripples, darker where it's wettest."""
+    rng = np.random.default_rng(241)
+    yy, xx = np.mgrid[0:N, 0:N].astype(np.float32) / N
+    warp = fbm(N, N, rng, 3, 3)
+    dist = np.hypot(xx - 0.5 + 0.2 * (warp - 0.5), yy - 0.5 + 0.2 * (warp - 0.5))
+    rip = 0.5 + 0.5 * np.sin(dist * 48 + warp * 6)
+    img = mix((158, 126, 86), (200, 170, 122), 0.6 * rip + 0.4 * fbm(N, N, rng, 6, 3))
+    wet = np.clip((fbm(N, N, rng, 3, 3) - 0.5) * 2.5, 0, 1)
+    img = img + (np.array((112, 86, 56), np.float32) - img) * (0.5 * wet)[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
+
+
+def strata():
+    """Terrera's cliffs and the boards' edges: layered earth and rock, wavy bands, seamless left-right."""
+    rng = np.random.default_rng(243)
+    h, w = 1024, N
+    warp = fbm(h, w, rng, 3, 4, wrap_x=True)
+    rows = np.arange(h, dtype=np.float32)[:, None] / h
+    bands = 0.5 + 0.5 * np.sin((rows * 11 + warp * 1.4) * 2 * np.pi)
+    t = 0.55 * bands + 0.45 * fbm(h, w, rng, 6, 4, wrap_x=True)
+    img = mix((64, 48, 34), (138, 108, 78), t)
+    img *= (0.88 + 0.24 * fbm(h, w, rng, 32, 2, wrap_x=True))[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def cave_table():
+    """Around Terrera: the hive's dark cave floor, loose rocks, and the mouths of Durant tunnels."""
+    rng = np.random.default_rng(247)
+    h, w = 1211, 2048
+    img = mix((34, 26, 20), (66, 52, 40), fbm(h, w, rng, 5, 5))
+    img *= (0.9 + 0.2 * fbm(h, w, rng, 40, 2))[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(260):
+        pebble(d, rng.random() * w, rng.random() * h, rng.uniform(3, 12), rng)
+    for _ in range(26):                                       # tunnel mouths: dark holes with a raised rim
+        x, y, r = rng.random() * w, rng.random() * h, rng.uniform(26, 60)
+        for k, col in ((1.25, (96, 74, 52, 255)), (1.05, (40, 28, 18, 255)), (0.8, (20, 13, 8, 255)), (0.5, (8, 5, 3, 255))):
+            d.ellipse([x - r * k, y - r * k * 0.8, x + r * k, y + r * k * 0.8], fill=col)
+    return out.filter(ImageFilter.GaussianBlur(0.8))
+
+
 def main():
     files = {
+        "arenas/terrera/textures/hive1.png": lambda p: hive_floor(251).save(p),
+        "arenas/terrera/textures/hive2.png": lambda p: hive_floor(252).save(p),
+        "arenas/terrera/textures/quicksand.png": lambda p: quicksand().save(p),
+        "arenas/terrera/textures/strata.png": lambda p: strata().save(p),
+        "misc/cave-placeholder-v1.jpg": lambda p: cave_table().save(p, quality=90),
         "arenas/valora/textures/tread1.png": lambda p: tread_plate(231).save(p),
         "arenas/valora/textures/tread2.png": lambda p: tread_plate(232).save(p),
         "arenas/valora/textures/iron-top.png": lambda p: iron_top().save(p),

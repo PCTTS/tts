@@ -43,7 +43,7 @@ import json, math, re, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_board import Arena  # noqa: E402
+from build_board import Arena, expand_regions  # noqa: E402
 from build_pieces import BELL_LIFT, DOOR_H, gear_file  # noqa: E402  (the stand's beam is built for the bell at this height)
 from tts import exec_lua, report  # noqa: E402
 
@@ -195,7 +195,7 @@ def blocker_opening(data, r, c, T):
 
 
 def pieces(arena, info):
-    data = json.loads((arena / "map.json").read_text(encoding="utf-8"))
+    data = expand_regions(json.loads((arena / "map.json").read_text(encoding="utf-8")))
     grid = Arena(arena)
     R, C, T = info["rows"], info["cols"], info["tile"]
     out = []

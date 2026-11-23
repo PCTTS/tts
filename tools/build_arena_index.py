@@ -13,13 +13,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fast_data  # noqa: E402
 from place_pieces import pieces  # noqa: E402
+from build_board import expand_regions  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 SNAP_LIFT = 0.02   # snap points float this far above the tile tops
 
 
 def arena_entry(folder):
-    data = json.loads((folder / "map.json").read_text(encoding="utf-8"))
+    data = expand_regions(json.loads((folder / "map.json").read_text(encoding="utf-8")))
     board = data["board"]
     info = json.loads((folder / board["geometry"]).read_text(encoding="utf-8"))
     rel = folder.relative_to(REPO).as_posix()
