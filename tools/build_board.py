@@ -882,6 +882,10 @@ class Mesh:
         Path(path).write_text("\n".join(lines) + "\n", encoding="ascii")
 
 
+WALL_ENDS = {"N": ("W", "E"), "S": ("E", "W"), "E": ("N", "S"), "W": ("S", "N")}   # the sides at a wall's two ends
+                                                                                   # (its edge runs start -> end)
+
+
 def build_mesh(a):
     W, H = a.C * PX, a.R * PX + STRIP
     y_span = a.y_span()
@@ -898,6 +902,12 @@ def build_mesh(a):
 
     features = {}
     own, inner_n = own_walls(a)   # walls with their own image ("walls:<surface>") and the slices left for the rest
+    textures = a.data.get("textures") or {}
+
+    def surface_key(surface):   # the own_walls() key of a surface's walls (its first tile's)
+        t0 = next((a.tile(r, c) for r in range(a.R) for c in range(a.C)
+                   if a.tile(r, c) and a.tile(r, c).get("surface", "floor") == surface), None)
+        return own_key(a, t0) if t0 else None
 
     def lows(r, c):   # a tile's slopes and inner corners (cached)
         if (r, c) not in features:
@@ -992,10 +1002,29 @@ def build_mesh(a):
                     us = ((pick % (inner_n if nb else half)) + (half if nb else 0)) * PX
                     ua, ub = us, us + PX - 1
                 fs = sorted(set(edge_breaks(r, c) + (edge_breaks(r + dr, c + dc) if nb else [])))
+                uv_for = None
+                if key in own and key[2] is not None:   # "above": under a wedge at either end of this wall (its band,
+                    # out to the wedge's foot) the other surface's wall image all the way down, the tile's own image
+                    # only below its flat top (Pugilis: the ground floor's cliff under the middle stairs' wedges)
+                    okey = surface_key(textures[f"walls:{key[0]}"]["above"])
+                    risen, rc = rises(a, r, c), rise_corners(a, r, c)
+                    s0, s1 = WALL_ENDS[side]
+
+                    def corner(s, side=side):   # the corner at an end of this wall: "NE", ...
+                        return "".join(sorted((side, s), key=lambda q: q in "WE"))
+                    band0, band1 = (s0 in risen or corner(s0) in rc), (s1 in risen or corner(s1) in rc)
+                    if okey in own and (band0 or band1):
+                        os_ = own[okey][pick % len(own[okey])] * PX
+                        oa, ob, fw = os_ + WALL_GUTTER, os_ + PX - WALL_GUTTER, t["slant"] / TILE
+
+                        def uv_for(f0, f1, oa=oa, ob=ob, ua=ua, ub=ub, fw=fw, band0=band0, band1=band1):
+                            mid = (f0 + f1) / 2
+                            lo, hi = (oa, ob) if (band0 and mid < fw) or (band1 and mid > 1 - fw) else (ua, ub)
+                            return lambda f, y: wall_uv(lo + f * (hi - lo), y)
                 if len(fs) > 2:   # a slope along this edge, here or next door: the wall follows both surfaces
                     profile_wall(m, edge, fs, lambda px, pz: surface_at(r, c, px, pz),
                                  (lambda px, pz: surface_at(r + dr, c + dc, px, pz)) if nb else (lambda px, pz: low),
-                                 normal, lambda f, y: wall_uv(ua + f * (ub - ua), y))
+                                 normal, lambda f, y: wall_uv(ua + f * (ub - ua), y), uv_for=uv_for)
                     continue
                 if low >= wall_top:
                     continue
@@ -1191,13 +1220,15 @@ def edge_distance(seg, px, pz):
     return math.hypot(px - (ax + k * dx), pz - (az + k * dz)), b0 + (b1 - b0) * k
 
 
-def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
+def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6, uv_for=None):
     """The wall along a tile edge where this tile's surface stands above its neighbour's, both followed along the
     edge (fs: fractions of the edge where either can bend): e.g. beside a slope whose neighbour at the same level
-    doesn't slope that way, or a slope coming down onto a lower slope. The neighbour builds its own higher parts."""
+    doesn't slope that way, or a slope coming down onto a lower slope. The neighbour builds its own higher parts.
+    uv_for(f0, f1), if given, picks the uv function for the piece between two breaks (see build_mesh)."""
     (ax, az), (bx, bz) = edge
     pts = [(f, ax + (bx - ax) * f, az + (bz - az) * f) for f in fs]
     for (f0, x0, z0), (f1, x1, z1) in zip(pts, pts[1:]):
+        suv = uv_for(f0, f1) if uv_for else uv
         h0, h1, l0, l1 = mine(x0, z0), mine(x1, z1), theirs(x0, z0), theirs(x1, z1)
         d0, d1 = h0 - l0, h1 - l1
         if d0 <= eps and d1 <= eps:
@@ -1211,11 +1242,11 @@ def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
                 f0, x0, z0, h0, l0, d0 = f0 + (f1 - f0) * k, fx, fz, fh, fh, 0.0
         if d0 > eps and d1 > eps:
             m.quad([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1), (x0, l0, z0)],
-                   [uv(f0, h0), uv(f1, h1), uv(f1, l1), uv(f0, l0)], normal)
+                   [suv(f0, h0), suv(f1, h1), suv(f1, l1), suv(f0, l0)], normal)
         elif d0 > eps:
-            m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x0, l0, z0)], [uv(f0, h0), uv(f1, h1), uv(f0, l0)], normal)
+            m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x0, l0, z0)], [suv(f0, h0), suv(f1, h1), suv(f0, l0)], normal)
         else:
-            m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1)], [uv(f0, h0), uv(f1, h1), uv(f1, l1)], normal)
+            m.tri_facing([(x0, h0, z0), (x1, h1, z1), (x1, l1, z1)], [suv(f0, h0), suv(f1, h1), suv(f1, l1)], normal)
 
 
 def taper_height(seg, top, w, px, pz):
