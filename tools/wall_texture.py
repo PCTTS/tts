@@ -246,6 +246,7 @@ def publish(folder, walls, opts):
     dests = {}
     for _, image in walls:   # Pugilis_Cliff2.png -> textures/cliff2.png
         stem = re.sub(r"[^a-z0-9]+", "-", image.stem.lower()).strip("-").removeprefix(folder.name + "-")
+        stem = re.sub(r"^\d{8}-", "", stem)   # 20261120_Cliff6.png -> cliff6 (a dated drawing file)
         dests[image] = folder / "textures" / f"{stem}{image.suffix.lower()}"
         dests[image].parent.mkdir(exist_ok=True)
         if image.resolve() != dests[image].resolve():
