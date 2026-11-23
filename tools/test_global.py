@@ -103,7 +103,10 @@ function spawnObjectData(t)
   local kind = t.data.Name == "CardCustom" and "Card" or ((t.data.Name == "Figurine_Custom" or (t.data.CustomMesh and t.data.CustomMesh.TypeIndex == 1)) and "Figurine" or "Generic")
   local cm = t.data.CustomMesh
   return stub({ tags = t.data.Tags, type = kind, getName = function() return t.data.Nickname end,
-    getPosition = function() return t.position end,
+    getPosition = function()   -- always a Vector in TTS, whatever it was spawned with
+      local p = t.position or {}
+      return p.x and p or Vector(p[1] or 0, p[2] or 0, p[3] or 0)
+    end,
     getCustomObject = function() return cm and { mesh = cm.MeshURL, diffuse = cm.DiffuseURL } or {} end })
 end
 
@@ -243,8 +246,8 @@ def main():
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
     check(got == [("Chrysalia", False), ("Fontaine", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True),
-                  ("Spectra", False), ("Violight", False), ("Viperia", False), ("Yaksha", False)],
-          f"map list shows the nine arenas, Pugilis on the table ({got})")
+                  ("Spectra", False), ("Valora", False), ("Violight", False), ("Viperia", False), ("Yaksha", False)],
+          f"map list shows the ten arenas, Pugilis on the table ({got})")
 
     def row(name):   # the map panel's row for an arena (alphabetical)
         return f"mapRes_White_{[m.name for m in g.mapList().values()].index(name) + 1}"
@@ -443,6 +446,95 @@ def main():
     lua.execute('gateClicked(nil, nil, "gate_1"); gateClicked(nil, nil, "gate_2")')
     check(abs(g.fEdge.pos.y - (0.41 - 1.16)) < 1e-6 and up(g.wEdge) and up(g.wInner),
           "opening them again sinks the blocks and fills the river")
+
+    # Valora: 5 gear plates (3 numbered), 10 blockers (closed), 3 capture zones lifted onto the gear plates
+    lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')   # the gate stand-ins
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", row("Valora"))
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    vidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Valora"]
+    gears = [json.loads(s.data.Memo) for s in new if s.data.Tags[1] == "Gear"]
+    doors = [(s, json.loads(s.data.Memo)) for s in new if s.data.Tags[1] == "Door"]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("valora", "mesh"))
+          and len(gears) == 5 and sorted(m["gear"] for m in gears) == [0, 0, 1, 2, 3] and kinds.count("Zone") == 3
+          and len(doors) == 10 and all(s.data.Locked and m["open"] is False and abs(m["x"] - s.position.x) < 1e-6
+                                       and abs(m["z"] - s.position.z) < 1e-6 for s, m in doors)
+          and len(vidx["snaps"]) == 256 - 32 - 66 and backdrop(new, "misc/foundry-placeholder-v1.jpg"),
+          "picking Valora: its board, 5 gears (numbered 1-3 and two plain), 10 blockers that start closed, 3 zones, "
+          "snap points on all but the walls and the gear tiles (the plates carry those), the foundry table")
+
+    # a gear turns 270 degrees the way it points, carrying what stands on it round; a numbered gear's doors button
+    # opens and closes its blockers (sliding into the wall beside them, or sinking)
+    T = 3.24875
+    lua.execute(r"""
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end
+      local function obj(tags, memo, pos)
+        local o = { tags = tags, guid = "v" .. #objects, menu = {}, snaps = {}, ui = {}, pos = pos, rot = Vector(0, 0, 0) }
+        o.memo = memo and JSON.encode(memo) or ""
+        o.getPosition = function() return o.pos end
+        o.setPosition = function(p) o.pos = Vector(p[1] or p.x, p[2] or p.y, p[3] or p.z) end
+        o.setPositionSmooth = function(p) o.pos = p end
+        o.getRotation = function() return o.rot end
+        o.setRotation = function(r) o.rot = Vector(r[1], r[2], r[3]) end
+        o.setLock = function(l) o.locked = l; o.lockLog = (o.lockLog or "") .. tostring(l) .. " " end
+        o.getSnapPoints = function() return o.snaps end
+        o.setSnapPoints = function(s) o.snaps = s end
+        o.setDescription = function(d) o.desc = d end
+        o.clearContextMenu = function() o.menu = {} end
+        o.addContextMenuItem = function(label, fn) o.menu[#o.menu + 1] = { label = label, fn = fn } end
+        o.UI = { setXml = function(x) o.ui.xml = x end, setCustomAssets = function(a) o.ui.assets = a end }
+        o.hasTag = function(t) for _, x in ipairs(o.tags) do if x == t then return true end end return false end
+        o.getLock = function() return o.locked or false end
+        objects[#objects + 1] = o
+        return o
+      end
+      gearPlate = obj({ "Gear", "ArenaPiece" }, { gear = 2, size = 4, turn = "ccw", tile = 3.24875 }, Vector(10, 0.961, 20))
+      gearPlate.locked = true
+      smallGear = obj({ "Gear", "ArenaPiece" }, { gear = 0, size = 3, turn = "cw", tile = 3.24875 }, Vector(-10, 0.961, 0))
+      smallGear.locked = true
+      rider = obj({ "Pokemon" }, nil, Vector(10 + 1.5 * 3.24875, 1.03, 20 + 0.5 * 3.24875))
+      rider.rot = Vector(0, 33, 0)
+      offGear = obj({ "Pokemon" }, nil, Vector(10 + 2.5 * 3.24875, 1.03, 20))
+      held = obj({ "Pokemon" }, nil, Vector(10, 1.5, 20)); held.held_by_color = "Red"
+      doorA = obj({ "Door", "ArenaPiece" }, { door = 2, open = false, x = 1, y = 1.37, z = 8, sx = -3.24875, sy = 0, sz = 0 }, Vector(1, 1.37, 8))
+      doorB = obj({ "Door", "ArenaPiece" }, { door = 3, open = false, x = 2, y = 1.37, z = 14, sx = 0, sy = -1.94, sz = 0 }, Vector(2, 1.37, 14))
+      doorC = obj({ "Door", "ArenaPiece" }, { door = 1, open = false, x = 3, y = 1.37, z = 0, sx = 0, sy = 0, sz = 3.24875 }, Vector(3, 1.37, 0))
+      for _, o in ipairs({ gearPlate, smallGear, doorA, doorB, doorC }) do onObjectSpawn(o) end
+      getObjectFromGUID = function(guid) for _, o in ipairs(objects) do if o.guid == guid and not o.destroyed then return o end end end
+    """)
+    gp, sg = g.gearPlate, g.smallGear
+    xml = str(gp.ui.xml)
+    check(len(list(gp.snaps.values())) == 16 and len(list(sg.snaps.values())) == 9
+          and f'id="gear_{gp.guid}"' in xml and 'onClick="Global/gearClicked"' in xml and 'id="doors_2"' in xml
+          and 'onClick="Global/doorsClicked"' in xml and [a.name for a in gp.ui.assets.values()] == ["turnccw", "doors"]
+          and [a.name for a in sg.ui.assets.values()] == ["turncw"] and 'doors_' not in str(sg.ui.xml)
+          and [m.label for m in gp.menu.values()] == ["Turn gear", "Blockers 2 open/close"]
+          and g.doorA.interactable is False,
+          "a gear plate carries a snap point per tile and its turn button (+ the doors button and menu on a numbered "
+          "gear); blockers can't be clicked")
+    lua.execute(f'gearClicked(nil, nil, "gear_{gp.guid}")')
+    r, off, h = g.rider, g.offGear, g.held
+    # counter-clockwise seen from above, 270 degrees: an offset (dx, dz) ends at (dz, -dx)
+    check(abs(r.pos.x - (10 + 0.5 * T)) < 1e-6 and abs(r.pos.z - (20 - 1.5 * T)) < 1e-6 and abs(r.pos.y - 1.03) < 1e-9
+          and r.rot.y == 33 and r.locked is False and r.lockLog == "true false "
+          and abs(gp.rot.y - 90) < 1e-6 and not g.turningGears[gp.guid],
+          f"turning a counter-clockwise gear carries a Pokemon 270 degrees round it, facing kept, unlocked after "
+          f"({r.pos.x:.3f}, {r.pos.z:.3f}; plate yaw {gp.rot.y:.1f})")
+    check(abs(off.pos.x - (10 + 2.5 * T)) < 1e-9 and abs(h.pos.x - 10) < 1e-9 and h.lockLog is None,
+          "a Pokemon off the gear, or held in a hand, stays where it is")
+    lua.execute("smallRider = rider; rider.pos = Vector(-10, 1.03, 3.24875); turnGear(smallGear)")
+    check(abs(r.pos.x - (-10 - T)) < 1e-6 and abs(r.pos.z - 0) < 1e-6 and abs(sg.rot.y - 270) < 1e-6,
+          f"a clockwise gear turns the other way: from its far side to its left ({r.pos.x:.3f}, {r.pos.z:.3f})")
+    lua.execute('doorsClicked(nil, nil, "doors_2")')
+    dA, dB, dC = g.doorA, g.doorB, g.doorC
+    check(abs(dA.pos.x - (1 - T)) < 1e-6 and json.loads(dA.memo)["open"] is True and abs(dB.pos.y - 1.37) < 1e-9
+          and abs(dC.pos.z) < 1e-9,
+          "the doors button opens its own blockers (sliding into the wall), not the others")
+    lua.execute('doorsClicked(nil, nil, "doors_3"); gearPlate.menu[2].fn("Red")')
+    check(abs(dA.pos.x - 1) < 1e-6 and json.loads(dA.memo)["open"] is False and abs(dB.pos.y - (1.37 - 1.94)) < 1e-6,
+          "pressed again they close; a blocker with no wall beside it sinks into the floor")
 
     # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
     lua.execute(r"""

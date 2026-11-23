@@ -1,0 +1,61 @@
+{
+  "name": "Valora",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's drawn board (mapstomake/valora.webp, taken from player 2's side: turned 180 degrees and perspective-straightened): a steel floor with walls two levels tall, five gears (three 4x4 turning counter-clockwise with a capture zone in the middle, numbered 1-3; two 3x3 turning clockwise), and blockers that gears 1-3 open and close.",
+  "grid": [
+    "..2.....##......",
+    ".2.2.....#.gggg.",
+    "2.2..#.....gzzg.",
+    ".2......c..gzzg.",
+    ".....#....#gggg.",
+    ".ggg####bb##....",
+    ".ggg.#ggggb.....",
+    ".ggg.#gzzgb..##.",
+    ".##..agzzg#.ggg.",
+    ".....agggg#.ggg.",
+    "....##aa####ggg.",
+    ".gggg#....#.....",
+    ".gzzg..c......1.",
+    ".gzzg.....#..1.1",
+    ".gggg.#.....1.1.",
+    "......##.....1.."
+  ],
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. solid = nothing can stand on or cross it (no snap point). marker = something on the tile (painted, or a 3D piece with piece: true). g/z = gear tiles: a gear's plate (tools/place_pieces.py, from \"gears\") lies over them and carries their snap points (snap: false); z = a capture zone on a gear (its frame lifted onto the plate). a/b/c = blockers opened and closed by gear 1/2/3 (a steel block, closed at the start; the board shows a hazard frame under it).",
+  "legend": {
+    ".": { "level": 0, "surface": "floor" },
+    "#": { "level": 2, "surface": "wall", "solid": true },
+    "g": { "level": 0, "surface": "gearbed", "snap": false },
+    "z": { "level": 0, "surface": "gearbed", "snap": false, "marker": "zone", "paint": false, "piece": true, "lift": 0.05 },
+    "a": { "level": 0, "surface": "floor", "marker": "blocker1", "piece": true },
+    "b": { "level": 0, "surface": "floor", "marker": "blocker2", "piece": true },
+    "c": { "level": 0, "surface": "floor", "marker": "blocker3", "piece": true },
+    "1": { "level": 0, "surface": "floor", "marker": "spawn1" },
+    "2": { "level": 0, "surface": "floor", "marker": "spawn2" }
+  },
+  "_gears": "Each gear: its top-left tile [row, col], size (3 or 4 tiles), which way it turns seen from above (ccw / cw) and its number (0 = none; a numbered gear opens and closes its blockers). Its plate shows the arrows (tools/build_pieces.py gear_arrow), the same as on the user's board.",
+  "gears": [
+    { "at": [1, 11], "size": 4, "turn": "ccw", "number": 2 },
+    { "at": [6, 6], "size": 4, "turn": "ccw", "number": 3 },
+    { "at": [11, 1], "size": 4, "turn": "ccw", "number": 1 },
+    { "at": [5, 1], "size": 3, "turn": "cw", "number": 0 },
+    { "at": [8, 12], "size": 3, "turn": "cw", "number": 0 }
+  ],
+  "numbers": "both",
+  "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/foundry-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py: steel tread plate floor, iron wall tops and sides.",
+  "textures": {
+    "floor": { "images": ["textures/tread1.png", "textures/tread2.png"], "span": 1, "vary": true },
+    "wall": { "image": "textures/iron-top.png", "span": 1, "vary": true },
+    "walls": { "image": "textures/iron-wall.png" }
+  },
+  "palette": {
+    "floor": "#6E6C69",
+    "wall": "#4A4848",
+    "gearbed": "#1C1C1E",
+    "cliff": "#3A3836",
+    "base": "#2A2826",
+    "fall": "#D2392C"
+  }
+}

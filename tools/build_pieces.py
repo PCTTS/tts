@@ -25,7 +25,16 @@ Writes (only files that are missing: bump a version when what a file holds chang
   slope), props/zoneframe2-raised60-v1.obj, -4- for slant 0.559 (60 degrees),
   props/zoneframe2-raised70-v1.obj, -4- for slant 0.352 (70 degrees); RAISED_SLANTS lists them
   props/statue-v1.obj, props/statue-v1.jpg, props/statue-collider-v1.obj  (Spectra: a small stone pawn)
+  props/gear3-v1.obj, props/gear4-v1.obj  (Valora: a gear's steel plate, 3x3 or 4x4 tiles; also its own collider)
+  props/gear4-ccw-1-v1.jpg, -2-, -3-, props/gear3-cw-v1.jpg  (its arrows (and number), per gear kind GEAR_KINDS)
+  props/door-v1.obj, props/door-1-v1.jpg, -2-, -3-  (Valora: a blocker, a steel block filling its tile; own collider)
 tools/place_pieces.py puts them on an arena's marker tiles.
+
+Gear (Valora): a thin square steel plate lying on a gear's tiles, the tile seams and an arrow on each tile (which
+way it turns), hazard stripes round its rim, a numbered gear's number in the middle (N/N). It turns as a whole;
+the arrows are the same after any quarter turn. Its own frame: y = 0 is the tile top, centred.
+Blocker (Valora): a steel block filling its tile, a little lower than the walls it slides into; hazard stripes
+round its top, its gear's number on top (N/N). Its own frame: y = 0 is the tile top, centred.
 
 Statue (Spectra): a plain weathered stone pawn: a round base, a tapering body, a collar and a ball head; players
 move it when the dice say so. Its own frame: y = 0 is the tile top.
@@ -109,6 +118,17 @@ TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, 
 TREE_BASE, TREE_BASE_H = 1.6, 0.1        # tree tile: base width (fits the flat top of a sloped tile) and thickness
 GIFT = 0.9                               # gift box size
 STATUE_R, STATUE_H = 0.62, 1.57          # statue pawn: base radius, height (the top of its head)
+TILE = 3.24875                           # board tile (build_board --tile) and one level's height
+LEVEL = 0.9677127659574466
+GEAR_GAP, GEAR_T = 0.05, 0.05            # gear plate: inset from the gear's edge, thickness
+GEAR_PX = 256                            # gear texture pixels per tile
+GEAR_KINDS = [(4, "ccw", 1), (4, "ccw", 2), (4, "ccw", 3), (3, "cw", 0)]   # (size, turn, number; 0 = none) to build
+DOOR_IN, DOOR_H = 0.03, 2 * LEVEL - 0.03  # blocker: inset from its tile's edges; height (just under a 2-level wall)
+
+
+def gear_file(size, turn, number=0):
+    """A gear kind's texture (in props/)."""
+    return f"gear{size}-{turn}{'-' + str(number) if number else ''}-v1.jpg"
 BACKDROP_W, BACKDROP_D = 87.9078, 51.9810    # the custom table's play area (its image), measured in TTS
 
 
@@ -698,6 +718,174 @@ def statue_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.6))
 
 
+# ------------------------------------------------------------------------------------------------ Valora
+def gear_arrow(size, turn, r, c):
+    """The arrow on tile (r, c) of a size x size gear, as an image direction (dx, dy) with y down, or None (an odd
+    gear's middle tile). Each ring of tiles runs round the way the gear turns ("ccw": left along the top, down the
+    left side, right along the bottom, up the right side; "cw" the other way), a corner pointing along the side it
+    starts."""
+    lo, hi = min(r, c, size - 1 - r, size - 1 - c), size - 1 - min(r, c, size - 1 - r, size - 1 - c)
+    if lo == hi:
+        return None
+    top, bottom, left, right = r == lo, r == hi, c == lo, c == hi
+    if turn == "ccw":
+        if top and not left:
+            return (-1, 0)
+        if left and not bottom:
+            return (0, 1)
+        if bottom and not right:
+            return (1, 0)
+        return (0, -1)
+    if top and not right:
+        return (1, 0)
+    if right and not bottom:
+        return (0, 1)
+    if bottom and not left:
+        return (-1, 0)
+    return (0, -1)
+
+
+def plate_box(m, w, d, h, top_uv, side_uv):
+    """A w x d box from y = 0 to h, centred: its top mapped by top_uv(x, z), each side by side_uv(along, y)."""
+    x, z = w / 2, d / 2
+    m.face4([(-x, h, z), (x, h, z), (x, h, -z), (-x, h, -z)], [top_uv(-x, z), top_uv(x, z), top_uv(x, -z), top_uv(-x, -z)],
+            [(0, 1, 0)] * 4)
+    m.flat([(-x, 0, z), (-x, 0, -z), (x, 0, -z), (x, 0, z)], side_uv(0, 0), (0, -1, 0))
+    for (ax, az), (bx, bz), n, ln in (((-x, -z), (x, -z), (0, 0, -1), w), ((x, -z), (x, z), (1, 0, 0), d),
+                                      ((x, z), (-x, z), (0, 0, 1), w), ((-x, z), (-x, -z), (-1, 0, 0), d)):
+        m.face4([(ax, 0, az), (bx, 0, bz), (bx, h, bz), (ax, h, az)],
+                [side_uv(0, 0), side_uv(ln, 0), side_uv(ln, h), side_uv(0, h)], [n] * 4)
+
+
+def gear_plate(size):
+    """A gear's plate. The texture covers the gear's full size x size tiles; the plate is GEAR_GAP smaller all
+    round, so the tile seams on it sit over the board's. Its sides use the texture's dark rim."""
+    m = PieceMesh()
+    full = size * TILE
+    w = full - 2 * GEAR_GAP
+    m_top = lambda x, z: (0.5 + x / full, 0.5 + z / full)
+    m_side = lambda along, y: (0.002, 0.998)   # the texture's dark top-left corner
+    plate_box(m, w, w, GEAR_T, m_top, m_side)
+    return m
+
+
+def hazard(d, box, width, phase=0):
+    """Yellow and black diagonal stripes filling a rectangle's border band `width` wide."""
+    x0, y0, x1, y1 = box
+    d.rectangle([x0, y0, x1, y1], fill=(236, 186, 32, 255))
+    step = width * 1.4
+    k = -(y1 - y0) + phase
+    while k < (x1 - x0) + (y1 - y0):
+        d.polygon([(x0 + k, y0), (x0 + k + step / 2, y0), (x0 + k + step / 2 + (y1 - y0), y1), (x0 + k + (y1 - y0), y1)],
+                  fill=(26, 24, 22, 255))
+        k += step
+
+
+def draw_pair_number(img, text, cx, cy, size, fill):
+    """A number as a diagonal fraction (the user's style for numbered markers): upright at the top left, upside down
+    at the bottom right, a stroke between; each player reads one from their own side."""
+    from build_board import font
+    f = font(size)
+    pad = size
+    layer = Image.new("RGBA", (2 * pad, 2 * pad), (0, 0, 0, 0))
+    ImageDraw.Draw(layer).text((pad, pad), text, font=f, fill=fill, anchor="mm", stroke_width=max(2, size // 10),
+                               stroke_fill=(20, 18, 16, 255))
+    k = size * 0.42
+    img.alpha_composite(layer, (round(cx - k - pad), round(cy - k - pad)))
+    img.alpha_composite(layer.rotate(180), (round(cx + k - pad), round(cy + k - pad)))
+    s = ImageDraw.Draw(img)
+    reach = size * 0.55
+    s.line([(cx - reach, cy + reach), (cx + reach, cy - reach)], fill=(20, 18, 16, 255), width=round(size * 0.09) + 4)
+    s.line([(cx - reach, cy + reach), (cx + reach, cy - reach)], fill=fill, width=round(size * 0.09))
+
+
+def steel(n_w, n_h, rng, lo=(66, 68, 72), hi=(98, 100, 104)):
+    """Brushed steel: soft noise with fine streaks along x."""
+    g = rng.random((8, 8))
+    t = np.asarray(Image.fromarray((g * 255).astype(np.uint8)).resize((n_w, n_h), Image.BICUBIC), np.float32) / 255
+    streak = rng.random((n_h, 1)).astype(np.float32) * 0.12
+    t = np.clip(0.8 * t + streak, 0, 1)
+    lo, hi = np.array(lo, np.float32), np.array(hi, np.float32)
+    return lo + (hi - lo) * t[..., None]
+
+
+def gear_texture(size, turn, number=0):
+    """A gear plate's top: steel tiles with their seams, rivets at the corners, an arrow on each tile, hazard
+    stripes round the rim, the number (N/N) in the middle of a numbered gear."""
+    rng = np.random.default_rng(300 + 10 * size + number)
+    p, n = GEAR_PX, size * GEAR_PX
+    img = Image.fromarray(np.clip(steel(n, n, rng), 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+    d = ImageDraw.Draw(img, "RGBA")
+    rim = round(p * 0.07)
+    hazard(d, (0, 0, n - 1, rim), rim)
+    hazard(d, (0, n - 1 - rim, n - 1, n - 1), rim)
+    side = Image.new("RGBA", (n, rim + 1), (0, 0, 0, 0))
+    hazard(ImageDraw.Draw(side, "RGBA"), (0, 0, n - 1, rim), rim)
+    img.alpha_composite(side.rotate(90, expand=True), (0, 0))
+    img.alpha_composite(side.rotate(90, expand=True), (n - 1 - rim, 0))
+    d.rectangle([0, 0, 3, 3], fill=(20, 18, 18, 255))               # the dark corner the plate's sides use
+    for k in range(1, size):
+        d.line([(k * p, rim), (k * p, n - rim)], fill=(28, 28, 30, 255), width=4)
+        d.line([(rim, k * p), (n - rim, k * p)], fill=(28, 28, 30, 255), width=4)
+        d.line([(k * p + 3, rim), (k * p + 3, n - rim)], fill=(140, 142, 146, 120), width=1)
+        d.line([(rim, k * p + 3), (n - rim, k * p + 3)], fill=(140, 142, 146, 120), width=1)
+    for r in range(size):
+        for c in range(size):
+            for ox, oy in ((0.12, 0.12), (0.88, 0.12), (0.12, 0.88), (0.88, 0.88)):
+                x, y = (c + ox) * p, (r + oy) * p
+                d.ellipse([x - 6, y - 6, x + 6, y + 6], fill=(60, 60, 64, 255), outline=(24, 24, 26, 255), width=2)
+            arrow = gear_arrow(size, turn, r, c)
+            if not arrow:
+                continue
+            dx, dy = arrow
+            cx, cy = (c + 0.5) * p, (r + 0.5) * p
+            ln, head, w = 0.3 * p, 0.17 * p, round(0.07 * p)
+            tail, tip = (cx - dx * ln, cy - dy * ln), (cx + dx * ln, cy + dy * ln)
+            nx, ny = -dy, dx
+            neck = (tip[0] - dx * head, tip[1] - dy * head)
+            for col, extra in (((20, 18, 16, 230), 6), ((238, 232, 214, 255), 0)):
+                d.line([tail, neck], fill=col, width=w + extra)
+                d.polygon([(tip[0] + dx * extra / 2, tip[1] + dy * extra / 2),
+                           (neck[0] + nx * (head * 0.8 + extra / 2), neck[1] + ny * (head * 0.8 + extra / 2)),
+                           (neck[0] - nx * (head * 0.8 + extra / 2), neck[1] - ny * (head * 0.8 + extra / 2))], fill=col)
+    if number:
+        draw_pair_number(img, str(number), n / 2, n / 2, round(p * 0.3), (245, 200, 60, 255))
+    return img.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def door_block():
+    """A blocker: a steel block filling its tile. Texture: its top in the upper half (512 x 512), its sides below."""
+    m = PieceMesh()
+    s = TILE - 2 * DOOR_IN
+    plate_box(m, s, s, DOOR_H, lambda x, z: (0.5 + x / s, 0.75 + 0.5 * z / s),
+              lambda along, y: (along / s, 0.5 * y / DOOR_H))
+    return m
+
+
+def door_texture(number):
+    """A blocker's top: steel, hazard stripes round the edge, its gear's number (N/N); its sides: steel panels with
+    vertical seams, a hazard band along the top."""
+    rng = np.random.default_rng(340 + number)
+    w, h = 512, 1024
+    img = Image.fromarray(np.clip(steel(w, h, rng, (78, 78, 82), (112, 112, 116)), 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+    d = ImageDraw.Draw(img, "RGBA")
+    band = 34
+    for box in ((0, 0, w - 1, band), (0, 511 - band, w - 1, 511)):
+        hazard(d, box, band)
+    side = Image.new("RGBA", (512, band + 1), (0, 0, 0, 0))
+    hazard(ImageDraw.Draw(side, "RGBA"), (0, 0, 511, band), band)
+    img.alpha_composite(side.rotate(90, expand=True), (0, 0))
+    img.alpha_composite(side.rotate(90, expand=True), (w - 1 - band, 0))
+    draw_pair_number(img, str(number), w / 2, 256, 118, (245, 200, 60, 255))
+    hazard(d, (0, 512, w - 1, 512 + band), band)                       # the sides: hazard band along the top edge
+    for x in (0, w // 3, 2 * w // 3, w - 1):
+        d.line([(x, 512 + band), (x, h)], fill=(30, 30, 32, 255), width=5)
+    for x in (w // 6, w // 2, 5 * w // 6):
+        for y in range(560, h, 90):
+            d.ellipse([x - 5, y - 5, x + 5, y + 5], fill=(60, 60, 64, 255), outline=(24, 24, 26, 255), width=2)
+    return img.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
 # ------------------------------------------------------------------------------------------------ backdrop
 def backdrop():
     """A flat panel the size of the table's play area: an arena's surroundings are shown on it instead of on the
@@ -803,6 +991,12 @@ def main():
         "statue-v1.obj": lambda p: statue().write(p),
         "statue-v1.jpg": lambda p: statue_texture().save(p, quality=92),
         "statue-collider-v1.obj": lambda p: statue_collider().write(p),
+        "gear3-v1.obj": lambda p: gear_plate(3).write(p),
+        "gear4-v1.obj": lambda p: gear_plate(4).write(p),
+        **{gear_file(s, t, n): (lambda p, s=s, t=t, n=n: gear_texture(s, t, n).save(p, quality=92))
+           for s, t, n in GEAR_KINDS},
+        "door-v1.obj": lambda p: door_block().write(p),
+        **{f"door-{n}-v1.jpg": (lambda p, n=n: door_texture(n).save(p, quality=92)) for n in (1, 2, 3)},
         **{f"zoneframe{n}-{name}-v1.obj": (lambda p, n=n, s=s: zone_frame(n, s).write(p))
            for s, name in RAISED_SLANTS.items() for n in (2, 4)},
     }

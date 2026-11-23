@@ -22,6 +22,12 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
         to close it; legend "gate": its number, "branch" and "part" ("edge"/"inner"): which water it lets through.
   fountain (Fontaine): a marble fountain on a solid tile.
   statue (Spectra): a small stone pawn, NOT locked: players move it when the dice say so.
+  blockerN (Valora): a steel block filling the tile (Door), opened and closed by gear N: it slides into the wall
+        beside it (the one across from another blocker of its set, if any: a doorway's two halves part), or sinks
+        into the floor where there's no wall. Blockers start closed.
+  gears (Valora, map.json "gears": [{"at": [row, col], "size": 3|4, "turn": "ccw"|"cw", "number": n}]): a steel
+        plate (Gear) over each gear's tiles that Global.lua turns. Its tiles have "snap": false: the plate carries
+        their snap points. A capture zone on a gear (legend "lift": its thickness) sits on the plate.
   water tiles (legend "water": true, with "branch" and "part"): Fontaine's river, a water slab on each tile that
         Global.lua lowers out of sight when its stretch drains.
   zone (capture zone tiles): a frame around each square group of them (2x2), which takes the colour of the player
@@ -38,7 +44,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_board import Arena  # noqa: E402
-from build_pieces import BELL_LIFT  # noqa: E402  (the stand's beam is built for the bell at this height)
+from build_pieces import BELL_LIFT, DOOR_H, gear_file  # noqa: E402  (the stand's beam is built for the bell at this height)
 from tts import exec_lua, report  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
@@ -75,6 +81,9 @@ FOUNTAIN = {"mesh": "props/fountain-v1.obj", "diffuse": "props/fountain-v1.jpg",
             "convex": False, "material": 0}
 STATUE = {"mesh": "props/statue-v1.obj", "diffuse": "props/statue-v1.jpg", "collider": "props/statue-collider-v1.obj",
           "convex": True, "material": 3}   # matte stone
+GEAR_PLATES = {n: {"mesh": f"props/gear{n}-v1.obj", "collider": f"props/gear{n}-v1.obj", "convex": True, "material": 3}
+               for n in (3, 4)}
+DOOR = {"mesh": "props/door-v1.obj", "collider": "props/door-v1.obj", "convex": True, "material": 3}
 WATER_DEPTH = 0.62   # Fontaine: the water's surface above the river bed (the canal walls are 0.968 high)
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
 
@@ -102,7 +111,7 @@ def zones(data, info):
         if len(cols) != size or len(group) != size * size or size not in ZONES:
             sys.exit(f"capture zone tiles {sorted(group)}: only square 2x2 or 4x4 zones have a frame")
         tile = data["legend"][data["grid"][rows[0]][cols[0]]]
-        top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0)
+        top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0) + tile.get("lift", 0.0)
         cx = sum((c + 0.5 - C / 2) * T for _, c in group) / len(group)
         cz = sum((R / 2 - r - 0.5) * T for r, _ in group) / len(group)
         # raised above every tile round it, with sloping edges: the frame that sits inside the slopes
@@ -163,6 +172,28 @@ def board_json(arena, name=None):
     return boards[-1]
 
 
+def blocker_opening(data, r, c, T):
+    """Where a blocker goes when it opens, as a world offset (x, y, z): into a wall beside it (preferring the one
+    straight across from another blocker of its set, so a doorway's two halves part to its two sides), else down
+    into the floor."""
+    grid, legend = data["grid"], data["legend"]
+    me = legend[grid[r][c]]
+
+    def at(rr, cc):
+        return legend[grid[rr][cc]] if 0 <= rr < len(grid) and 0 <= cc < len(grid[0]) else None
+    walls, mates = [], []
+    for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        t = at(r + dr, c + dc)
+        if t and t.get("solid") and t.get("level", 0) > me.get("level", 0):
+            walls.append((dr, dc))
+        if t and t.get("marker") == me.get("marker"):
+            mates.append((dr, dc))
+    pick = next((w for w in walls if (-w[0], -w[1]) in mates), walls[0] if walls else None)
+    if pick:
+        return (round(pick[1] * T, 5), 0.0, round(-pick[0] * T, 5))
+    return (0.0, round(-(DOOR_H + 0.03), 5), 0.0)
+
+
 def pieces(arena, info):
     data = json.loads((arena / "map.json").read_text(encoding="utf-8"))
     grid = Arena(arena)
@@ -178,7 +209,8 @@ def pieces(arena, info):
                 out.append({"kind": "Water", "name": "River water", "model": WATER, "pos": [cx, bed + WATER_DEPTH, cz],
                             "yaw": 0, "desc": "", "branch": tile["branch"], "part": tile["part"]})
             if tile.get("void") or not tile.get("piece") or not (
-                    marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift", "gate", "fountain", "statue")):
+                    marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift", "gate", "fountain", "statue")
+                    or marker.startswith("blocker")):
                 continue
             top = info["floor0"] + tile["level"] * info["level_height"] - tile.get("sink", 0.0)
             if marker == "gate":   # its frame of posts, and the sluice block (Global.lua lowers it: gates start open)
@@ -190,6 +222,11 @@ def pieces(arena, info):
             elif marker == "fountain":
                 out.append({"kind": "Fountain", "name": "Fountain", "model": FOUNTAIN, "pos": [cx, top, cz], "yaw": 0,
                             "desc": "Fountain. A Pokémon that ends its turn next to it takes 1/16 of its HP in water damage."})
+            elif marker.startswith("blocker"):   # starts closed, filling the tile
+                n = int(marker[len("blocker"):])
+                sx, sy, sz = blocker_opening(data, r, c, T)
+                out.append({"kind": "Door", "name": f"Blocker {n}", "model": {**DOOR, "diffuse": f"props/door-{n}-v1.jpg"},
+                            "pos": [cx, top, cz], "yaw": 0, "desc": "", "door": n, "sx": sx, "sy": sy, "sz": sz})
             elif marker == "statue":
                 out.append({"kind": "Statue", "name": "Statue", "model": STATUE, "pos": [cx, top, cz], "yaw": 0,
                             "desc": "", "free": True})
@@ -217,6 +254,16 @@ def pieces(arena, info):
                 pos = [cx + sx * (T / 2 - FLAG_INSET), top, cz + sz * (T / 2 - FLAG_INSET)]
                 yaw = math.degrees(math.atan2(-sz, sx)) + 180   # TTS yaw that turns the model's +x toward (-sx, -sz)
                 out.append({"kind": "Flag", "name": "Flag", "model": FLAG, "pos": pos, "yaw": yaw % 360, "desc": ""})
+    for g in data.get("gears", []):
+        (r0, c0), n, num = g["at"], g["size"], g.get("number", 0)
+        tile = data["legend"][data["grid"][r0][c0]]
+        top = info["floor0"] + tile.get("level", 0) * info["level_height"]
+        diffuse = "props/" + gear_file(n, g["turn"], num)
+        if not (REPO / diffuse).exists():
+            sys.exit(f"gear {g}: no {diffuse} (add the kind to GEAR_KINDS in tools/build_pieces.py)")
+        out.append({"kind": "Gear", "name": f"Gear {num}" if num else "Gear", "model": {**GEAR_PLATES[n], "diffuse": diffuse},
+                    "pos": [(c0 + n / 2 - C / 2) * T, top, (R / 2 - r0 - n / 2) * T], "yaw": 0, "desc": "",
+                    "gear": num, "size": n, "turn": g["turn"], "tile": round(T, 5)})
     for size, pos, slant in zones(data, info):
         out.append({"kind": "Zone", "name": "Capture zone", "model": (RAISED_ZONES[slant] if slant else ZONES)[size], "pos": list(pos), "yaw": 0,
                     "desc": "", "tiles": size, "tile": round(T, 5)})

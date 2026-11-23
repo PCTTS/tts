@@ -120,8 +120,40 @@ def updown(d):
         d.polygon(P(x, tip, x - 22, tip + 30 * sy, x + 22, tip + 30 * sy), fill=255)
 
 
+def turn(d, ccw=True):
+    """Turn a gear (Valora): three quarters of a circle with an arrowhead, the way the gear turns as seen from above
+    (a turn reads the same way round from either side of the table). ccw=False mirrors it."""
+    r, w = 40, STROKE * 1.2
+    fx = (lambda x: x) if ccw else (lambda x: 128 - x)
+    # the arc runs counter-clockwise from 45 degrees up to 315 (maths angles, y up); drawn as a polyline so it can
+    # be mirrored
+    pts = []
+    for k in range(0, 271, 5):
+        a = math.radians(45 + k)
+        pts.append((fx(64 + r * math.cos(a)), 64 - r * math.sin(a)))
+    d.line([v * K for p in pts for v in p], fill=255, width=round(w * K), joint="curve")
+    a = math.radians(315)
+    ex, ey = 64 + r * math.cos(a), 64 - r * math.sin(a)         # the arc's end (lower right)
+    tx, ty = -math.sin(a), -math.cos(a)                          # counter-clockwise tangent there (screen, y down)
+    nx, ny = math.cos(a), -math.sin(a)                           # outward
+    tip = (ex + tx * 26, ey + ty * 26)
+    b1, b2 = (ex + nx * 20 - tx * 4, ey + ny * 20 - ty * 4), (ex - nx * 20 - tx * 4, ey - ny * 20 - ty * 4)
+    d.polygon([(fx(x) * K, y * K) for x, y in (tip, b1, b2)], fill=255)
+
+
+def doors(d):
+    """Open or close a gear's blockers: two door panels parting, an arrow out of each (the same from either side)."""
+    w = round(STROKE * K)
+    d.rectangle(P(14, 40, 54, 114), outline=255, width=w)
+    d.rectangle(P(74, 40, 114, 114), outline=255, width=w)
+    for x0, x1 in ((50, 12), (78, 116)):
+        d.line(P(x0, 18, x1 + (8 if x1 < 64 else -8), 18), fill=255, width=w)
+        s = -1 if x1 < 64 else 1
+        d.polygon(P(x1, 18, x1 - 16 * s, 6, x1 - 16 * s, 30), fill=255)
+
+
 SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords, "ability": sparkle,
-          "die": die, "updown": updown}
+          "die": die, "updown": updown, "turnccw": turn, "turncw": lambda d: turn(d, False), "doors": doors}
 
 
 def render(shape, size=N, ss=SS):

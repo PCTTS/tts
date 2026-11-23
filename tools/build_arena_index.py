@@ -30,6 +30,8 @@ def arena_entry(folder):
             tile = data["legend"][ch]
             if tile.get("void") or tile.get("solid"):   # nothing stands on solid tiles (walls)
                 continue
+            if tile.get("snap") is False:   # a piece over the tile carries its snap point (Valora's gear plates)
+                continue
             top = info["floor0"] + tile.get("level", 0) * info["level_height"] - tile.get("sink", 0.0) + SNAP_LIFT
             snaps.append([round((c + 0.5 - C / 2) * T, 4), round(top, 4), round((R / 2 - r - 0.5) * T, 4)])
     name, items = pieces(folder, info)

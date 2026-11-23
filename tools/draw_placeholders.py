@@ -50,6 +50,12 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 moss creeping up, seamless left-right
   misc/graveyard-placeholder-v1.jpg             table image around Spectra: dark grass in a pale mist, rows of
                                                 small weathered headstones
+  arenas/valora/textures/tread1.png, tread2.png  Valora's floor: weathered steel tread plate, rust in patches
+  arenas/valora/textures/iron-top.png           the walls' tops: heavy dark iron plates, rivets along the seams
+  arenas/valora/textures/iron-wall.png          the walls' sides: riveted iron panels, rust running down from the
+                                                rivets, seamless left-right
+  misc/foundry-placeholder-v1.jpg               table image around Valora: big riveted floor plates, grime, glowing
+                                                ore channels down the sides
 """
 from pathlib import Path
 
@@ -893,8 +899,111 @@ def graveyard_table():
     return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
 
 
+RUST = ((104, 58, 32), (150, 88, 46))
+
+
+def rusted(img, rng, h, w, amount=0.75, cut=0.58, wrap_x=False):
+    """Rust over steel in patches."""
+    rust = np.clip((fbm(h, w, rng, 5, 4, wrap_x=wrap_x) - cut) * 3.5, 0, 1)
+    return img + (mix(*RUST, fbm(h, w, rng, 14, 3, wrap_x=wrap_x)) - img) * (amount * rust)[..., None]
+
+
+def rivet(d, x, y, r=4.0):
+    d.ellipse([x - r, y - r, x + r, y + r], fill=(70, 66, 62, 255), outline=(30, 28, 26, 255))
+    d.ellipse([x - r * 0.6, y - r * 0.7, x, y - r * 0.1], fill=(170, 164, 156, 200))
+
+
+def tread_plate(seed):
+    """Valora's floor: weathered steel tread plate (raised lugs in a herringbone), rust in patches."""
+    rng = np.random.default_rng(seed)
+    img = mix((88, 87, 86), (118, 115, 110), fbm(N, N, rng, 4, 4))
+    out = to_img(rusted(img, rng, N, N, 0.7, 0.6)).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    step = 32
+    for gy in range(-1, N // step + 1):
+        for gx in range(-1, N // step + 1):
+            cx, cy = gx * step + step / 2, gy * step + step / 2
+            s = 1 if (gx + gy) % 2 == 0 else -1
+            dx, dy = 9 * s, 9
+            d.line([(cx - dx + 1.5, cy - dy + 1.5), (cx + dx + 1.5, cy + dy + 1.5)], fill=(30, 28, 26, 150), width=5)
+            d.line([(cx - dx, cy - dy), (cx + dx, cy + dy)], fill=(150, 146, 140, 170), width=4)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+def iron_top():
+    """Valora's wall tops: heavy dark iron plates with rivets along the seams, a little rust."""
+    rng = np.random.default_rng(221)
+    img = mix((56, 55, 58), (82, 78, 76), fbm(N, N, rng, 4, 4))
+    out = to_img(rusted(img, rng, N, N, 0.55, 0.62)).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for k in (0, N // 2, N):
+        d.line([(k, 0), (k, N)], fill=(24, 22, 22, 255), width=5)
+        d.line([(0, k), (N, k)], fill=(24, 22, 22, 255), width=5)
+        for t in range(16, N, 32):
+            rivet(d, k + (10 if k < N else -10), t)
+            rivet(d, t, k + (10 if k < N else -10))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def iron_wall():
+    """Valora's wall sides: riveted iron panels, rust running down from the rivets, grime at the foot (seamless
+    left-right)."""
+    rng = np.random.default_rng(223)
+    h, w = 1024, N
+    img = mix((60, 58, 60), (86, 82, 80), fbm(h, w, rng, 4, 4, wrap_x=True))
+    img = rusted(img, rng, h, w, 0.45, 0.64, wrap_x=True)
+    img *= (1.0 - 0.3 * np.linspace(0, 1, h, dtype=np.float32) ** 2)[:, None, None]
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for y in (0, 256, 512, 768):
+        d.line([(0, y), (w, y)], fill=(22, 20, 20, 255), width=5)
+    for x in (0, w // 2, w):
+        d.line([(x, 0), (x, h)], fill=(22, 20, 20, 255), width=5)
+    for y in (0, 256, 512, 768):
+        for x in range(16, w, 32):
+            rivet(d, x, y + 12)
+            if rng.random() < 0.3:                                    # a rust streak running down from it
+                ln = rng.uniform(40, 160)
+                d.line([(x, y + 16), (x + rng.uniform(-3, 3), y + 16 + ln)], fill=(130, 70, 36, 90), width=3)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+def foundry_table():
+    """Around Valora: a dark foundry floor of big riveted steel plates, grime, and glowing ore channels running down
+    the side strips beside the board."""
+    rng = np.random.default_rng(227)
+    h, w = 1211, 2048
+    img = mix((36, 36, 38), (62, 60, 58), fbm(h, w, rng, 5, 5))
+    img = rusted(img, rng, h, w, 0.35, 0.62)
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for x in range(0, w + 1, 160):
+        d.line([(x, 0), (x, h)], fill=(16, 16, 16, 255), width=4)
+    for y in range(0, h + 1, 160):
+        d.line([(0, y), (w, y)], fill=(16, 16, 16, 255), width=4)
+    for x in range(0, w + 1, 160):
+        for y in range(0, h + 1, 160):
+            for ox, oy in ((10, 10), (-10, 10), (10, -10), (-10, -10)):
+                rivet(d, x + ox, y + oy, 4.5)
+    img = np.asarray(out.convert("RGB"), np.float32)
+    xx = np.arange(w, dtype=np.float32)[None, :]
+    wob = 14 * np.sin(np.arange(h, dtype=np.float32)[:, None] / 37.0)
+    for cx in (210, w - 210):                                       # molten channels, a soft glow round them
+        dist = np.abs(xx - cx - wob)
+        glow = np.exp(-(dist / 46) ** 2)[..., None]
+        core = np.clip(1 - dist / 16, 0, 1)[..., None]
+        img = img + (np.array((255, 120, 30), np.float32) - img) * (0.55 * glow)
+        img = img + (np.array((255, 214, 120), np.float32) - img) * core
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
+
+
 def main():
     files = {
+        "arenas/valora/textures/tread1.png": lambda p: tread_plate(231).save(p),
+        "arenas/valora/textures/tread2.png": lambda p: tread_plate(232).save(p),
+        "arenas/valora/textures/iron-top.png": lambda p: iron_top().save(p),
+        "arenas/valora/textures/iron-wall.png": lambda p: iron_wall().save(p),
+        "misc/foundry-placeholder-v1.jpg": lambda p: foundry_table().save(p, quality=90),
         "arenas/spectra/textures/grave-grass1.png": lambda p: grave_grass(211).save(p),
         "arenas/spectra/textures/grave-grass2.png": lambda p: grave_grass(212).save(p),
         "arenas/spectra/textures/crypt-top.png": lambda p: crypt_top().save(p),

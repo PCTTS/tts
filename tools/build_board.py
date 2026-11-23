@@ -692,7 +692,7 @@ def painted_marker(t):
     return t.get("decal") or (t.get("marker") if t.get("paint", True) else None)
 
 
-NUMBERED = ("passage-in", "passage-out", "trapdoor", "button", "zone-number")   # markers that carry a number
+NUMBERED = ("passage-in", "passage-out", "trapdoor", "button", "zone-number", "blocker")   # markers that carry a number
 
 
 def both_ways(a, t):
@@ -851,6 +851,27 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None):
             draw_pair(im, n, cx, cy, round(40 * u), fill)
         else:
             o.text((cx, cy + 2 * u), n, font=font(round(52 * u)), fill=fill, anchor="mm")
+    elif marker.startswith("blocker"):   # where a blocker stands when closed (Valora): a dark slot in a hazard-striped
+        n = marker[len("blocker"):]       # frame, the number of the gear that opens and closes it
+        m0, band = 5 * u, 13 * u
+        stripes = Image.new("RGBA", (p, p), (236, 186, 32, 255))
+        sd = ImageDraw.Draw(stripes)
+        for k in range(-p, 2 * p, round(18 * u)):
+            sd.polygon([(k, 0), (k + 9 * u, 0), (k + 9 * u + p, p), (k + p, p)], fill=(26, 24, 22, 255))
+        mask = Image.new("L", (p, p), 0)
+        md = ImageDraw.Draw(mask)
+        md.rectangle([m0, m0, p - m0, p - m0], fill=255)
+        md.rectangle([m0 + band, m0 + band, p - m0 - band, p - m0 - band], fill=0)
+        layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
+        layer.paste(stripes, (0, 0), mask)
+        im.alpha_composite(layer, (round(x0), round(y0)))
+        o.rectangle([x0 + m0 + band, y0 + m0 + band, x0 + p - m0 - band, y0 + p - m0 - band], fill=(34, 34, 38, 255))
+        gold = (245, 200, 60, 255)
+        if both:
+            draw_pair(im, n, cx, cy, round(30 * u), gold, stroke_width=round(2 * u), stroke_fill=(20, 18, 16, 255))
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(38 * u)), fill=gold, anchor="mm", stroke_width=round(2 * u),
+                   stroke_fill=(20, 18, 16, 255))
     elif marker == "lantern":   # an iron lantern with a lit flame in a warm glow (Spectra: on crypt corners)
         for rr, alpha in ((58, 26), (48, 40), (38, 56)):
             o.ellipse([cx - rr * u, cy - rr * u, cx + rr * u, cy + rr * u], fill=(255, 150, 50, alpha))

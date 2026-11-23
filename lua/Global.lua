@@ -16,6 +16,8 @@ Flags take the colour of the last Pokémon put down on their tile (left-click on
 take the colour of the player with more Pokémon in them.
 Water gates (Fontaine): click the arrows on a gate (or right-click it) to open or close it; the river past it
 drains or fills.
+Gears (Valora): click the turning arrow on a gear (or right-click it) to turn it 270 degrees, carrying what stands
+on it round; a numbered gear's doors button opens or closes its blockers.
 HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
@@ -28,7 +30,8 @@ ICONS = {
   pokeball = "ui/icons/pokeball-v3.png", map = "ui/icons/map-v3.png", status = "ui/icons/status-v3.png",
   item = "ui/icons/item-v3.png", skill = "ui/icons/skill-v3.png", ability = "ui/icons/ability-v3.png",
 }
-PIECE_ICONS = { die = "ui/icons/die-v3.png", updown = "ui/icons/updown-v3.png" }   -- buttons on arena pieces
+PIECE_ICONS = { die = "ui/icons/die-v3.png", updown = "ui/icons/updown-v3.png",   -- buttons on arena pieces
+  turnccw = "ui/icons/turnccw-v3.png", turncw = "ui/icons/turncw-v3.png", doors = "ui/icons/doors-v3.png" }
 -- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
 -- UI images it shrinks, so a much larger image looks jagged.
 BAR_ICON, BAR_MARGIN, BAR_GAP = 32, 3, 6
@@ -230,7 +233,8 @@ READERS = {
   end,
   arenas = function(rows)
     local t, cur = {}, nil
-    local NUM = { yaw = true, material = true, pair = true, tile = true, tiles = true, gate = true, branch = true }
+    local NUM = { yaw = true, material = true, pair = true, tile = true, tiles = true, gate = true, branch = true,
+      gear = true, size = true, door = true, sx = true, sy = true, sz = true }
     for _, f in ipairs(rows) do
       if f[1] == "arena" then
         cur = { mesh = f[3], texture = f[4], table = f[5] or "", snaps = {}, pieces = {} }
@@ -297,7 +301,7 @@ function onLoad(saved)
       elseif obj.hasTag("Pokemon") then
         plainStandee(obj)
       elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap")
-        or obj.hasTag("GateFrame") or obj.hasTag("Gate") or obj.hasTag("Water")
+        or obj.hasTag("GateFrame") or obj.hasTag("Gate") or obj.hasTag("Water") or obj.hasTag("Gear") or obj.hasTag("Door")
         or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") or obj.hasTag("Pillar") then
         pieceSetup(obj)
       elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
@@ -322,7 +326,7 @@ end
 -- pieces still need clicks (HP signs, flags, buttons), so players just can't delete or cut them; the map picker
 -- replaces them by script, which isn't a player action.
 PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand", "GateFrame", "Gate", "Water",
-  "Fountain", "Statue" }
+  "Fountain", "Statue", "Gear", "Door" }
 
 function onPlayerAction(player, action, targets)
   if action == Player.Action.Select or action == Player.Action.PickUp then
@@ -751,6 +755,11 @@ function spawnArenaPiece(p, origin, base)
   elseif p.kind == "Water" then
     data.Memo = JSON.encode({ branch = p.branch, part = p.part, y = pos.y })
     data.CustomMesh.CastShadows = false
+  elseif p.kind == "Gear" then
+    data.Memo = JSON.encode({ gear = p.gear or 0, size = p.size or 4, turn = p.turn or "ccw", tile = p.tile or BOARD_TILE })
+  elseif p.kind == "Door" then   -- blockers start closed, filling their tile; the memo keeps that spot
+    data.Memo = JSON.encode({ door = p.door, open = false, x = pos.x, y = pos.y, z = pos.z,
+      sx = p.sx or 0, sy = p.sy or 0, sz = p.sz or 0 })
   end
   return spawnObjectData({ data = data, position = pos, rotation = { 0, p.yaw, 0 },
     callback_function = function(obj) pieceSetup(obj) end })
@@ -1401,6 +1410,116 @@ function gateClicked(_, _, id)
 end
 
 ----------------------------------------------------------------------------------------------------
+-- Gears and blockers (Valora). A gear is a steel plate (Gear) lying on its tiles: its button (or right-click > Turn
+-- gear) turns it 270 degrees the way its arrows point, carrying whatever stands on it round with it (Pokémon keep
+-- the way they face; nothing is teleported: the plate and its riders sweep round together). A numbered gear (1-3)
+-- also has a doors button that opens or closes its blockers (Door): steel blocks that slide into the wall beside
+-- them, or sink into the floor where there's no wall. Blockers start closed.
+-- Memos: Gear { gear (0: unnumbered), size, turn ("ccw"/"cw" seen from above), tile }; Door { door, open,
+-- x, y, z (where it stands closed), sx, sy, sz (the move that opens it) }.
+----------------------------------------------------------------------------------------------------
+GEAR_TURN_FRAMES = 150   -- a turn takes this many frames (about two and a half seconds)
+GEAR_T = 0.05            -- tools/build_pieces.py: a gear plate's thickness
+GEAR_BUTTON_IN = 0.55    -- its buttons sit this far in from two of its edges, in opposite corner tiles
+turningGears = {}        -- gear guid -> true while it turns
+
+function gearState(obj)
+  local st = memoTable(obj)
+  st.size, st.tile, st.turn, st.gear = st.size or 4, st.tile or BOARD_TILE, st.turn or "ccw", st.gear or 0
+  return st
+end
+
+-- A snap point on every tile of the plate (the board has none under it).
+function gearSnaps(st)
+  local snaps, h = {}, (st.size - 1) / 2
+  for i = 0, st.size - 1 do
+    for j = 0, st.size - 1 do
+      snaps[#snaps + 1] = { position = { (i - h) * st.tile, GEAR_T + 0.02, (j - h) * st.tile }, rotation = { 0, 0, 0 },
+        rotation_snap = false }
+    end
+  end
+  return snaps
+end
+
+-- What rides on a gear: anything loose (Pokémon, gift boxes) resting over its tiles and not in someone's hand.
+function gearRiders(plate, st)
+  local c, half, riders = plate.getPosition(), st.size * st.tile / 2, {}
+  for _, o in ipairs(getAllObjects()) do
+    if o ~= plate and not o.getLock() and not o.held_by_color then
+      local p = o.getPosition()
+      if math.abs(p.x - c.x) < half and math.abs(p.z - c.z) < half and p.y > c.y - 0.5 and p.y < c.y + 5 then
+        riders[#riders + 1] = { obj = o, dx = p.x - c.x, dz = p.z - c.z, y = p.y }
+      end
+    end
+  end
+  return riders
+end
+
+-- Turn a gear 270 degrees the way its arrows point, a little each frame, its riders swept round with it (held still
+-- meanwhile: locked, so physics doesn't drop them, and unlocked again at the end). Seen from above with player 1's
+-- side at the bottom, "ccw" is counter-clockwise; in TTS a positive yaw turns clockwise.
+function turnGear(plate)
+  if not plate or turningGears[plate.guid] then return false end
+  local st = gearState(plate)
+  local c, riders, yaw0 = plate.getPosition(), gearRiders(plate, st), plate.getRotation().y
+  local sign = st.turn == "cw" and -1 or 1
+  turningGears[plate.guid] = true
+  for _, r in ipairs(riders) do r.obj.setLock(true) end
+  local k = 0
+  local function step()
+    k = k + 1
+    local t = k / GEAR_TURN_FRAMES
+    local a = sign * math.rad(270) * t * t * (3 - 2 * t)   -- eased in and out
+    local ca, sa = math.cos(a), math.sin(a)
+    plate.setRotation({ 0, (yaw0 - math.deg(a)) % 360, 0 })
+    for _, r in ipairs(riders) do
+      r.obj.setPosition({ c.x + r.dx * ca - r.dz * sa, r.y, c.z + r.dx * sa + r.dz * ca })
+    end
+    if k < GEAR_TURN_FRAMES then
+      Wait.frames(step, 1)
+    else
+      for _, r in ipairs(riders) do r.obj.setLock(false) end
+      turningGears[plate.guid] = nil
+    end
+  end
+  step()
+  return true
+end
+
+function setDoorsOpen(n, open)
+  for _, door in ipairs(piecesTagged("Door")) do
+    local st = memoTable(door)
+    if st.door == n and (st.open == true) ~= open then
+      st.open = open
+      door.memo = JSON.encode(st)
+      if st.x then
+        local to = Vector(st.x, st.y, st.z)
+        if open then to = Vector(st.x + (st.sx or 0), st.y + (st.sy or 0), st.z + (st.sz or 0)) end
+        door.setPositionSmooth(to, false, false)
+      end
+    end
+  end
+end
+
+function toggleDoors(n)
+  for _, door in ipairs(piecesTagged("Door")) do
+    local st = memoTable(door)
+    if st.door == n then return setDoorsOpen(n, st.open ~= true) end
+  end
+end
+
+-- A gear's buttons: "gear_<its guid>" turns it, "doors_<number>" opens or closes that number's blockers.
+function gearClicked(_, _, id)
+  local plate = getObjectFromGUID(tostring(id or ""):sub(6))
+  if plate then turnGear(plate) end
+end
+
+function doorsClicked(_, _, id)
+  local n = tonumber(tostring(id or ""):sub(7))
+  if n then toggleDoors(n) end
+end
+
+----------------------------------------------------------------------------------------------------
 -- Traps (Chrysalia): a trap piece on its tile; once it has caught a Pokémon, right-click > Spring trap removes it.
 ----------------------------------------------------------------------------------------------------
 TRAP_DESC = "Trap. A Pokémon that ends its turn here finishes its activation and skips its next one; then the trap "
@@ -1452,6 +1571,24 @@ function pieceSetup(obj)
     obj.addContextMenuItem("Close gate", function() setGateOpen(n, false) end)
   elseif obj.hasTag("Gate") then
     obj.interactable = false   -- opened and closed through its posts
+  elseif obj.hasTag("Gear") then
+    local st = gearState(obj)
+    if #(obj.getSnapPoints() or {}) ~= st.size * st.size then obj.setSnapPoints(gearSnaps(st)) end
+    local icon, h = st.turn == "cw" and "turncw" or "turnccw", st.size * st.tile / 2 - GEAR_BUTTON_IN
+    local assets = { { name = icon, url = BASE_URL .. PIECE_ICONS[icon] } }
+    local xml = pieceButtonXml("gear_" .. obj.guid, h, -h, GEAR_T + 0.01, "gearClicked", "Turn the gear", icon)
+    obj.clearContextMenu()
+    obj.addContextMenuItem("Turn gear", function() turnGear(obj) end)
+    if st.gear > 0 then
+      assets[2] = { name = "doors", url = BASE_URL .. PIECE_ICONS.doors }
+      xml = xml .. pieceButtonXml("doors_" .. st.gear, -h, h, GEAR_T + 0.01, "doorsClicked",
+        "Open or close blockers " .. st.gear, "doors")
+      obj.addContextMenuItem("Blockers " .. st.gear .. " open/close", function() toggleDoors(st.gear) end)
+    end
+    obj.UI.setCustomAssets(assets)
+    obj.UI.setXml(xml)
+  elseif obj.hasTag("Door") then
+    obj.interactable = false   -- opened and closed from its gear
   elseif obj.hasTag("Water") then
     obj.interactable = false   -- part of the board; a Pokémon can stand on it
     if #(obj.getSnapPoints() or {}) ~= 1 then
