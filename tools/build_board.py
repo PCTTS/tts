@@ -889,8 +889,8 @@ def slopes(a, r, c):
     raised areas whose tiles all share the same slant, one level step, not next to the sky (else the build stops)."""
     t = a.tile(r, c)
     w = t.get("slant", 0)
-    if not w or t.get("slant_to"):   # "slant_to" tiles: see contact_edges()
-        return {}
+    if not w or t.get("slant_to") or t.get("sheer"):   # "slant_to" tiles: see contact_edges(); "sheer": its drops
+        return {}                                          # to lower ground stay walls (its slant is for its wedges up)
     level, out = t.get("level", 0), {}
     for side, (dr, dc, _) in DIRS.items():
         nb = a.tile(r + dr, c + dc)
@@ -943,7 +943,7 @@ def inner_corners(a, r, c):
     """A slanted tile's inner (concave) corners: {"NE"/"NW"/"SE"/"SW": the bottom of the dip}, where the diagonal
     neighbour is lower but both sides beside it are not."""
     t = a.tile(r, c)
-    if not (t and t.get("slant")) or t.get("slant_to"):
+    if not (t and t.get("slant")) or t.get("slant_to") or t.get("sheer"):
         return {}
     level, out = t.get("level", 0), {}
     for dr, dc in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
