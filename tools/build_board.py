@@ -27,6 +27,7 @@ FLOOR0 = 0.3      # top of level 0 above the board's underside at TILE 2.35 (sca
 PX = 128          # texture pixels per tile
 SS = 2            # supersampling for the texture art
 STRIP = 256       # texture rows under the tile area, used for the walls
+WALL_GUTTER = 4   # texture pixels each side of an own wall image's slice: its wrapped edge, outside its UVs
 DIRS = {"N": (-1, 0, (0, 0, 1)), "S": (1, 0, (0, 0, -1)), "E": (0, 1, (1, 0, 0)), "W": (0, -1, (-1, 0, 0))}
 
 
@@ -206,12 +207,16 @@ def paint_own_walls(a, img, layers, p):
     ("levels": [lo, hi]: fitted from lo up to hi; "scale": "tile": its own shape, a tile wide like the tiles'
     textures, cut off wherever a wall ends), repeated below; "across" copies side by side per tile (default: the
     whole number nearest the image's own shape; 1 at "scale": "tile"). Above its top (a wedge's side, see rises())
-    the surface's own texture, at the wall scale."""
+    the surface's own texture, at the wall scale. Each slice keeps a WALL_GUTTER each side, filled with the image's
+    own wrapped edge: the walls' UVs stay inside it, so texture filtering (and TTS's smaller mipmap copies) never
+    blends in the neighbouring slice, which showed as a dark line down one end of a wall."""
     y0, rows = a.R * p, STRIP * SS
     span = a.y_span()
+    g = WALL_GUTTER * SS
+    iw = p - 2 * g   # the part of a slice the walls map a tile's width onto
 
-    def row(y):   # the strip row at height y (see wall_uv in build_mesh)
-        return y0 + (1 - y / span) * rows
+    def row(y):   # the row at height y in a slice's column (see wall_uv in build_mesh)
+        return (1 - y / span) * rows
     own, _ = own_walls(a)
     for (surface, top), slices in own.items():
         spec = a.data["textures"][f"walls:{surface}"]
@@ -229,25 +234,27 @@ def paint_own_walls(a, img, layers, p):
         if surface in layers:
             r, c = next((r, c) for r in range(a.R) for c in range(a.C)
                         if a.tile(r, c) and a.tile(r, c).get("surface", "floor") == surface)
-            above = layers[surface].crop((c * p, r * p, (c + 1) * p, (r + 1) * p)).resize((p, tall), Image.LANCZOS)
+            above = layers[surface].crop((c * p, r * p, (c + 1) * p, (r + 1) * p)).resize((iw, tall), Image.LANCZOS)
         for i in slices:
-            x0 = i * p
+            col = Image.new("RGB", (iw, rows), a.palette[surface])
             ytop = round(row(top))
             if above is not None:   # its bottom row at the tiles' top
-                for k in range(ytop, y0, -tall):
-                    piece = above.crop((0, max(0, tall - (k - y0)), p, tall))
-                    img.paste(piece, (x0, k - piece.height))
-            elif ytop > y0:
-                ImageDraw.Draw(img).rectangle([x0, y0, x0 + p - 1, ytop - 1], fill=a.palette[surface])
+                for k in range(ytop, 0, -tall):
+                    piece = above.crop((0, max(0, tall - k), iw, tall))
+                    col.paste(piece, (0, k - piece.height))
             level = top
             while level > 1e-9:   # a copy's height at a time down to the underside
                 ra, rb = round(row(level)), round(row(max(0.0, level - fit)))
                 full = round(row(level - fit)) - ra   # a partial last band shows the image's top part
                 for j in range(across):
-                    xa, xb = x0 + round(j * p / across), x0 + round((j + 1) * p / across)
+                    xa, xb = round(j * iw / across), round((j + 1) * iw / across)
                     copy = rnd.choice(choices).resize((xb - xa, full), Image.LANCZOS)
-                    img.paste(copy.crop((0, 0, xb - xa, rb - ra)), (xa, ra))
+                    col.paste(copy.crop((0, 0, xb - xa, rb - ra)), (xa, ra))
                 level -= fit
+            x0 = i * p
+            img.paste(col, (x0 + g, y0))
+            img.paste(col.crop((iw - g, 0, iw, rows)), (x0, y0))       # the gutters: its edges wrapped round
+            img.paste(col.crop((0, 0, g, rows)), (x0 + g + iw, y0))
 
 
 def draw_texture(a):
@@ -952,20 +959,22 @@ def build_mesh(a):
                 half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
                 pick = r * 5 + c * 3 + len(side)
                 key = own_key(a, t) if nb else None
-                if key in own:   # this tile's own inner wall image (see own_walls)
+                if key in own:   # this tile's own inner wall image (see own_walls), inside its slice's gutters
                     us = own[key][pick % len(own[key])] * PX
+                    ua, ub = us + WALL_GUTTER, us + PX - WALL_GUTTER
                 else:
                     us = ((pick % (inner_n if nb else half)) + (half if nb else 0)) * PX
+                    ua, ub = us, us + PX - 1
                 fs = sorted(set(edge_breaks(r, c) + (edge_breaks(r + dr, c + dc) if nb else [])))
                 if len(fs) > 2:   # a slope along this edge, here or next door: the wall follows both surfaces
                     profile_wall(m, edge, fs, lambda px, pz: surface_at(r, c, px, pz),
                                  (lambda px, pz: surface_at(r + dr, c + dc, px, pz)) if nb else (lambda px, pz: low),
-                                 normal, lambda f, y: wall_uv(us + f * (PX - 1), y))
+                                 normal, lambda f, y: wall_uv(ua + f * (ub - ua), y))
                     continue
                 if low >= wall_top:
                     continue
                 m.quad([(ax, wall_top, az), (bx, wall_top, bz), (bx, low, bz), (ax, low, az)],
-                       [wall_uv(us, wall_top), wall_uv(us + PX - 1, wall_top), wall_uv(us + PX - 1, low), wall_uv(us, low)],
+                       [wall_uv(ua, wall_top), wall_uv(ub, wall_top), wall_uv(ub, low), wall_uv(ua, low)],
                        normal)
     if a.float:
         underside(a, m, wall_uv)

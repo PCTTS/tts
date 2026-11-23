@@ -9,6 +9,8 @@ nothing pushed), then publish the one to keep.
                                                       texture version (the mesh is reused when it's unchanged),
                                                       arena index, offline tests, commit + push, wait for GitHub
                                                       Pages, then put the published board on the table
+  python -I tools/wall_texture.py --wall floor=<image> --wall stairs=<image2> ...   a different image per surface
+                                                      (works with --watch and --publish too)
   options:  --arena pugilis   --surface stairs (whose inner walls; several: floor,stairs)
             --levels LO HI   fit the image from level LO's top to level HI's top on every wall (layers line up)
             --natural        the image's own shape, a tile wide like the floor textures, cut off wherever a wall ends
@@ -172,11 +174,11 @@ def to_tts(name, mesh, diffuse):
         print("TTS isn't answering (it only does while a game is loaded)")
 
 
-def preview(folder, image, surfaces, opts):
+def preview(folder, walls, opts):
     t0 = time.time()
     a = arena(folder)
     data, board = published(folder)
-    for surface in surfaces:
+    for surface, image in walls:
         a.data.setdefault("textures", {})[f"walls:{surface}"] = wall_spec(data, surface, str(image.resolve()), opts)
     PREVIEWS.mkdir(exist_ok=True)
     for old in sorted(PREVIEWS.glob(f"{folder.name}-*"))[:-4]:   # keep just the last few
@@ -192,20 +194,24 @@ def preview(folder, image, surfaces, opts):
     to_tts(data["name"], mesh_url, jpg.as_uri())
 
 
-def watch(folder, image, surfaces, opts):
+def watch(folder, walls, opts):
+    images = sorted({image for _, image in walls})
     seen = None
-    print(f"watching {image} (Ctrl+C stops)")
+
+    def stamps():
+        try:
+            return tuple(image.stat().st_mtime_ns for image in images)
+        except FileNotFoundError:
+            return None
+    print(f"watching {', '.join(map(str, images))} (Ctrl+C stops)")
     try:
         while True:
-            try:
-                stamp = image.stat().st_mtime_ns
-            except FileNotFoundError:
-                stamp = None
+            stamp = stamps()
             if stamp and stamp != seen:
                 time.sleep(0.5)   # let the paint program finish writing it
-                seen = image.stat().st_mtime_ns
+                seen = stamps()
                 try:
-                    preview(folder, image, surfaces, opts)
+                    preview(folder, walls, opts)
                 except Exception as e:   # a half-written image: try again on the next save
                     print("couldn't build:", e)
             time.sleep(1)
@@ -232,16 +238,18 @@ def wait_for_pages(paths, minutes=6):
     return False
 
 
-def publish(folder, image, surfaces, opts):
-    stem = re.sub(r"[^a-z0-9]+", "-", image.stem.lower()).strip("-").removeprefix(folder.name + "-")
-    dest = folder / "textures" / f"{stem}{image.suffix.lower()}"   # Pugilis_Cliff2.png -> textures/cliff2.png
-    dest.parent.mkdir(exist_ok=True)
-    if image.resolve() != dest.resolve():
-        shutil.copy2(image, dest)
+def publish(folder, walls, opts):
+    dests = {}
+    for _, image in walls:   # Pugilis_Cliff2.png -> textures/cliff2.png
+        stem = re.sub(r"[^a-z0-9]+", "-", image.stem.lower()).strip("-").removeprefix(folder.name + "-")
+        dests[image] = folder / "textures" / f"{stem}{image.suffix.lower()}"
+        dests[image].parent.mkdir(exist_ok=True)
+        if image.resolve() != dests[image].resolve():
+            shutil.copy2(image, dests[image])
     text, crlf = read_map(folder)
     data = json.loads(text)
-    for surface in surfaces:
-        text = set_object(text, f"walls:{surface}", wall_spec(data, surface, f"textures/{dest.name}", opts),
+    for surface, image in walls:
+        text = set_object(text, f"walls:{surface}", wall_spec(data, surface, f"textures/{dests[image].name}", opts),
                           "textures")
     write_map(folder, text, crlf)
 
@@ -267,10 +275,12 @@ def publish(folder, image, surfaces, opts):
         print(tests.stdout[-2000:], tests.stderr[-2000:])
         sys.exit("tests failed: nothing committed")
     rel = lambda p: p.relative_to(REPO).as_posix()   # noqa: E731
-    paths = [rel(folder / "map.json"), rel(dest), "arenas/index.json", "arenas/index.txt"] + \
+    paths = [rel(folder / "map.json"), *sorted({rel(d) for d in dests.values()}), "arenas/index.json",
+             "arenas/index.txt"] + \
             [rel(folder / f) for f in files.values()]
     run("git", "add", "--", *paths)
-    message = (f"{data['name']} texture {tag}: {image.name} on the inner walls of {', '.join(surfaces)}\n\n"
+    used = "; ".join(f"{image.name} on the {surface} walls" for surface, image in walls)
+    message = (f"{data['name']} texture {tag}: {used}\n\n"
                "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n")
     subprocess.run(["git", "commit", "-q", "-F", "-", "--", *paths], cwd=REPO, check=True, input=message, text=True)
     run("git", "push", "-q")
@@ -297,6 +307,7 @@ def main():
     ap.add_argument("image", type=Path, nargs="?")
     ap.add_argument("--arena", default="pugilis")
     ap.add_argument("--surface", default="stairs")
+    ap.add_argument("--wall", action="append", default=[], metavar="SURFACE=IMAGE")
     ap.add_argument("--across", type=int)
     ap.add_argument("--levels", type=int, nargs=2)
     ap.add_argument("--top", type=int)
@@ -309,11 +320,16 @@ def main():
     folder = REPO / "arenas" / args.arena.lower()
     if args.reset:
         return reset(folder)
-    if not args.image or not args.image.exists():
-        sys.exit(f"no image at {args.image}")
+    walls = [(surface, args.image) for surface in args.surface.split(",")] if args.image else []
+    walls += [(w.split("=", 1)[0], Path(w.split("=", 1)[1])) for w in args.wall]
+    if not walls:
+        sys.exit("give an image (or --wall SURFACE=IMAGE)")
+    for _, image in walls:
+        if not image.exists():
+            sys.exit(f"no image at {image}")
     opts = {"across": args.across, "levels": args.levels, "top": args.top, "natural": args.natural,
             "mirror": args.mirror}
-    job = (folder, args.image, args.surface.split(","), opts)
+    job = (folder, walls, opts)
     if args.publish:
         publish(*job)
     elif args.watch:
