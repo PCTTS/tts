@@ -9,10 +9,12 @@ nothing pushed), then publish the one to keep.
                                                       texture version (the mesh is reused when it's unchanged),
                                                       arena index, offline tests, commit + push, wait for GitHub
                                                       Pages, then put the published board on the table
-  options:  --arena pugilis   --surface stairs (whose inner walls; several: floor,stairs)   --levels LO HI (fit the
-            image from level LO's top to level HI's top on every wall, so its layers line up; default: one level
-            from each tile's top)   --across N (copies across a tile; default: the whole number nearest the image's
-            own shape). Settings already in map.json are kept unless given.
+  options:  --arena pugilis   --surface stairs (whose inner walls; several: floor,stairs)
+            --levels LO HI   fit the image from level LO's top to level HI's top on every wall (layers line up)
+            --natural        the image's own shape, a tile wide like the floor textures, cut off wherever a wall ends
+            --top L          its top at level L's top on every wall (default: each tile's own top)
+            --across N       copies across a tile (default: nearest the image's shape; 1 with --natural)
+            (default size: one level.) Settings already in map.json are kept unless given.
 
 A previewed board points at a file on this computer that the other players don't have: publish or --reset before
 saving the game.
@@ -120,15 +122,22 @@ def set_board(text, files):
     return text[:start] + block + text[end:]
 
 
-def wall_spec(data, surface, image, across, levels):
+def wall_spec(data, surface, image, opts):
     """The "walls:<surface>" texture spec with a new image (keeping its other settings; mirrored copies if new)."""
     spec = dict((data.get("textures") or {}).get(f"walls:{surface}") or {"vary": "mirror"})
     spec.pop("images", None)
     spec["image"] = image
-    if across:
-        spec["across"] = across
-    if levels:
-        spec["levels"] = levels
+    if opts.get("across"):
+        spec["across"] = opts["across"]
+    if opts.get("levels"):
+        spec["levels"] = opts["levels"]
+        spec.pop("top", None), spec.pop("scale", None)
+    if opts.get("top") is not None:
+        spec["top"] = opts["top"]
+        spec.pop("levels", None)
+    if opts.get("natural"):
+        spec["scale"] = "tile"
+        spec.pop("levels", None)
     return spec
 
 
@@ -157,13 +166,12 @@ def to_tts(name, mesh, diffuse):
         print("TTS isn't answering (it only does while a game is loaded)")
 
 
-def preview(folder, image, surfaces, across, levels):
+def preview(folder, image, surfaces, opts):
     t0 = time.time()
     a = arena(folder)
     data, board = published(folder)
     for surface in surfaces:
-        a.data.setdefault("textures", {})[f"walls:{surface}"] = wall_spec(data, surface, str(image.resolve()), across,
-                                                                          levels)
+        a.data.setdefault("textures", {})[f"walls:{surface}"] = wall_spec(data, surface, str(image.resolve()), opts)
     PREVIEWS.mkdir(exist_ok=True)
     for old in sorted(PREVIEWS.glob(f"{folder.name}-*"))[:-4]:   # keep just the last few
         old.unlink(missing_ok=True)
@@ -178,7 +186,7 @@ def preview(folder, image, surfaces, across, levels):
     to_tts(data["name"], mesh_url, jpg.as_uri())
 
 
-def watch(folder, image, surfaces, across, levels):
+def watch(folder, image, surfaces, opts):
     seen = None
     print(f"watching {image} (Ctrl+C stops)")
     try:
@@ -191,7 +199,7 @@ def watch(folder, image, surfaces, across, levels):
                 time.sleep(0.5)   # let the paint program finish writing it
                 seen = image.stat().st_mtime_ns
                 try:
-                    preview(folder, image, surfaces, across, levels)
+                    preview(folder, image, surfaces, opts)
                 except Exception as e:   # a half-written image: try again on the next save
                     print("couldn't build:", e)
             time.sleep(1)
@@ -218,7 +226,7 @@ def wait_for_pages(paths, minutes=6):
     return False
 
 
-def publish(folder, image, surfaces, across, levels):
+def publish(folder, image, surfaces, opts):
     stem = re.sub(r"[^a-z0-9]+", "-", image.stem.lower()).strip("-").removeprefix(folder.name + "-")
     dest = folder / "textures" / f"{stem}{image.suffix.lower()}"   # Pugilis_Cliff2.png -> textures/cliff2.png
     dest.parent.mkdir(exist_ok=True)
@@ -227,7 +235,7 @@ def publish(folder, image, surfaces, across, levels):
     text, crlf = read_map(folder)
     data = json.loads(text)
     for surface in surfaces:
-        text = set_object(text, f"walls:{surface}", wall_spec(data, surface, f"textures/{dest.name}", across, levels),
+        text = set_object(text, f"walls:{surface}", wall_spec(data, surface, f"textures/{dest.name}", opts),
                           "textures")
     write_map(folder, text, crlf)
 
@@ -285,6 +293,8 @@ def main():
     ap.add_argument("--surface", default="stairs")
     ap.add_argument("--across", type=int)
     ap.add_argument("--levels", type=int, nargs=2)
+    ap.add_argument("--top", type=int)
+    ap.add_argument("--natural", action="store_true")
     ap.add_argument("--watch", action="store_true")
     ap.add_argument("--publish", action="store_true")
     ap.add_argument("--reset", action="store_true")
@@ -294,7 +304,8 @@ def main():
         return reset(folder)
     if not args.image or not args.image.exists():
         sys.exit(f"no image at {args.image}")
-    job = (folder, args.image, args.surface.split(","), args.across, args.levels)
+    opts = {"across": args.across, "levels": args.levels, "top": args.top, "natural": args.natural}
+    job = (folder, args.image, args.surface.split(","), opts)
     if args.publish:
         publish(*job)
     elif args.watch:

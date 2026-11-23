@@ -171,20 +171,21 @@ def surface_layers(a, p):
 
 
 def wall_fit(a, t, spec):
-    """Where a "walls:<surface>" image sits on a tile's walls: (the height of its top, one copy's height). Default:
-    one level, its top at the tile's top; "levels": [lo, hi] = from the top of level lo up to the top of level hi,
-    the same on every wall, so its layers line up from wall to wall."""
+    """The height a "walls:<surface>" image's top sits at on a tile's walls: "levels": [lo, hi] = level hi's top;
+    "top": L = level L's top; default the tile's own top. ("levels" and "top" are the same on every wall, so the
+    image lines up from wall to wall; its size: see paint_own_walls.)"""
     if spec.get("levels"):
-        lo, hi = spec["levels"]
-        return a.floor0() + hi * LEVEL_H, (hi - lo) * LEVEL_H
-    return a.top(t), LEVEL_H
+        return a.floor0() + spec["levels"][1] * LEVEL_H
+    if spec.get("top") is not None:
+        return a.floor0() + spec["top"] * LEVEL_H
+    return a.top(t)
 
 
 def own_key(a, t):
     """The own_walls() key for a tile's inner walls, or None when its surface has no "walls:<surface>" image."""
     surface = t.get("surface", "floor")
     spec = (a.data.get("textures") or {}).get(f"walls:{surface}")
-    return (surface, wall_fit(a, t, spec)[0]) if spec else None
+    return (surface, wall_fit(a, t, spec)) if spec else None
 
 
 def own_walls(a):
@@ -201,9 +202,11 @@ def own_walls(a):
 
 
 def paint_own_walls(a, img, layers, p):
-    """The slices own_walls() hands out: the image fitted as wall_fit() says (one level from the tiles' top, or
-    "levels"), repeated below; "across" copies side by side per tile (default: the whole number nearest the image's
-    own shape). Above its top (a wedge's side, see rises()) the surface's own texture, at the wall scale."""
+    """The slices own_walls() hands out: the image's top where wall_fit() says, one copy fitted to one level
+    ("levels": [lo, hi]: fitted from lo up to hi; "scale": "tile": its own shape, a tile wide like the tiles'
+    textures, cut off wherever a wall ends), repeated below; "across" copies side by side per tile (default: the
+    whole number nearest the image's own shape; 1 at "scale": "tile"). Above its top (a wedge's side, see rises())
+    the surface's own texture, at the wall scale."""
     y0, rows = a.R * p, STRIP * SS
     span = a.y_span()
 
@@ -213,8 +216,12 @@ def paint_own_walls(a, img, layers, p):
     for (surface, top), slices in own.items():
         spec = a.data["textures"][f"walls:{surface}"]
         src = Image.open(a.folder / (spec.get("images") or [spec["image"]])[0])
-        fit = (spec["levels"][1] - spec["levels"][0]) * LEVEL_H if spec.get("levels") else LEVEL_H
-        across = spec.get("across") or max(1, round(TILE * src.height / (fit * src.width)))
+        if spec.get("scale") == "tile" and not spec.get("levels"):   # its own shape, not squeezed to a wall
+            across = spec.get("across") or 1
+            fit = TILE / across * src.height / src.width
+        else:
+            fit = (spec["levels"][1] - spec["levels"][0]) * LEVEL_H if spec.get("levels") else LEVEL_H
+            across = spec.get("across") or max(1, round(TILE * src.height / (fit * src.width)))
         choices = [v for imgs in texture_choices(a, spec, surface, *src.size) for v in imgs]
         rnd = random.Random(f"{a.data.get('name')}/walls:{surface}/{top:.4f}")
         tall = round(rows * TILE / span)   # one tile of the surface's texture, scaled as on the walls
