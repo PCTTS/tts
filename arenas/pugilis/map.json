@@ -6,7 +6,7 @@
     "####........####",
     "###..........###",
     "##............##",
-    "#...op..ppqT...#",
+    "#...op..ppqU...#",
     "2..Dpp..ppqqA...",
     "....ppF..Fpp...1",
     "2..opp....pqT...",
@@ -19,13 +19,14 @@
     "####........####",
     "#####1.1.1.#####"
   ],
-  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. slant = edges slope over this many world units (0.559: 60 degrees); slant_to = the floor slopes down only onto the stairs; rise = the pit builds a wedge up onto the foot of the stairs, so the stairs stay flat. Comparison (2026-11-22): the stairs on columns 0-7 (o, plain: true) are the original blocky stairs, no slopes round them; on columns 8-15 the bottom-row stair (s) has the pit build a wedge up onto it, while the others (T, their pit q) slope down into the pit inside their own tile, and the floor slopes down along their higher sides with the slope's foot following the stair down its cut (follow: true); where a bevel runs into higher ground its end is shaped by bevel_end (triangles: a flat triangle to the wall's top corner plus a vertical triangle; twisted / curved: one ruled face). surface picks the look from the palette. marker = something on the tile (painted on the board, and for flags/bells a 3D piece from tools/place_pieces.py). paint: false = don't paint the marker. orient: away-from-pit = turn the painted marker so its bottom points away from the neighbouring lower tiles. piece: true = also put a 3D piece there (tools/place_pieces.py: flags, bells).",
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. slant = edges slope over this many world units (0.559: 60 degrees); slant_to = the floor slopes down only onto the stairs; rise = the pit builds a wedge up onto the foot of the stairs, so the stairs stay flat. Comparison (2026-11-22): the stairs on columns 0-7 (o, plain: true) are the original blocky stairs, no slopes round them; on columns 8-15 the bottom-row stair (s) has the pit build a wedge up onto it, while the others (T, their pit q) slope down into the pit inside their own tile, and the floor slopes down along their higher sides with the slope's foot following the stair down its cut (follow: true); the top-right stair (U) instead has two wedges on its own tile running the full length of its floor sides, up to the floor (rise: true; solid over its cut), with the floor beside it flat (plain: true); where a bevel runs into higher ground its end is shaped by bevel_end (triangles: a flat triangle to the wall's top corner plus a vertical triangle; twisted / curved: one ruled face). surface picks the look from the palette. marker = something on the tile (painted on the board, and for flags/bells a 3D piece from tools/place_pieces.py). paint: false = don't paint the marker. orient: away-from-pit = turn the painted marker so its bottom points away from the neighbouring lower tiles. piece: true = also put a 3D piece there (tools/place_pieces.py: flags, bells).",
   "legend": {
     "#": { "void": true },
     ".": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor" },
     "p": { "level": 0, "surface": "pit", "slant": 0.559, "rise": ["stairs"] },
     "s": { "level": 1, "surface": "stairs" },
     "o": { "level": 1, "surface": "stairs", "plain": true },
+    "U": { "level": 1, "surface": "stairs", "slant": 0.559, "rise": true, "plain": true },
     "T": { "level": 1, "surface": "stairs", "slant": 0.559, "follow": true, "bevel_end": "triangles" },
     "q": { "level": 0, "surface": "pit", "slant": 0.559 },
     "1": { "level": 2, "slant": 0.559, "slant_to": ["stairs"], "surface": "floor", "marker": "spawn1" },
@@ -44,7 +45,7 @@
     ]
   },
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v31.obj", "texture": "board-v31.jpg", "geometry": "board-v31.json" },
+  "board": { "mesh": "board-v34.obj", "texture": "board-v34.jpg", "geometry": "board-v34.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/table-placeholder-v1.jpg",
   "_textures": "Image textures for surfaces (paths relative to this folder; images = pick one at random per copy). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour (or a named palette entry). walls = the inner walls (where ground drops inside the board); outer = the board's outer edge too.",

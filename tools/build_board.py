@@ -790,6 +790,8 @@ def build_mesh(a):
         if not sl and not inn and not rises(a, r, c) and not rise_corners(a, r, c) and not segs:
             return [0.0, 1.0]
         f = a.tile(r, c)["slant"] / TILE
+        if sl and rises(a, r, c):   # the step where a wedge's band ends over a slope (see slope_surface)
+            return [0.0, f, f * 65 / 64, 1.0 - f * 65 / 64, 1.0 - f, 1.0]
         if any(seg[6] and seg[7] != "triangles" for seg in segs):   # the finer grid by a taper (see slope_surface)
             fine = [f * i / 8 for i in range(1, 8)] + [f / 16, f / 32]
             return sorted({0.0, f, 1.0 - f, 1.0} | set(fine) | {1.0 - g for g in fine})
@@ -1130,17 +1132,13 @@ def taper_height(seg, top, w, px, pz):
 
 
 def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None, segments=None):
-    """A tile's surface height at (px, pz): raised by any wedges up to higher ground (risen, and rcorners round a
-    corner), then the lowest that any of its low features allows (see slope_surface)."""
+    """A tile's surface height at (px, pz): the lowest that any of its low features allows (see slope_surface), then
+    raised by any wedges up to higher ground (risen, and rcorners round a corner), each within its own band: a wedge
+    stands solid on top of the tile's slopes (Pugilis's top-right stair: the wedges up to the floor run the full
+    length of its edges, over its cut down to the pit)."""
     x0, x1, z0, z1 = box
     corner_pts = {"NW": (x0, z0), "NE": (x1, z0), "SW": (x0, z1), "SE": (x1, z1)}
     h = top
-    for side, high in (risen or {}).items():
-        d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
-        h = max(h, top + (high - top) * max(0.0, 1 - d / w))
-    for corner, high in (rcorners or {}).items():
-        cx, cz = corner_pts[corner]
-        h = max(h, top + (high - top) * max(0.0, 1 - math.hypot(px - cx, pz - cz) / w))
     for side, base in sloped.items():
         d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
         h = min(h, top - (top - base) * max(0.0, 1 - d / w))
@@ -1153,6 +1151,15 @@ def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None
             continue
         dist, base = edge_distance(seg, px, pz)
         h = min(h, top - (top - base) * max(0.0, 1 - dist / w))
+    for side, high in (risen or {}).items():
+        d = {"N": z0 - pz, "S": pz - z1, "W": px - x0, "E": x1 - px}[side]
+        if d <= w + 1e-9:
+            h = max(h, top + (high - top) * max(0.0, 1 - d / w))
+    for corner, high in (rcorners or {}).items():
+        cx, cz = corner_pts[corner]
+        dc = math.hypot(px - cx, pz - cz)
+        if dc <= w + 1e-9:
+            h = max(h, top + (high - top) * max(0.0, 1 - dc / w))
     return h
 
 
@@ -1170,6 +1177,10 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorn
     xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
     zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
                 reverse=True)
+    if risen and sloped:   # a wedge's band ends over a slope: a step there, nearly upright
+        step = w + w / 64
+        xs = sorted(set(xs) | {x0 + step, x1 - step})
+        zs = sorted(set(zs) | {z0 - step, z1 + step}, reverse=True)
     if any(seg[6] and seg[7] != "triangles" for seg in segments or ()):   # a ruled taper face fans into the corner
         fine = [w * i / 8 for i in range(1, 8)] + [w / 16, w / 32]
         xs = sorted(set(xs) | {x0 + f for f in fine} | {x1 - f for f in fine})
