@@ -170,15 +170,30 @@ def surface_layers(a, p):
     return layers
 
 
+def wall_fit(a, t, spec):
+    """Where a "walls:<surface>" image sits on a tile's walls: (the height of its top, one copy's height). Default:
+    one level, its top at the tile's top; "levels": [lo, hi] = from the top of level lo up to the top of level hi,
+    the same on every wall, so its layers line up from wall to wall."""
+    if spec.get("levels"):
+        lo, hi = spec["levels"]
+        return a.floor0() + hi * LEVEL_H, (hi - lo) * LEVEL_H
+    return a.top(t), LEVEL_H
+
+
+def own_key(a, t):
+    """The own_walls() key for a tile's inner walls, or None when its surface has no "walls:<surface>" image."""
+    surface = t.get("surface", "floor")
+    spec = (a.data.get("textures") or {}).get(f"walls:{surface}")
+    return (surface, wall_fit(a, t, spec)[0]) if spec else None
+
+
 def own_walls(a):
-    """Walls with their own image (map.json textures "walls:<surface>": the walls a tile of that surface stands on,
-    e.g. "walls:stairs" = the sides of the steps): {(surface, top): [wall strip slices]}, two slices (copies to pick
-    from) per height those tiles stand at, taken from the end of the strip; and how many slices that leaves the other
-    inner walls."""
+    """Inner walls with their own image (map.json textures "walls:<surface>": the inner walls a tile of that surface
+    stands on, e.g. "walls:stairs" = the sides of the steps; the board's outer edge keeps "walls"):
+    {(surface, image top): [wall strip slices]}, two slices (copies to pick from) per height the image's top sits
+    at, taken from the end of the strip; and how many slices that leaves the other inner walls."""
     half = a.C // 2
-    specs = a.data.get("textures") or {}
-    keys = sorted({(t.get("surface", "floor"), a.top(t)) for r in range(a.R) for c in range(a.C)
-                   for t in [a.tile(r, c)] if t and f"walls:{t.get('surface', 'floor')}" in specs})
+    keys = sorted({own_key(a, t) for r in range(a.R) for c in range(a.C) for t in [a.tile(r, c)] if t} - {None})
     own = {key: [2 * half - 1 - 2 * i, 2 * half - 2 - 2 * i] for i, key in enumerate(keys)}
     if 2 * len(keys) >= half:
         sys.exit("too many walls:<surface> heights for the wall strip")
@@ -186,9 +201,9 @@ def own_walls(a):
 
 
 def paint_own_walls(a, img, layers, p):
-    """The slices own_walls() hands out: the image fitted to one level, its top at the tiles' top, repeated a level
-    at a time below; "across" copies side by side per tile (default: the whole number nearest the image's own shape).
-    Above the top (a wedge's side, see rises()) the surface's own texture, at the same scale as on the walls."""
+    """The slices own_walls() hands out: the image fitted as wall_fit() says (one level from the tiles' top, or
+    "levels"), repeated below; "across" copies side by side per tile (default: the whole number nearest the image's
+    own shape). Above its top (a wedge's side, see rises()) the surface's own texture, at the wall scale."""
     y0, rows = a.R * p, STRIP * SS
     span = a.y_span()
 
@@ -198,7 +213,8 @@ def paint_own_walls(a, img, layers, p):
     for (surface, top), slices in own.items():
         spec = a.data["textures"][f"walls:{surface}"]
         src = Image.open(a.folder / (spec.get("images") or [spec["image"]])[0])
-        across = spec.get("across") or max(1, round(TILE * src.height / (LEVEL_H * src.width)))
+        fit = (spec["levels"][1] - spec["levels"][0]) * LEVEL_H if spec.get("levels") else LEVEL_H
+        across = spec.get("across") or max(1, round(TILE * src.height / (fit * src.width)))
         choices = [v for imgs in texture_choices(a, spec, surface, *src.size) for v in imgs]
         rnd = random.Random(f"{a.data.get('name')}/walls:{surface}/{top:.4f}")
         tall = round(rows * TILE / span)   # one tile of the surface's texture, scaled as on the walls
@@ -217,14 +233,14 @@ def paint_own_walls(a, img, layers, p):
             elif ytop > y0:
                 ImageDraw.Draw(img).rectangle([x0, y0, x0 + p - 1, ytop - 1], fill=a.palette[surface])
             level = top
-            while level > 1e-9:   # a level at a time down to the underside
-                ra, rb = round(row(level)), round(row(max(0.0, level - LEVEL_H)))
-                full = round(row(level - LEVEL_H)) - ra   # a partial last band shows the image's top part
+            while level > 1e-9:   # a copy's height at a time down to the underside
+                ra, rb = round(row(level)), round(row(max(0.0, level - fit)))
+                full = round(row(level - fit)) - ra   # a partial last band shows the image's top part
                 for j in range(across):
                     xa, xb = x0 + round(j * p / across), x0 + round((j + 1) * p / across)
                     copy = rnd.choice(choices).resize((xb - xa, full), Image.LANCZOS)
                     img.paste(copy.crop((0, 0, xb - xa, rb - ra)), (xa, ra))
-                level -= LEVEL_H
+                level -= fit
 
 
 def draw_texture(a):
@@ -928,8 +944,8 @@ def build_mesh(a):
                 (ax, az), (bx, bz) = edge
                 half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
                 pick = r * 5 + c * 3 + len(side)
-                key = (t.get("surface", "floor"), top)
-                if key in own:   # this tile's own wall image (see own_walls)
+                key = own_key(a, t) if nb else None
+                if key in own:   # this tile's own inner wall image (see own_walls)
                     us = own[key][pick % len(own[key])] * PX
                 else:
                     us = ((pick % (inner_n if nb else half)) + (half if nb else 0)) * PX
