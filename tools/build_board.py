@@ -782,7 +782,8 @@ def build_mesh(a):
             return [0.0, 1.0]
         f = a.tile(r, c)["slant"] / TILE
         if any(seg[6] for seg in segs):   # the finer grid by a taper (see slope_surface)
-            return sorted({0.0, f, 1.0 - f, 1.0} | {f / n for n in (8, 16, 32)} | {1.0 - f / n for n in (8, 16, 32)})
+            fine = [f * i / 8 for i in range(1, 8)] + [f / 16, f / 32]
+            return sorted({0.0, f, 1.0 - f, 1.0} | set(fine) | {1.0 - g for g in fine})
         return [0.0, f, 1.0 - f, 1.0]
 
     for r in range(a.R):
@@ -1070,12 +1071,13 @@ def profile_wall(m, edge, fs, mine, theirs, normal, uv, eps=1e-6):
 
 
 def taper_height(seg, top, w, px, pz):
-    """The surface of a tapering bevel end (see contact_edges; numpy arrays or numbers): one twisted four-sided
-    face, the same kind as a bevel's end beside a pit (the user's sketch). Its edges: the rung across the bevel
-    where the piece starts (the foot level with the landing, up to the top: green), the top running straight to
-    the wall's top corner (blue), the wall's vertical corner edge (red), and the stair's cut edge, from the landing
-    down to the base (orange). Straight lines join each point of green to the point of red at the same height
-    fraction (the face is ruled, like the middle stairs' ends). Outside it: the top."""
+    """The surface of a tapering bevel end (see contact_edges; numpy arrays or numbers): one twisted face, the
+    same kind as a bevel's end beside a pit (the user's sketch). Its edges: the rung across the bevel where the
+    piece starts (the foot level with the landing, up to the top: green), the top curving round to the wall's
+    top corner (blue: a quarter circle about the landing's corner, like the funnels' tops; a quarter ellipse if
+    the piece isn't as long as the slope is wide), the wall's vertical corner edge (red), and the stair's cut
+    edge from the landing down to the base (orange). Straight lines join each point of orange to the point of
+    the curve the same share of the way round. Outside it: the top."""
     (ax, az), (bx, bz), b0, b1, _, _, taper = seg
     px, pz = np.asarray(px, float), np.asarray(pz, float)
     dx, dz = bx - ax, bz - az
@@ -1087,11 +1089,23 @@ def taper_height(seg, top, w, px, pz):
         v, hw, hn = (1 - k) * length, b0, b1
     else:
         v, hw, hn = k * length, b1, b0
-    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
-        t = np.where(v > 1e-12, u * length / (np.maximum(v, 1e-12) * w), np.where(u > 1e-12, np.inf, 0.0))
-        sw = np.clip(v / length, 0, 1)
-        h = sw * (hw + t * (top - hw)) + (1 - sw) * (hn + t * (top - hn))
-        return np.where((k < 0) | (k > 1) | (t >= 1), top, h)
+    inside = (k >= 0) & (k <= 1) & ((u / w) ** 2 + ((length - v) / length) ** 2 < 1)
+    # which straight line through the point: the one from orange's point s of the way down (0, L(1 - s)) to the
+    # curve's point s of the way round (w cos a, L(1 - sin a)), a = s * 90 degrees; found by halving
+    lo, hi = np.zeros_like(u), np.ones_like(u)
+    for _ in range(40):
+        sm = (lo + hi) / 2
+        ang = sm * math.pi / 2
+        side = w * np.cos(ang) * (v - length * (1 - sm)) - length * (sm - np.sin(ang)) * u
+        lo, hi = np.where(side < 0, sm, lo), np.where(side < 0, hi, sm)
+    sm = (lo + hi) / 2
+    ang = sm * math.pi / 2
+    du, dv = w * np.cos(ang), length * (sm - np.sin(ang))
+    dd = du * du + dv * dv
+    with np.errstate(divide="ignore", invalid="ignore"):
+        t = np.clip(np.where(dd > 1e-18, (u * du + (v - length * (1 - sm)) * dv) / np.maximum(dd, 1e-18), 1.0), 0, 1)
+    h = (1 - t) * (hw + sm * (hn - hw)) + t * top
+    return np.where(inside, h, top)
 
 
 def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None, segments=None):
@@ -1135,8 +1149,8 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorn
     xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
     zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
                 reverse=True)
-    if any(seg[6] for seg in segments or ()):   # a taper's face fans into the wall's corner: finer there
-        fine = [w / 8, w / 16, w / 32]
+    if any(seg[6] for seg in segments or ()):   # a taper's curved face fans into the wall's corner: finer there
+        fine = [w * i / 8 for i in range(1, 8)] + [w / 16, w / 32]
         xs = sorted(set(xs) | {x0 + f for f in fine} | {x1 - f for f in fine})
         zs = sorted(set(zs) | {z0 - f for f in fine} | {z1 + f for f in fine}, reverse=True)
     for i in range(len(xs) - 1):
