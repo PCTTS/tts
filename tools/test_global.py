@@ -208,7 +208,7 @@ def main():
           "cards downloaded (246 items, 67 warrior skills)")
     check('class="hint"' not in xml and "Msg_" not in xml, "the panels have no hint lines")
     maps_panel = xml[xml.index('id="maps_White"'):xml.index('</VerticalLayout>', xml.index('id="maps_White"'))]
-    check('onClick="closePanel"' not in maps_panel and 'onClick="closePanel"' in xml, "the map panel has no X (the others keep theirs)")
+    check('onClick="closePanel"' in maps_panel, "the map panel has an X to close it")
     check(g.onChat is None, "no chat commands")
 
     # search
@@ -770,8 +770,8 @@ def main():
     # left alone
     lua.execute(r"""
       handObjs = {}
-      local function hand(c, x, z, sx, sz)
-        local h = { color = c, pos = Vector(x, 3.29, z), scale = Vector(sx, 11.9, sz), rot = Vector(0, 0, 0) }
+      local function hand(c, x, z, sx, sz, sy)
+        local h = { color = c, pos = Vector(x, 3.29, z), scale = Vector(sx, sy or 11.9, sz), rot = Vector(0, 0, 0) }
         h.getValue = function() return h.color end
         h.getPosition = function() return h.pos end
         h.getScale = function() return h.scale end
@@ -799,7 +799,7 @@ def main():
       spawnObjectData = function(t)
         if t.data.Name == "HandTrigger" then
           spawnedHands[#spawnedHands + 1] = t
-          hand(t.data.FogColor, t.position[1], t.position[3], t.data.Transform.scaleX, t.data.Transform.scaleZ)
+          hand(t.data.FogColor, t.position[1], t.position[3], t.data.Transform.scaleX, t.data.Transform.scaleZ, t.data.Transform.scaleY)
           return
         end
         return realSpawn(t)
@@ -808,12 +808,14 @@ def main():
     changed = g.ensureHandZones()
     live = {h.color: h for h in g.Hands.getHands().values()}
     red, pink = live.get("Red"), live.get("Pink")
-    edge_z, edge_x = 75.3 / 2 + 3.56 / 2 + 0.5, 110.3 / 2 + 3.56 / 2 + 0.5
+    edge_z, edge_x = 75.3 / 2 + 2.28, 110.3 / 2 + 2.28   # centres where the big zones' were (same spacebar camera)
     check(changed and sorted(live) == sorted(["Red", "White", "Blue", "Green", "Orange", "Yellow", "Pink", "Purple"])
           and [h.data.FogColor for h in g.spawnedHands.values()] == ["Green"]
-          and abs(red.pos.z + edge_z) < 1e-6 and red.pos.y == 2.85 and red.pos.x == -9.48 and red.scale.z == 3.56
+          and abs(red.pos.z + edge_z) < 1e-6 and red.pos.y == 2.85 and red.pos.x == -9.48
           and abs(pink.pos.x - edge_x) < 1e-6 and pink.rot.y == 270,
           "TTS's default hand zones are moved just past the table's edge (Brown/Teal removed, missing Green spawned)")
+    check(all(max(h.scale.x, h.scale.y, h.scale.z) <= 0.1 + 1e-9 for h in live.values()),
+          "the hand zones are tiny (0.1 a side), so nothing dragged near the edge catches on them")
     hc = g.heldCard.pos
     check(abs(hc.x + 9.48) < 1e-6 and abs(hc.z + edge_z) < 1e-6, "a card Red was holding is put back into Red's moved hand")
     check(not g.ensureHandZones(), "a correct layout is left alone")

@@ -343,10 +343,11 @@ function onPlayerAction(player, action, targets)
   return true
 end
 
--- Hand zones: eight, just past the table's edge-- Hand zones: eight, just past the table's edge (so cards on the team stands never fall into a hand), one pair on
--- each side; they also set each seat's spacebar camera. A save or reload can bring back TTS's default zones (which
--- reach over the stands), so the layout is checked on every load and put back if it differs.
-HAND_SIZE = { w = 9.48, h = 6.7, d = 3.56, y = 2.85, gap = 0.5 }
+-- Hand zones: eight tiny ones just past the table's edge (so cards on the team stands never fall into a hand, and
+-- pieces dragged near the edge don't catch on them), one pair on each side; they are kept only because they set each
+-- seat's spacebar camera (from where they stand: "out" past the edge, at height y). A save or reload can bring back
+-- TTS's default zones (which reach over the stands), so the layout is checked on every load and put back if it differs.
+HAND_SIZE = { w = 0.1, h = 0.1, d = 0.1, y = 2.85, out = 2.28 }
 HAND_LAYOUT = {   -- side: near (-z), far (+z), left (-x), right (+x); at: offset along that side
   { c = "Red", side = "near", at = -9.48 }, { c = "White", side = "near", at = 9.48 },
   { c = "Blue", side = "far", at = -9.48 }, { c = "Green", side = "far", at = 9.48 },
@@ -359,7 +360,7 @@ function handTargets()
   local ok, b = pcall(function() return Tables.getTableObject().getBounds() end)
   if not ok or not b then return nil end
   local hx, hz, out = b.size.x / 2, b.size.z / 2, {}
-  local off = HAND_SIZE.d / 2 + HAND_SIZE.gap
+  local off = HAND_SIZE.out
   for _, h in ipairs(HAND_LAYOUT) do
     local t = { c = h.c }
     if h.side == "near" then t.x, t.z, t.yaw = h.at, -(hz + off), 0
@@ -385,8 +386,8 @@ function ensureHandZones()
       same = false
     else
       local p, s = h.getPosition(), h.getScale()
-      if math.abs(p.x - t.x) > 0.1 or math.abs(p.z - t.z) > 0.1 or math.abs(s.x - HAND_SIZE.w) > 0.05
-        or math.abs(s.z - HAND_SIZE.d) > 0.05 then same = false end
+      if math.abs(p.x - t.x) > 0.1 or math.abs(p.z - t.z) > 0.1 or math.abs(s.x - HAND_SIZE.w) > 0.01
+        or math.abs(s.y - HAND_SIZE.h) > 0.01 or math.abs(s.z - HAND_SIZE.d) > 0.01 then same = false end
     end
   end
   if same then return false end
@@ -418,8 +419,8 @@ function ensureHandZones()
   end
   Wait.frames(function()   -- into the hand's new place: a card dropped in a hand zone joins that hand
     for _, t in ipairs(targets) do
-      for k, obj in ipairs(held[t.c]) do
-        obj.setPosition({ t.x + (k - 1) * 0.3, HAND_SIZE.y, t.z })
+      for _, obj in ipairs(held[t.c]) do
+        obj.setPosition({ t.x, HAND_SIZE.y, t.z })   -- the zone's centre: it's too small to spread them out
       end
     end
   end, 10)
@@ -794,7 +795,7 @@ local function dockXml()
     .. 'color="#00000000" raycastTarget="false">\n', -(w + 4), PANEL_W, h)
 end
 
-local function panelXml(kind, c, title, height, body, noClose)
+local function panelXml(kind, c, title, height, body)
   return string.format([[
 <VerticalLayout id="%s_%s" visibility="%s" active="false" rectAlignment="UpperRight" width="%d" height="%d"
        color="#141414F2" outline="#303030" outlineSize="1 1" padding="%d %d %d %d" spacing="4"
@@ -807,7 +808,7 @@ local function panelXml(kind, c, title, height, body, noClose)
   <Panel flexibleHeight="1"/>
 </VerticalLayout>
 ]], kind, c, c, PANEL_W, height, PANEL_PAD, PANEL_PAD, PANEL_PAD, PANEL_PAD, title,
-    noClose and "" or '<Button class="close" preferredWidth="28" onClick="closePanel" text="X"/>', body)
+    '<Button class="close" preferredWidth="28" onClick="closePanel" text="X"/>', body)
 end
 
 local function xmlText(s)
@@ -876,7 +877,7 @@ function buildUI()
     for i = 1, MAX_MAPS do
       rows[#rows + 1] = string.format('<Button id="mapRes_%s_%d" class="row" active="false" onClick="mapPick" text=" "/>', c, i)
     end
-    xml[#xml + 1] = panelXml("maps", c, "Choose the map", MAPS_BASE, table.concat(rows, "\n  "), true)
+    xml[#xml + 1] = panelXml("maps", c, "Choose the map", MAPS_BASE, table.concat(rows, "\n  "))
 
     -- statuses: a square in the status's colour, then the row (the clear row gets an empty square's space)
     rows = {}
