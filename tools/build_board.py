@@ -268,7 +268,7 @@ def draw_texture(a):
             pz = (a.R / 2 - (r + yy / p)) * TILE
             dist = np.full((p, p), np.inf, np.float32)
             for seg in segs:
-                (ax, az), (bx, bz), _, _, round_a, round_b, taper = seg
+                (ax, az), (bx, bz), _, _, round_a, round_b, taper = seg[:7]
                 dx, dz = bx - ax, bz - az
                 ll = dx * dx + dz * dz
                 kr = np.zeros_like(px) if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
@@ -790,7 +790,7 @@ def build_mesh(a):
         if not sl and not inn and not rises(a, r, c) and not rise_corners(a, r, c) and not segs:
             return [0.0, 1.0]
         f = a.tile(r, c)["slant"] / TILE
-        if any(seg[6] for seg in segs):   # the finer grid by a taper (see slope_surface)
+        if any(seg[6] and seg[7] != "triangles" for seg in segs):   # the finer grid by a taper (see slope_surface)
             fine = [f * i / 8 for i in range(1, 8)] + [f / 16, f / 32]
             return sorted({0.0, f, 1.0 - f, 1.0} | set(fine) | {1.0 - g for g in fine})
         return [0.0, f, 1.0 - f, 1.0]
@@ -1029,7 +1029,8 @@ def contact_edges(a, r, c):
                     if math.hypot(gap_c, gap_r) < wg:   # near enough to shape it
                         start_round = rounds[0] if k == 0 else pieces[k - 1][4] == 0
                         end_round = rounds[1] if k == len(pieces) - 1 else pieces[k + 1][4] == 0
-                        out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), b0, b1, start_round, end_round, taper))
+                        out.append(((wx(ca), wz(ra)), (wx(cb), wz(rb)), b0, b1, start_round, end_round, taper,
+                                    nb.get("bevel_end", "curved")))
     return out
 
 
@@ -1040,7 +1041,7 @@ def edge_distance(seg, px, pz):
     """(distance, bottom there) from (px, pz) to a contact edge (see contact_edges); past an end that doesn't
     round off (a side wall there), no distance: infinite. A tapering piece (taper 1: it narrows to nothing at its
     start, 2: at its end, where it meets higher ground) has its own shape: see taper_height."""
-    (ax, az), (bx, bz), b0, b1, round_a, round_b, taper = seg
+    (ax, az), (bx, bz), b0, b1, round_a, round_b, taper = seg[:7]
     dx, dz = bx - ax, bz - az
     ll = dx * dx + dz * dz
     k = 0.0 if ll == 0 else ((px - ax) * dx + (pz - az) * dz) / ll
@@ -1087,7 +1088,8 @@ def taper_height(seg, top, w, px, pz):
     the piece isn't as long as the slope is wide), the wall's vertical corner edge (red), and the stair's cut
     edge from the landing down to the base (orange). Straight lines join each point of orange to the point of
     the curve the same share of the way round. Outside it: the top."""
-    (ax, az), (bx, bz), b0, b1, _, _, taper = seg
+    (ax, az), (bx, bz), b0, b1, _, _, taper = seg[:7]
+    style = seg[7] if len(seg) > 7 else "curved"
     px, pz = np.asarray(px, float), np.asarray(pz, float)
     dx, dz = bx - ax, bz - az
     ll = dx * dx + dz * dz
@@ -1098,6 +1100,16 @@ def taper_height(seg, top, w, px, pz):
         v, hw, hn = (1 - k) * length, b0, b1
     else:
         v, hw, hn = k * length, b1, b0
+    if style == "triangles":   # one flat plane from the landing-level foot to the wall's top corner (the stair's
+        # cut meets it in a vertical triangle in line with the wall)
+        h = top - (top - hw) * np.maximum(0.0, 1 - (u + (length - v)) / w)
+        return np.where((k < 0) | (k > 1), top, h)
+    if style == "twisted":     # straight top from the rung's top to the wall's top corner
+        with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+            t = np.where(v > 1e-12, u * length / (np.maximum(v, 1e-12) * w), np.where(u > 1e-12, np.inf, 0.0))
+            sw = np.clip(v / length, 0, 1)
+            h = sw * (hw + t * (top - hw)) + (1 - sw) * (hn + t * (top - hn))
+            return np.where((k < 0) | (k > 1) | (t >= 1), top, h)
     inside = (k >= 0) & (k <= 1) & ((u / w) ** 2 + ((length - v) / length) ** 2 < 1)
     # which straight line through the point: the one from orange's point s of the way down (0, L(1 - s)) to the
     # curve's point s of the way round (w cos a, L(1 - sin a)), a = s * 90 degrees; found by halving
@@ -1158,7 +1170,7 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorn
     xs = sorted({x0 + w * i / steps for i in range(steps + 1)} | {x1 - w * i / steps for i in range(steps + 1)})
     zs = sorted({z0 - w * i / steps for i in range(steps + 1)} | {z1 + w * i / steps for i in range(steps + 1)},
                 reverse=True)
-    if any(seg[6] for seg in segments or ()):   # a taper's curved face fans into the wall's corner: finer there
+    if any(seg[6] and seg[7] != "triangles" for seg in segments or ()):   # a ruled taper face fans into the corner
         fine = [w * i / 8 for i in range(1, 8)] + [w / 16, w / 32]
         xs = sorted(set(xs) | {x0 + f for f in fine} | {x1 - f for f in fine})
         zs = sorted(set(zs) | {z0 - f for f in fine} | {z1 + f for f in fine}, reverse=True)
