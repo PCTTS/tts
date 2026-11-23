@@ -322,7 +322,7 @@ end
 -- pieces still need clicks (HP signs, flags, buttons), so players just can't delete or cut them; the map picker
 -- replaces them by script, which isn't a player action.
 PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand", "GateFrame", "Gate", "Water",
-  "Fountain" }
+  "Fountain", "Statue" }
 
 function onPlayerAction(player, action, targets)
   if action == Player.Action.Select or action == Player.Action.PickUp then

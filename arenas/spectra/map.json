@@ -1,0 +1,51 @@
+{
+  "name": "Spectra",
+  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's drawn board (mapstomake/spectra.webp, perspective-straightened; the white blobs on it are painted-over statues, left out): a graveyard of open ground with four crypts two levels tall, lanterns on two crypt corners, 14 statues that move on the dice, 4 flags.",
+  "grid": [
+    "...2.2.2####....",
+    "........####22..",
+    "###...........2.",
+    "###.S.....S.....",
+    "###.........####",
+    "..F.........####",
+    "...S.S.....F####",
+    ".S....S.S.S.L###",
+    "S...L####....S..",
+    "...F#####F....S.",
+    "....#####..S...S",
+    "..S.#####.......",
+    "................",
+    ".............1..",
+    "...........1....",
+    ".1.1.1...1......"
+  ],
+  "_legend": "level = height step (0 = lowest); tiles interact only within 1 level. surface picks the look from the palette. solid = nothing can stand on or cross it (no snap point). marker = something on the tile (painted, or a 3D piece with piece: true). L = a crypt corner with a lantern (painted icon). S = a statue's starting tile (a loose stone pawn players move).",
+  "legend": {
+    ".": { "level": 0, "surface": "floor" },
+    "#": { "level": 2, "surface": "crypt", "solid": true },
+    "L": { "level": 2, "surface": "crypt", "solid": true, "marker": "lantern" },
+    "S": { "level": 0, "surface": "floor", "marker": "statue", "paint": false, "piece": true },
+    "F": { "level": 0, "surface": "floor", "marker": "flag", "paint": false, "piece": true },
+    "1": { "level": 0, "surface": "floor", "marker": "spawn1" },
+    "2": { "level": 0, "surface": "floor", "marker": "spawn2" }
+  },
+  "_coords": "Edge numbers as on the user's board: 1-8 twice along each edge (two d8 runs: columns from player 1's left, rows from player 1's side), inside the edge tiles, each facing out from its edge. sides: the d4 direction of each edge (player 1's edge, right, player 2's edge, left), a badge on that edge.",
+  "coords": { "repeat": 8, "inset": 0.09, "sides": ["1", "2", "3", "4"] },
+  "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+  "table": "misc/graveyard-placeholder-v1.jpg",
+  "_textures": "Placeholders from tools/draw_placeholders.py: graveyard grass, crypt roof slabs, crypt walls.",
+  "textures": {
+    "floor": { "images": ["textures/grave-grass1.png", "textures/grave-grass2.png"], "span": 1, "vary": true },
+    "crypt": { "image": "textures/crypt-top.png", "span": 1, "vary": true },
+    "walls": { "image": "textures/crypt-wall.png" }
+  },
+  "palette": {
+    "floor": "#3C4634",
+    "crypt": "#55505E",
+    "cliff": "#3A3229",
+    "base": "#2A2620",
+    "fall": "#D2392C"
+  }
+}

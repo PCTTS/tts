@@ -24,7 +24,11 @@ Writes (only files that are missing: bump a version when what a file holds chang
   it, its edges sloping down: drawn in by the slope's run, on the flat top; same texture) for slant 0.8 (a 50 degree
   slope), props/zoneframe2-raised60-v1.obj, -4- for slant 0.559 (60 degrees),
   props/zoneframe2-raised70-v1.obj, -4- for slant 0.352 (70 degrees); RAISED_SLANTS lists them
+  props/statue-v1.obj, props/statue-v1.jpg, props/statue-collider-v1.obj  (Spectra: a small stone pawn)
 tools/place_pieces.py puts them on an arena's marker tiles.
+
+Statue (Spectra): a plain weathered stone pawn: a round base, a tapering body, a collar and a ball head; players
+move it when the dice say so. Its own frame: y = 0 is the tile top.
 
 Portal: a thin round tile lying on the ground, a pale swirl; tinted with its pair's colour. Its own frame: y = 0 is
 the tile top.
@@ -104,6 +108,7 @@ RAISED_SLANTS = {0.8: "raised", 0.559: "raised60", 0.352: "raised70"}   # a rais
 TRAP_R, TRAP_H, TRAP_TEETH = 1.0, 0.06, 14   # trap plate radius and thickness, teeth around its rim
 TREE_BASE, TREE_BASE_H = 1.6, 0.1        # tree tile: base width (fits the flat top of a sloped tile) and thickness
 GIFT = 0.9                               # gift box size
+STATUE_R, STATUE_H = 0.62, 1.57          # statue pawn: base radius, height (the top of its head)
 BACKDROP_W, BACKDROP_D = 87.9078, 51.9810    # the custom table's play area (its image), measured in TTS
 
 
@@ -653,6 +658,46 @@ def fountain_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.5))
 
 
+def statue():
+    """Spectra's statue: a plain stone pawn. Separate runs where the outline turns sharply, so those edges stay crisp.
+    The texture: its top row at the head, its bottom row at the base."""
+    m = PieceMesh()
+    stone = lambda fu, y: (fu, 0.03 + 0.94 * y / STATUE_H)
+    R = STATUE_R
+    lathe(m, [(0.0, 0.0), (R, 0.0)], stone)                                          # underside
+    lathe(m, [(R, 0.0), (R, 0.09)], stone)                                           # the base's rim
+    lathe(m, [(R, 0.09), (R - 0.05, 0.15), (0.48, 0.19)], stone)                     # its bevelled top
+    lathe(m, [(0.48, 0.19), (0.44, 0.26), (0.36, 0.55), (0.26, 0.86)], stone)        # body, narrowing upward
+    lathe(m, [(0.26, 0.86), (0.4, 0.92), (0.42, 0.98), (0.36, 1.02), (0.16, 1.05)], stone)   # collar
+    lathe(m, [(0.16, 1.05)] + sphere_profile(0.27, 1.3, 16)[3:], stone)              # head
+    return m
+
+
+def statue_collider():
+    m = PieceMesh()
+    lathe(m, [(0.0, 0.0), (STATUE_R, 0.0), (STATUE_R, 0.15), (0.44, 0.3), (0.3, 1.3), (0.0, STATUE_H)],
+          lambda fu, y: (0.5, 0.5), 16)
+    return m
+
+
+def statue_texture():
+    """Weathered grey stone with pale lichen, grimier toward the base (seamless around)."""
+    rng = np.random.default_rng(229)
+    n = 256
+
+    def blobs(cells):   # smooth noise, its last column matching its first so it wraps around the pawn
+        g = rng.random((cells, cells))
+        g = np.concatenate([g, g[:, :1]], axis=1)
+        return np.asarray(Image.fromarray((g * 255).astype(np.uint8)).resize((n, n), Image.BICUBIC), np.float32) / 255
+    t = 0.5 * blobs(6) + 0.3 * blobs(16) + 0.2 * blobs(48)
+    img = np.array((116, 114, 122), np.float32) + (t[..., None] - 0.5) * 70
+    lichen = np.clip((blobs(12) - 0.66) * 5, 0, 1)
+    img += (np.array((150, 158, 126), np.float32) - img) * (0.5 * lichen)[..., None]
+    down = np.linspace(0, 1, n, dtype=np.float32)[:, None, None]   # image rows: head at the top, base at the bottom
+    img *= 1.0 - 0.3 * down ** 2
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
 # ------------------------------------------------------------------------------------------------ backdrop
 def backdrop():
     """A flat panel the size of the table's play area: an arena's surroundings are shown on it instead of on the
@@ -755,6 +800,9 @@ def main():
         "gate-v1.jpg": lambda p: gate_texture().save(p, quality=92),
         "fountain-v1.obj": lambda p: fountain().write(p),
         "fountain-v1.jpg": lambda p: fountain_texture().save(p, quality=92),
+        "statue-v1.obj": lambda p: statue().write(p),
+        "statue-v1.jpg": lambda p: statue_texture().save(p, quality=92),
+        "statue-collider-v1.obj": lambda p: statue_collider().write(p),
         **{f"zoneframe{n}-{name}-v1.obj": (lambda p, n=n, s=s: zone_frame(n, s).write(p))
            for s, name in RAISED_SLANTS.items() for n in (2, 4)},
     }

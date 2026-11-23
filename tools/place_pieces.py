@@ -21,6 +21,7 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
   gate (Fontaine): a water gate on a river tile: four stone posts (GateFrame) and a sluice block (Gate) that rises
         to close it; legend "gate": its number, "branch" and "part" ("edge"/"inner"): which water it lets through.
   fountain (Fontaine): a marble fountain on a solid tile.
+  statue (Spectra): a small stone pawn, NOT locked: players move it when the dice say so.
   water tiles (legend "water": true, with "branch" and "part"): Fontaine's river, a water slab on each tile that
         Global.lua lowers out of sight when its stretch drains.
   zone (capture zone tiles): a frame around each square group of them (2x2), which takes the colour of the player
@@ -72,6 +73,8 @@ WATER = {"mesh": "props/water-v1.obj", "diffuse": "props/water-v1.jpg", "collide
          "convex": True, "material": 3}   # matte: shiny water mirrors the sky white at low angles
 FOUNTAIN = {"mesh": "props/fountain-v1.obj", "diffuse": "props/fountain-v1.jpg", "collider": "props/fountain-v1.obj",
             "convex": False, "material": 0}
+STATUE = {"mesh": "props/statue-v1.obj", "diffuse": "props/statue-v1.jpg", "collider": "props/statue-collider-v1.obj",
+          "convex": True, "material": 3}   # matte stone
 WATER_DEPTH = 0.62   # Fontaine: the water's surface above the river bed (the canal walls are 0.968 high)
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
 
@@ -175,7 +178,7 @@ def pieces(arena, info):
                 out.append({"kind": "Water", "name": "River water", "model": WATER, "pos": [cx, bed + WATER_DEPTH, cz],
                             "yaw": 0, "desc": "", "branch": tile["branch"], "part": tile["part"]})
             if tile.get("void") or not tile.get("piece") or not (
-                    marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift", "gate", "fountain")):
+                    marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift", "gate", "fountain", "statue")):
                 continue
             top = info["floor0"] + tile["level"] * info["level_height"] - tile.get("sink", 0.0)
             if marker == "gate":   # its frame of posts, and the sluice block (Global.lua lowers it: gates start open)
@@ -187,6 +190,9 @@ def pieces(arena, info):
             elif marker == "fountain":
                 out.append({"kind": "Fountain", "name": "Fountain", "model": FOUNTAIN, "pos": [cx, top, cz], "yaw": 0,
                             "desc": "Fountain. A Pokémon that ends its turn next to it takes 1/16 of its HP in water damage."})
+            elif marker == "statue":
+                out.append({"kind": "Statue", "name": "Statue", "model": STATUE, "pos": [cx, top, cz], "yaw": 0,
+                            "desc": "", "free": True})
             elif marker in ("tree", "gift"):
                 name, model = ("Tree", TREE) if marker == "tree" else ("Gift", GIFT)
                 out.append({"kind": name, "name": name if marker == "tree" else "Gift box", "model": model,

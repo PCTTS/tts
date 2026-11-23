@@ -243,18 +243,21 @@ def main():
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
     check(got == [("Chrysalia", False), ("Fontaine", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True),
-                  ("Violight", False), ("Viperia", False), ("Yaksha", False)],
-          f"map list shows the eight arenas, Pugilis on the table ({got})")
+                  ("Spectra", False), ("Violight", False), ("Viperia", False), ("Yaksha", False)],
+          f"map list shows the nine arenas, Pugilis on the table ({got})")
+
+    def row(name):   # the map panel's row for an arena (alphabetical)
+        return f"mapRes_White_{[m.name for m in g.mapList().values()].index(name) + 1}"
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
-          and calls.attrs["mapRes_White_5.text"] == "Pugilis" and calls.attrs["mapRes_White_5.colors"].startswith("#8DB8F7"),
+          and calls.attrs[row("Pugilis") + ".text"] == "Pugilis" and calls.attrs[row("Pugilis") + ".colors"].startswith("#8DB8F7"),
           "map button opens the map panel (and closes the search panel); the map on the table is highlighted, no label")
     n = len(calls.spawned)
-    g.mapPick(player, "-1", "mapRes_White_5")
+    g.mapPick(player, "-1", row("Pugilis"))
     check(len(calls.spawned) == n, "picking the arena that's already on the table does nothing")
     lua.execute("board.destroyed = true")
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_5")
+    g.mapPick(player, "-1", row("Pugilis"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     brd = new[0].data if new else None
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
@@ -268,7 +271,7 @@ def main():
     # Illusio: floating islands with 6 flags, 6 portals in their starting colours, 6 bridges that start dropped
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_3")
+    g.mapPick(player, "-1", row("Illusio"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("illusio", "mesh"))
@@ -288,7 +291,7 @@ def main():
     # Ingis: its board with the rock coordinates, three capture zone frames (neutral), the volcanic table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_4")
+    g.mapPick(player, "-1", row("Ingis"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
@@ -305,7 +308,7 @@ def main():
     # Viperia: 16 x 15, its 3 flags, no snap points on the walls, the jungle table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_7")
+    g.mapPick(player, "-1", row("Viperia"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     vmap = json.loads((REPO / "arenas" / "viperia" / "map.json").read_text(encoding="utf-8"))
@@ -319,7 +322,7 @@ def main():
     # Violight: 4 capture zone frames round the spire, no snap points on the spire, the steel table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_6")
+    g.mapPick(player, "-1", row("Violight"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     lidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Violight"]
@@ -331,7 +334,7 @@ def main():
     # Chrysalia: its board, 3 capture zone frames and 2 traps
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_1")
+    g.mapPick(player, "-1", row("Chrysalia"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("chrysalia", "mesh"))
@@ -356,7 +359,7 @@ def main():
     # Yaksha: a big 4x4 capture zone and two 2x2 ones, 6 tree tiles and 14 gift boxes that players move (not locked)
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_8")
+    g.mapPick(player, "-1", row("Yaksha"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
@@ -367,10 +370,23 @@ def main():
           and all(s.data.Locked for s in new if s.data.Tags[1] in ("Board3D", "Zone")),
           "picking Yaksha: its board, a 4x4 (raised: drawn in on its flat top) and two 2x2 zone frames, 6 trees and 14 gifts that players can move")
 
+    # Spectra: its board, 14 statues that players move (not locked), 4 flags, no snap points on the crypts
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", row("Spectra"))
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    statues = [s for s in new if s.data.Tags[1] == "Statue"]
+    sidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Spectra"]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("spectra", "mesh"))
+          and len(statues) == 14 and all(not s.data.Locked for s in statues) and kinds.count("Flag") == 4
+          and len(sidx["snaps"]) == 256 - 53 and backdrop(new, "misc/graveyard-placeholder-v1.jpg"),
+          "picking Spectra: its board, 14 statues players can move, 4 flags, snap points on all but the 53 crypt tiles, the graveyard table")
+
     # Fontaine: its river's water on every river tile, 8 gates (posts and sluice block) starting open, 4 fountains
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_2")
+    g.mapPick(player, "-1", row("Fontaine"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     fidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Fontaine"]
@@ -829,6 +845,7 @@ def main():
       end
       pBoard, pFlag, pStand, pCard, pTree = obj({ "Board3D" }), obj({ "Flag", "ArenaPiece" }), obj({ "Stand" }), obj({ "Item" }), obj({ "Tree", "ArenaPiece" })
       pPillar = obj({ "Pillar" })
+      pStatue = obj({ "Statue", "ArenaPiece" })
       pieceSetup(pBoard)
       pieceSetup(pPillar)
       delFlag = onPlayerAction(nil, Player.Action.Delete, { pCard, pFlag })
@@ -836,10 +853,13 @@ def main():
       delTree = onPlayerAction(nil, Player.Action.Delete, { pTree, pCard })
       pickCard = onPlayerAction(nil, Player.Action.PickUp, { pCard })
       pickTree = onPlayerAction(nil, Player.Action.PickUp, { pTree })
+      delStatue = onPlayerAction(nil, Player.Action.Delete, { pStatue })
+      pickStatue = onPlayerAction(nil, Player.Action.PickUp, { pStatue })
     """)
     check(g.pBoard.interactable is False and g.pPillar.interactable is False,
           "the board and the pillars can't be clicked, selected or deleted (not interactive)")
     check(g.delFlag is False and g.cutStand is False, "deleting a flag or cutting a stand is refused")
+    check(g.delStatue is False and g.pickStatue is True, "a statue can be picked up and moved, not deleted")
     check(g.delTree is True and g.pickCard is True and g.pickTree is True,
           "a tree or a card can still be deleted; other actions aren't blocked")
 

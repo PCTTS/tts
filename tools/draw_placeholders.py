@@ -43,6 +43,13 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/fontaine/textures/pebbles.png          the river bed: grey-brown pebbles on wet sand
   arenas/fontaine/textures/canal-wall.png       the canal walls and the board's edge: grey stone courses
   misc/valley-placeholder-v1.jpg                table image around Fontaine: meadow grass with small flowers
+  arenas/spectra/textures/grave-grass1.png, grave-grass2.png  Spectra's ground: dull dark graveyard grass, worn
+                                                bare patches, a faint pale mist
+  arenas/spectra/textures/crypt-top.png         the crypt roofs: dark grey-violet stone slabs, pale lichen
+  arenas/spectra/textures/crypt-wall.png        the crypts' sides: dark stone courses, damp toward the ground with
+                                                moss creeping up, seamless left-right
+  misc/graveyard-placeholder-v1.jpg             table image around Spectra: dark grass in a pale mist, rows of
+                                                small weathered headstones
 """
 from pathlib import Path
 
@@ -797,8 +804,102 @@ def valley_table():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
 
 
+MIST = (150, 146, 170)   # Spectra's pale violet haze
+
+
+def grave_grass(seed):
+    """Spectra's ground: dull dark grass, bare earth worn through in patches, a faint pale mist over it."""
+    rng = np.random.default_rng(seed)
+    img = mix((42, 56, 38), (76, 90, 58), np.clip((fbm(N, N, rng, 3) - 0.3) * 2.0, 0, 1))
+    bare = np.clip((fbm(N, N, rng, 5, 4) - 0.58) * 4, 0, 1)
+    img = img + (mix((56, 47, 38), (78, 66, 52), fbm(N, N, rng, 12, 3)) - img) * (0.85 * bare)[..., None]
+    img *= (0.92 + 0.16 * fbm(N, N, rng, 16, 3))[..., None]
+    mist = np.clip((fbm(N, N, rng, 2, 3) - 0.45) * 1.6, 0, 1) * 0.18
+    img = img + (np.array(MIST, np.float32) - img) * mist[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(2200):                                   # blades
+        x, y = rng.random() * N, rng.random() * N
+        ang = rng.normal(-np.pi / 2, 0.7)
+        ln = rng.uniform(4, 11)
+        col = (110, 126, 84, 110) if rng.random() < 0.5 else (24, 34, 22, 120)
+        d.line([(x, y), (x + ln * np.cos(ang), y + ln * np.sin(ang))], fill=col, width=2)
+    for _ in range(70):                                     # dead leaves and small stones
+        x, y, r = rng.random() * N, rng.random() * N, rng.uniform(2, 5)
+        col = (96, 74, 46, 170) if rng.random() < 0.6 else (118, 114, 122, 170)
+        d.ellipse([x - r, y - r * 0.7, x + r, y + r * 0.7], fill=col)
+    return out.filter(ImageFilter.GaussianBlur(0.5))
+
+
+def crypt_top():
+    """Spectra's crypt roofs: dark grey-violet stone slabs with pale lichen."""
+    rng = np.random.default_rng(201)
+    img = stone_blocks(N, N, rng, 4, base=(84, 80, 92))
+    lichen = np.clip((fbm(N, N, rng, 6, 3) - 0.62) * 4, 0, 1)
+    img = img + (np.array((122, 130, 102), np.float32) - img) * (0.5 * lichen)[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(400):                                    # speckles
+        x, y, r = rng.random() * N, rng.random() * N, rng.uniform(0.8, 2.0)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(40, 36, 48, 90) if rng.random() < 0.6 else (160, 156, 170, 80))
+    return out.filter(ImageFilter.GaussianBlur(0.5))
+
+
+def crypt_wall():
+    """The crypts' sides: dark stone courses, damp and darker toward the ground, moss creeping up from the bottom
+    (seamless left-right)."""
+    rng = np.random.default_rng(203)
+    h, w = 1024, N
+    img = stone_blocks(h, w, rng, 8, base=(82, 78, 90))
+    rows = np.linspace(0, 1, h, dtype=np.float32)[:, None]
+    img *= (1.0 - 0.28 * rows)[..., None]
+    moss = np.clip((fbm(h, w, rng, 5, 4, wrap_x=True) - 0.45) * 3, 0, 1) * np.clip((rows - 0.55) * 2.5, 0, 1)
+    green = mix((38, 60, 34), (68, 90, 50), fbm(h, w, rng, 12, 3, wrap_x=True))
+    img = img + (green - img) * (0.8 * moss)[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def graveyard_table():
+    """Around Spectra: dark graveyard grass in a pale mist, loose rows of small weathered headstones."""
+    rng = np.random.default_rng(207)
+    h, w = 1211, 2048
+    img = mix((28, 38, 28), (56, 68, 46), fbm(h, w, rng, 4, 5))
+    img *= (0.9 + 0.2 * fbm(h, w, rng, 40, 2))[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(9000):                                   # blades
+        x, y = rng.random() * w, rng.random() * h
+        ang = rng.normal(-np.pi / 2, 0.7)
+        ln = rng.uniform(5, 14)
+        col = (96, 112, 74, 100) if rng.random() < 0.5 else (18, 26, 16, 110)
+        d.line([(x, y), (x + ln * np.cos(ang), y + ln * np.sin(ang))], fill=col, width=2)
+    for y in range(70, h, 125):                             # headstones, seen from above and a little in front
+        x = rng.uniform(0, 70)
+        while x < w:
+            if rng.random() < 0.7:
+                sx, sy = x + rng.uniform(-14, 14), y + rng.uniform(-12, 12)
+                sw, sh = rng.uniform(26, 40), rng.uniform(16, 24)
+                grey = rng.uniform(96, 140)
+                d.ellipse([sx - sw * 0.7, sy + sh * 0.2, sx + sw * 0.8, sy + sh * 1.1], fill=(8, 12, 8, 110))   # shadow
+                d.rounded_rectangle([sx - sw / 2, sy - sh / 2, sx + sw / 2, sy + sh / 2], radius=sw * 0.35,
+                                    fill=(int(grey), int(grey), int(grey + 8), 255), outline=(40, 40, 46, 255), width=2)
+                if rng.random() < 0.25:                     # a cross carved in it
+                    d.line([(sx, sy - sh * 0.3), (sx, sy + sh * 0.3)], fill=(60, 60, 66, 255), width=3)
+                    d.line([(sx - sw * 0.18, sy - sh * 0.08), (sx + sw * 0.18, sy - sh * 0.08)], fill=(60, 60, 66, 255), width=3)
+            x += rng.uniform(110, 190)
+    img = np.asarray(out, np.float32)
+    mist = np.clip((fbm(h, w, rng, 3, 4) - 0.4) * 1.4, 0, 1) * 0.3
+    img = img + (np.array(MIST, np.float32) - img) * mist[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.8))
+
+
 def main():
     files = {
+        "arenas/spectra/textures/grave-grass1.png": lambda p: grave_grass(211).save(p),
+        "arenas/spectra/textures/grave-grass2.png": lambda p: grave_grass(212).save(p),
+        "arenas/spectra/textures/crypt-top.png": lambda p: crypt_top().save(p),
+        "arenas/spectra/textures/crypt-wall.png": lambda p: crypt_wall().save(p),
+        "misc/graveyard-placeholder-v1.jpg": lambda p: graveyard_table().save(p, quality=90),
         "arenas/fontaine/textures/grass1.png": lambda p: grass(31).save(p),
         "arenas/fontaine/textures/grass2.png": lambda p: grass(32).save(p),
         "arenas/fontaine/textures/pebbles.png": lambda p: pebbles().save(p),

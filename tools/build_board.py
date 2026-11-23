@@ -496,13 +496,20 @@ def draw_coords(over, a, p):
     """Coordinates in the board's edge tiles: x = 1..C along both player edges (from player 1's left), y = 1..R up
     both side edges (from player 1's side). Each number faces out from its own edge (its bottom toward that edge).
     "coords": {"cols": [first, last], "rows": [first, last]} (tile indices) numbers only those columns/rows, from 1;
-    "inset": how far in from the edge a number's centre sits, in tiles (default 0.15)."""
+    "inset": how far in from the edge a number's centre sits, in tiles (default 0.15); "repeat": n starts the count
+    again after n (Spectra: 1-8 twice along each edge, for d8 rolls); "sides": [near, right, far, left] puts a badge
+    with that text on each edge (Spectra: the d4 directions), see side_badges."""
     spec = a.data["coords"]
-    cols = range(a.C) if spec is True else range(spec["cols"][0], spec["cols"][1] + 1)
-    rows = range(a.R) if spec is True else range(spec["rows"][0], spec["rows"][1] + 1)
-    k = spec.get("inset", 0.15) if isinstance(spec, dict) else 0.15
+    opts = spec if isinstance(spec, dict) else {}
+    cols = range(a.C) if "cols" not in opts else range(spec["cols"][0], spec["cols"][1] + 1)
+    rows = range(a.R) if "rows" not in opts else range(spec["rows"][0], spec["rows"][1] + 1)
+    k = opts.get("inset", 0.15)
+    rep = opts.get("repeat")
     f = font(round(p * 0.15))
     size = round(p * 0.28)
+
+    def num(i):   # the i-th number along a run (from 0)
+        return str(i % rep + 1 if rep else i + 1)
 
     def label(text, cx, cy, edge):
         layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -512,11 +519,52 @@ def draw_coords(over, a, p):
         over.alpha_composite(layer, (round(cx - size / 2), round(cy - size / 2)))
 
     for c in cols:
-        label(str(c - cols.start + 1), c * p + p / 2, (a.R - k) * p, (1, 0))     # player 1's edge
-        label(str(c - cols.start + 1), c * p + p / 2, p * k, (-1, 0))            # player 2's edge
+        label(num(c - cols.start), c * p + p / 2, (a.R - k) * p, (1, 0))         # player 1's edge
+        label(num(c - cols.start), c * p + p / 2, p * k, (-1, 0))                # player 2's edge
     for r in rows:
-        label(str(rows.stop - r), p * k, r * p + p / 2, (0, -1))                  # left edge
-        label(str(rows.stop - r), (a.C - k) * p, r * p + p / 2, (0, 1))           # right edge
+        label(num(rows.stop - 1 - r), p * k, r * p + p / 2, (0, -1))              # left edge
+        label(num(rows.stop - 1 - r), (a.C - k) * p, r * p + p / 2, (0, 1))       # right edge
+    if opts.get("sides"):
+        side_badges(over, a, p, opts["sides"])
+
+
+SIDE_EDGES = ((1, 0), (0, 1), (-1, 0), (0, -1))   # "sides" order: player 1's edge, right, player 2's edge, left
+
+
+def side_badge_spot(a, edge):
+    """Where an edge's badge goes: on the boundary between two edge tiles nearest the edge's middle, both open (not
+    solid) and at the same height, so the badge lies flat across them. Returns (boundary, along_x)."""
+    along_x = edge[0] != 0
+    n = a.C if along_x else a.R
+    line = (a.R - 1 if edge[0] > 0 else 0) if along_x else (a.C - 1 if edge[1] > 0 else 0)
+
+    def at(i):
+        return a.tile(line, i) if along_x else a.tile(i, line)
+    ok = [b for b in range(1, n) if at(b - 1) and at(b) and not at(b - 1).get("solid") and not at(b).get("solid")
+          and abs(a.top(at(b - 1)) - a.top(at(b))) < 1e-6]
+    if not ok:
+        sys.exit(f"coords sides: no two open tiles at one height along the {edge} edge for its badge")
+    return min(ok, key=lambda b: (abs(b - n / 2), b)), along_x
+
+
+def side_badges(over, a, p, texts):
+    """A round badge with each edge's text (e.g. a d4 direction), facing out from its edge like the numbers."""
+    k = 0.16   # the badge's centre, this far in from the edge (tiles)
+    size = round(p * 0.36)
+    f = font(round(p * 0.17))
+    for edge, text in zip(SIDE_EDGES, texts):
+        b, along_x = side_badge_spot(a, edge)
+        if along_x:
+            cx, cy = b * p, ((a.R - k) if edge[0] > 0 else k) * p
+        else:
+            cx, cy = ((a.C - k) if edge[1] > 0 else k) * p, b * p
+        layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        d = ImageDraw.Draw(layer)
+        r = p * 0.13
+        d.ellipse([size / 2 - r, size / 2 - r, size / 2 + r, size / 2 + r], fill=(20, 16, 28, 210),
+                  outline=(232, 196, 96, 240), width=max(1, round(p * 0.018)))
+        d.text((size / 2, size / 2 + p * 0.005), str(text), font=f, fill=(240, 206, 110, 255), anchor="mm")
+        over.alpha_composite(layer.rotate(MARKER_TURN[edge]), (round(cx - size / 2), round(cy - size / 2)))
 
 
 def grass_fringe(a, img, layers, p):
@@ -803,6 +851,22 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None):
             draw_pair(im, n, cx, cy, round(40 * u), fill)
         else:
             o.text((cx, cy + 2 * u), n, font=font(round(52 * u)), fill=fill, anchor="mm")
+    elif marker == "lantern":   # an iron lantern with a lit flame in a warm glow (Spectra: on crypt corners)
+        for rr, alpha in ((58, 26), (48, 40), (38, 56)):
+            o.ellipse([cx - rr * u, cy - rr * u, cx + rr * u, cy + rr * u], fill=(255, 150, 50, alpha))
+        iron, glass = (34, 32, 38, 255), (250, 190, 92, 255)
+        o.ellipse([cx - 9 * u, cy - 50 * u, cx + 9 * u, cy - 34 * u], outline=iron, width=round(4 * u))   # ring
+        o.polygon([(cx - 13 * u, cy - 37 * u), (cx + 13 * u, cy - 37 * u), (cx + 26 * u, cy - 22 * u),
+                   (cx - 26 * u, cy - 22 * u)], fill=iron)                                                  # cap
+        o.rectangle([cx - 21 * u, cy - 22 * u, cx + 21 * u, cy + 25 * u], fill=glass, outline=iron, width=round(4 * u))
+        for bx in (-7, 7):                                                                                  # frame bars
+            o.line([(cx + bx * u, cy - 22 * u), (cx + bx * u, cy + 25 * u)], fill=iron, width=round(2 * u))
+        o.polygon([(cx, cy - 14 * u), (cx + 9 * u, cy + 4 * u), (cx + 7 * u, cy + 14 * u), (cx, cy + 19 * u),
+                   (cx - 7 * u, cy + 14 * u), (cx - 9 * u, cy + 4 * u)], fill=(240, 104, 26, 255))         # flame
+        o.polygon([(cx, cy - 3 * u), (cx + 5 * u, cy + 8 * u), (cx, cy + 15 * u), (cx - 5 * u, cy + 8 * u)],
+                  fill=(255, 232, 130, 255))
+        o.polygon([(cx - 26 * u, cy + 25 * u), (cx + 26 * u, cy + 25 * u), (cx + 18 * u, cy + 36 * u),
+                   (cx - 18 * u, cy + 36 * u)], fill=iron)                                                  # base
     elif marker.startswith("bell"):
         gold, deep = (226, 178, 60, 255), (150, 105, 30, 255)
         o.ellipse([cx - 26 * u, cy - 44 * u, cx + 26 * u, cy - 6 * u], fill=gold, outline=ink, width=round(3 * u))
