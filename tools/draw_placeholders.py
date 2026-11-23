@@ -63,6 +63,8 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 left-right
   misc/cave-placeholder-v1.jpg                  table image around Terrera: dark cave floor, loose rocks, the mouths
                                                 of Durant tunnels
+  arenas/terrera/textures/rock.png              the rock ridge between the boards: rough grey-brown rock, cracks,
+                                                lumps lit from one side (4 tiles to an image)
 """
 from pathlib import Path
 
@@ -1075,8 +1077,34 @@ def cave_table():
     return out.filter(ImageFilter.GaussianBlur(0.8))
 
 
+def rock_ridge():
+    """The rock ridge between Terrera's boards: rough grey-brown rock, lumpy (shaded as if lit from the top left),
+    cracks running through it. 512 px = 4 tiles."""
+    rng = np.random.default_rng(257)
+    hgt = fbm(N, N, rng, 6, 5)                                     # a height field: lumps
+    gy, gx = np.gradient(hgt)
+    light = np.clip(0.5 - (gx + gy) * 18, 0, 1)                    # lit from the top left
+    img = mix((70, 60, 52), (134, 120, 104), 0.55 * hgt + 0.45 * light)
+    img *= (0.9 + 0.2 * fbm(N, N, rng, 30, 2))[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(16):                                            # cracks
+        x, y, ang = rng.random() * N, rng.random() * N, rng.random() * 2 * np.pi
+        pts = [(x, y)]
+        for _ in range(rng.integers(6, 14)):
+            ang += rng.normal(0, 0.5)
+            x, y = x + 10 * np.cos(ang), y + 10 * np.sin(ang)
+            pts.append((x, y))
+        d.line(pts, fill=(30, 24, 20, 200), width=3)
+        d.line([(px + 1, py + 1) for px, py in pts], fill=(170, 156, 138, 80), width=1)
+    for _ in range(40):
+        pebble(d, rng.random() * N, rng.random() * N, rng.uniform(3, 8), rng)
+    return out.filter(ImageFilter.GaussianBlur(0.6))
+
+
 def main():
     files = {
+        "arenas/terrera/textures/rock.png": lambda p: rock_ridge().save(p),
         "arenas/terrera/textures/hive1.png": lambda p: hive_floor(251).save(p),
         "arenas/terrera/textures/hive2.png": lambda p: hive_floor(252).save(p),
         "arenas/terrera/textures/quicksand.png": lambda p: quicksand().save(p),

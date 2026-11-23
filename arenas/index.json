@@ -8631,8 +8631,8 @@
   ]
  },
  "Terrera Mountain": {
-  "mesh": "arenas/terrera/board-v3.obj",
-  "texture": "arenas/terrera/board-v3.jpg",
+  "mesh": "arenas/terrera/board-v4.obj",
+  "texture": "arenas/terrera/board-v4.jpg",
   "table": "misc/cave-placeholder-v1.jpg",
   "snaps": [
    [
