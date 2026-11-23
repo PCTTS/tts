@@ -18,6 +18,11 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
         shuffles every portal's pair (Global.lua).
   trap: a trap piece on the tile; right-click > Spring trap removes it once it's been used (Global.lua).
   tree / gift: a tree tile (Yaksha) or a gift box on the tile, NOT locked: players lift it off / move it themselves.
+  gate (Fontaine): a water gate on a river tile: four stone posts (GateFrame) and a sluice block (Gate) that rises
+        to close it; legend "gate": its number, "branch" and "part" ("edge"/"inner"): which water it lets through.
+  fountain (Fontaine): a marble fountain on a solid tile.
+  water tiles (legend "water": true, with "branch" and "part"): Fontaine's river, a water slab on each tile that
+        Global.lua lowers out of sight when its stretch drains.
   zone (capture zone tiles): a frame around each square group of them (2x2), which takes the colour of the player
         with more Pokemon inside (Global.lua). A zone raised above every tile round it, with sloping edges, gets
         the frame drawn in on its flat top (Yaksha's centre).
@@ -59,6 +64,15 @@ TREE = {"mesh": "props/tree-v1.obj", "diffuse": "props/tree-v1.jpg", "collider":
         "convex": True, "material": 1}
 GIFT = {"mesh": "props/gift-v1.obj", "diffuse": "props/gift-v1.jpg", "collider": "props/gift-v1.obj",
         "convex": True, "material": 3}
+GATE_FRAME = {"mesh": "props/gateframe-v1.obj", "diffuse": "props/gate-v1.jpg", "collider": "props/gateframe-v1.obj",
+              "convex": False, "material": 1}
+GATE = {"mesh": "props/gate-v1.obj", "diffuse": "props/gate-v1.jpg", "collider": "props/gate-v1.obj",
+        "convex": True, "material": 1}
+WATER = {"mesh": "props/water-v1.obj", "diffuse": "props/water-v1.jpg", "collider": "props/water-v1.obj",
+         "convex": True, "material": 3}   # matte: shiny water mirrors the sky white at low angles
+FOUNTAIN = {"mesh": "props/fountain-v1.obj", "diffuse": "props/fountain-v1.jpg", "collider": "props/fountain-v1.obj",
+            "convex": False, "material": 0}
+WATER_DEPTH = 0.62   # Fontaine: the water's surface above the river bed (the canal walls are 0.968 high)
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
 
 
@@ -155,11 +169,25 @@ def pieces(arena, info):
         for c, ch in enumerate(row):
             tile = data["legend"].get(ch, {})
             marker = tile.get("marker", "")
-            if tile.get("void") or not tile.get("piece") or not (marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift")):
-                continue
             cx, cz = (c + 0.5 - C / 2) * T, (R / 2 - r - 0.5) * T
+            if not tile.get("void") and tile.get("water"):   # Fontaine's river: a water tile, in its gate's stretch
+                bed = info["floor0"] + tile["level"] * info["level_height"] - tile.get("sink", 0.0)
+                out.append({"kind": "Water", "name": "River water", "model": WATER, "pos": [cx, bed + WATER_DEPTH, cz],
+                            "yaw": 0, "desc": "", "branch": tile["branch"], "part": tile["part"]})
+            if tile.get("void") or not tile.get("piece") or not (
+                    marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift", "gate", "fountain")):
+                continue
             top = info["floor0"] + tile["level"] * info["level_height"] - tile.get("sink", 0.0)
-            if marker in ("tree", "gift"):
+            if marker == "gate":   # its frame of posts, and the sluice block (Global.lua lowers it: gates start open)
+                fields = {"gate": tile["gate"], "branch": tile["branch"], "part": tile["part"]}
+                out.append({"kind": "GateFrame", "name": f"Water gate {tile['gate']}", "model": GATE_FRAME,
+                            "pos": [cx, top, cz], "yaw": 0, "desc": "", **fields})
+                out.append({"kind": "Gate", "name": f"Water gate {tile['gate']}", "model": GATE,
+                            "pos": [cx, top, cz], "yaw": 0, "desc": "", **fields})
+            elif marker == "fountain":
+                out.append({"kind": "Fountain", "name": "Fountain", "model": FOUNTAIN, "pos": [cx, top, cz], "yaw": 0,
+                            "desc": "Fountain. A Pokémon that ends its turn next to it takes 1/16 of its HP in water damage."})
+            elif marker in ("tree", "gift"):
                 name, model = ("Tree", TREE) if marker == "tree" else ("Gift", GIFT)
                 out.append({"kind": name, "name": name if marker == "tree" else "Gift box", "model": model,
                             "pos": [cx, top, cz], "yaw": 0, "desc": "", "free": True})

@@ -14,6 +14,8 @@ card on the slope under each. Which stand is yours depends on your seat colour (
   * Map:      pick which arena goes on the table (3D boards from arenas/index.json, with snap points and pieces).
 Flags take the colour of the last Pokémon put down on their tile (left-click one to make it neutral); capture zones
 take the colour of the player with more Pokémon in them.
+Water gates (Fontaine): click the arrows on a gate (or right-click it) to open or close it; the river past it
+drains or fills.
 HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
@@ -228,7 +230,7 @@ READERS = {
   end,
   arenas = function(rows)
     local t, cur = {}, nil
-    local NUM = { yaw = true, material = true, pair = true, tile = true, tiles = true }
+    local NUM = { yaw = true, material = true, pair = true, tile = true, tiles = true, gate = true, branch = true }
     for _, f in ipairs(rows) do
       if f[1] == "arena" then
         cur = { mesh = f[3], texture = f[4], table = f[5] or "", snaps = {}, pieces = {} }
@@ -295,6 +297,7 @@ function onLoad(saved)
       elseif obj.hasTag("Pokemon") then
         plainStandee(obj)
       elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap")
+        or obj.hasTag("GateFrame") or obj.hasTag("Gate") or obj.hasTag("Water")
         or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") or obj.hasTag("Pillar") then
         pieceSetup(obj)
       elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
@@ -318,7 +321,8 @@ end
 -- The board, its backdrop and the pillars aren't interactive at all (pieceSetup). The team stands and the map's fixed
 -- pieces still need clicks (HP signs, flags, buttons), so players just can't delete or cut them; the map picker
 -- replaces them by script, which isn't a player action.
-PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand" }
+PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand", "GateFrame", "Gate", "Water",
+  "Fountain" }
 
 function onPlayerAction(player, action, targets)
   if action == Player.Action.Select or action == Player.Action.PickUp then
@@ -738,6 +742,14 @@ function spawnArenaPiece(p, origin, base)
   elseif p.kind == "Bridge" then
     data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, tile = p.tile or BOARD_TILE })
     pos = Vector(pos.x, pos.y - BRIDGE_DROP, pos.z)
+  elseif p.kind == "Gate" then   -- gates start open: the sluice block sunk into the river bed
+    data.Memo = JSON.encode({ gate = p.gate, branch = p.branch, part = p.part, open = true, y = pos.y })
+    pos = Vector(pos.x, pos.y - GATE_DROP, pos.z)
+  elseif p.kind == "GateFrame" then
+    data.Memo, data.Description = JSON.encode({ gate = p.gate, branch = p.branch, part = p.part }), GATE_DESC
+  elseif p.kind == "Water" then
+    data.Memo = JSON.encode({ branch = p.branch, part = p.part, y = pos.y })
+    data.CustomMesh.CastShadows = false
   end
   return spawnObjectData({ data = data, position = pos, rotation = { 0, p.yaw, 0 },
     callback_function = function(obj) pieceSetup(obj) end })
@@ -1327,6 +1339,67 @@ function refreshZones()
 end
 
 ----------------------------------------------------------------------------------------------------
+-- Water gates (Fontaine): a river runs in from each corner past an edge gate, on past an inner gate, and into
+-- the middle, where the four branches meet round the island. A gate is four stone posts (GateFrame: its button
+-- and menu) and a sluice block (Gate) that rises between them to close it. Closing an edge gate drains its whole
+-- branch (with that branch's quarter of the middle); closing an inner gate drains the river past it. Each river
+-- tile's water is a slab (Water), sunk out of sight while dry. Gates start open. Memos: { gate, branch, part,
+-- open (Gate), y = its height when up (Gate, Water) }.
+----------------------------------------------------------------------------------------------------
+GATE_DROP = 1.16        -- an open gate's block sinks this far: below the river bed
+WATER_DROP = 0.75       -- dry water sinks this far: below the river bed
+GATE_BUTTON = { x = 1.29, z = -1.29, y = 1.57 }   -- on top of a corner post
+GATE_DESC = "Water gate. Click the arrows (or right-click) to open or close it; closing it drains the river past it."
+
+-- Every Water tile up (wet) or sunk (dry): wet while the gates upstream of it are open.
+function refreshWater()
+  local open = {}   -- branch -> part -> open
+  for _, gate in ipairs(piecesTagged("Gate")) do
+    local st = memoTable(gate)
+    if st.branch then
+      open[st.branch] = open[st.branch] or {}
+      open[st.branch][st.part] = st.open ~= false
+    end
+  end
+  for _, water in ipairs(piecesTagged("Water")) do
+    local st = memoTable(water)
+    local branch = open[st.branch] or {}
+    local wet = branch.edge ~= false and (st.part == "edge" or branch.inner ~= false)
+    if st.y then
+      local p = water.getPosition()
+      local y = wet and st.y or st.y - WATER_DROP
+      if math.abs(p.y - y) > 0.01 then water.setPositionSmooth(Vector(p.x, y, p.z), false, false) end
+    end
+  end
+end
+
+function setGateOpen(n, open)
+  for _, gate in ipairs(piecesTagged("Gate")) do
+    local st = memoTable(gate)
+    if st.gate == n and (st.open ~= false) ~= open then
+      st.open = open
+      gate.memo = JSON.encode(st)
+      local p = gate.getPosition()
+      if st.y then gate.setPositionSmooth(Vector(p.x, open and st.y - GATE_DROP or st.y, p.z), false, false) end
+    end
+  end
+  refreshWater()
+end
+
+function toggleGate(n)
+  for _, gate in ipairs(piecesTagged("Gate")) do
+    local st = memoTable(gate)
+    if st.gate == n then return setGateOpen(n, st.open == false) end
+  end
+end
+
+-- The arrows on a gate's post: its id is "gate_<number>".
+function gateClicked(_, _, id)
+  local n = tonumber(tostring(id or ""):sub(6))
+  if n then toggleGate(n) end
+end
+
+----------------------------------------------------------------------------------------------------
 -- Traps (Chrysalia): a trap piece on its tile; once it has caught a Pokémon, right-click > Spring trap removes it.
 ----------------------------------------------------------------------------------------------------
 TRAP_DESC = "Trap. A Pokémon that ends its turn here finishes its activation and skips its next one; then the trap "
@@ -1367,6 +1440,22 @@ function pieceSetup(obj)
     obj.clearContextMenu()
     obj.addContextMenuItem("Raise this bridge", function() setBridgeUp(obj, true) end)
     obj.addContextMenuItem("Drop this bridge", function() setBridgeUp(obj, false) end)
+  elseif obj.hasTag("GateFrame") then
+    local n = memoTable(obj).gate or 0
+    obj.setDescription(GATE_DESC)
+    obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
+    obj.UI.setXml(pieceButtonXml("gate_" .. n, GATE_BUTTON.x, GATE_BUTTON.z, GATE_BUTTON.y, "gateClicked",
+      "Open or close the gate", "updown"))
+    obj.clearContextMenu()
+    obj.addContextMenuItem("Open gate", function() setGateOpen(n, true) end)
+    obj.addContextMenuItem("Close gate", function() setGateOpen(n, false) end)
+  elseif obj.hasTag("Gate") then
+    obj.interactable = false   -- opened and closed through its posts
+  elseif obj.hasTag("Water") then
+    obj.interactable = false   -- part of the board; a Pokémon can stand on it
+    if #(obj.getSnapPoints() or {}) ~= 1 then
+      obj.setSnapPoints({ { position = { 0, 0, 0 }, rotation_snap = false } })
+    end
   end
 end
 

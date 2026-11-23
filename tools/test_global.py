@@ -236,19 +236,19 @@ def main():
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Chrysalia", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True), ("Violight", False),
-                  ("Viperia", False), ("Yaksha", False)],
-          f"map list shows the seven arenas, Pugilis on the table ({got})")
+    check(got == [("Chrysalia", False), ("Fontaine", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True),
+                  ("Violight", False), ("Viperia", False), ("Yaksha", False)],
+          f"map list shows the eight arenas, Pugilis on the table ({got})")
     g.toolClick(player, "-1", "tool_maps")
     check(calls.attrs["maps_White.active"] == "true" and calls.attrs["dex_White.active"] == "false"
-          and calls.attrs["mapRes_White_4.text"] == "Pugilis" and calls.attrs["mapRes_White_4.colors"].startswith("#8DB8F7"),
+          and calls.attrs["mapRes_White_5.text"] == "Pugilis" and calls.attrs["mapRes_White_5.colors"].startswith("#8DB8F7"),
           "map button opens the map panel (and closes the search panel); the map on the table is highlighted, no label")
     n = len(calls.spawned)
-    g.mapPick(player, "-1", "mapRes_White_4")
+    g.mapPick(player, "-1", "mapRes_White_5")
     check(len(calls.spawned) == n, "picking the arena that's already on the table does nothing")
     lua.execute("board.destroyed = true")
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_4")
+    g.mapPick(player, "-1", "mapRes_White_5")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     brd = new[0].data if new else None
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
@@ -262,7 +262,7 @@ def main():
     # Illusio: floating islands with 6 flags, 6 portals in their starting colours, 6 bridges that start dropped
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_2")
+    g.mapPick(player, "-1", "mapRes_White_3")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/illusio/board-v6.obj")
@@ -282,7 +282,7 @@ def main():
     # Ingis: its board with the rock coordinates, three capture zone frames (neutral), the volcanic table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_3")
+    g.mapPick(player, "-1", "mapRes_White_4")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
@@ -299,7 +299,7 @@ def main():
     # Viperia: 16 x 15, its 3 flags, no snap points on the walls, the jungle table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_6")
+    g.mapPick(player, "-1", "mapRes_White_7")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     vmap = json.loads((REPO / "arenas" / "viperia" / "map.json").read_text(encoding="utf-8"))
@@ -313,7 +313,7 @@ def main():
     # Violight: 4 capture zone frames round the spire, no snap points on the spire, the steel table
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_5")
+    g.mapPick(player, "-1", "mapRes_White_6")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     lidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Violight"]
@@ -350,7 +350,7 @@ def main():
     # Yaksha: a big 4x4 capture zone and two 2x2 ones, 6 tree tiles and 14 gift boxes that players move (not locked)
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", "mapRes_White_7")
+    g.mapPick(player, "-1", "mapRes_White_8")
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new]
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
@@ -360,6 +360,67 @@ def main():
           and kinds.count("Tree") == 6 and kinds.count("Gift") == 14 and all(not s.data.Locked for s in free)
           and all(s.data.Locked for s in new if s.data.Tags[1] in ("Board3D", "Zone")),
           "picking Yaksha: its board, a 4x4 (raised: drawn in on its flat top) and two 2x2 zone frames, 6 trees and 14 gifts that players can move")
+
+    # Fontaine: its river's water on every river tile, 8 gates (posts and sluice block) starting open, 4 fountains
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", "mapRes_White_2")
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    fidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Fontaine"]
+    gates = [s for s in new if s.data.Tags[1] == "Gate"]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith("arenas/fontaine/board-v1.obj")
+          and kinds.count("Water") == 56 and kinds.count("GateFrame") == 8 and kinds.count("Gate") == 8
+          and kinds.count("Fountain") == 4 and kinds.count("Zone") == 3 and len(fidx["snaps"]) == 256 - 4
+          and all(json.loads(s.data.Memo)["open"] for s in gates) and backdrop(new, "misc/valley-placeholder-v1.jpg"),
+          "picking Fontaine: its board, the river's water, 8 gates (open), 4 fountains, 3 zones, the valley table")
+    check(abs((json.loads(gates[0].data.Memo)["y"] - gates[0].position.y) - 1.16) < 1e-6,
+          "an open gate's sluice block starts sunk into the river bed")
+
+    # gates drain the river past them: an edge gate its whole branch (with its quarter of the middle), an inner
+    # gate the part past it
+    lua.execute(r"""
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end
+      local function piece(tag, memo, y)
+        local o = { tags = { tag, "ArenaPiece" }, guid = tag .. #objects, menu = {}, snaps = {}, ui = {}, pos = Vector(0, y, 0) }
+        o.hasTag = function(t) return t == tag or t == "ArenaPiece" end
+        o.memo = JSON.encode(memo)
+        o.getPosition = function() return o.pos end
+        o.setPositionSmooth = function(p) o.pos = p end
+        o.getSnapPoints = function() return o.snaps end
+        o.setSnapPoints = function(s) o.snaps = s end
+        o.setDescription = function(d) o.desc = d end
+        o.clearContextMenu = function() o.menu = {} end
+        o.addContextMenuItem = function(label, fn) o.menu[#o.menu + 1] = { label = label, fn = fn } end
+        o.UI = { setXml = function(x) o.ui.xml = x end, setCustomAssets = function(a) o.ui.assets = a end }
+        objects[#objects + 1] = o
+        onObjectSpawn(o)
+        return o
+      end
+      fFrame = piece("GateFrame", { gate = 1, branch = 1, part = "edge" }, 0.41)
+      fEdge = piece("Gate", { gate = 1, branch = 1, part = "edge", open = true, y = 0.41 }, 0.41 - 1.16)
+      fInner = piece("Gate", { gate = 2, branch = 1, part = "inner", open = true, y = 0.41 }, 0.41 - 1.16)
+      fOther = piece("Gate", { gate = 3, branch = 2, part = "edge", open = true, y = 0.41 }, 0.41 - 1.16)
+      wEdge = piece("Water", { branch = 1, part = "edge", y = 1.03 }, 1.03)
+      wInner = piece("Water", { branch = 1, part = "inner", y = 1.03 }, 1.03)
+      wOther = piece("Water", { branch = 2, part = "inner", y = 1.03 }, 1.03)
+    """)
+    fr = g.fFrame
+    check('onClick="Global/gateClicked"' in str(fr.ui.xml) and 'id="gate_1"' in str(fr.ui.xml)
+          and [fr.menu[i].label for i in (1, 2)] == ["Open gate", "Close gate"] and fr.desc.startswith("Water gate."),
+          "a gate's posts get the arrows button (for gate 1) and Open / Close gate")
+    check(g.wEdge.interactable is False and g.fEdge.interactable is False and len(list(g.wEdge.snaps.values())) == 1,
+          "the water and the sluice block can't be clicked; a water tile has a snap point")
+    lua.execute('gateClicked(nil, nil, "gate_2")')
+    up = lambda o: abs(o.pos.y - 1.03) < 1e-6
+    check(abs(g.fInner.pos.y - 0.41) < 1e-6 and up(g.wEdge) and not up(g.wInner) and up(g.wOther),
+          "closing an inner gate raises its block and drains only the river past it")
+    lua.execute('fFrame.menu[2].fn("Red")')
+    check(abs(g.fEdge.pos.y - 0.41) < 1e-6 and not up(g.wEdge) and not up(g.wInner) and up(g.wOther),
+          "closing the edge gate (right-click) drains its whole branch; another branch keeps its water")
+    lua.execute('gateClicked(nil, nil, "gate_1"); gateClicked(nil, nil, "gate_2")')
+    check(abs(g.fEdge.pos.y - (0.41 - 1.16)) < 1e-6 and up(g.wEdge) and up(g.wInner),
+          "opening them again sinks the blocks and fills the river")
 
     # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
     lua.execute(r"""

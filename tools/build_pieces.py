@@ -16,6 +16,10 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/tree-v1.obj, props/tree-v1.jpg, props/tree-collider-v1.obj
   props/gift-v1.obj, props/gift-v1.jpg  (also its own collider)
   props/backdrop-v1.obj  (also its own collider)
+  props/water-v1.obj, props/water-v1.jpg  (Fontaine: one river tile's water, a thin slab; also its own collider)
+  props/gateframe-v1.obj, props/gate-v1.obj, props/gate-v1.jpg  (Fontaine: a water gate's four corner posts, and
+  the sluice block between them that rises to close the gate; each its own collider)
+  props/fountain-v1.obj, props/fountain-v1.jpg  (Fontaine: a marble fountain; also its own collider)
   props/zoneframe2-raised-v1.obj, props/zoneframe4-raised-v1.obj  (frames for a zone raised above everything round
   it, its edges sloping down: drawn in by the slope's run, on the flat top; same texture) for slant 0.8 (a 50 degree
   slope), props/zoneframe2-raised60-v1.obj, -4- for slant 0.559 (60 degrees),
@@ -537,6 +541,118 @@ def gift_texture():
     return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
 
 
+# ------------------------------------------------------------------------------------------------ Fontaine
+WATER_T = 0.06                           # water slab thickness; its own frame: y = 0 is the water's surface
+GATE_POST, GATE_INSET = 0.38, 0.1        # gate posts: width, and how far in from the tile's corners
+GATE_POST_H = 1.55                       # post height above the river bed (the canal walls are 0.968 high)
+GATE_BLOCK_H = 1.08                      # the sluice block: from the bed to a little above the canal's top
+FOUNTAIN_R = 1.3                         # the basin's radius
+
+
+def box_uv(m, x0, x1, y0, y1, z0, z1, region):
+    """A box, each face showing the whole texture region (u0, v0, u1, v1)."""
+    u0, v0, u1, v1 = region
+    uv = [(u0, v0), (u1, v0), (u1, v1), (u0, v1)]
+    m.face4([(x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)], uv, [(0, 1, 0)] * 4)
+    m.face4([(x0, y0, z0), (x1, y0, z0), (x1, y0, z1), (x0, y0, z1)], uv, [(0, -1, 0)] * 4)
+    m.face4([(x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0)], uv, [(0, 0, -1)] * 4)
+    m.face4([(x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1)], uv, [(0, 0, 1)] * 4)
+    m.face4([(x0, y0, z0), (x0, y0, z1), (x0, y1, z1), (x0, y1, z0)], uv, [(-1, 0, 0)] * 4)
+    m.face4([(x1, y0, z0), (x1, y0, z1), (x1, y1, z1), (x1, y1, z0)], uv, [(1, 0, 0)] * 4)
+
+
+def water_tile():
+    """One river tile's water: a thin slab exactly a tile across (neighbours meet seamlessly), its top at y = 0."""
+    m = PieceMesh()
+    h = BOARD_TILE / 2
+    box_uv(m, -h, h, -WATER_T, 0.0, -h, h, (0.0, 0.0, 1.0, 1.0))
+    return m
+
+
+def water_texture(n=256):
+    """Clear river water, seamless both ways (only whole waves across the tile), ripples and glints."""
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32) / n
+    rng = np.random.default_rng(211)
+    wave = np.zeros((n, n), np.float32)
+    for _ in range(9):
+        kx, ky = rng.integers(-4, 5), rng.integers(-4, 5)
+        wave += np.sin(2 * np.pi * (kx * xx + ky * yy) + rng.random() * 6.3) / (1 + abs(kx) + abs(ky))
+    wave = (wave - wave.min()) / (wave.max() - wave.min())
+    img = np.array((38, 104, 168), np.float32) + (np.array((84, 160, 214), np.float32) - (38, 104, 168)) * wave[..., None]
+    glint = np.clip((wave - 0.86) / 0.14, 0, 1)
+    img = img + (np.array((225, 242, 250), np.float32) - img) * (0.55 * glint)[..., None]
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+
+
+def gate_frame():
+    """A water gate's frame: four square stone posts in the tile's corners, from the river bed (y = 0) up past
+    the canal's top, with iron caps."""
+    m = PieceMesh()
+    h = BOARD_TILE / 2 - GATE_INSET
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            xa, xb = sorted((sx * h, sx * (h - GATE_POST)))
+            za, zb = sorted((sz * h, sz * (h - GATE_POST)))
+            box_uv(m, xa, xb, 0.0, GATE_POST_H - 0.08, za, zb, (0.0, 0.0, 0.5, 1.0))          # stone
+            box_uv(m, xa - 0.03, xb + 0.03, GATE_POST_H - 0.08, GATE_POST_H, za - 0.03, zb + 0.03,
+                   (0.52, 0.9, 0.98, 1.0))                                                       # iron cap
+    return m
+
+
+def gate_block():
+    """The sluice block between the posts: iron-bound timber, from the bed (y = 0) to just above the canal's
+    top. Raised it closes the gate; sunk into the bed it's open."""
+    m = PieceMesh()
+    h = BOARD_TILE / 2 - GATE_INSET - GATE_POST + 0.02
+    box_uv(m, -h, h, 0.0, GATE_BLOCK_H, -h, h, (0.5, 0.0, 1.0, 0.88))
+    return m
+
+
+def gate_texture():
+    """Left half: grey stone with darker joints. Right: timber planks with iron bands (and a strip of iron)."""
+    rng = np.random.default_rng(213)
+    n = 256
+    img = np.zeros((n, n, 3), np.float32)
+    stone = np.array((128, 126, 118), np.float32) * (0.86 + 0.2 * rng.random((n, n // 2, 1)))
+    stone[::64] *= 0.6
+    img[:, :n // 2] = stone
+    wood = np.array((116, 82, 50), np.float32) * (0.85 + 0.15 * rng.random((n, n // 2, 1)))
+    wood[:, ::21] *= 0.6                                       # plank gaps
+    for y in (int(n * 0.18), int(n * 0.5), int(n * 0.8)):
+        wood[y - 7:y + 7] = (64, 66, 72)                       # iron bands
+    img[:, n // 2:] = wood
+    img[int(n * 0.9):, n // 2:] = (58, 60, 66)                # iron
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+def fountain():
+    """A marble fountain: a round basin of water, a column, an upper bowl of water and a finial. Its own frame:
+    y = 0 is the tile top. The texture: marble above, water in the bottom quarter."""
+    m = PieceMesh()
+    marble = lambda fu, y: (fu, 0.3 + 0.65 * min(1.0, y / 2.2))
+    water = lambda fu, y: (fu, 0.12)
+    r = FOUNTAIN_R
+    lathe(m, [(r, 0.0), (r, 0.42), (r - 0.12, 0.48), (r - 0.18, 0.42), (r - 0.18, 0.3)], marble)   # basin wall and rim
+    lathe(m, [(r - 0.18, 0.3), (0.0, 0.3)], water)                                                    # its water
+    lathe(m, [(0.24, 0.3), (0.2, 1.3), (0.26, 1.38)], marble)                                         # column
+    lathe(m, [(0.26, 1.38), (0.62, 1.55), (0.66, 1.62), (0.58, 1.62), (0.58, 1.58)], marble)          # upper bowl
+    lathe(m, [(0.58, 1.58), (0.0, 1.58)], water)
+    lathe(m, [(0.1, 1.58), (0.1, 1.82), (0.16, 1.9)] + sphere_profile(0.12, 2.0, 8)[4:], marble)     # finial
+    return m
+
+
+def fountain_texture():
+    rng = np.random.default_rng(217)
+    n = 256
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32) / n
+    veins = np.abs(np.sin((xx * 3 + yy * 5 + 0.6 * rng.random()) * 6.3 + 2.5 * np.sin(xx * 9 + yy * 4)))
+    img = np.array((236, 234, 228), np.float32) - (np.clip(0.25 - veins, 0, 1) * 160)[..., None]
+    img *= (0.95 + 0.06 * rng.random((n, n, 1))).astype(np.float32)
+    water = water_texture(n)
+    img[int(n * 0.75):] = np.asarray(water, np.float32)[int(n * 0.75):]
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
 # ------------------------------------------------------------------------------------------------ backdrop
 def backdrop():
     """A flat panel the size of the table's play area: an arena's surroundings are shown on it instead of on the
@@ -632,6 +748,13 @@ def main():
         "gift-v1.obj": lambda p: gift().write(p),
         "gift-v1.jpg": lambda p: gift_texture().save(p, quality=92),
         "backdrop-v1.obj": lambda p: backdrop().write(p),
+        "water-v1.obj": lambda p: water_tile().write(p),
+        "water-v1.jpg": lambda p: water_texture().save(p, quality=92),
+        "gateframe-v1.obj": lambda p: gate_frame().write(p),
+        "gate-v1.obj": lambda p: gate_block().write(p),
+        "gate-v1.jpg": lambda p: gate_texture().save(p, quality=92),
+        "fountain-v1.obj": lambda p: fountain().write(p),
+        "fountain-v1.jpg": lambda p: fountain_texture().save(p, quality=92),
         **{f"zoneframe{n}-{name}-v1.obj": (lambda p, n=n, s=s: zone_frame(n, s).write(p))
            for s, name in RAISED_SLANTS.items() for n in (2, 4)},
     }

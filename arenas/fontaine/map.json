@@ -1,0 +1,281 @@
+{
+ "name": "Fontaine",
+ "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. From the arena's drawing (the user's Google Drawing, the same as the old flat map): a river (level 0, always low ground) runs in from each corner past an edge gate, along to an inner gate, round a land tongue, and into the middle, where the four branches meet round the island; three 2x2 capture zones; four fountains, each with a splash area on the four tiles next to it; 6 spawns a side.",
+ "grid": [
+  "..K.K..KK..K.K..",
+  "................",
+  "................",
+  "A1....x..x....3C",
+  "a..2.xFxxFx.4..c",
+  "a.Bbb.x..x.ddD.c",
+  "aaa2bbbbdddd4ccc",
+  "..zz..bzzd..zz..",
+  "..zz..fzzh..zz..",
+  "eee6ffffhhhh8ggg",
+  "e.Gff.x..x.hhI.g",
+  "e..6.xFxxFx.8..g",
+  "E5....x..x....7H",
+  "................",
+  "................",
+  "..P.P..PP..P.P.."
+ ],
+ "_legend": "level = height step (0 = lowest). surface picks the look from the palette. solid = nothing stands there (no snap points). marker = something on the tile (painted, or a 3D piece with piece: true). water: a river tile, with a water slab that drains when its gate (or the gate upstream) is closed: branch = which corner's river (1 top-left, 2 top-right, 3 bottom-left, 4 bottom-right from player 1's side), part = edge (fed by the edge gate) or inner (fed by both gates: past the inner gate, and that branch's quarter of the middle). gate N: water gate N on that tile (edge gates odd, inner gates even); buttonN: a button for gate N. splash: a fountain's splash area.",
+ "legend": {
+  ".": {
+   "level": 1,
+   "surface": "floor"
+  },
+  "x": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "splash"
+  },
+  "F": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "fountain",
+   "paint": false,
+   "piece": true,
+   "solid": true
+  },
+  "z": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "zone",
+   "paint": false,
+   "piece": true
+  },
+  "K": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "spawn2"
+  },
+  "P": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "spawn1"
+  },
+  "1": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button1"
+  },
+  "2": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button2"
+  },
+  "3": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button3"
+  },
+  "4": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button4"
+  },
+  "5": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button5"
+  },
+  "6": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button6"
+  },
+  "7": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button7"
+  },
+  "8": {
+   "level": 1,
+   "surface": "floor",
+   "marker": "button8"
+  },
+  "a": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 1,
+   "part": "edge"
+  },
+  "b": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 1,
+   "part": "inner"
+  },
+  "c": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 2,
+   "part": "edge"
+  },
+  "d": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 2,
+   "part": "inner"
+  },
+  "e": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 3,
+   "part": "edge"
+  },
+  "f": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 3,
+   "part": "inner"
+  },
+  "g": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 4,
+   "part": "edge"
+  },
+  "h": {
+   "level": 0,
+   "surface": "bed",
+   "water": true,
+   "branch": 4,
+   "part": "inner"
+  },
+  "A": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 1,
+   "branch": 1,
+   "part": "edge",
+   "water": true
+  },
+  "B": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 2,
+   "branch": 1,
+   "part": "inner",
+   "water": true
+  },
+  "C": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 3,
+   "branch": 2,
+   "part": "edge",
+   "water": true
+  },
+  "D": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 4,
+   "branch": 2,
+   "part": "inner",
+   "water": true
+  },
+  "E": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 5,
+   "branch": 3,
+   "part": "edge",
+   "water": true
+  },
+  "G": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 6,
+   "branch": 3,
+   "part": "inner",
+   "water": true
+  },
+  "H": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 7,
+   "branch": 4,
+   "part": "edge",
+   "water": true
+  },
+  "I": {
+   "level": 0,
+   "surface": "bed",
+   "marker": "gate",
+   "paint": false,
+   "piece": true,
+   "gate": 8,
+   "branch": 4,
+   "part": "inner",
+   "water": true
+  }
+ },
+ "_numbers": "How the button numbers read: \"both\" = a diagonal fraction N/N, upright top left, upside down bottom right, so either player reads it from their side.",
+ "numbers": "both",
+ "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
+ "board": {
+  "mesh": "board-v1.obj",
+  "texture": "board-v1.jpg",
+  "geometry": "board-v1.json"
+ },
+ "_table": "Image for the table around the board (placeholder until the arena gets its own).",
+ "table": "misc/valley-placeholder-v1.jpg",
+ "_textures": "Placeholders from tools/draw_placeholders.py, a grassy castle valley: grass on the land, pebbles on the river bed, grey stone canal walls (and the board's edge); the water, gates and fountains are 3D pieces (tools/build_pieces.py).",
+ "textures": {
+  "floor": {
+   "images": [
+    "textures/grass1.png",
+    "textures/grass2.png"
+   ],
+   "span": 1,
+   "vary": true
+  },
+  "bed": {
+   "image": "textures/pebbles.png",
+   "span": 1,
+   "vary": true
+  },
+  "walls": {
+   "image": "textures/canal-wall.png",
+   "outer": true
+  }
+ },
+ "palette": {
+  "floor": "#5A8A38",
+  "bed": "#7A6E5A",
+  "cliff": "#7E7C74",
+  "base": "#4A4840",
+  "fall": "#D2392C",
+  "button": "#4FA8E0"
+ }
+}

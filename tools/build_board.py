@@ -236,10 +236,10 @@ def draw_texture(a):
                 both = both_ways(a, t)
                 if turn:   # drawn upright on its own layer, then turned so its bottom points the right way
                     layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
-                    draw_marker(layer, painted, 0, 0, p, both)
+                    draw_marker(layer, painted, 0, 0, p, both, a.palette.get("button"))
                     over.alpha_composite(layer.rotate(turn), (x0, y0t))
                 else:
-                    draw_marker(over, painted, x0, y0t, p, both)
+                    draw_marker(over, painted, x0, y0t, p, both, a.palette.get("button"))
     for r in range(a.R):   # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope
         for c in range(a.C):
             sloped = slopes(a, r, c) if a.tile(r, c) else {}
@@ -568,8 +568,9 @@ def draw_pair(im, text, cx, cy, size, fill, **style):
     im.alpha_composite(stroke, (round(cx - pad), round(cy - pad)))
 
 
-def draw_marker(im, marker, x0, y0, p, both=False):
-    """Paints a marker on the image im, upright in the tile at (x0, y0). both: its number as N/N (draw_pair)."""
+def draw_marker(im, marker, x0, y0, p, both=False, button=None):
+    """Paints a marker on the image im, upright in the tile at (x0, y0). both: its number as N/N (draw_pair).
+    button: the buttons' ring colour (the map's palette "button"; default yellow)."""
     if not marker:
         return
     o = ImageDraw.Draw(im)
@@ -646,7 +647,7 @@ def draw_marker(im, marker, x0, y0, p, both=False):
                    anchor="mm", stroke_width=round(3 * u), stroke_fill=dark_wood)
     elif marker.startswith("button"):   # a round pressure plate in a dark recess, a glowing yellow ring, its number
         n = marker[len("button"):]
-        yellow = (245, 212, 38, 255)
+        yellow = tuple(button) + (255,) if button else (245, 212, 38, 255)
         o.ellipse([cx - 48 * u, cy - 48 * u, cx + 48 * u, cy + 48 * u], fill=(16, 14, 22, 255))
         o.ellipse([cx - 42 * u, cy - 42 * u, cx + 42 * u, cy + 42 * u], fill=(58, 56, 68, 255), outline=yellow,
                   width=round(5 * u))
@@ -659,6 +660,14 @@ def draw_marker(im, marker, x0, y0, p, both=False):
         else:
             o.text((cx, cy + 2 * u), n, font=font(round(38 * u)), fill=yellow, anchor="mm", stroke_width=round(2 * u),
                    stroke_fill=(30, 26, 10, 255))
+    elif marker == "splash":   # a fountain's splash area: wet ground, ripple rings and droplets (looks the same any way up)
+        o.ellipse([cx - 52 * u, cy - 52 * u, cx + 52 * u, cy + 52 * u], fill=(30, 60, 90, 46))
+        for rr, alpha in ((44, 120), (30, 95), (16, 70)):
+            o.ellipse([cx - rr * u, cy - rr * u, cx + rr * u, cy + rr * u], outline=(200, 232, 250, alpha), width=round(3 * u))
+        for k in range(10):
+            ang = k * 2 * math.pi / 10 + 0.3
+            dx, dy = math.cos(ang) * 50 * u, math.sin(ang) * 50 * u
+            o.ellipse([cx + dx - 3 * u, cy + dy - 3 * u, cx + dx + 3 * u, cy + dy + 3 * u], fill=(210, 236, 252, 150))
     elif marker.startswith("zone-number"):   # a capture zone's number, painted faintly on each of its tiles
         n = marker[len("zone-number"):]
         fill = (236, 226, 255, 120)

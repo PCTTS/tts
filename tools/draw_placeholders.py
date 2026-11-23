@@ -39,6 +39,10 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/violight/textures/spire-top.png        the centre spire's top (2x2 tiles): coil rings round a glowing core
   arenas/violight/textures/spire-wall.png       the spire's sides and the board's edge: steel panels, violet bands
   misc/violight-placeholder-v1.jpg              table image around Violight: big dark steel deck plates
+  arenas/fontaine/textures/grass1.png, grass2.png  Fontaine's land: valley grass (Illusio's kind, other seeds)
+  arenas/fontaine/textures/pebbles.png          the river bed: grey-brown pebbles on wet sand
+  arenas/fontaine/textures/canal-wall.png       the canal walls and the board's edge: grey stone courses
+  misc/valley-placeholder-v1.jpg                table image around Fontaine: meadow grass with small flowers
 """
 from pathlib import Path
 
@@ -754,8 +758,52 @@ def violight_table():
     return out.filter(ImageFilter.GaussianBlur(0.6))
 
 
+def pebbles():
+    """A river bed: wet sand under a scatter of rounded pebbles in greys and browns, each with a soft shadow."""
+    rng = np.random.default_rng(221)
+    out = to_img(mix((96, 88, 72), (124, 114, 94), fbm(N, N, rng, 6, 4))).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    cols = [(132, 128, 120), (110, 104, 96), (150, 140, 124), (96, 92, 88), (162, 154, 140), (120, 100, 80)]
+    for _ in range(420):
+        x, y = rng.random() * N, rng.random() * N
+        rx, ry = rng.uniform(6, 16), rng.uniform(4, 11)
+        col = cols[rng.integers(0, len(cols))]
+        d.ellipse([x - rx + 2, y - ry + 3, x + rx + 2, y + ry + 3], fill=(40, 34, 26, 90))
+        d.ellipse([x - rx, y - ry, x + rx, y + ry], fill=col + (255,))
+        d.ellipse([x - rx * 0.5, y - ry * 0.7, x, y - ry * 0.1], fill=tuple(min(255, v + 40) for v in col) + (110,))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+def canal_wall():
+    rng = np.random.default_rng(223)
+    img = stone_blocks(1024, N, rng, 7, base=(128, 126, 118))
+    img *= np.linspace(1.0, 0.8, 1024, dtype=np.float32)[:, None, None]   # damper toward the water
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.5))
+
+
+def valley_table():
+    """Around Fontaine: meadow grass, a little darker, with small white and yellow flowers."""
+    rng = np.random.default_rng(227)
+    h, w = 1211, 2048
+    t = fbm(h, w, rng, 6, 5)
+    img = mix((58, 102, 40), (104, 152, 64), np.clip((t - 0.3) * 2.0, 0, 1)) * 0.85
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(2400):
+        x, y = rng.random() * w, rng.random() * h
+        col = [(246, 244, 236), (246, 214, 80), (236, 236, 250)][rng.integers(0, 3)]
+        rr = rng.uniform(1.5, 3.2)
+        d.ellipse([x - rr, y - rr, x + rr, y + rr], fill=col + (220,))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
 def main():
     files = {
+        "arenas/fontaine/textures/grass1.png": lambda p: grass(31).save(p),
+        "arenas/fontaine/textures/grass2.png": lambda p: grass(32).save(p),
+        "arenas/fontaine/textures/pebbles.png": lambda p: pebbles().save(p),
+        "arenas/fontaine/textures/canal-wall.png": lambda p: canal_wall().save(p),
+        "misc/valley-placeholder-v1.jpg": lambda p: valley_table().save(p, quality=90),
         "arenas/violight/textures/steel1.png": lambda p: steel_plate(171).save(p),
         "arenas/violight/textures/steel2.png": lambda p: steel_plate(172).save(p),
         "arenas/violight/textures/electric1.png": lambda p: electric_panel(175).save(p),
