@@ -14,6 +14,8 @@ nothing pushed), then publish the one to keep.
             --natural        the image's own shape, a tile wide like the floor textures, cut off wherever a wall ends
             --top L          its top at level L's top on every wall (default: each tile's own top)
             --across N       copies across a tile (default: nearest the image's shape; 1 with --natural)
+            --mirror         mirror copies at random (for images whose left and right edges don't meet; a seamless
+                             image looks best unmirrored, so its pattern runs straight on from wall to wall)
             (default size: one level.) Settings already in map.json are kept unless given.
 
 A previewed board points at a file on this computer that the other players don't have: publish or --reset before
@@ -123,8 +125,8 @@ def set_board(text, files):
 
 
 def wall_spec(data, surface, image, opts):
-    """The "walls:<surface>" texture spec with a new image (keeping its other settings; mirrored copies if new)."""
-    spec = dict((data.get("textures") or {}).get(f"walls:{surface}") or {"vary": "mirror"})
+    """The "walls:<surface>" texture spec with a new image (keeping its other settings)."""
+    spec = dict((data.get("textures") or {}).get(f"walls:{surface}") or {})
     spec.pop("images", None)
     spec["image"] = image
     if opts.get("across"):
@@ -135,6 +137,10 @@ def wall_spec(data, surface, image, opts):
     if opts.get("top") is not None:
         spec["top"] = opts["top"]
         spec.pop("levels", None)
+    if opts.get("mirror"):
+        spec["vary"] = "mirror"
+    else:
+        spec.pop("vary", None)
     if opts.get("natural"):
         spec["scale"] = "tile"
         spec.pop("levels", None)
@@ -295,6 +301,7 @@ def main():
     ap.add_argument("--levels", type=int, nargs=2)
     ap.add_argument("--top", type=int)
     ap.add_argument("--natural", action="store_true")
+    ap.add_argument("--mirror", action="store_true")
     ap.add_argument("--watch", action="store_true")
     ap.add_argument("--publish", action="store_true")
     ap.add_argument("--reset", action="store_true")
@@ -304,7 +311,8 @@ def main():
         return reset(folder)
     if not args.image or not args.image.exists():
         sys.exit(f"no image at {args.image}")
-    opts = {"across": args.across, "levels": args.levels, "top": args.top, "natural": args.natural}
+    opts = {"across": args.across, "levels": args.levels, "top": args.top, "natural": args.natural,
+            "mirror": args.mirror}
     job = (folder, args.image, args.surface.split(","), opts)
     if args.publish:
         publish(*job)
