@@ -6253,7 +6253,7 @@
  },
  "Pugilis": {
   "mesh": "arenas/pugilis/board-v38.obj",
-  "texture": "arenas/pugilis/board-v38.jpg",
+  "texture": "arenas/pugilis/board-v39.jpg",
   "table": "misc/table-placeholder-v1.jpg",
   "snaps": [
    [

@@ -254,7 +254,7 @@ def main():
     flags = [s for s in new[1:] if s.data.Tags[1] == "Flag"]
     check(brd is not None and brd.Nickname == "Pugilis" and brd.Tags[1] == "Board3D" and brd.Locked
           and brd.CustomMesh.MeshURL.endswith("arenas/pugilis/board-v38.obj") and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
-          and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v38.jpg") and not brd.CustomMesh.Convex,
+          and brd.CustomMesh.DiffuseURL.endswith("arenas/pugilis/board-v39.jpg") and not brd.CustomMesh.Convex,
           "picking Pugilis puts its 3D board on the table (its own mesh as collider)")
     check(len(flags) == 4 and backdrop(new, "misc/table-placeholder-v1.jpg") and calls.tableURL is None,
           "with its 4 flags and its surroundings on the backdrop panel (the table itself untouched)")

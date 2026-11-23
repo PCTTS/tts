@@ -226,7 +226,7 @@ def draw_texture(a):
             o.line([(x0, y0t + p - 3 * SS), (x0 + p, y0t + p - 3 * SS)], fill=(0, 0, 0, 55), width=2 * SS)
             o.line([(x0 + p - 3 * SS, y0t), (x0 + p - 3 * SS, y0t + p)], fill=(0, 0, 0, 55), width=2 * SS)
             o.rectangle([x0, y0t, x0 + p - 1, y0t + p - 1], outline=(40, 28, 18, 110), width=SS)
-            if t.get("surface") == "stairs":
+            if t.get("surface") == "stairs" and a.data.get("stair_lines", True):   # "stair_lines": false: none
                 draw_steps(o, a, r, c, x0, y0t, p)
             if t.get("outline"):
                 draw_outline(over, a, r, c, x0, y0t, p)
@@ -294,16 +294,18 @@ def draw_texture(a):
                 continue
             band = a.tile(r, c)["slant"] / TILE * p
             x0, y0t = c * p, r * p
+            plain_sand = a.tile(r, c).get("shade") is False   # "shade": false: the wedges show just the surface
             for i in range(round(band)):
                 alpha = round(70 * (i / band) ** 1.5)   # i = distance from the tile's edge (the top of the slope)
+                ink = (0, 0, 0, 0) if plain_sand else (30, 18, 8, alpha)
                 if "N" in risen:
-                    o.line([(x0, y0t + i), (x0 + p, y0t + i)], fill=(30, 18, 8, alpha))
+                    o.line([(x0, y0t + i), (x0 + p, y0t + i)], fill=ink)
                 if "S" in risen:
-                    o.line([(x0, y0t + p - i), (x0 + p, y0t + p - i)], fill=(30, 18, 8, alpha))
+                    o.line([(x0, y0t + p - i), (x0 + p, y0t + p - i)], fill=ink)
                 if "W" in risen:
-                    o.line([(x0 + i, y0t), (x0 + i, y0t + p)], fill=(30, 18, 8, alpha))
+                    o.line([(x0 + i, y0t), (x0 + i, y0t + p)], fill=ink)
                 if "E" in risen:
-                    o.line([(x0 + p - i, y0t), (x0 + p - i, y0t + p)], fill=(30, 18, 8, alpha))
+                    o.line([(x0 + p - i, y0t), (x0 + p - i, y0t + p)], fill=ink)
     for r in range(a.R):   # rising corners: darkening toward the foot of the cone
         for c in range(a.C):
             rc = rise_corners(a, r, c) if a.tile(r, c) else {}
