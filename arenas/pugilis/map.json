@@ -143,13 +143,13 @@
   "_stair_lines": "No step lines painted on the stairs (the user's choice, 2026-11-22).",
   "stair_lines": false,
   "board": {
-    "mesh": "board-v41.obj",
-    "texture": "board-v41.jpg",
-    "geometry": "board-v41.json"
+    "mesh": "board-v40.obj",
+    "texture": "board-v40.jpg",
+    "geometry": "board-v40.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/table-placeholder-v1.jpg",
-  "_textures": "Image textures for surfaces (paths relative to this folder; images = pick one at random per copy). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour (or a named palette entry). walls = the inner walls (where ground drops inside the board); outer = the board's outer edge too. walls:stairs = the sides of the steps (the user's Pugilis_Cliff1 art): fitted to one level, its top at the step's top, two copies per tile; vary mirror = mirrored copies only.",
+  "_textures": "Image textures for surfaces (paths relative to this folder; images = pick one at random per copy). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour (or a named palette entry). walls = the inner walls (where ground drops inside the board); outer = the board's outer edge too. walls:<surface> = that surface's inner walls get their own image (tools/wall_texture.py previews and publishes them; the user tried cliff art on the steps and inner walls, 2026-11-22, and went back to dirt).",
   "textures": {
     "floor": {
       "images": [
@@ -185,10 +185,6 @@
       "vary": true,
       "match": "pit",
       "outer": true
-    },
-    "walls:stairs": {
-      "image": "textures/cliff1.png",
-      "vary": "mirror"
     }
   },
   "palette": {
