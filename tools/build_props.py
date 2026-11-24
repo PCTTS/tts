@@ -8,6 +8,12 @@ TTS script uses: pedestals on top, three card slots per pedestal on the slope; t
 Published files are only written when missing: bump a file's version when what it holds changes (TTS caches by
 link). stand-v1.obj (the light stand on props-v1.jpg) stays published for saves made before the wood.
 
+Also the pedestals (script-managed objects, so a stand can hold 9 or 6 and they can slide): props/pedestal-v1.obj
+(a round wooden pedestal with its black HP sign floating above it), pedestal-plain-v1.obj (no sign: the spectator
+stand's), pedestal-collider-v1.obj, pedestal-v1.jpg; the spectator stand at the table's right end
+(spectators-v1.obj on the stand wood); the turn track for each arena's turn count (turns-<n>-v1.obj/.jpg) and its
+token (turntoken-v1.obj/.jpg, a Poke Ball seen from above).
+
 Stand, in its own frame (as placed on the near/south trim): the back face (toward the board) is z = 0 and the
 stand extends toward -z (toward the player); y = 0 is the table top. Cross-section: a flat top for the
 pedestals, a slope down toward the player for the cards, and a small lip at the bottom so cards don't slide.
@@ -274,6 +280,217 @@ def wood_texture(w=WOOD_W, h=WOOD_H, black=False):
     return img
 
 
+# Pedestals (script-managed since the 9-slot stands): a round wooden pedestal; the team stands' carry the black HP sign
+# floating above them (where stand-v4 had it), the spectator stand's are plain. Origin = the middle of the pedestal's
+# bottom, on the stand top.
+PED_R, PED_H, PED_BEVEL, PED_SEG = 1.15, PEDESTAL_TOP, 0.05, 48
+PED_SIGN_Y = SIGN_Y - TOP_H             # the sign's centre above the pedestal's bottom (2.8)
+PED_TEX = 512
+PED_TOP_C, PED_TOP_R = 192, 184         # texture: the top's disc (centre, radius in px)
+PED_SIDE = (392, 8, 504, 376)           # the side's strip
+PED_BLACK = (8, 456, 504, 504)          # the sign's black
+
+
+def ped_uv(px, py):
+    return px / PED_TEX, 1 - py / PED_TEX
+
+
+def pedestal(sign=True):
+    m = SmoothMesh()
+    r0 = PED_R - PED_BEVEL
+    ring = [(math.cos(2 * math.pi * i / PED_SEG), math.sin(2 * math.pi * i / PED_SEG)) for i in range(PED_SEG + 1)]
+    profile = [(PED_R, 0.0), (PED_R, PED_H - PED_BEVEL), (r0, PED_H)]
+    x0, y0, x1, y1 = PED_SIDE
+    for (ra, ya), (rb, yb) in zip(profile, profile[1:]):
+        dr, dy = rb - ra, yb - ya
+        ln = math.hypot(dr, dy)
+        nr, ny = dy / ln, -dr / ln
+        for i in range(PED_SEG):
+            (ca, sa), (cb, sb) = ring[i], ring[i + 1]
+            corners = [(ra * ca, ya, ra * sa), (ra * cb, ya, ra * sb), (rb * cb, yb, rb * sb), (rb * ca, yb, rb * sa)]
+            normals = [(nr * ca, ny, nr * sa), (nr * cb, ny, nr * sb), (nr * cb, ny, nr * sb), (nr * ca, ny, nr * sa)]
+            u0, u1 = x0 + (x1 - x0) * i / PED_SEG, x0 + (x1 - x0) * (i + 1) / PED_SEG
+            v0, v1 = y1 - (y1 - y0) * ya / PED_H, y1 - (y1 - y0) * yb / PED_H
+            uvs = [ped_uv(u0, v0), ped_uv(u1, v0), ped_uv(u1, v1), ped_uv(u0, v1)]
+            mid = ((ca + cb) / 2, (sa + sb) / 2)
+            m.quad_smooth(corners, uvs, normals, (nr * mid[0], ny, nr * mid[1]))
+    k = PED_TOP_R / r0
+    for i in range(PED_SEG):   # the top: a fan, the texture's disc laid on it
+        (ca, sa), (cb, sb) = ring[i], ring[i + 1]
+        tri = [(0, PED_H, 0), (r0 * ca, PED_H, r0 * sa), (r0 * cb, PED_H, r0 * sb)]
+        m.tri(tri, [ped_uv(PED_TOP_C + k * x, PED_TOP_C - k * z) for x, _, z in tri], (0, 1, 0))
+    if sign:
+        black = [ped_uv((PED_BLACK[0] + PED_BLACK[2]) / 2, (PED_BLACK[1] + PED_BLACK[3]) / 2)] * 4
+        bx0, bx1 = -SIGN_W / 2, SIGN_W / 2
+        by0, by1 = PED_SIGN_Y - SIGN_H / 2, PED_SIGN_Y + SIGN_H / 2
+        bz0, bz1 = -SIGN_D / 2, SIGN_D / 2
+        m.quad([(bx0, by1, bz0), (bx1, by1, bz0), (bx1, by0, bz0), (bx0, by0, bz0)], black, (0, 0, -1))
+        m.quad([(bx0, by1, bz1), (bx1, by1, bz1), (bx1, by0, bz1), (bx0, by0, bz1)], black, (0, 0, 1))
+        m.quad([(bx0, by1, bz0), (bx1, by1, bz0), (bx1, by1, bz1), (bx0, by1, bz1)], black, (0, 1, 0))
+        m.quad([(bx0, by0, bz0), (bx1, by0, bz0), (bx1, by0, bz1), (bx0, by0, bz1)], black, (0, -1, 0))
+        m.quad([(bx0, by0, bz0), (bx0, by1, bz0), (bx0, by1, bz1), (bx0, by0, bz1)], black, (-1, 0, 0))
+        m.quad([(bx1, by0, bz0), (bx1, by1, bz0), (bx1, by1, bz1), (bx1, by0, bz1)], black, (1, 0, 0))
+    return m
+
+
+def pedestal_collider():
+    """The pedestal's solid: a plain closed cylinder (the sign has no collider: it floats over the Pokemon)."""
+    m = StandeeMesh()
+    seg = 24
+    ring = [(PED_R * math.cos(2 * math.pi * i / seg), PED_R * math.sin(2 * math.pi * i / seg)) for i in range(seg + 1)]
+    uv = [ped_uv(PED_TOP_C, PED_TOP_C)] * 4
+    for i in range(seg):
+        (xa, za), (xb, zb) = ring[i], ring[i + 1]
+        mx, mz = (xa + xb) / 2, (za + zb) / 2
+        m.quad([(xa, 0, za), (xb, 0, zb), (xb, PED_H, zb), (xa, PED_H, za)], uv, (mx, 0, mz))
+        m.tri([(0, PED_H, 0), (xa, PED_H, za), (xb, PED_H, zb)], uv[:3], (0, 1, 0))
+        m.tri([(0, 0, 0), (xa, 0, za), (xb, 0, zb)], uv[:3], (0, -1, 0))
+    return m
+
+
+def pedestal_texture():
+    """Polished mid-brown wood (lighter than the stand, so the pedestals stand out on it): the top with faint
+    rings and a darker rim, the side a little darker, and a black patch for the sign."""
+    rng = np.random.default_rng(31)
+    n = PED_TEX
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+    grain = smooth_noise(rng, n, n, 6, 90) * 0.5 + smooth_noise(rng, n, n, 24, 260) * 0.25
+    base = np.array((150, 102, 60), np.float32)
+    img = base + grain[..., None] * np.array((26, 18, 11), np.float32)
+    r = np.hypot(xx - PED_TOP_C, yy - PED_TOP_C) / PED_TOP_R
+    rings = 0.5 + 0.5 * np.sin(r * 38 + smooth_noise(rng, n, n, 5, 5) * 2.5)
+    top = base + (rings[..., None] - 0.5) * np.array((22, 15, 9), np.float32) + grain[..., None] * np.array((10, 7, 4), np.float32)
+    top *= (1 - 0.22 * np.clip((r - 0.86) / 0.1, 0, 1))[..., None]        # a darker rim
+    top *= (1 + 0.10 * np.clip(1 - np.hypot(xx - PED_TOP_C + 50, yy - PED_TOP_C + 60) / 150, 0, 1))[..., None]  # sheen
+    img = np.where((r <= 1.02)[..., None], top, img)
+    x0, y0, x1, y1 = PED_SIDE
+    img[y0:y1, x0:x1] *= 0.8
+    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB")
+    ImageDraw.Draw(out).rectangle([PED_BLACK[0], PED_BLACK[1], PED_BLACK[2], PED_BLACK[3]], fill=BLACK)
+    return out
+
+
+# The spectator stand: a wooden block at the table's right end (in its own frame: long along z), its 6 pedestals
+# on top in two threes, each player's on their own half (Global.lua SPECTATORS).
+SPEC_W, SPEC_H, SPEC_L = 4.4, 1.6, 25.0
+
+
+def box_in_wood(m, x0, x1, y0, y1, z0, z1):
+    """A block in the stand's wood at its real scale, the grain along z (top: the slope's strip, sides: the back's,
+    ends: the caps')."""
+    def face(corners, row, a_of, b_of, normal):
+        m.quad(corners, [wood_uv(row, a_of(c), b_of(c)) for c in corners], normal)
+    face([(x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)], "slope", lambda c: c[2] - z0, lambda c: c[0] - x0, (0, 1, 0))
+    for x, nx in ((x0, -1), (x1, 1)):
+        face([(x, y1, z0), (x, y1, z1), (x, y0, z1), (x, y0, z0)], "back", lambda c: c[2] - z0, lambda c: y1 - c[1], (nx, 0, 0))
+    for z, nz in ((z0, -1), (z1, 1)):
+        face([(x0, y1, z), (x1, y1, z), (x1, y0, z), (x0, y0, z)], "cap", lambda c: c[0] - x0, lambda c: y1 - c[1], (0, 0, nz))
+
+
+def spectators():
+    m = StandeeMesh()
+    box_in_wood(m, -SPEC_W / 2, SPEC_W / 2, 0, SPEC_H, -SPEC_L / 2, SPEC_L / 2)
+    return m
+
+
+# The turn track: a thin wooden strip along the table's right end with a numbered slot per turn (1 at the near/south
+# end), the arena's last turn in gold; its numbers read from the table's end (sideways to both players). The token
+# (a Poke Ball seen from above) snaps to the slots (Global.lua TURN_TRACK).
+TURN_SLOT, TURN_END, TURN_W, TURN_T, TURN_PX = 2.0, 0.4, 2.6, 0.15, 80
+TURN_COUNTS = (10, 12, 15)
+
+
+def turn_length(n):
+    return n * TURN_SLOT + 2 * TURN_END
+
+
+def turn_strip(n):
+    """In its own frame: long along z (turn 1 at -z), across x, standing TURN_T tall. Texture: the top over the whole
+    image above a strip of wood for the sides. The image's left is -z: seen from the table's end (+x, looking toward
+    -x; TTS is left-handed, so -z is on the left) the image reads the right way round, 1 on the left."""
+    m = StandeeMesh()
+    L = turn_length(n)
+    tw, top_h, th = round(L * TURN_PX), round(TURN_W * TURN_PX), round(TURN_W * TURN_PX) + 32
+
+    def uv(z, x):          # top: image x from -z (left) to +z, image y from -x (top) to +x
+        return (z + L / 2) * TURN_PX / tw, 1 - (x + TURN_W / 2) * TURN_PX / th
+
+    def side_uv(a, b):     # a 0..1 along, b 0..1 down the wood strip under the top
+        return a, 1 - (top_h + 4 + b * 24) / th
+    x0, x1, z0, z1 = -TURN_W / 2, TURN_W / 2, -L / 2, L / 2
+    top = [(x0, TURN_T, z0), (x1, TURN_T, z0), (x1, TURN_T, z1), (x0, TURN_T, z1)]
+    m.quad(top, [uv(c[2], c[0]) for c in top], (0, 1, 0))
+    for x, nx in ((x0, -1), (x1, 1)):
+        m.quad([(x, TURN_T, z0), (x, TURN_T, z1), (x, 0, z1), (x, 0, z0)],
+               [side_uv(0, 0), side_uv(1, 0), side_uv(1, 1), side_uv(0, 1)], (nx, 0, 0))
+    for z, nz in ((z0, -1), (z1, 1)):
+        m.quad([(x0, TURN_T, z), (x1, TURN_T, z), (x1, 0, z), (x0, 0, z)],
+               [side_uv(0, 0), side_uv(0.1, 0), side_uv(0.1, 1), side_uv(0, 1)], (0, 0, nz))
+    return m
+
+
+def turn_texture(n):
+    from PIL import ImageFont
+    L = turn_length(n)
+    tw, top_h, th = round(L * TURN_PX), round(TURN_W * TURN_PX), round(TURN_W * TURN_PX) + 32
+    img = wood_texture(w=tw, h=th)
+    d = ImageDraw.Draw(img)
+    font = ImageFont.truetype("arialbd.ttf", round(TURN_PX * 1.05))
+    size = 1.7 * TURN_PX
+    for i in range(1, n + 1):
+        zc = -L / 2 + TURN_END + (i - 0.5) * TURN_SLOT
+        cx, cy = (zc + L / 2) * TURN_PX, top_h / 2
+        last = i == n
+        fill, edge = ((232, 196, 98), (120, 84, 24)) if last else ((222, 206, 172), (96, 70, 44))
+        d.rounded_rectangle([cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2], radius=TURN_PX * 0.22,
+                            fill=fill, outline=edge, width=max(2, TURN_PX // 18))
+        d.text((cx, cy + TURN_PX * 0.04), str(i), font=font, fill=(58, 34, 18), anchor="mm")
+    return img
+
+
+def turn_snaps(n):
+    """The slot centres along the strip (its own frame), turn 1 first."""
+    L = turn_length(n)
+    return [round(-L / 2 + TURN_END + (i - 0.5) * TURN_SLOT, 4) for i in range(1, n + 1)]
+
+
+TOKEN_R, TOKEN_H, TOKEN_SEG, TOKEN_TEX = 0.72, 0.3, 48, 256
+
+
+def turn_token():
+    """A thick round token, its top a Poke Ball (red half toward -z), its side black."""
+    m = SmoothMesh()
+    ring = [(math.cos(2 * math.pi * i / TOKEN_SEG), math.sin(2 * math.pi * i / TOKEN_SEG)) for i in range(TOKEN_SEG + 1)]
+    black = (6 / TOKEN_TEX, 1 - 128 / TOKEN_TEX)
+    for i in range(TOKEN_SEG):
+        (ca, sa), (cb, sb) = ring[i], ring[i + 1]
+        corners = [(TOKEN_R * ca, 0, TOKEN_R * sa), (TOKEN_R * cb, 0, TOKEN_R * sb), (TOKEN_R * cb, TOKEN_H, TOKEN_R * sb),
+                   (TOKEN_R * ca, TOKEN_H, TOKEN_R * sa)]
+        normals = [(ca, 0, sa), (cb, 0, sb), (cb, 0, sb), (ca, 0, sa)]
+        m.quad_smooth(corners, [black] * 4, normals, ((ca + cb) / 2, 0, (sa + sb) / 2))
+        k = 120 / TOKEN_R
+        for y, ny in ((TOKEN_H, 1), (0, -1)):
+            tri = [(0, y, 0), (TOKEN_R * ca, y, TOKEN_R * sa), (TOKEN_R * cb, y, TOKEN_R * sb)]
+            m.tri(tri, [((128 + k * x) / TOKEN_TEX, 1 - (128 + k * z) / TOKEN_TEX) for x, _, z in tri], (0, ny, 0))
+    return m
+
+
+def token_texture():
+    S = 4
+    n = TOKEN_TEX * S
+    img = Image.new("RGB", (n, n), (12, 12, 12))
+    d = ImageDraw.Draw(img)
+    c, r = n / 2, 120 * S
+    d.pieslice([c - r, c - r, c + r, c + r], 180, 360, fill=(214, 38, 42))
+    d.pieslice([c - r, c - r, c + r, c + r], 0, 180, fill=(244, 244, 240))
+    band = 15 * S
+    d.rectangle([c - r, c - band / 2, c + r, c + band / 2], fill=(12, 12, 12))
+    d.ellipse([c - 38 * S, c - 38 * S, c + 38 * S, c + 38 * S], fill=(12, 12, 12))
+    d.ellipse([c - 27 * S, c - 27 * S, c + 27 * S, c + 27 * S], fill=(244, 244, 240))
+    d.ellipse([c - 17 * S, c - 17 * S, c + 17 * S, c + 17 * S], outline=(170, 170, 170), width=3 * S)
+    return img.resize((TOKEN_TEX, TOKEN_TEX), Image.LANCZOS)
+
+
 def slots():
     """Slot positions in the stand's frame. Card rotation is (0, yaw, tilt): the card is turned a quarter so it
     lies landscape, then tilted to the slope (see Global.lua for the yaw)."""
@@ -300,7 +517,17 @@ def main():
         "stand-wood-v2.jpg": lambda p: wood_texture(black=True).save(p, quality=90),
         "pillar-v2.obj": lambda p: pillar().write(p),
         "props-v1.jpg": lambda p: texture().save(p, quality=92),
+        "pedestal-v1.obj": lambda p: pedestal().write(p),
+        "pedestal-plain-v1.obj": lambda p: pedestal(sign=False).write(p),
+        "pedestal-collider-v1.obj": lambda p: pedestal_collider().write(p),
+        "pedestal-v1.jpg": lambda p: pedestal_texture().save(p, quality=92),
+        "spectators-v1.obj": lambda p: spectators().write(p),
+        "turntoken-v1.obj": lambda p: turn_token().write(p),
+        "turntoken-v1.jpg": lambda p: token_texture().save(p, quality=92),
     }
+    for n in TURN_COUNTS:
+        files[f"turns-{n}-v1.obj"] = lambda p, n=n: turn_strip(n).write(p)
+        files[f"turns-{n}-v1.jpg"] = lambda p, n=n: turn_texture(n).save(p, quality=90)
     for name, make in files.items():
         if not (OUT / name).exists():
             make(OUT / name)
@@ -308,6 +535,7 @@ def main():
     info = slots()
     (OUT / "stand-v1.json").write_text(json.dumps(info, indent=1), encoding="utf-8")
     print(json.dumps(info))
+    print("turn track slots:", {n: turn_snaps(n) for n in TURN_COUNTS})
 
 
 if __name__ == "__main__":

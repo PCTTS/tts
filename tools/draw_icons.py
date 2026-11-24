@@ -165,9 +165,20 @@ def fling(d):
         d.polygon(P(*tip, base[0] + nx * 21, base[1] + ny * 21, base[0] - nx * 21, base[1] - ny * 21), fill=255)
 
 
+def bench(d):
+    """Send a Pokémon to the spectator stand (sit it out): an arrow into a bench seen from the side."""
+    w = round(STROKE * K)
+    d.line(P(56, 74, 120, 74), fill=255, width=w)                 # seat
+    d.line(P(112, 74, 112, 30), fill=255, width=w)                # backrest
+    for x in (64, 104):
+        d.line(P(x, 74, x, 112), fill=255, width=w)               # legs
+    d.line(P(6, 50, 30, 50), fill=255, width=w)
+    d.polygon(P(48, 50, 26, 30, 26, 70), fill=255)                # arrowhead toward the bench
+
+
 SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords, "ability": sparkle,
           "die": die, "updown": updown, "turnccw": turn, "turncw": lambda d: turn(d, False), "doors": doors,
-          "fling": fling}
+          "fling": fling, "bench": bench}
 
 
 def render(shape, size=N, ss=SS):
