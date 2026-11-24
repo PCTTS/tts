@@ -245,10 +245,10 @@ def main():
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Chrysalia", False), ("Fontaine", False), ("Illusio", False), ("Ingis", False), ("Pugilis", True),
-                  ("Spectra", False), ("Terrera Mountain", False), ("Valora", False), ("Violight", False), ("Viperia", False),
-                  ("Yaksha", False)],
-          f"map list shows the eleven arenas, Pugilis on the table ({got})")
+    check(got == [("Chrysalia", False), ("Fontaine", False), ("Greenleaf", False), ("Illusio", False), ("Ingis", False),
+                  ("Pugilis", True), ("Spectra", False), ("Terrera Mountain", False), ("Valora", False), ("Violight", False),
+                  ("Viperia", False), ("Yaksha", False)],
+          f"map list shows the twelve arenas, Pugilis on the table ({got})")
 
     def row(name):   # the map panel's row for an arena (alphabetical)
         return f"mapRes_White_{[m.name for m in g.mapList().values()].index(name) + 1}"
@@ -552,6 +552,131 @@ def main():
     lua.execute('doorsClicked(nil, nil, "doors_3"); gearPlate.menu[2].fn("Red")')
     check(abs(dA.pos.x - 1) < 1e-6 and json.loads(dA.memo)["open"] is False and abs(dB.pos.y - (1.37 - 1.94)) < 1e-6,
           "pressed again they close; a blocker with no wall beside it sinks into the floor")
+
+    # Greenleaf: 4 flags, 4 traps, 3 flowers (each with its 3 spots), the grass bridge sunk in the creek
+    lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')   # the stand-ins
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", row("Greenleaf"))
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    gidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Greenleaf"]
+    flowers = {s.data.Nickname: json.loads(s.data.Memo) for s in new if s.data.Tags[1] == "Flower"}
+    gbridge = [s for s in new if s.data.Tags[1] == "Bridge"]
+    bm = json.loads(gbridge[0].data.Memo) if gbridge else {}
+    red = [[round(v, 3) for v in t] for t in flowers.get("Red flower", {}).get("targets", [])]
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("greenleaf", "mesh"))
+          and kinds.count("Flag") == 4 and kinds.count("Trap") == 4 and sorted(flowers) == ["Blue flower", "Red flower", "Violet flower"]
+          and all(len(m["targets"]) == 3 for m in flowers.values()) and len(gbridge) == 1
+          and gbridge[0].data.Nickname == "Grass bridge" and bm.get("tiles") == 5 and bm.get("rows") == 2 and bm.get("up") is False
+          and abs(bm["y"] - gbridge[0].position.y - bm["drop"]) < 1e-6 and abs(bm["drop"] - (0.9677 + 0.03)) < 1e-3
+          and len(gidx["snaps"]) == 256 - 53 - 10 - 3 and backdrop(new, "misc/garden-placeholder-v1.jpg"),
+          "picking Greenleaf: its board, 4 flags, 4 traps, 3 flowers with 3 spots each, the grass bridge (5x2) sunk a "
+          "level into the creek, snap points on all but the hedges, the creek and the flowers, the garden table")
+    T = 3.24875
+    want = [[-T, 0, -2 * T], [3 * T, 0, -2 * T], [3 * T, 0, 0]]
+    check(len(red) == 3 and all(abs(a - b) < 2e-3 for t, w in zip(red, want) for a, b in zip(t, w)),
+          f"the red flower's spots 1-3 are where the board paints them, from its tile ({red})")
+
+    # the grass bridge: 10 snap points, its arrows where four tiles meet; it rises and sinks like the rope bridges
+    # (a Pokemon on it keeps it up); a flower flings the Pokemon on it to a free spot at random, in an arc
+    lua.execute(r"""
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end
+      function standIn(tags, memo, pos)
+        local o = { tags = tags, guid = "gl" .. #objects, menu = {}, snaps = {}, ui = {}, pos = pos, rot = Vector(0, 0, 0) }
+        o.memo = memo and JSON.encode(memo) or ""
+        o.getPosition = function() return o.pos end
+        o.setPosition = function(p)
+          o.pos = Vector(p[1] or p.x, p[2] or p.y, p[3] or p.z)
+          o.top = math.max(o.top or -1e9, o.pos.y)
+        end
+        o.setPositionSmooth = function(p) o.pos = p end
+        o.positionToLocal = function(v) return Vector(v.x - o.pos.x, v.y - o.pos.y, v.z - o.pos.z) end
+        o.getRotation = function() return o.rot end
+        o.setLock = function(l) o.locked = l; o.lockLog = (o.lockLog or "") .. tostring(l) .. " " end
+        o.getLock = function() return o.locked or false end
+        o.getSnapPoints = function() return o.snaps end
+        o.setSnapPoints = function(s) o.snaps = s end
+        o.setDescription = function(d) o.desc = d end
+        o.clearContextMenu = function() o.menu = {} end
+        o.addContextMenuItem = function(label, fn) o.menu[#o.menu + 1] = { label = label, fn = fn } end
+        o.UI = { setXml = function(x) o.ui.xml = x end, setCustomAssets = function(a) o.ui.assets = a end }
+        o.hasTag = function(t) for _, x in ipairs(o.tags) do if x == t then return true end end return false end
+        objects[#objects + 1] = o
+        return o
+      end
+      getObjectFromGUID = function(guid) for _, o in ipairs(objects) do if o.guid == guid and not o.destroyed then return o end end end
+      grassBridge = standIn({ "Bridge", "ArenaPiece" }, { up = false, y = 1.3824, tiles = 5, rows = 2, tile = 3.24875,
+        drop = 0.9977 }, Vector(200, 1.3824 - 0.9977, 0))
+      grassBridge.locked = true
+      onObjectSpawn(grassBridge)
+    """)
+    gb = g.grassBridge
+    snaps = [tuple(round(v, 3) for v in s.position.values()) for s in gb.snaps.values()]
+    check(len(snaps) == 10 and (round(2 * T, 3), 0.02, round(T / 2, 3)) in snaps and (round(-2 * T, 3), 0.02, round(-T / 2, 3)) in snaps
+          and 'position="162 0 -2"' in str(gb.ui.xml) and 'onClick="Global/bridgeClicked"' in str(gb.ui.xml)
+          and [m.label for m in gb.menu.values()] == ["Raise the bridge", "Sink the bridge"] and str(gb.desc).startswith("Sunk: closed."),
+          f"the grass bridge carries a snap point on each of its 10 tiles, its arrows between four of them and Raise / "
+          f"Sink in its menu ({len(snaps)} snaps)")
+    g.bridgeClicked(player)
+    check(abs(gb.pos.y - 1.3824) < 1e-6 and json.loads(gb.memo)["up"] and str(gb.desc).startswith("Up:"),
+          "its arrows raise it level with the lawn")
+    lua.execute(r"""
+      onGrass = standIn({ "Pokemon" }, nil, Vector(200 + 2 * 3.24875, 1.40, -3.24875 / 2))
+    """)
+    g.bridgeClicked(player)
+    up_still = abs(gb.pos.y - 1.3824) < 1e-6
+    lua.execute("onGrass.destroyed = true")
+    g.bridgeClicked(player)
+    check(up_still and abs(gb.pos.y - (1.3824 - 0.9977)) < 1e-6 and not json.loads(gb.memo)["up"],
+          "with a Pokemon on its far end's second row it stays up; once it's gone the arrows sink it into the creek")
+
+    lua.execute(r"""
+      flower = standIn({ "Flower", "ArenaPiece" }, { targets = { { 3.24875, 0, 0 }, { 0, 0, 3.24875 }, { -3.24875, 0.9677, 0 } },
+        tile = 3.24875 }, Vector(100, 1.3824, 0))
+      flower.locked = true
+      onObjectSpawn(flower)
+      flung = standIn({ "Pokemon" }, nil, Vector(100, 1.3824 + 0.06 + 0.01, 0))
+      flung.rot = Vector(0, 77, 0)
+      blockMon = standIn({ "Pokemon" }, nil, Vector(100 + 3.24875, 1.40, 0.4))
+      gift = standIn({ "Gift" }, nil, Vector(100, 1.45, 3.24875 - 0.5))
+      flingOk = flowerClicked(nil, nil, "fling_" .. flower.guid)
+    """)
+    fl, mon = g.flower, g.flung
+    check(len(list(fl.snaps.values())) == 1 and abs(fl.snaps[1].position[2] - 0.08) < 1e-9
+          and f'id="fling_{fl.guid}"' in str(fl.ui.xml) and 'onClick="Global/flowerClicked"' in str(fl.ui.xml)
+          and fl.ui.assets[1].url.endswith("ui/icons/fling-v3.png") and [m.label for m in fl.menu.values()] == ["Fling Pokémon"]
+          and str(fl.desc).startswith("Flower."),
+          "a flower carries its tile's snap point, the fling button and menu, and its description")
+    check(abs(mon.pos.x - (100 - T)) < 1e-6 and abs(mon.pos.z) < 1e-6 and abs(mon.pos.y - (1.3824 + 0.9677 + 0.01)) < 1e-6
+          and mon.rot.y == 77 and mon.lockLog == "true false " and not g.flinging[fl.guid],
+          f"its button throws the Pokemon on it to the one free spot (the others hold a Pokemon and a gift box), at the "
+          f"same height above the ground, facing kept, unlocked after ({mon.pos.x:.3f}, {mon.pos.y:.3f}, {mon.pos.z:.3f})")
+    check(mon.top > 1.3824 + 3.5, f"it flies there in an arc (top {mon.top:.2f}), no jump cut")
+    lua.execute(r"""
+      blockMon.destroyed = true; gift.destroyed = true
+      landed = {}
+      for i = 1, 40 do
+        flung.pos = Vector(100, 1.3824 + 0.07, 0)
+        flingFromFlower(flower)
+        local k = string.format("%.2f,%.2f", flung.pos.x - 100, flung.pos.z)
+        landed[k] = (landed[k] or 0) + 1
+      end
+    """)
+    spots = sorted(dict(g.landed.items()))
+    check(spots == ["-3.25,0.00", "0.00,3.25", "3.25,0.00"], f"with all three free, it lands on each of them at random ({spots})")
+    lua.execute(r"""
+      flung.pos = Vector(100, 1.3824 + 0.07, 0)
+      s1 = standIn({ "Pokemon" }, nil, Vector(100 + 3.24875, 1.40, 0))
+      s2 = standIn({ "Pokemon" }, nil, Vector(100, 1.40, 3.24875))
+      s3 = standIn({ "Pokemon" }, nil, Vector(100 - 3.24875, 2.36, 0))
+      allTaken = flingFromFlower(flower)
+      s1.destroyed = true; s2.destroyed = true; s3.destroyed = true
+      flung.pos = Vector(130, 1.40, 0)
+      noneOn = flingFromFlower(flower)
+      flung.destroyed = true
+    """)
+    check(g.allTaken is False and g.noneOn is False, "with all three spots taken, or nobody on the flower, nothing is thrown")
 
     # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
     lua.execute(r"""
@@ -955,6 +1080,7 @@ def main():
       pBoard, pFlag, pStand, pCard, pTree = obj({ "Board3D" }), obj({ "Flag", "ArenaPiece" }), obj({ "Stand" }), obj({ "Item" }), obj({ "Tree", "ArenaPiece" })
       pPillar = obj({ "Pillar" })
       pStatue = obj({ "Statue", "ArenaPiece" })
+      pFlower = obj({ "Flower", "ArenaPiece" })
       pieceSetup(pBoard)
       pieceSetup(pPillar)
       delFlag = onPlayerAction(nil, Player.Action.Delete, { pCard, pFlag })
@@ -964,10 +1090,12 @@ def main():
       pickTree = onPlayerAction(nil, Player.Action.PickUp, { pTree })
       delStatue = onPlayerAction(nil, Player.Action.Delete, { pStatue })
       pickStatue = onPlayerAction(nil, Player.Action.PickUp, { pStatue })
+      delFlower = onPlayerAction(nil, Player.Action.Delete, { pFlower })
     """)
     check(g.pBoard.interactable is False and g.pPillar.interactable is False,
           "the board and the pillars can't be clicked, selected or deleted (not interactive)")
-    check(g.delFlag is False and g.cutStand is False, "deleting a flag or cutting a stand is refused")
+    check(g.delFlag is False and g.cutStand is False and g.delFlower is False,
+          "deleting a flag or a flower, or cutting a stand, is refused")
     check(g.delStatue is False and g.pickStatue is True, "a statue can be picked up and moved, not deleted")
     check(g.delTree is True and g.pickCard is True and g.pickTree is True,
           "a tree or a card can still be deleted; other actions aren't blocked")

@@ -152,8 +152,22 @@ def doors(d):
         d.polygon(P(x1, 18, x1 - 16 * s, 6, x1 - 16 * s, 30), fill=255)
 
 
+def fling(d):
+    """Fling the Pokémon on a flower (Greenleaf): three arrows flying out from a dot, one toward each of its spots
+    (much the same from either side of the table)."""
+    d.ellipse(P(64 - 13, 64 - 13, 64 + 13, 64 + 13), fill=255)
+    for deg in (90, 210, 330):
+        a = math.radians(deg)
+        ux, uy = math.cos(a), -math.sin(a)                       # outward, screen coordinates (y down)
+        nx, ny = -uy, ux
+        d.line(P(64 + ux * 24, 64 + uy * 24, 64 + ux * 42, 64 + uy * 42), fill=255, width=round(STROKE * K))
+        tip, base = (64 + ux * 62, 64 + uy * 62), (64 + ux * 34, 64 + uy * 34)
+        d.polygon(P(*tip, base[0] + nx * 21, base[1] + ny * 21, base[0] - nx * 21, base[1] - ny * 21), fill=255)
+
+
 SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords, "ability": sparkle,
-          "die": die, "updown": updown, "turnccw": turn, "turncw": lambda d: turn(d, False), "doors": doors}
+          "die": die, "updown": updown, "turnccw": turn, "turncw": lambda d: turn(d, False), "doors": doors,
+          "fling": fling}
 
 
 def render(shape, size=N, ss=SS):

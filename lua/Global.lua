@@ -31,7 +31,8 @@ ICONS = {
   item = "ui/icons/item-v3.png", skill = "ui/icons/skill-v3.png", ability = "ui/icons/ability-v3.png",
 }
 PIECE_ICONS = { die = "ui/icons/die-v3.png", updown = "ui/icons/updown-v3.png",   -- buttons on arena pieces
-  turnccw = "ui/icons/turnccw-v3.png", turncw = "ui/icons/turncw-v3.png", doors = "ui/icons/doors-v3.png" }
+  turnccw = "ui/icons/turnccw-v3.png", turncw = "ui/icons/turncw-v3.png", doors = "ui/icons/doors-v3.png",
+  fling = "ui/icons/fling-v3.png" }
 -- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
 -- UI images it shrinks, so a much larger image looks jagged.
 BAR_ICON, BAR_MARGIN, BAR_GAP = 32, 3, 6
@@ -234,7 +235,7 @@ READERS = {
   arenas = function(rows)
     local t, cur = {}, nil
     local NUM = { yaw = true, material = true, pair = true, tile = true, tiles = true, gate = true, branch = true,
-      gear = true, size = true, door = true, sx = true, sy = true, sz = true }
+      gear = true, size = true, door = true, sx = true, sy = true, sz = true, rows = true, drop = true }
     for _, f in ipairs(rows) do
       if f[1] == "arena" then
         cur = { mesh = f[3], texture = f[4], table = f[5] or "", snaps = {}, pieces = {} }
@@ -302,6 +303,7 @@ function onLoad(saved)
         plainStandee(obj)
       elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap")
         or obj.hasTag("GateFrame") or obj.hasTag("Gate") or obj.hasTag("Water") or obj.hasTag("Gear") or obj.hasTag("Door")
+        or obj.hasTag("Flower")
         or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") or obj.hasTag("Pillar") then
         pieceSetup(obj)
       elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
@@ -326,7 +328,7 @@ end
 -- pieces still need clicks (HP signs, flags, buttons), so players just can't delete or cut them; the map picker
 -- replaces them by script, which isn't a player action.
 PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand", "GateFrame", "Gate", "Water",
-  "Fountain", "Statue", "Gear", "Door" }
+  "Fountain", "Statue", "Gear", "Door", "Flower" }
 
 function onPlayerAction(player, action, targets)
   if action == Player.Action.Select or action == Player.Action.PickUp then
@@ -744,9 +746,16 @@ function spawnArenaPiece(p, origin, base)
     data.ColorDiffuse, data.Memo = portalTint(p.pair or 1), JSON.encode({ pair = p.pair or 1 })
   elseif p.kind == "Zone" then
     data.ColorDiffuse, data.Memo = NEUTRAL, JSON.encode({ tiles = p.tiles or 2, tile = p.tile or BOARD_TILE })
-  elseif p.kind == "Bridge" then
-    data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, tile = p.tile or BOARD_TILE })
-    pos = Vector(pos.x, pos.y - BRIDGE_DROP, pos.z)
+  elseif p.kind == "Bridge" then   -- rope bridges hang below the islands; the grass bridge is sunk in the creek
+    data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, rows = p.rows or 1, tile = p.tile or BOARD_TILE,
+      drop = p.drop })
+    pos = Vector(pos.x, pos.y - (p.drop or BRIDGE_DROP), pos.z)
+  elseif p.kind == "Flower" then   -- its spots: "dx,dy,dz;..." from its tile top to theirs
+    local targets = {}
+    for _, s in ipairs(splitPlain(p.targets or "", ";")) do
+      if s ~= "" then targets[#targets + 1] = numbers(s) end
+    end
+    data.Memo = JSON.encode({ targets = targets, tile = p.tile or BOARD_TILE })
   elseif p.kind == "Gate" then   -- gates start open: the sluice block sunk into the river bed
     data.Memo = JSON.encode({ gate = p.gate, branch = p.branch, part = p.part, open = true, y = pos.y })
     pos = Vector(pos.x, pos.y - GATE_DROP, pos.z)
@@ -1221,7 +1230,9 @@ end
 -- level with the islands (crossable); dropped = hanging below them (closed). They start dropped. The arrows on
 -- any bridge raise them all, or drop them all, except that a bridge with a Pokémon on it stays up (the rules:
 -- it doesn't close until the next time they all do). Right-click a bridge to raise or drop just that one.
--- Its memo: { up, y = its height when up, tiles, tile }.
+-- Greenleaf's grass bridge works the same way (the same rule): a deck 5 tiles long and 2 across over the creek that
+-- sinks into the water to close (its memo's drop: how far), its top just under the surface.
+-- Its memo: { up, y = its height when up, tiles (along it), rows (across it), tile, drop (nil: BRIDGE_DROP) }.
 ----------------------------------------------------------------------------------------------------
 BOARD_TILE = 3.24875
 BRIDGE_DROP = 1.6
@@ -1229,14 +1240,17 @@ BRIDGE_BUTTON = { z = 1.0, y = 0.02 }   -- beside the middle of the deck, clear 
 
 function bridgeState(obj)
   local st = memoTable(obj)
-  st.tiles, st.tile = st.tiles or 1, st.tile or BOARD_TILE
+  st.tiles, st.rows, st.tile = st.tiles or 1, st.rows or 1, st.tile or BOARD_TILE
   return st
 end
 
 function bridgeSnaps(st)
   local snaps = {}
   for i = 1, st.tiles do
-    snaps[i] = { position = { (i - (st.tiles + 1) / 2) * st.tile, 0.02, 0 }, rotation = { 0, 0, 0 }, rotation_snap = false }
+    for j = 1, st.rows do
+      snaps[#snaps + 1] = { position = { (i - (st.tiles + 1) / 2) * st.tile, 0.02, (j - (st.rows + 1) / 2) * st.tile },
+        rotation = { 0, 0, 0 }, rotation_snap = false }
+    end
   end
   return snaps
 end
@@ -1244,16 +1258,20 @@ end
 -- The Pokémon standing on a bridge, or nil.
 function pokemonOnBridge(bridge)
   local st = bridgeState(bridge)
-  local half = st.tiles * st.tile / 2
+  local half, across = st.tiles * st.tile / 2, st.rows * st.tile / 2
   for _, obj in ipairs(getAllObjects()) do
     if obj.hasTag("Pokemon") then
       local p = bridge.positionToLocal(obj.getPosition())
-      if math.abs(p.x) <= half + 0.2 and math.abs(p.z) <= 1.6 and p.y > -0.5 and p.y < 3 then return obj end
+      if math.abs(p.x) <= half + 0.2 and math.abs(p.z) <= across and p.y > -0.5 and p.y < 3 then return obj end
     end
   end
 end
 
-function bridgeDescription(up)
+function bridgeDescription(up, st)
+  if st and st.drop then   -- the grass bridge (one on its map)
+    return (up and "Up: Pokémon can cross it." or "Sunk: closed.") .. " It rises or sinks every second turn: click "
+      .. "the arrows on it. With a Pokémon on it, it stays up until the next time."
+  end
   return (up and "Up: Pokémon can cross it." or "Dropped: closed.") .. " The bridges go up or down together every "
     .. "second turn: click the arrows on any bridge. One with a Pokémon on it stays up until the next time. "
     .. "Right-click it to raise or drop just this one."
@@ -1265,8 +1283,8 @@ function setBridgeUp(obj, up)
   st.up = up
   obj.memo = JSON.encode(st)
   local p = obj.getPosition()
-  if st.y then obj.setPositionSmooth(Vector(p.x, up and st.y or st.y - BRIDGE_DROP, p.z), false, false) end
-  obj.setDescription(bridgeDescription(up))
+  if st.y then obj.setPositionSmooth(Vector(p.x, up and st.y or st.y - (st.drop or BRIDGE_DROP), p.z), false, false) end
+  obj.setDescription(bridgeDescription(up, st))
   return true
 end
 
@@ -1522,6 +1540,97 @@ function doorsClicked(_, _, id)
 end
 
 ----------------------------------------------------------------------------------------------------
+-- Flowers (Greenleaf): a flat bloom lying on its tile. Its button (or right-click > Fling Pokémon) throws the Pokémon
+-- standing on it to one of the flower's numbered spots at random, in an arc you can watch (it keeps the way it
+-- faces). A spot something stands on is left out; with all of them taken nothing happens (the rules).
+-- Its memo: { targets = { {dx, dy, dz}, ... } (from its tile top to each spot's), tile }.
+----------------------------------------------------------------------------------------------------
+FLOWER_T = 0.06                         -- tools/build_pieces.py: the bloom's thickness
+FLOWER_BUTTON = { x = 0.86, z = -0.86 }   -- on a petal, clear of a Pokémon's base
+FLING_TIME, FLING_FRAMES = 1.2, 72      -- seconds a throw takes (game clock); frames without one (offline tests)
+FLING_PEAK = 3.5                        -- how high the arc goes (plus a quarter of the distance)
+FLOWER_DESC = "Flower. A Pokémon that ends its turn here is flung to one of its three numbered spots at random (not "
+  .. "one that's taken), keeping its facing. Click the arrows on it to fling."
+flinging = {}                           -- flower guid -> true while it throws
+
+function flowerState(obj)
+  local st = memoTable(obj)
+  st.targets, st.tile = st.targets or {}, st.tile or BOARD_TILE
+  return st
+end
+
+local function overTile(o, x, y, z, half)
+  local p = o.getPosition()
+  return math.abs(p.x - x) < half and math.abs(p.z - z) < half and p.y > y - 0.5 and p.y < y + 5
+end
+
+-- The Pokémon standing on a flower (not one in someone's hand), or nil.
+function pokemonOnFlower(flower)
+  local c, half = flower.getPosition(), flowerState(flower).tile / 2
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Pokemon") and not o.held_by_color and overTile(o, c.x, c.y, c.z, half) then return o end
+  end
+end
+
+-- A flower's spots with nothing on them (a Pokémon, or anything loose), as the tops of their tiles.
+function freeFlowerSpots(flower, thrown)
+  local c, st = flower.getPosition(), flowerState(flower)
+  local half, free = st.tile / 2 - 0.05, {}
+  for _, t in ipairs(st.targets) do
+    local x, y, z = c.x + (t[1] or 0), c.y + (t[2] or 0), c.z + (t[3] or 0)
+    local taken = false
+    for _, o in ipairs(getAllObjects()) do
+      if o ~= thrown and o ~= flower and (o.hasTag("Pokemon") or not o.getLock()) and overTile(o, x, y, z, half) then
+        taken = true
+      end
+    end
+    if not taken then free[#free + 1] = Vector(x, y, z) end
+  end
+  return free
+end
+
+-- Throw the Pokémon on a flower to one of its free spots: along an arc, a little each frame (locked meanwhile so
+-- physics leaves it alone), landing at the same height above the ground as it stood on the flower.
+function flingFromFlower(flower)
+  if not flower or flinging[flower.guid] then return false end
+  local mon = pokemonOnFlower(flower)
+  if not mon then return false end
+  local spots = freeFlowerSpots(flower, mon)
+  if #spots == 0 then return false end
+  local to = spots[math.random(#spots)]
+  local from = mon.getPosition()
+  local lift = math.max(0, from.y - (flower.getPosition().y + FLOWER_T))
+  local dest = Vector(to.x, to.y + lift, to.z)
+  local dx, dz = dest.x - from.x, dest.z - from.z
+  local peak = FLING_PEAK + 0.25 * math.sqrt(dx * dx + dz * dz)
+  local wasLocked = mon.getLock()
+  flinging[flower.guid] = true
+  mon.setLock(true)
+  local clock = Time and Time.time and function() return Time.time end
+  local k, t0 = 0, clock and clock()
+  local function step()
+    k = k + 1
+    local t = math.min(1, clock and (clock() - t0) / FLING_TIME or k / FLING_FRAMES)
+    mon.setPosition({ from.x + dx * t, from.y + (dest.y - from.y) * t + 4 * peak * t * (1 - t), from.z + dz * t })
+    if t < 1 then
+      Wait.frames(step, 1)
+    else
+      mon.setLock(wasLocked)
+      flinging[flower.guid] = nil
+      flagTaken(mon)
+    end
+  end
+  step()
+  return true
+end
+
+-- A flower's button: its id is "fling_<its guid>".
+function flowerClicked(_, _, id)
+  local flower = getObjectFromGUID(tostring(id or ""):sub(7))
+  if flower then flingFromFlower(flower) end
+end
+
+----------------------------------------------------------------------------------------------------
 -- Traps (Chrysalia): a trap piece on its tile; once it has caught a Pokémon, right-click > Spring trap removes it.
 ----------------------------------------------------------------------------------------------------
 TRAP_DESC = "Trap. A Pokémon that ends its turn here finishes its activation and skips its next one; then the trap "
@@ -1554,14 +1663,23 @@ function pieceSetup(obj)
     Wait.frames(refreshZones, 1)
   elseif obj.hasTag("Bridge") then
     local st = bridgeState(obj)
-    if #(obj.getSnapPoints() or {}) ~= st.tiles then obj.setSnapPoints(bridgeSnaps(st)) end
-    obj.setDescription(bridgeDescription(st.up))
+    if #(obj.getSnapPoints() or {}) ~= st.tiles * st.rows then obj.setSnapPoints(bridgeSnaps(st)) end
+    obj.setDescription(bridgeDescription(st.up, st))
     obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
-    obj.UI.setXml(pieceButtonXml("bridgeArrows", 0, BRIDGE_BUTTON.z, BRIDGE_BUTTON.y, "bridgeClicked",
-      "Raise or drop the bridges", "updown"))
     obj.clearContextMenu()
-    obj.addContextMenuItem("Raise this bridge", function() setBridgeUp(obj, true) end)
-    obj.addContextMenuItem("Drop this bridge", function() setBridgeUp(obj, false) end)
+    if st.rows > 1 then   -- the grass bridge: its arrows where four of its tiles meet, clear of every Pokémon's base
+      local bx = (st.tiles % 2 == 1) and st.tile / 2 or 0
+      local bz = (st.rows % 2 == 0) and 0 or st.tile / 2
+      obj.UI.setXml(pieceButtonXml("bridgeArrows", bx, bz, BRIDGE_BUTTON.y, "bridgeClicked", "Raise or sink the bridge",
+        "updown"))
+      obj.addContextMenuItem("Raise the bridge", function() setBridgeUp(obj, true) end)
+      obj.addContextMenuItem("Sink the bridge", function() setBridgeUp(obj, false) end)
+    else
+      obj.UI.setXml(pieceButtonXml("bridgeArrows", 0, BRIDGE_BUTTON.z, BRIDGE_BUTTON.y, "bridgeClicked",
+        "Raise or drop the bridges", "updown"))
+      obj.addContextMenuItem("Raise this bridge", function() setBridgeUp(obj, true) end)
+      obj.addContextMenuItem("Drop this bridge", function() setBridgeUp(obj, false) end)
+    end
   elseif obj.hasTag("GateFrame") then
     local n = memoTable(obj).gate or 0
     obj.setDescription(GATE_DESC)
@@ -1589,6 +1707,16 @@ function pieceSetup(obj)
     end
     obj.UI.setCustomAssets(assets)
     obj.UI.setXml(xml)
+  elseif obj.hasTag("Flower") then
+    if #(obj.getSnapPoints() or {}) ~= 1 then   -- the tile's snap point, on the bloom
+      obj.setSnapPoints({ { position = { 0, FLOWER_T + 0.02, 0 }, rotation = { 0, 0, 0 }, rotation_snap = false } })
+    end
+    obj.setDescription(FLOWER_DESC)
+    obj.UI.setCustomAssets({ { name = "fling", url = BASE_URL .. PIECE_ICONS.fling } })
+    obj.UI.setXml(pieceButtonXml("fling_" .. obj.guid, FLOWER_BUTTON.x, FLOWER_BUTTON.z, FLOWER_T + 0.01, "flowerClicked",
+      "Fling the Pokémon on it", "fling"))
+    obj.clearContextMenu()
+    obj.addContextMenuItem("Fling Pokémon", function() flingFromFlower(obj) end)
   elseif obj.hasTag("Door") then
     obj.interactable = false   -- opened and closed from its gear
   elseif obj.hasTag("Water") then

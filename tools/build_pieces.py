@@ -28,7 +28,14 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/gear3-v1.obj, props/gear4-v1.obj  (Valora: a gear's steel plate, 3x3 or 4x4 tiles; also its own collider)
   props/gear4-ccw-1-v1.jpg, -2-, -3-, props/gear3-cw-v1.jpg  (its arrows (and number), per gear kind GEAR_KINDS)
   props/door-v1.obj, props/door-1-v1.jpg, -2-, -3-  (Valora: a blocker, a steel block filling its tile; own collider)
+  props/flower-v1.obj, props/flower-red-v1.jpg, -blue-, -violet-  (Greenleaf: a flower, a flat bloom; own collider)
+  props/grassbridge-v1.obj, props/grassbridge-v1.jpg, props/grassbridge-collider-v1.obj  (Greenleaf's grass bridge)
 tools/place_pieces.py puts them on an arena's marker tiles.
+
+Flower (Greenleaf): a thin flat bloom lying on its tile, eight round petals in its colour round a golden middle; a
+Pokemon stands on its middle (it carries the tile's snap point). Its own frame: y = 0 is the tile top.
+Grass bridge (Greenleaf): a thick deck of woven grass over the creek, 5 tiles long and 2 across, plaited grass along
+its edges; it sinks into the water to close. Its own frame: y = 0 is the deck's top, centred.
 
 Gear (Valora): a thin square steel plate lying on a gear's tiles, the tile seams and an arrow on each tile (which
 way it turns), hazard stripes round its rim, a numbered gear's number in the middle (N/N). It turns as a whole;
@@ -124,6 +131,11 @@ GEAR_GAP, GEAR_T = 0.05, 0.05            # gear plate: inset from the gear's edg
 GEAR_PX = 256                            # gear texture pixels per tile
 GEAR_KINDS = [(4, "ccw", 1), (4, "ccw", 2), (4, "ccw", 3), (3, "cw", 0)]   # (size, turn, number; 0 = none) to build
 DOOR_IN, DOOR_H = 0.03, 2 * LEVEL - 0.03  # blocker: inset from its tile's edges; height (just under a 2-level wall)
+FLOWER_R, FLOWER_T, FLOWER_PETALS = 1.5, 0.06, 8   # Greenleaf flower: petal tips' radius, thickness, petals
+FLOWER_COLORS = {"red": (226, 52, 60), "blue": (60, 123, 234), "violet": (154, 88, 218)}   # = the map's palette
+GRASS_TILES, GRASS_ROWS = 5, 2            # Greenleaf's grass bridge: tiles long (x), tiles across (z)
+GRASS_L, GRASS_W, GRASS_D = GRASS_TILES * TILE - 0.04, GRASS_ROWS * TILE - 0.08, 0.32   # its deck: length, width,
+                                          # thickness (a little short of the creek, so it never rubs the banks)
 
 
 def gear_file(size, turn, number=0):
@@ -886,6 +898,160 @@ def door_texture(number):
     return img.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
 
 
+# ------------------------------------------------------------------------------------------------ Greenleaf
+def flower_radius(a):
+    """The flower's outline at angle a: round petal tips (at multiples of 360 / FLOWER_PETALS degrees, one pointing
+    along +x), pointed notches between them."""
+    return FLOWER_R * (0.64 + 0.36 * abs(math.cos(FLOWER_PETALS / 2 * a)) ** 0.8)
+
+
+FLOWER_SEG = 160
+FLOWER_UV = FLOWER_R * 1.02   # the texture spans this far each way from the middle
+
+
+def flower_pad():
+    """A flower: a thin flat bloom lying on its tile, a Pokémon standing on its middle. The texture is the bloom seen
+    from above; the rim shows the petals' edge colour. Also its own collider. Its own frame: y = 0 is the tile top."""
+    m = PieceMesh()
+    uv = lambda x, z: (0.5 + x / (2 * FLOWER_UV), 0.5 + z / (2 * FLOWER_UV))
+    pts = [(flower_radius(a) * math.cos(a), flower_radius(a) * math.sin(a))
+           for a in (2 * math.pi * k / FLOWER_SEG for k in range(FLOWER_SEG))]
+    for k in range(FLOWER_SEG):
+        (x0, z0), (x1, z1) = pts[k], pts[(k + 1) % FLOWER_SEG]
+        m.face4([(0, FLOWER_T, 0), (0, FLOWER_T, 0), (x1, FLOWER_T, z1), (x0, FLOWER_T, z0)],
+                [uv(0, 0), uv(0, 0), uv(x1, z1), uv(x0, z0)], [(0, 1, 0)] * 4)
+        n = norm((z1 - z0, 0, -(x1 - x0)))
+        if n[0] * x0 + n[2] * z0 < 0:
+            n = (-n[0], 0, -n[2])
+        m.face4([(x0, 0, z0), (x1, 0, z1), (x1, FLOWER_T, z1), (x0, FLOWER_T, z0)],
+                [uv(x0, z0), uv(x1, z1), uv(x1, z1), uv(x0, z0)], [n] * 4)
+    return m
+
+
+def flower_texture(color):
+    """A flower seen from above: petals in its colour, lighter toward their tips, a vein down each and a dark line
+    between them; a golden middle with seeds. Pixel (px, py) is the point (x, z) = ((px/n - 0.5), (0.5 - py/n)) *
+    2 FLOWER_UV, so the petals sit where the mesh has them."""
+    n = 512
+    rng = np.random.default_rng(400 + sum(color))
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32) + 0.5
+    x, z = (xx / n - 0.5) * 2 * FLOWER_UV, (0.5 - yy / n) * 2 * FLOWER_UV
+    r, a = np.hypot(x, z), np.arctan2(z, x)
+    edge = FLOWER_R * (0.64 + 0.36 * np.abs(np.cos(FLOWER_PETALS / 2 * a)) ** 0.8)
+    t = np.clip(r / edge, 0, 1)
+    base = np.array(color, np.float32)
+    img = base * (0.62 + 0.5 * t[..., None] ** 1.3)
+    img = img + (np.array((255, 255, 255), np.float32) - img) * (0.18 * np.clip((t - 0.75) / 0.25, 0, 1))[..., None]
+    img *= (0.94 + 0.1 * rng.random((n, n, 1))).astype(np.float32)
+    img = np.where((t >= 0.97)[..., None], base * 0.45, img)                       # the rim: a darker edge
+    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    px = lambda xw, zw: (n * (0.5 + xw / (2 * FLOWER_UV)), n * (0.5 - zw / (2 * FLOWER_UV)))
+    dark = tuple(int(v * 0.4) for v in color) + (220,)
+    for k in range(FLOWER_PETALS):
+        tip = 2 * math.pi * k / FLOWER_PETALS
+        notch = tip + math.pi / FLOWER_PETALS
+        rn = flower_radius(notch)
+        d.line([px(0.3 * math.cos(notch), 0.3 * math.sin(notch)), px(rn * math.cos(notch), rn * math.sin(notch))],
+               fill=dark, width=5)                                                      # between two petals
+        d.line([px(0.45 * math.cos(tip), 0.45 * math.sin(tip)), px(1.25 * math.cos(tip), 1.25 * math.sin(tip))],
+               fill=tuple(int(v * 0.7) for v in color) + (160,), width=3)               # the petal's vein
+    c, rc = px(0, 0), 0.46 / (2 * FLOWER_UV) * n
+    d.ellipse([c[0] - rc - 5, c[1] - rc - 5, c[0] + rc + 5, c[1] + rc + 5], fill=dark)
+    d.ellipse([c[0] - rc, c[1] - rc, c[0] + rc, c[1] + rc], fill=(238, 178, 40, 255))
+    for _ in range(140):                                                                # seeds
+        ra, rr = rng.random() * 2 * math.pi, math.sqrt(rng.random()) * rc * 0.9
+        sx, sy = c[0] + math.cos(ra) * rr, c[1] + math.sin(ra) * rr
+        d.ellipse([sx - 3, sy - 3, sx + 3, sy + 3], fill=(150, 88, 20, 230) if rng.random() < 0.6 else (252, 224, 110, 230))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+GB_TOP, GB_SIDE, GB_END, GB_BOTTOM = (0, 406), (440, 520), (560, 640), (700, 1000)   # texture rows (1024 x 1024)
+
+
+def grass_bridge():
+    """Greenleaf's grass bridge: a thick deck of woven grass, GRASS_TILES long (along x) and GRASS_ROWS across, its
+    top at y = 0 (level with the lawn when it's up). Texture: the top (its tiles' seams faintly marked), then the
+    long sides, the ends and the underside in bands below."""
+    m = PieceMesh()
+    L, w, d = GRASS_L / 2, GRASS_W / 2, GRASS_D
+    rows = lambda r0, r1, f: 1 - (r0 + f * (r1 - r0)) / 1024
+    top = lambda x, z: (0.5 + x / GRASS_L, rows(*GB_TOP, 0.5 - z / GRASS_W))
+    m.face4([(-L, 0, w), (L, 0, w), (L, 0, -w), (-L, 0, -w)], [top(-L, w), top(L, w), top(L, -w), top(-L, -w)],
+            [(0, 1, 0)] * 4)
+    for sz in (-1, 1):                                                 # long sides
+        z = sz * w
+        m.face4([(-L, 0, z), (L, 0, z), (L, -d, z), (-L, -d, z)],
+                [(0, rows(*GB_SIDE, 0)), (1, rows(*GB_SIDE, 0)), (1, rows(*GB_SIDE, 1)), (0, rows(*GB_SIDE, 1))],
+                [(0, 0, sz)] * 4)
+    for sx in (-1, 1):                                                 # ends
+        x = sx * L
+        u1 = 400 / 1024
+        m.face4([(x, 0, -w), (x, 0, w), (x, -d, w), (x, -d, -w)],
+                [(0, rows(*GB_END, 0)), (u1, rows(*GB_END, 0)), (u1, rows(*GB_END, 1)), (0, rows(*GB_END, 1))],
+                [(sx, 0, 0)] * 4)
+    m.face4([(-L, -d, -w), (L, -d, -w), (L, -d, w), (-L, -d, w)],
+            [(0, rows(*GB_BOTTOM, 0)), (1, rows(*GB_BOTTOM, 0)), (1, rows(*GB_BOTTOM, 1)), (0, rows(*GB_BOTTOM, 1))],
+            [(0, -1, 0)] * 4)
+    return m
+
+
+def grass_bridge_collider():
+    m = PieceMesh()
+    box(m, -GRASS_L / 2, GRASS_L / 2, -GRASS_D, 0, -GRASS_W / 2, GRASS_W / 2)
+    return m
+
+
+def grass_bridge_texture():
+    """The grass bridge: a thick mat of grass on top, its tiles' seams faintly marked, a plaited grass rope along each
+    long edge; plaited grass and roots on the sides and ends; dark roots and soil underneath."""
+    rng = np.random.default_rng(410)
+    n = 1024
+    t = np.asarray(Image.fromarray((rng.random((24, 24)) * 255).astype(np.uint8)).resize((n, n), Image.BICUBIC),
+                   np.float32) / 255
+    img = np.array((70, 124, 46), np.float32) + (t[..., None] - 0.5) * np.array((50, 60, 30), np.float32)
+    img *= (1 + rng.normal(0, 0.05, (n, n, 1))).astype(np.float32)
+    out = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    t0, t1 = GB_TOP
+    for _ in range(9000):                                              # blades on the top
+        x, y = rng.random() * n, t0 + rng.random() * (t1 - t0)
+        ang, ln = rng.normal(-math.pi / 2, 0.7), rng.uniform(6, 14)
+        col = (150, 206, 96, 120) if rng.random() < 0.5 else (34, 76, 24, 120)
+        d.line([(x, y), (x + ln * math.cos(ang), y + ln * math.sin(ang))], fill=col, width=2)
+    for k in range(1, GRASS_TILES):                                    # the tiles' seams, faint like the board's
+        x = k * n / GRASS_TILES
+        d.line([(x, t0 + 30), (x, t1 - 30)], fill=(24, 50, 16, 42), width=3)
+    for k in range(1, GRASS_ROWS):
+        y = t0 + k * (t1 - t0) / GRASS_ROWS
+        d.line([(30, y), (n - 30, y)], fill=(24, 50, 16, 42), width=3)
+
+    def plait(y0, y1):                                                 # a band of plaited grass, along the image
+        d.rectangle([0, y0, n, y1], fill=(112, 128, 60, 255))
+        hgt = y1 - y0
+        for x in range(-hgt, n + hgt, 14):
+            d.line([(x, y0), (x + hgt * 0.6, y1)], fill=(84, 104, 44, 255), width=6)
+            d.line([(x + 7, y1), (x + 7 + hgt * 0.6, y0)], fill=(150, 160, 84, 200), width=3)
+    plait(t0, t0 + 22)                                                 # rope along the long edges (on the top)
+    plait(t1 - 22, t1)
+    plait(*GB_SIDE)
+    plait(*GB_END)
+    for y0, y1 in (GB_SIDE, GB_END):                                   # grass hanging over from the top
+        for x in range(0, n, 6):
+            d.line([(x, y0), (x + rng.uniform(-3, 3), y0 + rng.uniform(6, 22))], fill=(60, 116, 40, 230), width=3)
+    b0, b1 = GB_BOTTOM
+    d.rectangle([0, b0, n, b1], fill=(48, 34, 22, 255))
+    for _ in range(120):                                               # roots underneath
+        x, y, ang = rng.random() * n, b0 + rng.random() * (b1 - b0), rng.random() * 6.3
+        pts = [(x, y)]
+        for _ in range(8):
+            ang += rng.normal(0, 0.4)
+            x, y = x + 14 * math.cos(ang), y + 14 * math.sin(ang)
+            pts.append((x, y))
+        d.line(pts, fill=(128, 100, 66, 200), width=3)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
 # ------------------------------------------------------------------------------------------------ backdrop
 def backdrop():
     """A flat panel the size of the table's play area: an arena's surroundings are shown on it instead of on the
@@ -999,6 +1165,12 @@ def main():
         **{f"door-{n}-v1.jpg": (lambda p, n=n: door_texture(n).save(p, quality=92)) for n in (1, 2, 3)},
         **{f"zoneframe{n}-{name}-v1.obj": (lambda p, n=n, s=s: zone_frame(n, s).write(p))
            for s, name in RAISED_SLANTS.items() for n in (2, 4)},
+        "flower-v1.obj": lambda p: flower_pad().write(p),
+        **{f"flower-{name}-v1.jpg": (lambda p, c=c: flower_texture(c).save(p, quality=92))
+           for name, c in FLOWER_COLORS.items()},
+        "grassbridge-v1.obj": lambda p: grass_bridge().write(p),
+        "grassbridge-collider-v1.obj": lambda p: grass_bridge_collider().write(p),
+        "grassbridge-v1.jpg": lambda p: grass_bridge_texture().save(p, quality=92),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

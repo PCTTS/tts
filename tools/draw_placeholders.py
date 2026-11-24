@@ -65,6 +65,13 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 of Durant tunnels
   arenas/terrera/textures/rock.png              the rock ridge between the boards: rough grey-brown rock, cracks,
                                                 lumps lit from one side (4 tiles to an image)
+  arenas/greenleaf/textures/lawn1.png, lawn2.png  Greenleaf's ground: a garden lawn, a little clover, the odd daisy
+  arenas/greenleaf/textures/hedge-top.png       the hedges' tops: densely clipped small leaves, seamless both ways
+  arenas/greenleaf/textures/hedge-wall.png      the hedges' sides: packed leaves, lighter along the clipped top,
+                                                shadowed toward the ground, seamless left-right
+  arenas/greenleaf/textures/creek.png           the creek under the grass bridge: green-blue water, lily pads
+  arenas/greenleaf/textures/soil.png            the creek's banks and the board's edge: garden soil, stones, roots
+  misc/garden-placeholder-v1.jpg                table image around Greenleaf: lawn, round flower beds, low shrubs
 """
 from pathlib import Path
 
@@ -1102,8 +1109,166 @@ def rock_ridge():
     return out.filter(ImageFilter.GaussianBlur(0.6))
 
 
+HEDGE_GREENS = [(34, 78, 30), (46, 96, 36), (60, 112, 42), (28, 64, 26), (78, 128, 50)]
+
+
+def blossom(d, x, y, r, col, centre=(246, 206, 60)):
+    """A small five-petal flower seen from above."""
+    for k in range(5):
+        a = k * 2 * np.pi / 5
+        px, py = x + np.cos(a) * r * 0.55, y + np.sin(a) * r * 0.55
+        d.ellipse([px - r * 0.5, py - r * 0.5, px + r * 0.5, py + r * 0.5], fill=col + (235,))
+    d.ellipse([x - r * 0.32, y - r * 0.32, x + r * 0.32, y + r * 0.32], fill=centre + (255,))
+
+
+def lawn(seed):
+    """Greenleaf's ground: a well-kept garden lawn, lush and even, a little clover and the odd daisy."""
+    rng = np.random.default_rng(seed)
+    img = mix((66, 122, 46), (104, 160, 64), np.clip((fbm(N, N, rng, 3) - 0.3) * 2.0, 0, 1))
+    img *= (0.93 + 0.14 * fbm(N, N, rng, 16, 3))[..., None]
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(3000):                                   # blades
+        x, y = rng.random() * N, rng.random() * N
+        ang = rng.normal(-np.pi / 2, 0.6)
+        ln = rng.uniform(5, 12)
+        col = (150, 204, 96, 110) if rng.random() < 0.5 else (36, 80, 26, 110)
+        d.line([(x, y), (x + ln * np.cos(ang), y + ln * np.sin(ang))], fill=col, width=2)
+    clover_patches(d, rng, N, N, int(rng.integers(1, 3)), 0.8)
+    for _ in range(int(rng.integers(4, 9))):                # daisies
+        blossom(d, rng.random() * N, rng.random() * N, rng.uniform(5, 7), (248, 248, 242))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def hedge_leaves(d, rng, w, h, count, size, wrap_y=True, light_top=0.0):
+    """Packed little leaves for a clipped hedge, drawn again across the edges so the image tiles (left-right, and
+    top-bottom with wrap_y). light_top: leaves near the top come out lighter (the clipped top of a hedge's side)."""
+    for _ in range(count):
+        x, y = rng.random() * w, rng.random() * h
+        col = HEDGE_GREENS[rng.integers(0, len(HEDGE_GREENS))]
+        k = rng.uniform(0.8, 1.15) * (1 + light_top * max(0.0, 1 - y / (0.25 * h)))
+        col = tuple(min(255, int(v * k)) for v in col) + (240,)
+        ln, ang = rng.uniform(0.7, 1.3) * size, rng.random() * 6.3
+        for dx in (-w, 0, w):
+            for dy in ((-h, 0, h) if wrap_y else (0,)):
+                leaf(d, x + dx, y + dy, ln, ang, col)
+
+
+def hedge_top():
+    """The top of Greenleaf's hedges: densely clipped small leaves, seamless both ways."""
+    rng = np.random.default_rng(261)
+    out = to_img(mix((18, 40, 16), (30, 60, 24), fbm(N, N, rng, 4, 3))).convert("RGBA")
+    hedge_leaves(ImageDraw.Draw(out, "RGBA"), rng, N, N, 3400, 17)
+    img = np.asarray(out.convert("RGB"), np.float32) * (0.9 + 0.16 * fbm(N, N, rng, 3, 2))[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.5))
+
+
+def hedge_wall():
+    """The hedges' sides (two levels tall, a tile across): packed leaves, lighter along the clipped top, shadowed
+    toward the ground, seamless left-right."""
+    rng = np.random.default_rng(263)
+    h, w = 640, 1024
+    out = to_img(mix((14, 32, 12), (26, 52, 20), fbm(h, w, rng, 4, 3, wrap_x=True))).convert("RGBA")
+    hedge_leaves(ImageDraw.Draw(out, "RGBA"), rng, w, h, 5200, 30, wrap_y=False, light_top=0.25)
+    img = np.asarray(out.convert("RGB"), np.float32)
+    img *= np.linspace(1.04, 0.62, h, dtype=np.float32)[:, None, None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def creek():
+    """The creek under Greenleaf's grass bridge: clear green-blue water, ripples, a few lily pads."""
+    rng = np.random.default_rng(265)
+    t = fbm(N, N, rng, 3, 5)
+    rip = 0.5 + 0.5 * np.sin((t * 6 + fbm(N, N, rng, 2) * 2) * 2 * np.pi)
+    img = mix((26, 84, 96), (58, 136, 146), 0.65 * t + 0.35 * rip)
+    img = img + (np.array((206, 236, 236), np.float32) - img) * (0.3 * np.clip((rip - 0.85) / 0.15, 0, 1))[..., None]
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(4):                                      # lily pads: a disc with a notch, a darker rim
+        x, y, r = rng.uniform(60, N - 60), rng.uniform(60, N - 60), rng.uniform(26, 40)
+        a = rng.uniform(0, 360)
+        d.ellipse([x - r + 3, y - r + 4, x + r + 3, y + r + 4], fill=(10, 40, 46, 90))
+        d.pieslice([x - r, y - r, x + r, y + r], a + 18, a + 342, fill=(70, 130, 52, 255), outline=(40, 86, 34, 255), width=3)
+        for k in range(5):
+            b = np.radians(a + 40 + k * 60)
+            d.line([(x, y), (x + np.cos(b) * r * 0.8, y + np.sin(b) * r * 0.8)], fill=(56, 108, 42, 200), width=2)
+        if rng.random() < 0.5:
+            blossom(d, x + r * 0.3, y - r * 0.2, 11, (246, 196, 222))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
+
+
+def garden_soil():
+    """The creek's banks and the board's edge under the lawn: dark garden soil, small stones and roots, seamless
+    left-right."""
+    rng = np.random.default_rng(267)
+    out = to_img(mix((58, 40, 26), (92, 66, 42), fbm(N, N, rng, 4, 5, wrap_x=True))).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(26):                                     # roots: wavy thin strands
+        x, y, ang = rng.random() * N, rng.random() * N, rng.uniform(0.3, 2.8)
+        pts = [(x, y)]
+        for _ in range(int(rng.integers(5, 12))):
+            ang += rng.normal(0, 0.45)
+            x, y = x + 9 * np.cos(ang), y + 9 * np.sin(ang)
+            pts.append((x, y))
+        for dx in (-N, 0, N):
+            d.line([(px + dx, py) for px, py in pts], fill=(140, 110, 72, 170), width=2)
+    for _ in range(160):                                    # stones
+        x, y, r = rng.random() * N, rng.random() * N, rng.uniform(2, 7)
+        col = [(118, 108, 96), (92, 84, 76), (140, 128, 110)][rng.integers(0, 3)] + (230,)
+        for dx in (-N, 0, N):
+            d.ellipse([x + dx - r, y - r * 0.75, x + dx + r, y + r * 0.75], fill=col)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+def garden_table():
+    """Around Greenleaf: more lawn, darker, with round flower beds (dark soil, blooms in many colours) and low
+    shrubs."""
+    rng = np.random.default_rng(269)
+    h, w = 1211, 2048
+    t = fbm(h, w, rng, 6, 5)
+    img = mix((50, 98, 36), (90, 146, 58), np.clip((t - 0.3) * 2.0, 0, 1)) * 0.85
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    beds = [(246, 92, 98), (250, 196, 64), (180, 110, 230), (246, 150, 196), (250, 250, 244), (98, 150, 240)]
+    placed = []
+    for _ in range(400):                                    # beds that don't touch each other
+        if len(placed) >= 30:
+            break
+        x, y = rng.random() * w, rng.random() * h
+        rx, ry = rng.uniform(60, 110), rng.uniform(45, 80)
+        if any(((x - px) / (rx + prx + 40)) ** 2 + ((y - py) / (ry + pry + 40)) ** 2 < 1 for px, py, prx, pry in placed):
+            continue
+        placed.append((x, y, rx, ry))
+    for x, y, rx, ry in placed:
+        d.ellipse([x - rx - 6, y - ry - 6, x + rx + 6, y + ry + 6], fill=(128, 120, 104, 255))   # stone edging
+        d.ellipse([x - rx, y - ry, x + rx, y + ry], fill=(54, 38, 26, 255))
+        col = beds[rng.integers(0, len(beds))]
+        for _ in range(int(rx * ry / 90)):
+            a, k = rng.random() * 6.3, np.sqrt(rng.random()) * 0.9
+            fx, fy = x + np.cos(a) * rx * k, y + np.sin(a) * ry * k
+            leaf(d, fx, fy, rng.uniform(10, 16), rng.random() * 6.3, LEAF_GREENS[rng.integers(0, 5)] + (255,))
+            blossom(d, fx + rng.normal(0, 3), fy + rng.normal(0, 3), rng.uniform(5, 8), col)
+    for _ in range(30):                                     # low round shrubs, between the beds
+        x, y, r = rng.random() * w, rng.random() * h, rng.uniform(30, 55)
+        if any(((x - px) / (prx + r + 10)) ** 2 + ((y - py) / (pry + r + 10)) ** 2 < 1 for px, py, prx, pry in placed):
+            continue
+        d.ellipse([x - r + 6, y - r + 8, x + r + 6, y + r + 8], fill=(14, 30, 12, 120))
+        for _ in range(int(r * 6)):
+            a, k = rng.random() * 6.3, np.sqrt(rng.random())
+            leaf(d, x + np.cos(a) * r * k, y + np.sin(a) * r * k, rng.uniform(10, 18), rng.random() * 6.3,
+                 HEDGE_GREENS[rng.integers(0, len(HEDGE_GREENS))] + (250,))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
+
+
 def main():
     files = {
+        "arenas/greenleaf/textures/lawn1.png": lambda p: lawn(271).save(p),
+        "arenas/greenleaf/textures/lawn2.png": lambda p: lawn(272).save(p),
+        "arenas/greenleaf/textures/hedge-top.png": lambda p: hedge_top().save(p),
+        "arenas/greenleaf/textures/hedge-wall.png": lambda p: hedge_wall().save(p),
+        "arenas/greenleaf/textures/creek.png": lambda p: creek().save(p),
+        "arenas/greenleaf/textures/soil.png": lambda p: garden_soil().save(p),
+        "misc/garden-placeholder-v1.jpg": lambda p: garden_table().save(p, quality=90),
         "arenas/terrera/textures/rock.png": lambda p: rock_ridge().save(p),
         "arenas/terrera/textures/hive1.png": lambda p: hive_floor(251).save(p),
         "arenas/terrera/textures/hive2.png": lambda p: hive_floor(252).save(p),

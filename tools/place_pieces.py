@@ -36,6 +36,12 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
   bridge tiles (legend "bridge": true, sky with no board): each run of them between two islands is one rope
         bridge, 1 or 2 tiles long, carrying its own snap points; it starts dropped (closed) and the arrows on it
         raise or drop all the bridges (Global.lua).
+  grass bridge tiles (legend "bridge": "grass", Greenleaf's creek): the block of them is one grass bridge, 5 tiles
+        long and 2 across, level with the land at its ends; it starts sunk in the water (closed), its top just
+        under the surface, and its arrows raise or sink it (Global.lua, the rope bridges' rules).
+  flower-<name> (Greenleaf): a flat bloom (Flower) carrying the tile's snap point; its spots are the tiles marked
+        landing-<name>1, 2, 3 (painted), passed on as "targets": "dx,dy,dz;..." from the flower's tile top to each
+        spot's. Its button throws the Pokemon on it to one of them at random (Global.lua).
 Models come from tools/build_pieces.py. Global.lua's spawnArenaPiece spawns them, as the map picker does. TTS only
 keeps the result in memory: save the game afterwards.
 """
@@ -44,7 +50,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_board import Arena, expand_regions  # noqa: E402
-from build_pieces import BELL_LIFT, DOOR_H, gear_file  # noqa: E402  (the stand's beam is built for the bell at this height)
+from build_pieces import BELL_LIFT, DOOR_H, GRASS_ROWS, GRASS_TILES, gear_file  # noqa: E402  (the stand's beam is built for the bell at this height)
 from tts import exec_lua, report  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
@@ -84,6 +90,10 @@ STATUE = {"mesh": "props/statue-v1.obj", "diffuse": "props/statue-v1.jpg", "coll
 GEAR_PLATES = {n: {"mesh": f"props/gear{n}-v1.obj", "collider": f"props/gear{n}-v1.obj", "convex": True, "material": 3}
                for n in (3, 4)}
 DOOR = {"mesh": "props/door-v1.obj", "collider": "props/door-v1.obj", "convex": True, "material": 3}
+FLOWER = {"mesh": "props/flower-v1.obj", "collider": "props/flower-v1.obj", "convex": True, "material": 3}
+GRASS_BRIDGES = {(GRASS_TILES, GRASS_ROWS): {"mesh": "props/grassbridge-v1.obj", "diffuse": "props/grassbridge-v1.jpg",
+                                             "collider": "props/grassbridge-collider-v1.obj", "convex": True, "material": 3}}
+GRASS_SINK = 0.03    # a sunk grass bridge's top sits this far under the water
 WATER_DEPTH = 0.62   # Fontaine: the water's surface above the river bed (the canal walls are 0.968 high)
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
 
@@ -134,8 +144,11 @@ def level_at(data, r, c):
 
 
 def bridges(data, grid, info):
-    """One bridge per run of bridge tiles: [(tiles, (cx, top, cz), yaw)]. A run lies along a row or a column with an
-    island tile at each end (a single tile: islands on two opposite sides); the deck is level with those islands."""
+    """One bridge per block of bridge tiles: [(kind, tiles, rows, (cx, top, cz), yaw, drop)]. A rope bridge (legend
+    "bridge": true) is a run of 1 or 2 tiles along a row or a column with an island tile at each end (a single tile:
+    islands on two opposite sides). A grass bridge ("bridge": "grass") is a block of tiles (tiles long, rows across)
+    with land at both ends of each of its lines. The deck is level with the land at its ends. drop: how far a grass
+    bridge sinks to close (its top just under the water on its tiles); None for rope bridges."""
     R, C, T = info["rows"], info["cols"], info["tile"]
     cells = {(r, c) for r, row in enumerate(data["grid"]) for c, ch in enumerate(row) if data["legend"][ch].get("bridge")}
     out, seen = [], set()
@@ -153,16 +166,51 @@ def bridges(data, grid, info):
                     todo.append(n)
         rows, cols = sorted({r for r, _ in run}), sorted({c for _, c in run})
         r0, c0 = rows[0], cols[0]
-        along_x = len(rows) == 1 and (len(cols) > 1 or (grid.tile(r0, c0 - 1) and grid.tile(r0, c0 + 1)))
-        ends = [(r0, cols[0] - 1), (r0, cols[-1] + 1)] if along_x else [(rows[0] - 1, c0), (rows[-1] + 1, c0)]
+        kind = data["legend"][data["grid"][r0][c0]]["bridge"]
+        if len(rows) == 1 and len(cols) == 1:
+            along_x = bool(grid.tile(r0, c0 - 1) and grid.tile(r0, c0 + 1))
+        else:
+            along_x = len(cols) >= len(rows)
+        if along_x:
+            ends = [(r, cols[0] - 1) for r in rows] + [(r, cols[-1] + 1) for r in rows]
+        else:
+            ends = [(rows[0] - 1, c) for c in cols] + [(rows[-1] + 1, c) for c in cols]
         lands = [grid.tile(*e) for e in ends]
-        if len(rows) > 1 and len(cols) > 1 or not all(lands) or len(run) not in BRIDGES:
+        n_along, n_across = (len(cols), len(rows)) if along_x else (len(rows), len(cols))
+        if kind is True and (len(run) != len(rows) * len(cols) or n_across != 1 or not all(lands) or n_along not in BRIDGES):
             sys.exit(f"bridge tiles {sorted(run)}: a bridge must be 1 or 2 tiles in a line with an island at each end")
+        if kind is not True and (len(run) != len(rows) * len(cols) or not all(lands)
+                                 or any(t.get("bridge") for t in lands) or (n_along, n_across) not in GRASS_BRIDGES):
+            sys.exit(f"bridge tiles {sorted(run)}: a grass bridge must be a {GRASS_TILES}x{GRASS_ROWS} block with land at "
+                     "both ends of each line")
         top = info["floor0"] + lands[0].get("level", 0) * info["level_height"]
         cx = sum((c + 0.5 - C / 2) * T for _, c in run) / len(run)
         cz = sum((R / 2 - r - 0.5) * T for r, _ in run) / len(run)
-        out.append((len(run), (cx, top, cz), 0 if along_x else 90))
+        drop = None
+        if kind is not True:
+            bed = grid.tile(r0, c0)
+            bed_top = info["floor0"] + bed.get("level", 0) * info["level_height"] - bed.get("sink", 0.0)
+            drop = round(top - bed_top + GRASS_SINK, 5)
+        out.append((kind, n_along, n_across, (cx, top, cz), 0 if along_x else 90, drop))
     return out
+
+
+def flower_targets(data, info, name, r, c):
+    """A flower's spots (tiles marked landing-<name>1, 2, ...) in number order, as "dx,dy,dz;..." from the flower's
+    tile top to each spot's tile top (world units)."""
+    T, lh = info["tile"], info["level_height"]
+    me = data["legend"][data["grid"][r][c]]
+    spots = {}
+    for rr, row in enumerate(data["grid"]):
+        for cc, ch in enumerate(row):
+            m = data["legend"][ch].get("marker", "")
+            if m.startswith(f"landing-{name}") and m[len(f"landing-{name}"):].isdigit():
+                t = data["legend"][ch]
+                dy = (t.get("level", 0) - me.get("level", 0)) * lh - t.get("sink", 0.0) + me.get("sink", 0.0)
+                spots[int(m[len(f"landing-{name}"):])] = (round((cc - c) * T, 4), round(dy, 4), round((r - rr) * T, 4))
+    if sorted(spots) != list(range(1, len(spots) + 1)) or not spots:
+        sys.exit(f"flower-{name} at ({r}, {c}): its spots must be landing-{name}1, 2, ... (found {sorted(spots)})")
+    return ";".join(",".join(f"{v:g}" for v in spots[k]) for k in sorted(spots))
 
 
 def board_json(arena, name=None):
@@ -210,7 +258,7 @@ def pieces(arena, info):
                             "yaw": 0, "desc": "", "branch": tile["branch"], "part": tile["part"]})
             if tile.get("void") or not tile.get("piece") or not (
                     marker in BELLS or marker in ("flag", "portal", "trap", "tree", "gift", "gate", "fountain", "statue")
-                    or marker.startswith("blocker")):
+                    or marker.startswith("blocker") or marker.startswith("flower-")):
                 continue
             top = info["floor0"] + tile["level"] * info["level_height"] - tile.get("sink", 0.0)
             if marker == "gate":   # its frame of posts, and the sluice block (Global.lua lowers it: gates start open)
@@ -227,6 +275,11 @@ def pieces(arena, info):
                 sx, sy, sz = blocker_opening(data, r, c, T)
                 out.append({"kind": "Door", "name": f"Blocker {n}", "model": {**DOOR, "diffuse": f"props/door-{n}-v1.jpg"},
                             "pos": [cx, top, cz], "yaw": 0, "desc": "", "door": n, "sx": sx, "sy": sy, "sz": sz})
+            elif marker.startswith("flower-"):   # a flat bloom carrying the tile's snap point; its spots go along
+                name = marker[len("flower-"):]
+                out.append({"kind": "Flower", "name": f"{name.capitalize()} flower",
+                            "model": {**FLOWER, "diffuse": f"props/flower-{name}-v1.jpg"}, "pos": [cx, top, cz], "yaw": 0,
+                            "desc": "", "targets": flower_targets(data, info, name, r, c), "tile": round(T, 5)})
             elif marker == "statue":
                 out.append({"kind": "Statue", "name": "Statue", "model": STATUE, "pos": [cx, top, cz], "yaw": 0,
                             "desc": "", "free": True})
@@ -267,9 +320,13 @@ def pieces(arena, info):
     for size, pos, slant in zones(data, info):
         out.append({"kind": "Zone", "name": "Capture zone", "model": (RAISED_ZONES[slant] if slant else ZONES)[size], "pos": list(pos), "yaw": 0,
                     "desc": "", "tiles": size, "tile": round(T, 5)})
-    for tiles, pos, yaw in bridges(data, grid, info):
-        out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[tiles], "pos": list(pos), "yaw": yaw,
-                    "desc": "", "tiles": tiles, "tile": round(T, 5)})
+    for kind, tiles, rows, pos, yaw, drop in bridges(data, grid, info):
+        if kind is True:
+            out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[tiles], "pos": list(pos), "yaw": yaw,
+                        "desc": "", "tiles": tiles, "tile": round(T, 5)})
+        else:
+            out.append({"kind": "Bridge", "name": "Grass bridge", "model": GRASS_BRIDGES[(tiles, rows)], "pos": list(pos),
+                        "yaw": yaw, "desc": "", "tiles": tiles, "rows": rows, "tile": round(T, 5), "drop": drop})
     return data["name"], out
 
 

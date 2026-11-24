@@ -217,6 +217,13 @@ def own_key(a, t):
     return surface, wall_fit(a, t, spec), (a.top(t) if spec.get("above") else None)
 
 
+def own_outer(a, t):
+    """A "walls:<surface>" image with "outer": true is on that surface's walls at the board's outer edge too, all
+    the way down (Greenleaf: a hedge on the edge shows hedge, not the soil of the edge under the lawn)."""
+    spec = (a.data.get("textures") or {}).get(f"walls:{t.get('surface', 'floor')}")
+    return bool(spec and spec.get("outer"))
+
+
 def own_walls(a):
     """Inner walls with their own image (map.json textures "walls:<surface>": the inner walls a tile of that surface
     stands on, e.g. "walls:stairs" = the sides of the steps; the board's outer edge keeps "walls"):
@@ -376,10 +383,10 @@ def draw_texture(a):
                 both = both_ways(a, t)
                 if turn:   # drawn upright on its own layer, then turned so its bottom points the right way
                     layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
-                    draw_marker(layer, painted, 0, 0, p, both, a.palette.get("button"))
+                    draw_marker(layer, painted, 0, 0, p, both, a.palette.get("button"), a.palette)
                     over.alpha_composite(layer.rotate(turn), (x0, y0t))
                 else:
-                    draw_marker(over, painted, x0, y0t, p, both, a.palette.get("button"))
+                    draw_marker(over, painted, x0, y0t, p, both, a.palette.get("button"), a.palette)
     for r in range(a.R):   # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope
         for c in range(a.C):
             sloped = slopes(a, r, c) if a.tile(r, c) else {}
@@ -716,7 +723,8 @@ def painted_marker(t):
     return t.get("decal") or (t.get("marker") if t.get("paint", True) else None)
 
 
-NUMBERED = ("passage-in", "passage-out", "trapdoor", "button", "zone-number", "blocker", "tunnel")   # markers that carry a number
+NUMBERED = ("passage-in", "passage-out", "trapdoor", "button", "zone-number", "blocker", "tunnel", "passage",
+            "landing")   # markers that carry a number
 SAND_DIRS = {"n": (0, -1), "s": (0, 1), "e": (1, 0), "w": (-1, 0),   # quicksand pushes (image directions, y down)
              "ne": (1, -1), "nw": (-1, -1), "se": (1, 1), "sw": (-1, 1)}
 
@@ -783,9 +791,10 @@ def sand_arrow(o, cx, cy, u, way, scale=1.0, col=(66, 44, 24, 235)):
                (neck[0] + dy * head * 0.75, neck[1] - dx * head * 0.75)], fill=col)
 
 
-def draw_marker(im, marker, x0, y0, p, both=False, button=None):
+def draw_marker(im, marker, x0, y0, p, both=False, button=None, palette=None):
     """Paints a marker on the image im, upright in the tile at (x0, y0). both: its number as N/N (draw_pair).
-    button: the buttons' ring colour (the map's palette "button"; default yellow)."""
+    button: the buttons' ring colour (the map's palette "button"; default yellow). palette: the map's palette
+    (colours some markers look up: "passage<n>", "flower-<name>")."""
     if not marker:
         return
     o = ImageDraw.Draw(im)
@@ -845,6 +854,36 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None):
                 b2 = a + math.pi + side * 0.6
                 o.line([(px, py), (px + math.cos(b2) * 9 * u, py + math.sin(b2) * 9 * u)], fill=(196, 146, 246, 255),
                        width=round(3 * u))
+    elif marker.startswith("passage"):   # a secret passage both ways (Greenleaf): a burrow ringed in its pair's colour
+        n = marker[len("passage"):]       # (the map's palette "passage<n>"), its pair's number on it
+        col = tuple((palette or {}).get(f"passage{n}", (176, 116, 236)))
+        r = 42 * u
+        o.ellipse([cx - r - 5 * u, cy - r - 5 * u, cx + r + 5 * u, cy + r + 5 * u], fill=col + (80,))
+        o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=col + (255,), outline=(22, 16, 10, 255), width=round(3 * u))
+        for k, shade_col in ((0.8, (52, 36, 22, 255)), (0.64, (26, 18, 11, 255)), (0.46, (10, 7, 5, 255))):
+            o.ellipse([cx - r * k, cy - r * k, cx + r * k, cy + r * k], fill=shade_col)
+        if both:
+            draw_pair(im, n, cx, cy, round(28 * u), col + (255,), stroke_width=round(2 * u), stroke_fill=(10, 7, 5, 255))
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(34 * u)), fill=col + (255,), anchor="mm",
+                   stroke_width=round(2 * u), stroke_fill=(10, 7, 5, 255))
+    elif marker.startswith("landing-"):   # where a flower can throw a Pokémon (Greenleaf): a ring of petals in the
+        rest = marker[len("landing-"):]    # flower's colour (palette "flower-<name>"), the spot's number
+        name, n = rest.rstrip("0123456789"), rest[len(rest.rstrip("0123456789")):]
+        col = tuple((palette or {}).get(f"flower-{name}", (220, 60, 70)))
+        for k in range(8):
+            a = k * math.pi / 4
+            px, py = cx + math.cos(a) * 34 * u, cy + math.sin(a) * 34 * u
+            petal = [(px + math.cos(a) * 13 * u * math.cos(t) - math.sin(a) * 8 * u * math.sin(t),
+                      py + math.sin(a) * 13 * u * math.cos(t) + math.cos(a) * 8 * u * math.sin(t))
+                     for t in (i * math.pi / 8 for i in range(16))]
+            o.polygon(petal, fill=col + (190,), outline=(30, 22, 16, 200))
+        o.ellipse([cx - 26 * u, cy - 26 * u, cx + 26 * u, cy + 26 * u], fill=(34, 28, 20, 120))
+        if both:
+            draw_pair(im, n, cx, cy, round(26 * u), col + (255,), stroke_width=round(2 * u), stroke_fill=(20, 14, 10, 255))
+        else:
+            o.text((cx, cy + 2 * u), n, font=font(round(32 * u)), fill=col + (255,), anchor="mm",
+                   stroke_width=round(2 * u), stroke_fill=(20, 14, 10, 255))
     elif marker.startswith("trapdoor"):   # a wooden hatch with its pair's number
         h = 40 * u
         wood, dark_wood = (128, 92, 56, 255), (70, 48, 28, 255)
@@ -1151,7 +1190,7 @@ def build_mesh(a):
                 (ax, az), (bx, bz) = edge
                 half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
                 pick = r * 5 + c * 3 + len(side)
-                key = own_key(a, t) if nb else None
+                key = own_key(a, t) if nb or own_outer(a, t) else None
                 if key in own:   # this tile's own inner wall image (see own_walls), inside its slice's gutters
                     us = own[key][pick % len(own[key])] * PX
                     ua, ub = us + WALL_GUTTER, us + PX - WALL_GUTTER
