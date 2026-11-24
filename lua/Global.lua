@@ -1277,13 +1277,37 @@ function bridgeDescription(up, st)
     .. "Right-click it to raise or drop just this one."
 end
 
+BRIDGE_MOVE_TIME, BRIDGE_MOVE_FRAMES = 1.5, 90   -- the grass bridge rises or sinks this slowly (game clock;
+                                                  -- frames without one, in the offline tests)
+movingBridges = {}   -- bridge guid -> the move under way (a newer one takes over)
+
+-- Move the grass bridge up or down a little each frame, eased, so it's seen rising out of the water and sinking.
+local function slideBridge(obj, toY)
+  local p0, token = obj.getPosition(), {}
+  movingBridges[obj.guid] = token
+  local clock = Time and Time.time and function() return Time.time end
+  local k, t0 = 0, clock and clock()
+  local function step()
+    if obj == nil or movingBridges[obj.guid] ~= token then return end   -- gone (map changed), or moving again
+    k = k + 1
+    local t = math.min(1, clock and (clock() - t0) / BRIDGE_MOVE_TIME or k / BRIDGE_MOVE_FRAMES)
+    obj.setPosition({ p0.x, p0.y + (toY - p0.y) * t * t * (3 - 2 * t), p0.z })
+    if t < 1 then Wait.frames(step, 1) else movingBridges[obj.guid] = nil end
+  end
+  step()
+end
+
 function setBridgeUp(obj, up)
   local st = bridgeState(obj)
   if (st.up and true or false) == up then return false end
   st.up = up
   obj.memo = JSON.encode(st)
   local p = obj.getPosition()
-  if st.y then obj.setPositionSmooth(Vector(p.x, up and st.y or st.y - (st.drop or BRIDGE_DROP), p.z), false, false) end
+  if st.y and st.drop then
+    slideBridge(obj, up and st.y or st.y - st.drop)
+  elseif st.y then
+    obj.setPositionSmooth(Vector(p.x, up and st.y or st.y - BRIDGE_DROP, p.z), false, false)
+  end
   obj.setDescription(bridgeDescription(up, st))
   return true
 end

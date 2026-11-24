@@ -589,6 +589,7 @@ def main():
         o.setPosition = function(p)
           o.pos = Vector(p[1] or p.x, p[2] or p.y, p[3] or p.z)
           o.top = math.max(o.top or -1e9, o.pos.y)
+          o.moves = (o.moves or 0) + 1
         end
         o.setPositionSmooth = function(p) o.pos = p end
         o.positionToLocal = function(v) return Vector(v.x - o.pos.x, v.y - o.pos.y, v.z - o.pos.z) end
@@ -619,8 +620,9 @@ def main():
           f"the grass bridge carries a snap point on each of its 10 tiles, its arrows between four of them and Raise / "
           f"Sink in its menu ({len(snaps)} snaps)")
     g.bridgeClicked(player)
-    check(abs(gb.pos.y - 1.3824) < 1e-6 and json.loads(gb.memo)["up"] and str(gb.desc).startswith("Up:"),
-          "its arrows raise it level with the lawn")
+    check(abs(gb.pos.y - 1.3824) < 1e-6 and json.loads(gb.memo)["up"] and str(gb.desc).startswith("Up:")
+          and gb.moves == 90 and not g.movingBridges[gb.guid],
+          f"its arrows raise it level with the lawn, a little each frame (seen rising out of the water: {gb.moves} steps)")
     lua.execute(r"""
       onGrass = standIn({ "Pokemon" }, nil, Vector(200 + 2 * 3.24875, 1.40, -3.24875 / 2))
     """)
