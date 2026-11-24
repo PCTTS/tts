@@ -6100,7 +6100,7 @@
   ]
  },
  "Ingis": {
-  "mesh": "arenas/ingis/board-v5.obj",
+  "mesh": "arenas/ingis/board-v6.obj",
   "texture": "arenas/ingis/board-v5.jpg",
   "table": "misc/volcano-placeholder-v1.jpg",
   "depth": 51.98,
@@ -8498,7 +8498,7 @@
   ]
  },
  "Snow": {
-  "mesh": "arenas/snow/board-v1.obj",
+  "mesh": "arenas/snow/board-v2.obj",
   "texture": "arenas/snow/board-v1.jpg",
   "table": "misc/snowfield-placeholder-v1.jpg",
   "depth": 58.4775,
@@ -16474,7 +16474,7 @@
   ]
  },
  "Yaksha": {
-  "mesh": "arenas/yaksha/board-v4.obj",
+  "mesh": "arenas/yaksha/board-v9.obj",
   "texture": "arenas/yaksha/board-v6.jpg",
   "table": "misc/court-placeholder-v1.jpg",
   "depth": 51.98,

@@ -38,7 +38,7 @@
   },
   "_tile": "Built at the usual --tile 3.24875 (the user chose it over smaller tiles): 18 tiles = 58.48 across, so the table stretches front to back for this map (Global.lua setTableDepth: the trims keep their width, the picture covers the board's depth, the team stands move back a tile).",
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "board": { "mesh": "board-v2.obj", "texture": "board-v1.jpg", "geometry": "board-v2.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/snowfield-placeholder-v1.jpg",
   "_textures": "Placeholders from tools/draw_placeholders.py: fresh snow on the high ground, trampled snow with frozen earth on the low ground, glassy ice, cold water with floating ice, snowy rock round the board's edge.",

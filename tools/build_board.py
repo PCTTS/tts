@@ -1099,6 +1099,7 @@ def build_mesh(a):
         return u_px / W, 1 - (a.R * PX + STRIP * (1 - y / y_span)) / H
 
     features = {}
+    curve = a.data.get("curve_steps", 24)   # triangles round each inner corner's dip (see slope_surface)
     own, inner_n = own_walls(a)   # walls with their own image ("walls:<surface>") and the slices left for the rest
     textures = a.data.get("textures") or {}
 
@@ -1149,15 +1150,15 @@ def build_mesh(a):
             def tuv(px, pz):   # the tile's texture seen from above, so the slopes show its edge band
                 return u0 + (px - x0) / (x1 - x0) * (u1 - u0), v0 + (z0 - pz) / (z0 - z1) * (v1 - v0)
             if rises(a, r, c) or rise_corners(a, r, c):   # slopes up to higher ground (and maybe down too): the fine surface
-                slope_surface(m, t, top, (x0, x1, z0, z1), sloped, inner, tuv, risen=rises(a, r, c),
+                slope_surface(m, t, top, (x0, x1, z0, z1), sloped, inner, tuv, curve, risen=rises(a, r, c),
                               rcorners=rise_corners(a, r, c))
             elif contact_edges(a, r, c):   # sloping down onto nearby stairs (see contact_edges)
-                slope_surface(m, t, top, (x0, x1, z0, z1), {}, {}, tuv, segments=contact_edges(a, r, c))
+                slope_surface(m, t, top, (x0, x1, z0, z1), {}, {}, tuv, curve, segments=contact_edges(a, r, c))
             elif not sloped and not inner:
                 m.quad([(x0, top, z0), (x1, top, z0), (x1, top, z1), (x0, top, z1)],
                        [(u0, v0), (u1, v0), (u1, v1), (u0, v1)], (0, 1, 0))
             elif inner:   # a finer surface: straight slopes along low sides, a rounded dip into each inner corner
-                slope_surface(m, t, top, (x0, x1, z0, z1), sloped, inner, tuv)
+                slope_surface(m, t, top, (x0, x1, z0, z1), sloped, inner, tuv, curve)
             else:   # the top shrinks in on those sides; each slope runs from its edge down to the tile's edge
                 w = {s: (t["slant"] if s in sloped else 0.0) for s in DIRS}
                 tx0, tx1, tz0, tz1 = x0 + w["W"], x1 - w["E"], z0 - w["N"], z1 + w["S"]
@@ -1531,11 +1532,15 @@ def surface_height(top, box, sloped, inner, w, px, pz, risen=None, rcorners=None
     return h
 
 
-def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorners=None, segments=None):
+def slope_surface(m, t, top, box, sloped, inner, tuv, curve=24, risen=None, rcorners=None, segments=None, steps=4):
     """A slanted tile as a grid of triangles: the height at a point is the lowest that any of its low features
     allows: straight slopes inward from each low side, a round dip (a quarter cone) around each inner corner, each
     reaching the top `slant` in. The grid has lines `steps` apart across each slope band, so a hip crease or the
-    top of a slope falls on grid lines; each cell is split along whichever diagonal follows the surface better."""
+    top of a slope falls on grid lines; each cell is split along whichever diagonal follows the surface better.
+    On a tile with only straight slopes and dips, each dip's corner square (`slant` a side) is drawn instead as an
+    exact cone, a fan of `curve` triangles from the corner (its height changes in a straight line from it), with
+    the flat top round it fanned from the square's far corner: round, for a handful of triangles (a finer grid
+    made the board too heavy for TTS to load). Its edges meet the neighbours' straight profiles."""
     x0, x1, z0, z1 = box
     w = t["slant"]
 
@@ -1553,16 +1558,37 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, steps=4, risen=None, rcorn
         fine = [w * i / 8 for i in range(1, 8)] + [w / 16, w / 32]
         xs = sorted(set(xs) | {x0 + f for f in fine} | {x1 - f for f in fine})
         zs = sorted(set(zs) | {z0 - f for f in fine} | {z1 + f for f in fine}, reverse=True)
+    fans = []   # (corner point, direction into the tile along x and z) of each dip drawn as a cone
+    if not (risen or rcorners or segments):
+        for corner in inner:
+            fans.append(((x0 if corner[1] == "W" else x1, z0 if corner[0] == "N" else z1),
+                         (1 if corner[1] == "W" else -1, -1 if corner[0] == "N" else 1)))
+
+    def in_fan_square(px, pz):
+        return any(0 <= (px - cx) * dx <= w and 0 <= (pz - cz) * dz <= w for (cx, cz), (dx, dz) in fans)
+
+    def vert(px, pz):
+        return (px, height(px, pz), pz)
+
     for i in range(len(xs) - 1):
         for j in range(len(zs) - 1):
+            if in_fan_square((xs[i] + xs[i + 1]) / 2, (zs[j] + zs[j + 1]) / 2):
+                continue
             pts = [(xs[i], zs[j]), (xs[i + 1], zs[j]), (xs[i + 1], zs[j + 1]), (xs[i], zs[j + 1])]
-            v = [(px, height(px, pz), pz) for px, pz in pts]
+            v = [vert(px, pz) for px, pz in pts]
             mid = height((xs[i] + xs[i + 1]) / 2, (zs[j] + zs[j + 1]) / 2)
             a_err = abs((v[0][1] + v[2][1]) / 2 - mid)   # split along 0-2, or along 1-3
             b_err = abs((v[1][1] + v[3][1]) / 2 - mid)
             tris = ((0, 1, 2), (0, 2, 3)) if a_err <= b_err else ((0, 1, 3), (1, 2, 3))
             for tri in tris:
                 m.tri([v[k] for k in tri], [tuv(v[k][0], v[k][2]) for k in tri], down=False)
+    for (cx, cz), (dx, dz) in fans:
+        apex, far = vert(cx, cz), vert(cx + dx * w, cz + dz * w)
+        arc = [vert(cx + dx * w * math.cos(a), cz + dz * w * math.sin(a))
+               for a in (math.pi / 2 * k / curve for k in range(curve + 1))]
+        for k in range(curve):
+            for tri in ((apex, arc[k], arc[k + 1]), (far, arc[k + 1], arc[k])):   # the cone, the flat top round it
+                m.tri(list(tri), [tuv(px, pz) for px, _, pz in tri], down=False)
 
 
 def underside(a, m, wall_uv, S=4):
