@@ -80,9 +80,9 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 left-right
   misc/snowfield-placeholder-v1.jpg             table image around Snow: snowfield, snowy pines, rocks (2048 x 1362:
                                                 Snow's deeper play area)
-  misc/pugilis-dirt-v1.jpg                      table image around Pugilis: the user's Dirt 2 / Dirt 5 tiles (not a
+  misc/pugilis-dirt-v2.jpg                      table image around Pugilis: the user's Dirt 2 / Dirt 5 tiles (not a
                                                 placeholder), mixed like the board's floor and lined up with its tiles,
-                                                a shade darker (between the top floor and the stairs)
+                                                shaded like the stairs (v1: between the top floor and the stairs)
 """
 from pathlib import Path
 
@@ -1386,15 +1386,14 @@ def snowfield_table():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
 
 
-def pugilis_table():
+def pugilis_table(sand=(200, 166, 118)):
     """Around Pugilis: the user's own dirt (arenas/pugilis/textures/dirt2.png, dirt5.png) like the board's top floor,
-    a little darker (the user's pick): each image recoloured so its median is SAND, halfway between the raw dirt's
-    (226, 194, 160) and the stairs' #C8A676 (as build_board.py's "match" does). A random pick of the two per tile,
-    each turned and mirrored at random, at the board's 128 px per tile (3464 x 2048 = the play area) and lined up
-    with the board's tiles (the board sits in the middle)."""
+    shaded like the stairs (the user's pick; v1 was halfway between the raw dirt's (226, 194, 160) and the stairs):
+    each image recoloured so its median is `sand`, the stairs' #C8A676 (as build_board.py's "match" does). A random
+    pick of the two per tile, each turned and mirrored at random, at the board's 128 px per tile (3464 x 2048 = the
+    play area) and lined up with the board's tiles (the board sits in the middle)."""
     import random
     from PIL import ImageStat
-    sand = (213, 180, 139)
     tile, px = 3.24875, 128
     w, h = round(87.9078 / tile * px), round(51.981 / tile * px)
     copies = []
@@ -1424,7 +1423,8 @@ def main():
         "arenas/snow/textures/ice.png": lambda p: ice().save(p),
         "arenas/snow/textures/icy-water.png": lambda p: icy_water().save(p),
         "arenas/snow/textures/snow-rock.png": lambda p: snow_rock().save(p),
-        "misc/pugilis-dirt-v1.jpg": lambda p: pugilis_table().save(p, quality=90),
+        "misc/pugilis-dirt-v1.jpg": lambda p: pugilis_table((213, 180, 139)).save(p, quality=90),
+        "misc/pugilis-dirt-v2.jpg": lambda p: pugilis_table().save(p, quality=90),
         "misc/snowfield-placeholder-v1.jpg": lambda p: snowfield_table().save(p, quality=90),
         "arenas/greenleaf/textures/lawn1.png": lambda p: lawn(271).save(p),
         "arenas/greenleaf/textures/lawn2.png": lambda p: lawn(272).save(p),

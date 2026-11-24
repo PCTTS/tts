@@ -7451,7 +7451,7 @@
  "Pugilis": {
   "mesh": "arenas/pugilis/board-v42.obj",
   "texture": "arenas/pugilis/board-v42.jpg",
-  "table": "misc/pugilis-dirt-v1.jpg",
+  "table": "misc/pugilis-dirt-v2.jpg",
   "depth": 51.98,
   "turns": 15,
   "snaps": [
