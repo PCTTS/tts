@@ -36,9 +36,11 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
   bridge tiles (legend "bridge": true, sky with no board): each run of them between two islands is one rope
         bridge, 1 or 2 tiles long, carrying its own snap points; it starts dropped (closed) and the arrows on it
         raise or drop all the bridges (Global.lua).
-  grass bridge tiles (legend "bridge": "grass", Greenleaf's creek): the block of them is one grass bridge, 5 tiles
-        long and 2 across, level with the land at its ends; it starts sunk in the water (closed), its top just
-        under the surface, and its arrows raise or sink it (Global.lua, the rope bridges' rules).
+  grass bridge tiles (legend "bridge": "grass", Greenleaf's creek: 2 lines of 5 tiles between two walls): one grass
+        bridge in two halves, a mat over each line, level with the land at its ends. Each half grows out of the wall
+        beside its line (sx, sz: the move from open into that wall); it starts closed, inside its wall. Both halves
+        share a "group"; the first ("lead") carries the arrows, on top of its wall ("hy": the wall's top above the
+        mat's), which open or close it (Global.lua, the rope bridges' rules).
   flower-<name> (Greenleaf): a flat bloom (Flower) carrying the tile's snap point; its spots are the tiles marked
         landing-<name>1, 2, 3 (painted), passed on as "targets": "dx,dy,dz;..." from the flower's tile top to each
         spot's. Its button throws the Pokemon on it to one of them at random (Global.lua).
@@ -50,7 +52,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from build_board import Arena, expand_regions  # noqa: E402
-from build_pieces import BELL_LIFT, DOOR_H, GRASS_ROWS, GRASS_TILES, gear_file  # noqa: E402  (the stand's beam is built for the bell at this height)
+from build_pieces import BELL_LIFT, DOOR_H, GRASS_TILES, gear_file  # noqa: E402  (the stand's beam is built for the bell at this height)
 from tts import exec_lua, report  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
@@ -91,9 +93,8 @@ GEAR_PLATES = {n: {"mesh": f"props/gear{n}-v1.obj", "collider": f"props/gear{n}-
                for n in (3, 4)}
 DOOR = {"mesh": "props/door-v1.obj", "collider": "props/door-v1.obj", "convex": True, "material": 3}
 FLOWER = {"mesh": "props/flower-v1.obj", "collider": "props/flower-v1.obj", "convex": True, "material": 3}
-GRASS_BRIDGES = {(GRASS_TILES, GRASS_ROWS): {"mesh": "props/grassbridge-v1.obj", "diffuse": "props/grassbridge-v1.jpg",
-                                             "collider": "props/grassbridge-collider-v1.obj", "convex": True, "material": 3}}
-GRASS_SINK = 0.03    # a sunk grass bridge's top sits this far under the water
+GRASS_BRIDGE = {"mesh": "props/grassbridge-v2.obj", "diffuse": "props/grassbridge-v2.jpg",
+                "collider": "props/grassbridge-collider-v2.obj", "convex": True, "material": 3}
 WATER_DEPTH = 0.62   # Fontaine: the water's surface above the river bed (the canal walls are 0.968 high)
 BELLS = {"bell-attack": ("ATK bell", "attack"), "bell-defense": ("DEF bell", "defense")}
 
@@ -144,12 +145,10 @@ def level_at(data, r, c):
 
 
 def bridges(data, grid, info):
-    """One bridge per block of bridge tiles: [(kind, tiles, rows, (cx, top, cz), yaw, drop)]. A rope bridge (legend
-    "bridge": true) is a run of 1 or 2 tiles along a row or a column with an island tile at each end (a single tile:
-    islands on two opposite sides). A grass bridge ("bridge": "grass") is a block of tiles (tiles long, rows across)
-    with land at both ends of each of its lines. The deck is level with the land at its ends. drop: how far a grass
-    bridge sinks to close (its top just under the water on its tiles); None for rope bridges."""
-    R, C, T = info["rows"], info["cols"], info["tile"]
+    """One entry per block of bridge tiles: [(kind, rows, cols, top, along_x)]. A rope bridge (legend "bridge": true)
+    is a run of 1 or 2 tiles along a row or a column with an island tile at each end (a single tile: islands on two
+    opposite sides). A grass bridge ("bridge": "grass") is a block of tiles with land at both ends of each of its
+    lines. top: the land's height at its ends (the deck is level with it)."""
     cells = {(r, c) for r, row in enumerate(data["grid"]) for c, ch in enumerate(row) if data["legend"][ch].get("bridge")}
     out, seen = [], set()
     for start in sorted(cells):
@@ -179,19 +178,30 @@ def bridges(data, grid, info):
         n_along, n_across = (len(cols), len(rows)) if along_x else (len(rows), len(cols))
         if kind is True and (len(run) != len(rows) * len(cols) or n_across != 1 or not all(lands) or n_along not in BRIDGES):
             sys.exit(f"bridge tiles {sorted(run)}: a bridge must be 1 or 2 tiles in a line with an island at each end")
-        if kind is not True and (len(run) != len(rows) * len(cols) or not all(lands)
-                                 or any(t.get("bridge") for t in lands) or (n_along, n_across) not in GRASS_BRIDGES):
-            sys.exit(f"bridge tiles {sorted(run)}: a grass bridge must be a {GRASS_TILES}x{GRASS_ROWS} block with land at "
-                     "both ends of each line")
-        top = info["floor0"] + lands[0].get("level", 0) * info["level_height"]
-        cx = sum((c + 0.5 - C / 2) * T for _, c in run) / len(run)
-        cz = sum((R / 2 - r - 0.5) * T for r, _ in run) / len(run)
-        drop = None
-        if kind is not True:
-            bed = grid.tile(r0, c0)
-            bed_top = info["floor0"] + bed.get("level", 0) * info["level_height"] - bed.get("sink", 0.0)
-            drop = round(top - bed_top + GRASS_SINK, 5)
-        out.append((kind, n_along, n_across, (cx, top, cz), 0 if along_x else 90, drop))
+        if kind is not True and (len(run) != len(rows) * len(cols) or not all(lands) or any(t.get("bridge") for t in lands)):
+            sys.exit(f"bridge tiles {sorted(run)}: a grass bridge must be a block of tiles with land at both ends of each line")
+        out.append((kind, rows, cols, info["floor0"] + lands[0].get("level", 0) * info["level_height"], along_x))
+    return out
+
+
+def grass_halves(data, grid, info, rows, cols, top, group):
+    """A grass bridge's two halves (pieces): a mat over each of its two lines, growing out of the wall along that
+    line's outer side (each half's back, its own +z, faces its wall: the second half is turned round)."""
+    R, C, T, lh = info["rows"], info["cols"], info["tile"], info["level_height"]
+    if len(rows) != 2 or len(cols) != GRASS_TILES:
+        sys.exit(f"grass bridge {rows}x{cols}: it must be 2 lines of {GRASS_TILES} tiles, running along a row")
+    out = []
+    for i, r in enumerate(rows):
+        wall_r = r - 1 if i == 0 else r + 1
+        walls = [grid.tile(wall_r, c) for c in cols]
+        land_level = round((top - info["floor0"]) / lh)
+        if not all(w and w.get("solid") and w.get("level", 0) > land_level for w in walls):
+            sys.exit(f"grass bridge line {r}: it needs a wall along its whole outer side (row {wall_r}) to grow out of")
+        out.append({"kind": "Bridge", "name": "Grass bridge", "model": GRASS_BRIDGE,
+                    "pos": [sum((c + 0.5 - C / 2) * T for c in cols) / len(cols), top, (R / 2 - r - 0.5) * T],
+                    "yaw": 0 if i == 0 else 180, "desc": "", "tiles": len(cols), "tile": round(T, 5),
+                    "sx": 0.0, "sz": round(T if i == 0 else -T, 5), "group": group, "lead": i == 0,
+                    "hy": round((min(w["level"] for w in walls) - land_level) * lh, 5)})
     return out
 
 
@@ -320,13 +330,17 @@ def pieces(arena, info):
     for size, pos, slant in zones(data, info):
         out.append({"kind": "Zone", "name": "Capture zone", "model": (RAISED_ZONES[slant] if slant else ZONES)[size], "pos": list(pos), "yaw": 0,
                     "desc": "", "tiles": size, "tile": round(T, 5)})
-    for kind, tiles, rows, pos, yaw, drop in bridges(data, grid, info):
+    groups = 0
+    for kind, rows, cols, top, along_x in bridges(data, grid, info):
         if kind is True:
-            out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[tiles], "pos": list(pos), "yaw": yaw,
-                        "desc": "", "tiles": tiles, "tile": round(T, 5)})
+            run = [(r, c) for r in rows for c in cols]
+            cx = sum((c + 0.5 - C / 2) * T for _, c in run) / len(run)
+            cz = sum((R / 2 - r - 0.5) * T for r, _ in run) / len(run)
+            out.append({"kind": "Bridge", "name": "Rope bridge", "model": BRIDGES[len(run)], "pos": [cx, top, cz],
+                        "yaw": 0 if along_x else 90, "desc": "", "tiles": len(run), "tile": round(T, 5)})
         else:
-            out.append({"kind": "Bridge", "name": "Grass bridge", "model": GRASS_BRIDGES[(tiles, rows)], "pos": list(pos),
-                        "yaw": yaw, "desc": "", "tiles": tiles, "rows": rows, "tile": round(T, 5), "drop": drop})
+            groups += 1
+            out += grass_halves(data, grid, info, rows, cols, top, groups)
     return data["name"], out
 
 

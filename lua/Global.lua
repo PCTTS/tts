@@ -235,7 +235,7 @@ READERS = {
   arenas = function(rows)
     local t, cur = {}, nil
     local NUM = { yaw = true, material = true, pair = true, tile = true, tiles = true, gate = true, branch = true,
-      gear = true, size = true, door = true, sx = true, sy = true, sz = true, rows = true, drop = true }
+      gear = true, size = true, door = true, sx = true, sy = true, sz = true, group = true, hy = true }
     for _, f in ipairs(rows) do
       if f[1] == "arena" then
         cur = { mesh = f[3], texture = f[4], table = f[5] or "", snaps = {}, pieces = {} }
@@ -746,10 +746,13 @@ function spawnArenaPiece(p, origin, base)
     data.ColorDiffuse, data.Memo = portalTint(p.pair or 1), JSON.encode({ pair = p.pair or 1 })
   elseif p.kind == "Zone" then
     data.ColorDiffuse, data.Memo = NEUTRAL, JSON.encode({ tiles = p.tiles or 2, tile = p.tile or BOARD_TILE })
-  elseif p.kind == "Bridge" then   -- rope bridges hang below the islands; the grass bridge is sunk in the creek
-    data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, rows = p.rows or 1, tile = p.tile or BOARD_TILE,
-      drop = p.drop })
-    pos = Vector(pos.x, pos.y - (p.drop or BRIDGE_DROP), pos.z)
+  elseif p.kind == "Bridge" and (p.sx or p.sz) then   -- a grass half starts closed, inside its hedge
+    data.Memo = JSON.encode({ up = false, x = pos.x, y = pos.y, z = pos.z, sx = p.sx or 0, sz = p.sz or 0,
+      tiles = p.tiles or 1, tile = p.tile or BOARD_TILE, group = p.group, lead = p.lead, hy = p.hy })
+    pos = Vector(pos.x + (p.sx or 0), pos.y, pos.z + (p.sz or 0))
+  elseif p.kind == "Bridge" then   -- rope bridges start dropped, hanging below the islands
+    data.Memo = JSON.encode({ up = false, y = pos.y, tiles = p.tiles or 1, tile = p.tile or BOARD_TILE })
+    pos = Vector(pos.x, pos.y - BRIDGE_DROP, pos.z)
   elseif p.kind == "Flower" then   -- its spots: "dx,dy,dz;..." from its tile top to theirs
     local targets = {}
     for _, s in ipairs(splitPlain(p.targets or "", ";")) do
@@ -1230,27 +1233,36 @@ end
 -- level with the islands (crossable); dropped = hanging below them (closed). They start dropped. The arrows on
 -- any bridge raise them all, or drop them all, except that a bridge with a Pokémon on it stays up (the rules:
 -- it doesn't close until the next time they all do). Right-click a bridge to raise or drop just that one.
--- Greenleaf's grass bridge works the same way (the same rule): a deck 5 tiles long and 2 across over the creek that
--- sinks into the water to close (its memo's drop: how far), its top just under the surface.
--- Its memo: { up, y = its height when up, tiles (along it), rows (across it), tile, drop (nil: BRIDGE_DROP) }.
+-- Greenleaf's grass bridge goes by the same rule. It's two halves (a "group"), a mat of grass along each hedge
+-- beside the creek: open, they've grown out of their hedges over the water to meet in the middle; closed, they're
+-- drawn back inside the hedges. They start closed and move together, slowly (seen growing); a Pokémon on either
+-- half keeps both open. The first half ("lead") carries the arrows, on top of its hedge, where they stay put
+-- (a closed half is hidden in its hedge, so nothing on the half itself could be clicked); snap points only while
+-- open (none hidden in the hedge).
+-- Memo: rope { up, y = its height when up, tiles, tile }; grass half { up, x, y, z (where it lies open), sx, sz
+-- (the move from there into its hedge), tiles, tile, group, lead, hy (the hedge's top above the mat's) }.
 ----------------------------------------------------------------------------------------------------
 BOARD_TILE = 3.24875
 BRIDGE_DROP = 1.6
 BRIDGE_BUTTON = { z = 1.0, y = 0.02 }   -- beside the middle of the deck, clear of a Pokémon's base
+GRASS_GROW_TIME, GRASS_GROW_FRAMES = 2.0, 120   -- a grass half grows out or draws back this slowly (game clock;
+                                                -- frames without one, in the offline tests)
+movingBridges = {}   -- grass half guid -> the move under way (a newer one takes over)
 
 function bridgeState(obj)
   local st = memoTable(obj)
-  st.tiles, st.rows, st.tile = st.tiles or 1, st.rows or 1, st.tile or BOARD_TILE
+  st.tiles, st.tile = st.tiles or 1, st.tile or BOARD_TILE
   return st
+end
+
+local function grassBridge(st)
+  return st.sx ~= nil or st.sz ~= nil
 end
 
 function bridgeSnaps(st)
   local snaps = {}
   for i = 1, st.tiles do
-    for j = 1, st.rows do
-      snaps[#snaps + 1] = { position = { (i - (st.tiles + 1) / 2) * st.tile, 0.02, (j - (st.rows + 1) / 2) * st.tile },
-        rotation = { 0, 0, 0 }, rotation_snap = false }
-    end
+    snaps[i] = { position = { (i - (st.tiles + 1) / 2) * st.tile, 0.02, 0 }, rotation = { 0, 0, 0 }, rotation_snap = false }
   end
   return snaps
 end
@@ -1258,31 +1270,42 @@ end
 -- The Pokémon standing on a bridge, or nil.
 function pokemonOnBridge(bridge)
   local st = bridgeState(bridge)
-  local half, across = st.tiles * st.tile / 2, st.rows * st.tile / 2
+  local half = st.tiles * st.tile / 2
   for _, obj in ipairs(getAllObjects()) do
     if obj.hasTag("Pokemon") then
       local p = bridge.positionToLocal(obj.getPosition())
-      if math.abs(p.x) <= half + 0.2 and math.abs(p.z) <= across and p.y > -0.5 and p.y < 3 then return obj end
+      if math.abs(p.x) <= half + 0.2 and math.abs(p.z) <= 1.6 and p.y > -0.5 and p.y < 3 then return obj end
     end
   end
 end
 
 function bridgeDescription(up, st)
-  if st and st.drop then   -- the grass bridge (one on its map)
-    return (up and "Up: Pokémon can cross it." or "Sunk: closed.") .. " It rises or sinks every second turn: click "
-      .. "the arrows on it. With a Pokémon on it, it stays up until the next time."
+  if st and grassBridge(st) then
+    return (up and "Open: grown over the creek; Pokémon can cross it." or "Closed.") .. " It opens or closes every "
+      .. "second turn: click the arrows on the hedge beside it. With a Pokémon on it, it stays open until the next time."
   end
   return (up and "Up: Pokémon can cross it." or "Dropped: closed.") .. " The bridges go up or down together every "
     .. "second turn: click the arrows on any bridge. One with a Pokémon on it stays up until the next time. "
     .. "Right-click it to raise or drop just this one."
 end
 
-BRIDGE_MOVE_TIME, BRIDGE_MOVE_FRAMES = 1.5, 90   -- the grass bridge rises or sinks this slowly (game clock;
-                                                  -- frames without one, in the offline tests)
-movingBridges = {}   -- bridge guid -> the move under way (a newer one takes over)
+-- A grass half's snap points (open only), description, and on the lead half the arrows on top of its hedge: the
+-- same spot open or closed (the lead is never turned, so its own frame is the world's).
+function grassBridgeUI(obj, st)
+  st = st or bridgeState(obj)
+  obj.setSnapPoints(st.up and bridgeSnaps(st) or {})
+  obj.setDescription(bridgeDescription(st.up, st))
+  if st.lead then
+    local bx, bz = st.up and (st.sx or 0) or 0, st.up and (st.sz or 0) or 0
+    obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
+    obj.UI.setXml(pieceButtonXml("bridgeArrows", bx, bz, (st.hy or 0) + 0.02, "bridgeClicked", "Open or close the bridge",
+      "updown"))
+  end
+end
 
--- Move the grass bridge up or down a little each frame, eased, so it's seen rising out of the water and sinking.
-local function slideBridge(obj, toY)
+-- Move a grass half to `to` a little each frame, eased, so it's seen growing out of its hedge or drawing back;
+-- then `done`.
+local function growGrass(obj, to, done)
   local p0, token = obj.getPosition(), {}
   movingBridges[obj.guid] = token
   local clock = Time and Time.time and function() return Time.time end
@@ -1290,9 +1313,15 @@ local function slideBridge(obj, toY)
   local function step()
     if obj == nil or movingBridges[obj.guid] ~= token then return end   -- gone (map changed), or moving again
     k = k + 1
-    local t = math.min(1, clock and (clock() - t0) / BRIDGE_MOVE_TIME or k / BRIDGE_MOVE_FRAMES)
-    obj.setPosition({ p0.x, p0.y + (toY - p0.y) * t * t * (3 - 2 * t), p0.z })
-    if t < 1 then Wait.frames(step, 1) else movingBridges[obj.guid] = nil end
+    local t = math.min(1, clock and (clock() - t0) / GRASS_GROW_TIME or k / GRASS_GROW_FRAMES)
+    local e = t * t * (3 - 2 * t)
+    obj.setPosition({ p0.x + (to.x - p0.x) * e, p0.y + (to.y - p0.y) * e, p0.z + (to.z - p0.z) * e })
+    if t < 1 then
+      Wait.frames(step, 1)
+    else
+      movingBridges[obj.guid] = nil
+      if done then done() end
+    end
   end
   step()
 end
@@ -1302,25 +1331,39 @@ function setBridgeUp(obj, up)
   if (st.up and true or false) == up then return false end
   st.up = up
   obj.memo = JSON.encode(st)
-  local p = obj.getPosition()
-  if st.y and st.drop then
-    slideBridge(obj, up and st.y or st.y - st.drop)
-  elseif st.y then
-    obj.setPositionSmooth(Vector(p.x, up and st.y or st.y - BRIDGE_DROP, p.z), false, false)
+  if grassBridge(st) and st.x then
+    if st.lead then obj.UI.setXml("") end   -- the arrows come back on the hedge once it has moved
+    obj.setSnapPoints({})
+    local to = up and Vector(st.x, st.y, st.z) or Vector(st.x + (st.sx or 0), st.y, st.z + (st.sz or 0))
+    growGrass(obj, to, function() grassBridgeUI(obj) end)
+    return true
   end
+  local p = obj.getPosition()
+  if st.y then obj.setPositionSmooth(Vector(p.x, up and st.y or st.y - BRIDGE_DROP, p.z), false, false) end
   obj.setDescription(bridgeDescription(up, st))
   return true
 end
 
--- Raise them all if any is down; otherwise drop them all except the ones with a Pokémon on them.
+-- Raise them all if any is down; otherwise drop them all except the ones with a Pokémon on them (a grass bridge:
+-- both halves stay if either has one).
 function toggleBridges()
-  local bridges, anyDown = piecesTagged("Bridge"), false
-  for _, b in ipairs(bridges) do
-    if not bridgeState(b).up then anyDown = true end
-  end
+  local bridges, anyDown, held = piecesTagged("Bridge"), false, {}
   if #bridges == 0 then return end
   for _, b in ipairs(bridges) do
-    if anyDown or not pokemonOnBridge(b) then setBridgeUp(b, anyDown) end
+    local st = bridgeState(b)
+    if not st.up then anyDown = true end
+    if not anyDown and pokemonOnBridge(b) then held[st.group or b.guid] = true end
+  end
+  for _, b in ipairs(bridges) do
+    if anyDown or not held[bridgeState(b).group or b.guid] then setBridgeUp(b, anyDown) end
+  end
+end
+
+-- Open or close a grass bridge (both halves) from either half's menu.
+function setBridgeGroupUp(obj, up)
+  local g = bridgeState(obj).group
+  for _, b in ipairs(piecesTagged("Bridge")) do
+    if b == obj or (g and bridgeState(b).group == g) then setBridgeUp(b, up) end
   end
 end
 
@@ -1687,18 +1730,15 @@ function pieceSetup(obj)
     Wait.frames(refreshZones, 1)
   elseif obj.hasTag("Bridge") then
     local st = bridgeState(obj)
-    if #(obj.getSnapPoints() or {}) ~= st.tiles * st.rows then obj.setSnapPoints(bridgeSnaps(st)) end
-    obj.setDescription(bridgeDescription(st.up, st))
-    obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
     obj.clearContextMenu()
-    if st.rows > 1 then   -- the grass bridge: its arrows where four of its tiles meet, clear of every Pokémon's base
-      local bx = (st.tiles % 2 == 1) and st.tile / 2 or 0
-      local bz = (st.rows % 2 == 0) and 0 or st.tile / 2
-      obj.UI.setXml(pieceButtonXml("bridgeArrows", bx, bz, BRIDGE_BUTTON.y, "bridgeClicked", "Raise or sink the bridge",
-        "updown"))
-      obj.addContextMenuItem("Raise the bridge", function() setBridgeUp(obj, true) end)
-      obj.addContextMenuItem("Sink the bridge", function() setBridgeUp(obj, false) end)
+    if grassBridge(st) then   -- a grass half (only seen, and so right-clicked, while it's open)
+      grassBridgeUI(obj, st)
+      obj.addContextMenuItem("Open the bridge", function() setBridgeGroupUp(obj, true) end)
+      obj.addContextMenuItem("Close the bridge", function() setBridgeGroupUp(obj, false) end)
     else
+      if #(obj.getSnapPoints() or {}) ~= st.tiles then obj.setSnapPoints(bridgeSnaps(st)) end
+      obj.setDescription(bridgeDescription(st.up))
+      obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
       obj.UI.setXml(pieceButtonXml("bridgeArrows", 0, BRIDGE_BUTTON.z, BRIDGE_BUTTON.y, "bridgeClicked",
         "Raise or drop the bridges", "updown"))
       obj.addContextMenuItem("Raise this bridge", function() setBridgeUp(obj, true) end)

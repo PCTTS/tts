@@ -5218,17 +5218,43 @@
     "pos": [
      -4.8731,
      1.3824,
-     3.2487
+     4.8731
     ],
     "yaw": 0,
     "desc": "",
     "tiles": 5,
-    "rows": 2,
     "tile": 3.24875,
-    "drop": 0.99771,
-    "mesh": "props/grassbridge-v1.obj",
-    "diffuse": "props/grassbridge-v1.jpg",
-    "collider": "props/grassbridge-collider-v1.obj",
+    "sx": 0.0,
+    "sz": 3.24875,
+    "group": 1,
+    "lead": true,
+    "hy": 1.93543,
+    "mesh": "props/grassbridge-v2.obj",
+    "diffuse": "props/grassbridge-v2.jpg",
+    "collider": "props/grassbridge-collider-v2.obj",
+    "convex": true,
+    "material": 3
+   },
+   {
+    "kind": "Bridge",
+    "name": "Grass bridge",
+    "pos": [
+     -4.8731,
+     1.3824,
+     1.6244
+    ],
+    "yaw": 180,
+    "desc": "",
+    "tiles": 5,
+    "tile": 3.24875,
+    "sx": 0.0,
+    "sz": -3.24875,
+    "group": 1,
+    "lead": false,
+    "hy": 1.93543,
+    "mesh": "props/grassbridge-v2.obj",
+    "diffuse": "props/grassbridge-v2.jpg",
+    "collider": "props/grassbridge-collider-v2.obj",
     "convex": true,
     "material": 3
    }

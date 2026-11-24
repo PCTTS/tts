@@ -553,7 +553,7 @@ def main():
     check(abs(dA.pos.x - 1) < 1e-6 and json.loads(dA.memo)["open"] is False and abs(dB.pos.y - (1.37 - 1.94)) < 1e-6,
           "pressed again they close; a blocker with no wall beside it sinks into the floor")
 
-    # Greenleaf: 4 flags, 4 traps, 3 flowers (each with its 3 spots), the grass bridge sunk in the creek
+    # Greenleaf: 4 flags, 4 traps, 3 flowers (each with its 3 spots), the grass bridge's two halves inside their hedges
     lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')   # the stand-ins
     n = len(calls.spawned)
     g.refreshMaps("White")
@@ -562,24 +562,26 @@ def main():
     kinds = [s.data.Tags[1] for s in new]
     gidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Greenleaf"]
     flowers = {s.data.Nickname: json.loads(s.data.Memo) for s in new if s.data.Tags[1] == "Flower"}
-    gbridge = [s for s in new if s.data.Tags[1] == "Bridge"]
-    bm = json.loads(gbridge[0].data.Memo) if gbridge else {}
+    halves = [(s, json.loads(s.data.Memo)) for s in new if s.data.Tags[1] == "Bridge"]
     red = [[round(v, 3) for v in t] for t in flowers.get("Red flower", {}).get("targets", [])]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("greenleaf", "mesh"))
           and kinds.count("Flag") == 4 and kinds.count("Trap") == 4 and sorted(flowers) == ["Blue flower", "Red flower", "Violet flower"]
-          and all(len(m["targets"]) == 3 for m in flowers.values()) and len(gbridge) == 1
-          and gbridge[0].data.Nickname == "Grass bridge" and bm.get("tiles") == 5 and bm.get("rows") == 2 and bm.get("up") is False
-          and abs(bm["y"] - gbridge[0].position.y - bm["drop"]) < 1e-6 and abs(bm["drop"] - (0.9677 + 0.03)) < 1e-3
+          and all(len(m["targets"]) == 3 for m in flowers.values()) and len(halves) == 2
+          and all(s.data.Nickname == "Grass bridge" and m["tiles"] == 5 and m["group"] == 1 and m["up"] is False
+                  and abs(s.position.x - m["x"] - m["sx"]) < 1e-6 and abs(s.position.z - m["z"] - m["sz"]) < 1e-6
+                  and abs(abs(m["sz"]) - 3.24875) < 1e-3 and abs(m["hy"] - 2 * 0.9677) < 1e-3 for s, m in halves)
+          and sorted(m["lead"] for _, m in halves) == [False, True] and halves[0][1]["sz"] == -halves[1][1]["sz"]
           and len(gidx["snaps"]) == 256 - 53 - 10 - 3 and backdrop(new, "misc/garden-placeholder-v1.jpg"),
-          "picking Greenleaf: its board, 4 flags, 4 traps, 3 flowers with 3 spots each, the grass bridge (5x2) sunk a "
-          "level into the creek, snap points on all but the hedges, the creek and the flowers, the garden table")
+          "picking Greenleaf: its board, 4 flags, 4 traps, 3 flowers with 3 spots each, the grass bridge's two halves "
+          "closed inside the hedges either side of the creek, snap points on all but the hedges, the creek and the "
+          "flowers, the garden table")
     T = 3.24875
     want = [[-T, 0, -2 * T], [3 * T, 0, -2 * T], [3 * T, 0, 0]]
     check(len(red) == 3 and all(abs(a - b) < 2e-3 for t, w in zip(red, want) for a, b in zip(t, w)),
           f"the red flower's spots 1-3 are where the board paints them, from its tile ({red})")
 
-    # the grass bridge: 10 snap points, its arrows where four tiles meet; it rises and sinks like the rope bridges
-    # (a Pokemon on it keeps it up); a flower flings the Pokemon on it to a free spot at random, in an arc
+    # the grass bridge: two halves that grow out of their hedges together (a Pokemon on either keeps both open), the
+    # arrows on top of the lead half's hedge; a flower flings the Pokemon on it to a free spot at random, in an arc
     lua.execute(r"""
       for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end
       function standIn(tags, memo, pos)
@@ -607,31 +609,38 @@ def main():
         return o
       end
       getObjectFromGUID = function(guid) for _, o in ipairs(objects) do if o.guid == guid and not o.destroyed then return o end end end
-      grassBridge = standIn({ "Bridge", "ArenaPiece" }, { up = false, y = 1.3824, tiles = 5, rows = 2, tile = 3.24875,
-        drop = 0.9977 }, Vector(200, 1.3824 - 0.9977, 0))
-      grassBridge.locked = true
-      onObjectSpawn(grassBridge)
+      local T = 3.24875
+      grassN = standIn({ "Bridge", "ArenaPiece" }, { up = false, x = 200, y = 1.3824, z = T / 2, sx = 0, sz = T, tiles = 5,
+        tile = T, group = 1, lead = true, hy = 1.9354 }, Vector(200, 1.3824, 1.5 * T))
+      grassS = standIn({ "Bridge", "ArenaPiece" }, { up = false, x = 200, y = 1.3824, z = -T / 2, sx = 0, sz = -T, tiles = 5,
+        tile = T, group = 1, lead = false, hy = 1.9354 }, Vector(200, 1.3824, -1.5 * T))
+      for _, o in ipairs({ grassN, grassS }) do o.locked = true; onObjectSpawn(o) end
     """)
-    gb = g.grassBridge
-    snaps = [tuple(round(v, 3) for v in s.position.values()) for s in gb.snaps.values()]
-    check(len(snaps) == 10 and (round(2 * T, 3), 0.02, round(T / 2, 3)) in snaps and (round(-2 * T, 3), 0.02, round(-T / 2, 3)) in snaps
-          and 'position="162 0 -2"' in str(gb.ui.xml) and 'onClick="Global/bridgeClicked"' in str(gb.ui.xml)
-          and [m.label for m in gb.menu.values()] == ["Raise the bridge", "Sink the bridge"] and str(gb.desc).startswith("Sunk: closed."),
-          f"the grass bridge carries a snap point on each of its 10 tiles, its arrows between four of them and Raise / "
-          f"Sink in its menu ({len(snaps)} snaps)")
+    gn, gs = g.grassN, g.grassS
+    at = lambda o, z: abs(o.pos.x - 200) < 1e-6 and abs(o.pos.y - 1.3824) < 1e-6 and abs(o.pos.z - z) < 1e-6
+    check(len(list(gn.snaps.values())) == 0 and len(list(gs.snaps.values())) == 0
+          and 'position="0 0 -196"' in str(gn.ui.xml) and 'onClick="Global/bridgeClicked"' in str(gn.ui.xml) and gs.ui.xml is None
+          and [m.label for m in gs.menu.values()] == ["Open the bridge", "Close the bridge"] and str(gn.desc).startswith("Closed."),
+          "closed, the grass halves have no snap points (none hidden in the hedges); the lead's arrows sit on top of its "
+          "hedge; Open / Close in the menu")
     g.bridgeClicked(player)
-    check(abs(gb.pos.y - 1.3824) < 1e-6 and json.loads(gb.memo)["up"] and str(gb.desc).startswith("Up:")
-          and gb.moves == 90 and not g.movingBridges[gb.guid],
-          f"its arrows raise it level with the lawn, a little each frame (seen rising out of the water: {gb.moves} steps)")
+    check(at(gn, T / 2) and at(gs, -T / 2) and gn.moves == 120 and gs.moves == 120 and not g.movingBridges[gn.guid]
+          and len(list(gn.snaps.values())) == 5 and len(list(gs.snaps.values())) == 5 and 'position="0 325 -196"' in str(gn.ui.xml)
+          and json.loads(gs.memo)["up"] and str(gs.desc).startswith("Open:"),
+          f"its arrows grow both halves out of their hedges to meet over the creek, a little each frame ({gn.moves} "
+          f"steps), with a snap point on each tile; the arrows stay on the hedge")
     lua.execute(r"""
       onGrass = standIn({ "Pokemon" }, nil, Vector(200 + 2 * 3.24875, 1.40, -3.24875 / 2))
     """)
     g.bridgeClicked(player)
-    up_still = abs(gb.pos.y - 1.3824) < 1e-6
+    both_open = at(gn, T / 2) and at(gs, -T / 2)
     lua.execute("onGrass.destroyed = true")
     g.bridgeClicked(player)
-    check(up_still and abs(gb.pos.y - (1.3824 - 0.9977)) < 1e-6 and not json.loads(gb.memo)["up"],
-          "with a Pokemon on its far end's second row it stays up; once it's gone the arrows sink it into the creek")
+    check(both_open and at(gn, 1.5 * T) and at(gs, -1.5 * T) and len(list(gn.snaps.values())) == 0
+          and 'position="0 0 -196"' in str(gn.ui.xml) and not json.loads(gn.memo)["up"],
+          "with a Pokemon on one half both stay open; once it's gone the arrows draw both back into their hedges")
+    gs.menu[1].fn("Red")
+    check(at(gn, T / 2) and at(gs, -T / 2), "right-click > Open the bridge on either half opens both")
 
     lua.execute(r"""
       flower = standIn({ "Flower", "ArenaPiece" }, { targets = { { 3.24875, 0, 0 }, { 0, 0, 3.24875 }, { -3.24875, 0.9677, 0 } },
