@@ -1,5 +1,7 @@
 {
   "name": "Violight",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 10,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. From the arena's drawing (the user's choice over their play board, which swaps buttons 3 and 4: buttons 1 and 2 set off the zone diagonally across, 3 and 4 the zone straight across). 16x16, all ground level: the centre spire (2x2, solid), four 2x2 capture zones round it, a button on each corner of them, 14 groups of electric tiles, 6 spawns a side.",
   "grid": [
     ".......22.......",

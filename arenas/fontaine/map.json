@@ -1,5 +1,7 @@
 {
  "name": "Fontaine",
+ "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+ "turns": 10,
  "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. From the arena's drawing (the user's Google Drawing, the same as the old flat map): a river (level 0, always low ground) runs in from each corner past an edge gate, along to an inner gate, round a land tongue, and into the middle, where the four branches meet round the island; three 2x2 capture zones; four fountains, each with a splash area on the four tiles next to it; 6 spawns a side.",
  "grid": [
   "..K.K..KK..K.K..",

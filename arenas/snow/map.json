@@ -1,5 +1,7 @@
 {
   "name": "Snow",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 12,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's drawn board (mapstomake/icemap.jpg, taken from player 2's side: turned 180 degrees and perspective-straightened; the board looks the same turned round, only the spawns swap), 18 by 18: high ground round each player's spawns (one level up, its edges sloping down like Yaksha's), low ground through the middle and in the other two corners with the flags, two zigzags of water in the basin, and ice on the high ground that slides a Pokemon off it the way its arrows point.",
   "grid": [
     "++2+2++++++.......",

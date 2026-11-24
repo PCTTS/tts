@@ -4,6 +4,7 @@
   "texture": "arenas/chrysalia/board-v4.jpg",
   "table": "misc/mulch-placeholder-v2.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -1380,6 +1381,7 @@
   "texture": "arenas/fontaine/board-v1.jpg",
   "table": "misc/valley-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -4080,6 +4082,7 @@
   "texture": "arenas/greenleaf/board-v1.jpg",
   "table": "misc/garden-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -5268,6 +5271,7 @@
   "texture": "arenas/illusio/board-v6.jpg",
   "table": "misc/sky-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -4.8731,
@@ -6104,6 +6108,7 @@
   "texture": "arenas/ingis/board-v5.jpg",
   "table": "misc/volcano-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -7448,6 +7453,7 @@
   "texture": "arenas/pugilis/board-v42.jpg",
   "table": "misc/pugilis-dirt-v1.jpg",
   "depth": 51.98,
+  "turns": 15,
   "snaps": [
    [
     -8.1219,
@@ -8502,6 +8508,7 @@
   "texture": "arenas/snow/board-v1.jpg",
   "table": "misc/snowfield-placeholder-v1.jpg",
   "depth": 58.4775,
+  "turns": 12,
   "snaps": [
    [
     -27.6144,
@@ -10196,6 +10203,7 @@
   "texture": "arenas/spectra/board-v1.jpg",
   "table": "misc/graveyard-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -11523,6 +11531,7 @@
   "texture": "arenas/terrera/board-v4.jpg",
   "table": "misc/cave-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -25.99,
@@ -12899,6 +12908,7 @@
   "texture": "arenas/valora/board-v1.jpg",
   "table": "misc/foundry-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -14053,6 +14063,7 @@
   "texture": "arenas/violight/board-v1.jpg",
   "table": "misc/violight-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -15395,6 +15406,7 @@
   "texture": "arenas/viperia/board-v2.jpg",
   "table": "misc/jungle-placeholder-v1.jpg",
   "depth": 48.7312,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,
@@ -16478,6 +16490,7 @@
   "texture": "arenas/yaksha/board-v6.jpg",
   "table": "misc/court-placeholder-v1.jpg",
   "depth": 51.98,
+  "turns": 10,
   "snaps": [
    [
     -24.3656,

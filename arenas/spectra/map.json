@@ -1,5 +1,7 @@
 {
   "name": "Spectra",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 10,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's drawn board (mapstomake/spectra.webp, perspective-straightened; the white blobs on it are painted-over statues, left out): a graveyard of open ground with four crypts two levels tall, lanterns on two crypt corners, 14 statues that move on the dice, 4 flags.",
   "grid": [
     "...2.2.2####....",

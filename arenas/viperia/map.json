@@ -1,5 +1,7 @@
 {
   "name": "Viperia",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 10,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the old map image (maps/viperia.jpg), 16 wide by 15 deep: a jungle floor split up by vine-covered walls two levels tall (nothing crosses them), purple poison pools, small water wells, trap doors in numbered pairs and three flags.",
   "grid": [
     "....P#.22.#.2.2.",

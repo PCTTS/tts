@@ -1,5 +1,7 @@
 {
   "name": "Ingis",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 10,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From the old map image (maps/ingis.jpg): a raised ridge of volcanic sand (one level up, sloped sides) running corner to corner with the three capture zones on it, lava pools on the basalt around it. Rock coordinates: x = column 1-16 from player 1's left, y = row 1-16 from player 1's side.",
   "grid": [
     "................",

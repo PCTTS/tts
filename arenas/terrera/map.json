@@ -1,5 +1,7 @@
 {
   "name": "Terrera Mountain",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 10,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's three drawn boards (mapstomake/Terrera Mountain.webp, taken sideways: turned upright, each board perspective-straightened). Columns 0-7: the centre (8x16, both players' spawns, 2 flags). Columns 9-16: the two side floors (8x8 each), side by side with the centre like Yaksha's boxes (the pillars take the left strip): the top floor in rows 0-7, the bottom floor in rows 8-15. Column 8 is the strip between them: a ridge of rock at the centre's height (level 1) that nothing stands on (the user: an empty gap looked odd); the board is centred on it, so the point where all three boards meet is the middle of the table (the user's choice). Tunnels 1-4 link the centre with each floor (the d4 roll picks the exit).",
   "grid": [
     "...22...:GssssssH",

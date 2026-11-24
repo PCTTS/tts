@@ -40,7 +40,8 @@ def arena_entry(folder):
     out_pieces = [{**{k: v for k, v in p.items() if k != "model"}, "yaw": round(p["yaw"], 2),
                    "pos": [round(v, 4) for v in p["pos"]], **p["model"]} for p in items]   # (+ pair, tiles, tile)
     return name, {"mesh": f"{rel}/{board['mesh']}", "texture": f"{rel}/{board['texture']}",
-                  "table": data.get("table", ""), "depth": round(R * T, 4), "snaps": snaps, "pieces": out_pieces}
+                  "table": data.get("table", ""), "depth": round(R * T, 4), "turns": data.get("turns", 10), "snaps": snaps,
+                  "pieces": out_pieces}
 
 
 def main():

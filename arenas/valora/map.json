@@ -1,5 +1,7 @@
 {
   "name": "Valora",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 10,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's drawn board (mapstomake/valora.webp, taken from player 2's side: turned 180 degrees and perspective-straightened): a steel floor with walls two levels tall, five gears (three 4x4 turning counter-clockwise with a capture zone in the middle, numbered 1-3; two 3x3 turning clockwise), and blockers that gears 1-3 open and close.",
   "grid": [
     "..2.....##......",

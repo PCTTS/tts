@@ -1,5 +1,7 @@
 {
   "name": "Greenleaf",
+  "_turns": "How many turns a game lasts (the arena doc); the turn track at the table's end has a slot for each.",
+  "turns": 10,
   "_grid": "One character per tile, row 0 = the far side (player 2), last row = player 1's side. Each character is defined in the legend. From a photo of the user's drawn board (mapstomake/greenleaf.webp, perspective-straightened): a garden lawn split up by hedges two levels tall, a creek one level down with the grass bridge over it, four flags, four traps, four pairs of secret passages and three flowers that fling a Pokemon to one of their three numbered spots.",
   "grid": [
     "..1#2..###.3....",
