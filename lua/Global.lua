@@ -131,7 +131,7 @@ for _, k in ipairs(SEARCH_KINDS) do catalog[k] = { index = {}, list = {}, keys =
 roster = catalog.dex.index
 cardBacks = {}       -- kind -> back image path
 stats = {}           -- Pokémon name -> { hp, atk, def, spd, rng, types } (data/pokemon.json)
-arenas = {}          -- arena name -> { mesh, texture, table, snaps, pieces } (arenas/index.json)
+arenas = {}          -- arena name -> { mesh, texture, table, depth, snaps, pieces } (arenas/index.json)
 openPanel, searchHits, mapRows, spawnCount = {}, {}, {}, {}
 armed = {}           -- [colour] = status key waiting for that player to pick up a Pokémon
 queries = {}         -- [colour .. kind] = what that player last typed in that search box
@@ -150,7 +150,7 @@ DATA = {
   { key = "roster", url = ROSTER_URL, use = function(t) setCatalog("dex", t) end },
   { key = "cards", url = CARDS_URL, use = function(t) setCards(t) end },
   { key = "stats", url = STATS_URL, use = function(t) stats = t; refreshPedestals() end },
-  { key = "arenas", url = ARENAS_URL, use = function(t) arenas = t end },
+  { key = "arenas", url = ARENAS_URL, use = function(t) arenas = t; Wait.time(fitTableToBoard, 1) end },
 }
 STATE_MARK, STATE_SEP = "PCTTS-STATE-1", "\n\30\n"   -- a raw \30 (record separator) can't appear in JSON text
 rawData, savedState = {}, ""
@@ -238,7 +238,7 @@ READERS = {
       gear = true, size = true, door = true, sx = true, sy = true, sz = true, group = true, hy = true }
     for _, f in ipairs(rows) do
       if f[1] == "arena" then
-        cur = { mesh = f[3], texture = f[4], table = f[5] or "", snaps = {}, pieces = {} }
+        cur = { mesh = f[3], texture = f[4], table = f[5] or "", depth = tonumber(f[6] or ""), snaps = {}, pieces = {} }
         t[f[2]] = cur
       elseif f[1] == "snaps" and cur and (f[2] or "") ~= "" then
         for i, p in ipairs(splitPlain(f[2], ";")) do cur.snaps[i] = numbers(p) end
@@ -698,7 +698,8 @@ function loadArena(name, entry, base)
     end,
   })
   for _, p in ipairs(a.pieces or {}) do spawnArenaPiece(p, spot, base) end
-  if a.table and a.table ~= "" then setBackdrop(base .. a.table, base) end
+  if a.table and a.table ~= "" then setBackdrop(base .. a.table, base, tableLayout(a.depth)) end
+  setTableDepth(a.depth)
   return true
 end
 
@@ -708,21 +709,108 @@ function currentBackdrop()
   end
 end
 
--- Show an image round the board on the backdrop panel (kept if it already shows it). Locked and not clickable.
-function setBackdrop(image, base)
+----------------------------------------------------------------------------------------------------
+-- The table follows the board's depth. A board deeper than the usual play area (Snow: 18 tiles) gets the table
+-- stretched front to back just enough that its near and far trims stay their usual width outside the board: the
+-- map's picture is stretched to the board's depth and lies over the trim's inner part (a hair higher: the trim
+-- sits a little above the play area), and the team stands move back to the usual gap from the board, with
+-- everything resting on them (Pokémon, cards, the pedestal discs). Any other board puts the table and stands back.
+-- A table's scale may not be kept in a save, so it's applied again once the arena list has loaded.
+----------------------------------------------------------------------------------------------------
+TABLE_DEPTH = 75.246      -- the custom table front to back at scale 1 (measured in TTS)
+PLAY_DEPTH = 51.981       -- its play area front to back (= the backdrop panel at scale 1, and 16 tiles)
+STAND_GAP = 0.4095        -- a team stand's inner edge sits this far outside the play area (z 26.4)
+STAND_DEPTH = 10.8        -- a team stand front to back
+BACKDROP_LIFT = 0.9625    -- the panel's height when it lies over part of the trim (the trim's top is 0.9612)
+
+-- The table's stretch, the panel's and the stands' distance from the middle for a board `depth` deep.
+function tableLayout(depth)
+  local d = math.max(depth or PLAY_DEPTH, PLAY_DEPTH)
+  return { scale = (d + TABLE_DEPTH - PLAY_DEPTH) / TABLE_DEPTH, panel = d / PLAY_DEPTH, stand = d / 2 + STAND_GAP }
+end
+
+local function backdropY(lay)
+  return lay.panel > 1.0001 and BACKDROP_LIFT or BACKDROP.pos[2]
+end
+
+local function fitBackdrop(panel, lay)
+  if math.abs(panel.getScale().z - lay.panel) > 1e-4 then panel.setScale({ 1, 1, lay.panel }) end
+  local p = panel.getPosition()
+  if math.abs(p.y - backdropY(lay)) > 1e-5 then panel.setPosition({ p.x, backdropY(lay), p.z }) end
+end
+
+-- What rests on a team stand: anything over its footprint, except what's in a hand and the fixed pieces.
+local function standRiders(stand)
+  local p, out = stand.getPosition(), {}
+  local sgn = p.z < 0 and -1 or 1
+  for _, o in ipairs(getAllObjects()) do
+    if o ~= stand and not o.held_by_color and not (o.hasTag("Stand") or o.hasTag("Board3D") or o.hasTag("ArenaPiece")
+        or o.hasTag("ArenaBackdrop") or o.hasTag("Pillar")) then
+      local q = o.getPosition()
+      local into = (q.z - p.z) * sgn   -- how far in behind the stand's inner edge
+      if math.abs(q.x - p.x) <= STAND.length / 2 + 0.2 and into >= -0.1 and into <= STAND_DEPTH + 0.1 and q.y > p.y - 0.5 then
+        out[#out + 1] = o
+      end
+    end
+  end
+  return out
+end
+
+-- Stretch (or restore) the table for a board `depth` deep, move the stands (and what's on them) to suit, fit the
+-- backdrop panel, and put the hand zones at the table's new edges.
+function setTableDepth(depth)
+  local lay = tableLayout(depth)
+  local ok, tbl = pcall(function() return Tables.getTableObject() end)
+  if ok and tbl and tbl.setScale and math.abs(tbl.getScale().z - lay.scale) > 1e-4 then tbl.setScale({ 1, 1, lay.scale }) end
+  for _, stand in ipairs(getAllObjects()) do
+    if stand.hasTag("Stand") then
+      local p = stand.getPosition()
+      local dz = (p.z < 0 and -lay.stand or lay.stand) - p.z
+      if math.abs(dz) > 0.005 then
+        for _, o in ipairs(standRiders(stand)) do
+          local q = o.getPosition()
+          o.setPosition({ q.x, q.y, q.z + dz })
+        end
+        stand.setPosition({ p.x, p.y, p.z + dz })
+      end
+    end
+  end
+  local panel = currentBackdrop()
+  if panel then fitBackdrop(panel, lay) end
+  Wait.frames(ensureHandZones, 2)   -- once the table's new size shows in its bounds
+end
+
+-- After a load: the table's stretch for the board on it.
+function fitTableToBoard()
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Board3D") then
+      local a = arenas[o.getName()]
+      if a then setTableDepth(a.depth) end
+      return
+    end
+  end
+end
+
+-- Show an image round the board on the backdrop panel (kept if it already shows it), sized for the board (lay:
+-- tableLayout). Locked and not clickable.
+function setBackdrop(image, base, lay)
+  lay = lay or tableLayout()
   local old = currentBackdrop()
   if old then
-    if (old.getCustomObject() or {}).diffuse == image then return old end
+    if (old.getCustomObject() or {}).diffuse == image then
+      fitBackdrop(old, lay)
+      return old
+    end
     old.destruct()
   end
   return spawnObjectData({
     data = {
       Name = "Custom_Model", Nickname = "", Tags = { "ArenaBackdrop" }, Locked = true,
-      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = lay.panel },
       CustomMesh = { MeshURL = base .. BACKDROP.mesh, DiffuseURL = image, NormalURL = "", ColliderURL = base .. BACKDROP.mesh,
         Convex = false, MaterialIndex = 3, TypeIndex = 0, CastShadows = false, CustomShader = BOARD_SHADER },
     },
-    position = { BACKDROP.pos[1], BACKDROP.pos[2], BACKDROP.pos[3] }, rotation = { 0, 0, 0 },
+    position = { BACKDROP.pos[1], backdropY(lay), BACKDROP.pos[3] }, rotation = { 0, 0, 0 },
     callback_function = function(obj) obj.interactable = false end,
   })
 end

@@ -72,6 +72,14 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/greenleaf/textures/creek.png           the creek under the grass bridge: green-blue water, lily pads
   arenas/greenleaf/textures/soil.png            the creek's banks and the board's edge: garden soil, stones, roots
   misc/garden-placeholder-v1.jpg                table image around Greenleaf: lawn, round flower beds, low shrubs
+  arenas/snow/textures/snow1.png, snow2.png     Snow's high ground: fresh snow, blue-grey drift shading, glints
+  arenas/snow/textures/trampled1.png, -2.png    Snow's low ground: trampled grey snow, frozen earth and gravel
+  arenas/snow/textures/ice.png                  ice tiles: glassy pale blue, white cracks, streaks of light
+  arenas/snow/textures/icy-water.png            water: dark cold blue, floating plates of ice
+  arenas/snow/textures/snow-rock.png            the board's edge: grey layered rock, snow on its ledges, seamless
+                                                left-right
+  misc/snowfield-placeholder-v1.jpg             table image around Snow: snowfield, snowy pines, rocks (2048 x 1362:
+                                                Snow's deeper play area)
 """
 from pathlib import Path
 
@@ -1260,8 +1268,131 @@ def garden_table():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
 
 
+def snow(seed):
+    """Snow's high ground: fresh snow, soft drifts shaded blue-grey, faint wind ripples, glints."""
+    rng = np.random.default_rng(seed)
+    t = fbm(N, N, rng, 3, 5)
+    img = mix((206, 216, 230), (246, 249, 252), np.clip((t - 0.25) * 1.8, 0, 1))
+    rows = np.arange(N, dtype=np.float32)[:, None]
+    ripple = 0.5 + 0.5 * np.sin((rows / N * 9 + fbm(N, N, rng, 2) * 2.5) * 2 * np.pi)
+    img *= (0.97 + 0.03 * ripple)[..., None]
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(500):                                    # glints and shadowed grains
+        x, y, r = rng.random() * N, rng.random() * N, rng.uniform(0.6, 1.5)
+        col = (255, 255, 255, 230) if rng.random() < 0.6 else (150, 168, 196, 120)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=col)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.4))
+
+
+def trampled(seed):
+    """Snow's low ground: trampled grey snow, frozen earth and gravel showing through in patches."""
+    rng = np.random.default_rng(seed)
+    img = mix((150, 158, 170), (196, 204, 214), fbm(N, N, rng, 4, 5))
+    bare = np.clip((fbm(N, N, rng, 5, 4) - 0.56) * 4, 0, 1)
+    img = img + (mix((74, 66, 60), (104, 96, 88), fbm(N, N, rng, 14, 3)) - img) * (0.8 * bare)[..., None]
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(110):                                    # a little gravel
+        x, y, r = rng.random() * N, rng.random() * N, rng.uniform(1.2, 2.8)
+        col = [(110, 106, 104), (132, 128, 124), (90, 86, 84)][rng.integers(0, 3)] + (150,)
+        d.ellipse([x - r, y - r * 0.75, x + r, y + r * 0.75], fill=col)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def ice():
+    """Snow's ice tiles: glassy pale blue, darker depths, white cracks and streaks of light."""
+    rng = np.random.default_rng(281)
+    t = fbm(N, N, rng, 3, 5)
+    img = mix((120, 176, 214), (196, 230, 246), t)
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(9):                                      # cracks: branching random walks
+        x, y, ang = rng.random() * N, rng.random() * N, rng.random() * 6.3
+        pts = [(x, y)]
+        for _ in range(int(rng.integers(6, 14))):
+            ang += rng.normal(0, 0.45)
+            x, y = x + 16 * np.cos(ang), y + 16 * np.sin(ang)
+            pts.append((x, y))
+        d.line(pts, fill=(236, 248, 255, 200), width=2)
+    gloss = Image.new("RGBA", (N, N), (255, 255, 255, 0))   # soft glossy streaks (white under the clear: no dark blur)
+    g = ImageDraw.Draw(gloss)
+    for _ in range(4):
+        x0, y0 = rng.random() * N, rng.random() * N
+        g.line([(x0 - 60, y0 + 40), (x0 + 60, y0 - 40)], fill=(255, 255, 255, 60), width=int(rng.integers(14, 26)))
+    out.alpha_composite(gloss.filter(ImageFilter.GaussianBlur(9)))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
+
+
+def icy_water():
+    """Snow's water: dark cold blue, faint ripples, floating plates of ice."""
+    rng = np.random.default_rng(283)
+    t = fbm(N, N, rng, 3, 5)
+    rip = 0.5 + 0.5 * np.sin((t * 6 + fbm(N, N, rng, 2) * 2) * 2 * np.pi)
+    img = mix((22, 46, 72), (46, 84, 116), 0.6 * t + 0.4 * rip)
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(7):                                      # ice plates: irregular pale polygons with a shadow
+        x, y, r = rng.uniform(40, N - 40), rng.uniform(40, N - 40), rng.uniform(14, 34)
+        k = int(rng.integers(5, 9))
+        pts = [(x + np.cos(2 * np.pi * i / k + rng.normal(0, 0.2)) * r * rng.uniform(0.7, 1.2),
+                y + np.sin(2 * np.pi * i / k + rng.normal(0, 0.2)) * r * rng.uniform(0.7, 1.2)) for i in range(k)]
+        d.polygon([(px + 3, py + 4) for px, py in pts], fill=(10, 24, 40, 110))
+        d.polygon(pts, fill=(214, 232, 244, 235), outline=(160, 196, 222, 255))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
+
+
+def snow_rock():
+    """Snow's board edge and cliffs: grey layered rock, snow lying on its ledges, seamless left-right."""
+    rng = np.random.default_rng(285)
+    h, w = 1024, N
+    warp = fbm(h, w, rng, 3, 4, wrap_x=True)
+    rows = np.arange(h, dtype=np.float32)[:, None] / h
+    bands = 0.5 + 0.5 * np.sin((rows * 8 + warp * 1.4) * 2 * np.pi)
+    img = mix((70, 72, 78), (128, 130, 138), 0.55 * bands + 0.45 * fbm(h, w, rng, 6, 4, wrap_x=True))
+    ledge = np.clip((bands - 0.82) * 8, 0, 1) * np.clip((fbm(h, w, rng, 10, 3, wrap_x=True) - 0.3) * 3, 0, 1)
+    img = img + (np.array((236, 242, 248), np.float32) - img) * ledge[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def snowfield_table():
+    """Around Snow: a wide snowfield, blue drift shadows, snowy pines and a few rocks poking through. Drawn deeper than
+    the other table images (2048 x 1362, the play area's width by Snow's 18 tiles): its panel is stretched to the
+    board's depth (Global.lua setTableDepth)."""
+    rng = np.random.default_rng(287)
+    h, w = 1362, 2048
+    img = mix((196, 208, 224), (244, 247, 251), np.clip((fbm(h, w, rng, 5, 5) - 0.25) * 1.7, 0, 1))
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(40):                                     # rocks
+        x, y, r = rng.random() * w, rng.random() * h, rng.uniform(10, 26)
+        d.ellipse([x - r, y - r * 0.7, x + r, y + r * 0.7], fill=(92, 94, 100, 255))
+        d.ellipse([x - r * 0.8, y - r * 0.75, x + r * 0.6, y], fill=(240, 244, 250, 255))
+    for _ in range(70):                                     # pines seen from above: a shadow, star of dark
+        x, y, r = rng.random() * w, rng.random() * h, rng.uniform(28, 52)   # boughs, snow on them
+        d.ellipse([x - r + 14, y - r * 0.6 + 18, x + r + 30, y + r * 0.6 + 26], fill=(120, 136, 166, 110))
+        for ring, col in ((1.0, (34, 62, 44, 255)), (0.7, (44, 78, 54, 255)), (0.4, (56, 92, 64, 255))):
+            k = 9
+            pts = [(x + np.cos(2 * np.pi * i / (2 * k)) * r * ring * (1 if i % 2 == 0 else 0.55),
+                    y + np.sin(2 * np.pi * i / (2 * k)) * r * ring * (1 if i % 2 == 0 else 0.55)) for i in range(2 * k)]
+            d.polygon(pts, fill=col)
+        for _ in range(int(r)):
+            a, k2 = rng.random() * 6.3, rng.random() ** 0.7
+            sx, sy, sr = x + np.cos(a) * r * k2, y + np.sin(a) * r * k2, rng.uniform(2, 5)
+            d.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=(242, 246, 252, 230))
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
+
+
 def main():
     files = {
+        "arenas/snow/textures/snow1.png": lambda p: snow(291).save(p),
+        "arenas/snow/textures/snow2.png": lambda p: snow(292).save(p),
+        "arenas/snow/textures/trampled1.png": lambda p: trampled(293).save(p),
+        "arenas/snow/textures/trampled2.png": lambda p: trampled(294).save(p),
+        "arenas/snow/textures/ice.png": lambda p: ice().save(p),
+        "arenas/snow/textures/icy-water.png": lambda p: icy_water().save(p),
+        "arenas/snow/textures/snow-rock.png": lambda p: snow_rock().save(p),
+        "misc/snowfield-placeholder-v1.jpg": lambda p: snowfield_table().save(p, quality=90),
         "arenas/greenleaf/textures/lawn1.png": lambda p: lawn(271).save(p),
         "arenas/greenleaf/textures/lawn2.png": lambda p: lawn(272).save(p),
         "arenas/greenleaf/textures/hedge-top.png": lambda p: hedge_top().save(p),

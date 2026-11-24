@@ -706,8 +706,8 @@ def marker_turn(a, r, c, t):
     explicit "orient" wins ("away-from-pit": bottom away from the lower neighbours); anything else has its bottom
     toward the nearer left/right edge."""
     marker = painted_marker(t) or ""
-    if marker == "spawn1" or marker.startswith("sand-") or marker == "cracked":   # quicksand arrows point the
-        return 0                                                                    # way they push
+    if marker == "spawn1" or marker.startswith(("sand-", "ice-")) or marker == "cracked":   # quicksand and ice
+        return 0                                                                    # arrows point the way they push
     if marker.startswith("spawn2"):
         return 180
     if both_ways(a, t):   # N/N reads the same from either player's end: not turned
@@ -931,6 +931,8 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None, palette=None):
             o.text((cx, cy + 2 * u), n, font=font(round(52 * u)), fill=fill, anchor="mm")
     elif marker.startswith("sand-"):   # quicksand (Terrera): an arrow the way it drags a Pokémon that ends its turn here
         sand_arrow(o, cx, cy, u, SAND_DIRS[marker[len("sand-"):]])
+    elif marker.startswith("ice-"):   # ice (Snow): a deep blue arrow the way it slides a Pokémon (dirs as sand-)
+        sand_arrow(o, cx, cy, u, SAND_DIRS[marker[len("ice-"):]], 1.1, (24, 62, 112, 235))
     elif marker.startswith("tunnel"):   # a tunnel's mouth (Terrera): a dark burrow, its number (the d4 roll) on it;
         n, _, way = marker[len("tunnel"):].partition("-")   # "tunnel3-se": also quicksand pushing south-east
         r = 34 * u
@@ -1237,7 +1239,8 @@ def slopes(a, r, c):
     slope}, which is the neighbour's level (a sunken neighbour, like lava, gets a short wall below that). The slope
     sits inside the tile (the top shrinks by w on that side), so its neighbours stay flat. Inner corners (a lower
     diagonal neighbour, both sides beside it at this tile's level) dip down too: see inner_corners(). Supported:
-    raised areas whose tiles all share the same slant, one level step, not next to the sky (else the build stops)."""
+    raised areas whose tiles all share the same slant, one level step, not next to the sky (else the build stops; the
+    board's outer edge is fine: a wall straight down there)."""
     t = a.tile(r, c)
     w = t.get("slant", 0)
     if not w or t.get("slant_to") or t.get("sheer"):   # "slant_to" tiles: see contact_edges(); "sheer": its drops
@@ -1247,7 +1250,9 @@ def slopes(a, r, c):
         nb = a.tile(r + dr, c + dc)
         where = f"slanted tile row {r} col {c}"
         if nb is None:
-            sys.exit(f"{where}: slopes next to the sky aren't supported")
+            if 0 <= r + dr < a.R and 0 <= c + dc < a.C:   # void inside the grid: sky
+                sys.exit(f"{where}: slopes next to the sky aren't supported")
+            continue   # the board's outer edge: its wall goes straight down (following the slopes beside it)
         if nb.get("level", 0) < level:
             out[side] = a.level_top(nb)
         elif nb.get("level", 0) == level and (nb.get("slant", 0) != w or nb.get("slant_to")):

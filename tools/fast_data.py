@@ -11,7 +11,7 @@ tabs, which Global.lua splits with plain text search in a fraction of a second (
   roster  name, front, back, standee, source
   cards   "back", kind, image  |  "card", kind, name, class, group, face, effect
   stats   name, hp, atk, def, spd, rng, types (comma-separated)
-  arenas  "arena", name, mesh, texture, table  |  "snaps", x,y,z;x,y,z;...  |  "piece", key=value, ...
+  arenas  "arena", name, mesh, texture, table, depth  |  "snaps", x,y,z;x,y,z;...  |  "piece", key=value, ...
           (pos = x,y,z; convex/free = true/false; yaw/material/pair/tile/tiles = numbers)
 """
 import json
@@ -53,7 +53,7 @@ def stats(d):
 def arenas(d):
     rows = []
     for name, e in d.items():
-        rows.append(["arena", name, e["mesh"], e["texture"], e.get("table", "")])
+        rows.append(["arena", name, e["mesh"], e["texture"], e.get("table", ""), num(e["depth"]) if "depth" in e else ""])
         rows.append(["snaps", ";".join(",".join(num(v) for v in p) for p in e["snaps"])])
         for p in e["pieces"]:
             kv = []

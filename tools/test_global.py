@@ -107,6 +107,7 @@ function spawnObjectData(t)
       local p = t.position or {}
       return p.x and p or Vector(p[1] or 0, p[2] or 0, p[3] or 0)
     end,
+    setPosition = function(v) t.position = Vector(v[1] or v.x, v[2] or v.y, v[3] or v.z) end,
     getCustomObject = function() return cm and { mesh = cm.MeshURL, diffuse = cm.DiffuseURL } or {} end })
 end
 
@@ -246,9 +247,9 @@ def main():
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
     check(got == [("Chrysalia", False), ("Fontaine", False), ("Greenleaf", False), ("Illusio", False), ("Ingis", False),
-                  ("Pugilis", True), ("Spectra", False), ("Terrera Mountain", False), ("Valora", False), ("Violight", False),
-                  ("Viperia", False), ("Yaksha", False)],
-          f"map list shows the twelve arenas, Pugilis on the table ({got})")
+                  ("Pugilis", True), ("Snow", False), ("Spectra", False), ("Terrera Mountain", False), ("Valora", False),
+                  ("Violight", False), ("Viperia", False), ("Yaksha", False)],
+          f"map list shows the thirteen arenas, Pugilis on the table ({got})")
 
     def row(name):   # the map panel's row for an arena (alphabetical)
         return f"mapRes_White_{[m.name for m in g.mapList().values()].index(name) + 1}"
@@ -463,6 +464,69 @@ def main():
           and len(heights) == 3 and zone_y == [0.41, 1.38, 2.35] and backdrop(new, "misc/cave-placeholder-v1.jpg"),
           f"picking Terrera Mountain: its board (centre and two side floors at three heights {heights}), 2 flags, a zone "
           f"on each floor at its height {zone_y}, the cave table")
+
+    # Snow: 18 tiles deep, so the table stretches front to back (its trims keep their width outside the board), the
+    # snowfield covers the board's depth (a hair higher, over the trim), and the stands move back a tile with what's
+    # on them; picking a 16-tile map puts it all back
+    lua.execute(r"""
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end
+      tableObj = { scale = Vector(1, 1, 1) }
+      tableObj.getScale = function() return tableObj.scale end
+      tableObj.setScale = function(v) tableObj.scale = Vector(v[1], v[2], v[3]) end
+      tableObj.getBounds = function() return { size = Vector(110.3, 1, 75.246 * tableObj.scale.z) } end
+      Tables.getTableObject = function() return tableObj end
+      for _, st in ipairs({ southStand, northStand }) do   -- stands that can move
+        local pz = st.getPosition().z
+        st.getPosition = function() return Vector(0, 0.961, pz) end
+        st.setPosition = function(v) pz = v[3] or v.z end
+      end
+      local function loose(name, pos, locked)
+        local o = { tags = {}, pos = pos, locked = locked }
+        o.getName = function() return name end
+        o.getPosition = function() return o.pos end
+        o.setPosition = function(v) o.pos = Vector(v[1], v[2], v[3]) end
+        objects[#objects + 1] = o
+        return o
+      end
+      onPedestal = loose("Lokix", Vector(-17.625, 3.8, -28.0))
+      disc = loose("disc", Vector(-10.575, 3.68, 28.0), true)
+      inHand = loose("card", Vector(3.5, 3.0, -30.0)); inHand.held_by_color = "Red"
+      onBoard = loose("Pikachu", Vector(1.6, 1.4, -24.4))
+      for _, o in ipairs({ onPedestal, disc, inHand, onBoard }) do o.hasTag = function() return false end end
+    """)
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", row("Snow"))
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new]
+    sidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Snow"]
+    panel = [s for s in new if s.data.Tags[1] == "ArenaBackdrop"]
+    k = (58.4775 + 75.246 - 51.981) / 75.246
+    stand_z = 58.4775 / 2 + 0.4095
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("snow", "mesh"))
+          and kinds.count("Flag") == 4 and len(sidx["snaps"]) == 324 and abs(sidx["depth"] - 58.4775) < 1e-4
+          and backdrop(new, "misc/snowfield-placeholder-v1.jpg"),
+          "picking Snow: its 18x18 board, 4 flags, a snap point on every tile, the snowfield table")
+    check(abs(g.tableObj.scale.z - k) < 1e-6 and len(panel) == 1 and abs(panel[0].data.Transform.scaleZ - 58.4775 / 51.981) < 1e-6
+          and abs(panel[0].position[2] - 0.9625) < 1e-9,
+          f"the table stretches {k:.4f}x front to back (the trims keep their width outside the board) and the snowfield is "
+          f"stretched to the board's depth, a hair higher where it lies over the trim")
+    zs = lambda: (g.southStand.getPosition().z, g.northStand.getPosition().z)
+    sz, nz = zs()
+    check(abs(sz + stand_z) < 1e-6 and abs(nz - stand_z) < 1e-6 and abs(g.onPedestal.pos.z - (-28.0 - (stand_z - 26.4))) < 1e-6
+          and abs(g.disc.pos.z - (28.0 + stand_z - 26.4)) < 1e-6 and abs(g.inHand.pos.z + 30.0) < 1e-9
+          and abs(g.onBoard.pos.z + 24.4) < 1e-9,
+          f"the stands move back a tile to the usual gap from the board (z {nz:.3f}), taking the Pokemon on a pedestal and "
+          f"the (locked) pedestal discs with them; a card in a hand and a Pokemon on the board stay put")
+    lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')
+    g.mapPick(player, "-1", row("Spectra"))
+    sz, nz = zs()
+    spanel = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1) if calls.spawned[i].data.Tags[1] == "ArenaBackdrop"][-1]
+    check(abs(g.tableObj.scale.z - 1) < 1e-9 and abs(sz + 26.4) < 1e-6 and abs(nz - 26.4) < 1e-6
+          and abs(g.onPedestal.pos.z + 28.0) < 1e-6 and abs(g.disc.pos.z - 28.0) < 1e-6
+          and spanel.data.Transform.scaleZ == 1 and abs(spanel.position[2] - 0.9615) < 1e-9,
+          "picking a 16-tile map (Spectra) puts the table, the stands (and what's on them) and the panel back")
+    lua.execute("for _, o in ipairs({ onPedestal, disc, inHand, onBoard }) do o.destroyed = true end")
 
     # Valora: 5 gear plates (3 numbered), 10 blockers (closed), 3 capture zones lifted onto the gear plates
     lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')   # the gate stand-ins

@@ -5,7 +5,8 @@ For each arenas/<folder>/map.json with a "board" entry ({"mesh", "texture", "geo
 files, from tools/build_board.py), the index has the arena's board files, its table image, a snap point over
 every tile except "solid" ones (walls) (at the tile's top, position only: players set a Pokemon's facing themselves) and its 3D pieces
 (legend entries with "piece": true, placed as tools/place_pieces.py does). Positions are in the board's frame
-(the board sits on the table with no rotation). Global.lua downloads the index when the game loads.
+(the board sits on the table with no rotation), and its depth front to back (a board deeper than the usual play
+area stretches the table: Global.lua setTableDepth). Global.lua downloads the index when the game loads.
 """
 import json, sys
 from pathlib import Path
@@ -39,7 +40,7 @@ def arena_entry(folder):
     out_pieces = [{**{k: v for k, v in p.items() if k != "model"}, "yaw": round(p["yaw"], 2),
                    "pos": [round(v, 4) for v in p["pos"]], **p["model"]} for p in items]   # (+ pair, tiles, tile)
     return name, {"mesh": f"{rel}/{board['mesh']}", "texture": f"{rel}/{board['texture']}",
-                  "table": data.get("table", ""), "snaps": snaps, "pieces": out_pieces}
+                  "table": data.get("table", ""), "depth": round(R * T, 4), "snaps": snaps, "pieces": out_pieces}
 
 
 def main():
