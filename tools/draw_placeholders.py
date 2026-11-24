@@ -80,6 +80,9 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 left-right
   misc/snowfield-placeholder-v1.jpg             table image around Snow: snowfield, snowy pines, rocks (2048 x 1362:
                                                 Snow's deeper play area)
+  misc/pugilis-dirt-v1.jpg                      table image around Pugilis: the user's Dirt 2 / Dirt 5 tiles (not a
+                                                placeholder), mixed like the board's floor and lined up with its tiles,
+                                                a shade darker (between the top floor and the stairs)
 """
 from pathlib import Path
 
@@ -1383,6 +1386,35 @@ def snowfield_table():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
 
 
+def pugilis_table():
+    """Around Pugilis: the user's own dirt (arenas/pugilis/textures/dirt2.png, dirt5.png) like the board's top floor,
+    a little darker (the user's pick): each image recoloured so its median is SAND, halfway between the raw dirt's
+    (226, 194, 160) and the stairs' #C8A676 (as build_board.py's "match" does). A random pick of the two per tile,
+    each turned and mirrored at random, at the board's 128 px per tile (3464 x 2048 = the play area) and lined up
+    with the board's tiles (the board sits in the middle)."""
+    import random
+    from PIL import ImageStat
+    sand = (213, 180, 139)
+    tile, px = 3.24875, 128
+    w, h = round(87.9078 / tile * px), round(51.981 / tile * px)
+    copies = []
+    for name in ("dirt2", "dirt5"):
+        src = Image.open(REPO / "arenas/pugilis/textures" / f"{name}.png").convert("RGB")
+        typical = ImageStat.Stat(src).median
+        src = Image.merge("RGB", [band.point(lambda v, k=sand[i] / max(1, typical[i]): min(255, round(v * k)))
+                                  for i, band in enumerate(src.split())])
+        copies.append([v.resize((px, px), Image.LANCZOS) for t in (src, src.transpose(Image.FLIP_LEFT_RIGHT))
+                       for v in (t, t.transpose(Image.ROTATE_90), t.transpose(Image.ROTATE_180), t.transpose(Image.ROTATE_270))])
+    rnd = random.Random("Pugilis/table")
+    out = Image.new("RGB", (w, h))
+    x0 = w // 2 - ((w // 2 + px - 1) // px) * px
+    y0 = h // 2 - ((h // 2 + px - 1) // px) * px
+    for y in range(y0, h, px):
+        for x in range(x0, w, px):
+            out.paste(rnd.choice(rnd.choice(copies)), (x, y))
+    return out
+
+
 def main():
     files = {
         "arenas/snow/textures/snow1.png": lambda p: snow(291).save(p),
@@ -1392,6 +1424,7 @@ def main():
         "arenas/snow/textures/ice.png": lambda p: ice().save(p),
         "arenas/snow/textures/icy-water.png": lambda p: icy_water().save(p),
         "arenas/snow/textures/snow-rock.png": lambda p: snow_rock().save(p),
+        "misc/pugilis-dirt-v1.jpg": lambda p: pugilis_table().save(p, quality=90),
         "misc/snowfield-placeholder-v1.jpg": lambda p: snowfield_table().save(p, quality=90),
         "arenas/greenleaf/textures/lawn1.png": lambda p: lawn(271).save(p),
         "arenas/greenleaf/textures/lawn2.png": lambda p: lawn(272).save(p),

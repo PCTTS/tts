@@ -270,7 +270,7 @@ def main():
           and brd.CustomMesh.MeshURL.endswith(board("pugilis", "mesh")) and brd.CustomMesh.ColliderURL == brd.CustomMesh.MeshURL
           and brd.CustomMesh.DiffuseURL.endswith(board("pugilis", "texture")) and not brd.CustomMesh.Convex,
           "picking Pugilis puts its 3D board on the table (its own mesh as collider)")
-    check(len(flags) == 4 and backdrop(new, "misc/table-placeholder-v1.jpg") and calls.tableURL is None,
+    check(len(flags) == 4 and backdrop(new, "misc/pugilis-dirt-v1.jpg") and calls.tableURL is None,
           "with its 4 flags and its surroundings on the backdrop panel (the table itself untouched)")
 
     # Illusio: floating islands with 6 flags, 6 portals in their starting colours, 6 bridges that start dropped

@@ -147,8 +147,8 @@
     "texture": "board-v42.jpg",
     "geometry": "board-v42.json"
   },
-  "_table": "Image for the table around the board (placeholder until the arena gets its own).",
-  "table": "misc/table-placeholder-v1.jpg",
+  "_table": "Image for the table around the board: the user's Dirt 2 / Dirt 5 mixed like the top floor, a shade darker (between the top floor and the stairs; tools/draw_placeholders.py pugilis_table).",
+  "table": "misc/pugilis-dirt-v1.jpg",
   "_textures": "Image textures for surfaces (paths relative to this folder; images = pick one at random per copy). span = tiles one copy covers; vary = random quarter-turns and mirrors per copy; match = recolour to the surface's palette colour (or a named palette entry). walls = the inner walls (where ground drops inside the board); outer = the board's outer edge too. walls:<surface> = that surface's inner walls get their own image (tools/wall_texture.py previews and publishes them): the user's cliff art, Cliff 6 on the ground floor's walls and Cliff 8 on the steps' sides, both fitted from the pit floor (level 0) up to the ground floor (level 2) so the layers line up; above: floor = the steps' walls show the ground floor's cliff above the step's top and under the middle stairs' wedges; vary mirror = copies flipped at random.",
   "textures": {
     "walls:stairs": {
