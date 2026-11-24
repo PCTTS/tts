@@ -11,7 +11,7 @@ link). stand-v1.obj (the light stand on props-v1.jpg) stays published for saves 
 Also the pedestals (script-managed objects, so a stand can hold 9 or 6 and they can slide): props/pedestal-v1.obj
 (a round wooden pedestal with its black HP sign floating above it), pedestal-plain-v1.obj (no sign: the spectator
 stand's), pedestal-collider-v1.obj, pedestal-v1.jpg; the spectator stand at the table's right end
-(spectators-v1.obj on the stand wood); the turn track for each arena's turn count (turns-<n>-v2.obj/.jpg) and its
+(spectators-v2.obj on the stand wood); the turn track for each arena's turn count (turns-<n>-v2.obj/.jpg) and its
 token (turntoken-v2.obj/.jpg, a Poke Ball seen from above). (turns-<n>-v1 / turntoken-v1: the first look, unused.)
 
 Stand, in its own frame (as placed on the near/south trim): the back face (toward the board) is z = 0 and the
@@ -370,9 +370,11 @@ def pedestal_texture():
     return out
 
 
-# The spectator stand: a wooden block at the table's right end (in its own frame: long along z), its 6 pedestals
-# on top in two threes, each player's on their own half (Global.lua SPECTATORS).
-SPEC_W, SPEC_H, SPEC_L = 4.4, 1.6, 25.0
+# The spectator stand: a wooden block at the table's right end (in its own frame: long along z), as tall as the team
+# stands: its 6 pedestals in a row along the board side, evenly spaced (each player's 3 on their own half), and
+# beside each, on the outer side, room for its Pokemon's cards, stacked (Global.lua SPECTATORS). (v1: 4.4 x 1.6 x 25,
+# no room for cards.)
+SPEC_W, SPEC_H, SPEC_L = 5.4, TOP_H, 31.0
 
 
 def box_in_wood(m, x0, x1, y0, y1, z0, z1):
@@ -539,7 +541,7 @@ def main():
         "pedestal-plain-v1.obj": lambda p: pedestal(sign=False).write(p),
         "pedestal-collider-v1.obj": lambda p: pedestal_collider().write(p),
         "pedestal-v1.jpg": lambda p: pedestal_texture().save(p, quality=92),
-        "spectators-v1.obj": lambda p: spectators().write(p),
+        "spectators-v2.obj": lambda p: spectators().write(p),
         "turntoken-v2.obj": lambda p: turn_token().write(p),
         "turntoken-v2.jpg": lambda p: token_texture().save(p, quality=92),
     }
