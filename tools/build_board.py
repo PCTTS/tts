@@ -10,17 +10,17 @@ World layout (TTS units): the grid is centred on x = z = 0, row 0 is the far sid
 is y = 0. Tiles outside the arena ("void") get no geometry, so the board has the arena's real outline.
 TTS mirrors OBJ files on X when it loads them, so x is written negated.
 
-Floating islands (map.json "float": {lift, cliff, depth, power, max}, world units): everything is lifted `lift`
-above the table; where land meets the sky its edge drops `cliff`, and below that the rock hangs down, deeper the
+Floating islands (map.json "float": {lift, cliff, depth, power, max, rim_level}, world units): everything is lifted
+`lift` above the table; where land meets the sky its edge drops `cliff` below the top of level `rim_level` (default
+0: the islands' ground; a lower tile at the edge drops `cliff` below its own top), and below that the rock hangs down, deeper the
 farther a point is from the island's edge (depth * distance-in-tiles ^ power, at most `max`), so each island
 tapers to rough points underneath (on a grid `steps` x finer than the tiles, default 4: fewer for a board with a
 lot of land, to keep the model's vertex count down). No geometry under the sky tiles.
+Mountaintops (map.json "mountains": {slope}, with "float"; Avia): the islands are the tops of mountains instead: no
+underside; from the foot of each island's cliffs a rough rock face runs down and out at `slope` (rise over run;
+3.73 = 75 degrees) to the table (a cloud cover), each island its own mountain, apart from the others over the gaps
+(see flanks()); the board's outer edge drops straight to the table.
 
-Floating platforms (map.json "platforms": [{"path": [[row, col], ...]}], Avia): the platforms are 3D pieces
-(tools/place_pieces.py); with "rails": {below, width, height} the board gets a thin rail along each path (from
-tile middle to tile middle, its top `below` under the platforms' deck: the top of level "platform_level", default 0),
-coloured palette "rail" (painted into the
-atlas square of the path's bend tile, which is sky: nothing else uses it).
 """
 import json, math, random, sys
 from pathlib import Path
@@ -116,8 +116,20 @@ class Arena:
         return self.floor0() + self.max_level * LEVEL_H
 
     def rim(self):
-        """Floating islands: how high the cliff at an island's edge reaches down to (the underside starts there)."""
-        return self.floor0() - self.float.get("cliff", 0.45)
+        """Floating islands: how high the cliff at an island's edge reaches down to (the underside starts there):
+        `cliff` below the top of level "rim_level" (default 0)."""
+        return self.floor0() + self.float.get("rim_level", 0) * LEVEL_H - self.float.get("cliff", 0.45)
+
+    def rim_at(self, gx, gy):
+        """The rim at a point (tile units: column, row) on or in the land: lower where a tile touching it sits below
+        the rim's level (Avia's low tiles at an island's edge: their cliff drops `cliff` below their own top)."""
+        out = self.rim()
+        for r in (math.floor(gy - 1e-9), math.floor(gy + 1e-9)):
+            for c in (math.floor(gx - 1e-9), math.floor(gx + 1e-9)):
+                t = self.tile(r, c)
+                if t:
+                    out = min(out, self.top(t) - self.float.get("cliff", 0.45))
+        return out
 
     def away_from_pit(self, r, c):
         """The grid direction (dr, dc) pointing away from this tile's lower neighbours, or None if it has none."""
@@ -339,12 +351,6 @@ def draw_texture(a):
                 else:
                     base = a.palette[surface]
                     d.rectangle([box[0], box[1], box[2] - 1, box[3] - 1], fill=shade(base, rnd.uniform(0.96, 1.04)))
-    if a.data.get("rails"):   # each platform's rail colour, in its bend tile's (sky) square: see build_mesh
-        for plat in a.data.get("platforms") or []:
-            br, bc = plat["path"][1]
-            if a.tile(br, bc):
-                sys.exit(f"platform {plat['path']}: its bend tile must be sky (its rail's colour goes there)")
-            d.rectangle([bc * p, br * p, (bc + 1) * p - 1, (br + 1) * p - 1], fill=a.palette.get("rail", (184, 146, 90)))
     # wall strip, below the tiles. Left half: rock with horizontal strata, darker toward the bottom (outer walls).
     # Right half: the "walls" texture, if the map has one (inner walls); otherwise rock too. With "outer": true
     # in the walls texture, the left half (the board's outer edge) gets it as well.
@@ -396,10 +402,11 @@ def draw_texture(a):
                 both = both_ways(a, t)
                 if turn:   # drawn upright on its own layer, then turned so its bottom points the right way
                     layer = Image.new("RGBA", (p, p), (0, 0, 0, 0))
-                    draw_marker(layer, painted, 0, 0, p, both, a.palette.get("button"), a.palette)
+                    draw_marker(layer, painted, 0, 0, p, both, a.palette.get("button"), a.palette, a.data.get("marker_style"))
                     over.alpha_composite(layer.rotate(turn), (x0, y0t))
                 else:
-                    draw_marker(over, painted, x0, y0t, p, both, a.palette.get("button"), a.palette)
+                    draw_marker(over, painted, x0, y0t, p, both, a.palette.get("button"), a.palette,
+                                a.data.get("marker_style"))
     for r in range(a.R):   # slopes (see slopes()): the tile's edge band, darkening toward the bottom of the slope
         for c in range(a.C):
             sloped = slopes(a, r, c) if a.tile(r, c) else {}
@@ -719,6 +726,9 @@ def marker_turn(a, r, c, t):
     explicit "orient" wins ("away-from-pit": bottom away from the lower neighbours); anything else has its bottom
     toward the nearer left/right edge."""
     marker = painted_marker(t) or ""
+    if t.get("orient") == "out":   # bottom toward the board's nearest edge (Avia's spawns: read from outside, as drawn)
+        _, way = min((r, 0, (-1, 0)), (a.R - 1 - r, 1, (1, 0)), (c, 2, (0, -1)), (a.C - 1 - c, 3, (0, 1)))[::2]
+        return MARKER_TURN[way]
     if marker == "spawn1" or marker.startswith(("sand-", "ice-", "jump-")) or marker == "cracked":   # quicksand, ice
         return 0                                                    # and jump pad arrows point the way they act
     if marker.startswith("spawn2"):
@@ -804,16 +814,32 @@ def sand_arrow(o, cx, cy, u, way, scale=1.0, col=(66, 44, 24, 235)):
                (neck[0] + dy * head * 0.75, neck[1] - dx * head * 0.75)], fill=col)
 
 
-def draw_marker(im, marker, x0, y0, p, both=False, button=None, palette=None):
+def draw_marker(im, marker, x0, y0, p, both=False, button=None, palette=None, style=None):
     """Paints a marker on the image im, upright in the tile at (x0, y0). both: its number as N/N (draw_pair).
     button: the buttons' ring colour (the map's palette "button"; default yellow). palette: the map's palette
-    (colours some markers look up: "passage<n>", "flower-<name>")."""
+    (colours some markers look up: "passage<n>", "flower-<name>"). style: the map's "marker_style": "plain" paints
+    spawns and jump pads as bare translucent white symbols (a number, a double chevron), no rings or colours (Avia)."""
     if not marker:
         return
     o = ImageDraw.Draw(im)
     cx, cy, u = x0 + p / 2, y0 + p / 2, p / 128  # u = one design pixel
     ink = (45, 32, 22, 255)
-    if marker.startswith("spawn"):   # spawn1, spawn2, spawn2-star (a controlled spawn: a star above the number)
+    plain = (255, 255, 255, 115)   # "plain" style: translucent white (the ground shows through)
+    if style == "plain" and marker in ("spawn1", "spawn2"):   # an S with the player's number below right, as drawn
+        big, small, n = font(round(58 * u)), font(round(30 * u)), marker[5]
+        sb, nb = big.getbbox("S", anchor="ls"), small.getbbox(n, anchor="ls")
+        nx, ny = sb[2] + 3 * u - nb[0], 11 * u                 # the number's origin from the S's (baseline, left)
+        ox, oy = cx - (sb[0] + sb[2]) / 2, cy - (sb[1] + sb[3]) / 2   # the S's ink centred on the tile, the number off it
+        o.text((ox, oy), "S", font=big, fill=plain, anchor="ls")
+        o.text((ox + nx, oy + ny), n, font=small, fill=plain, anchor="ls")
+    elif style == "plain" and marker.startswith("jump-"):
+        dx, dy = SAND_DIRS[marker[len("jump-"):]]
+        px, py, arm = -dy, dx, 24 * u
+        for off in (-14, 14):   # two chevrons, tips 28 apart, centred on the tile
+            tx, ty = cx + dx * (off + 12) * u, cy + dy * (off + 12) * u
+            o.line([(tx - dx * arm + px * arm, ty - dy * arm + py * arm), (tx, ty),
+                    (tx - dx * arm - px * arm, ty - dy * arm - py * arm)], fill=plain, width=round(11 * u), joint="curve")
+    elif marker.startswith("spawn"):   # spawn1, spawn2, spawn2-star (a controlled spawn: a star above the number)
         col = (47, 111, 214, 255) if marker == "spawn1" else (214, 69, 47, 255)
         r = 40 * u
         o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(255, 255, 255, 70), outline=col, width=round(7 * u))
@@ -1216,6 +1242,23 @@ def build_mesh(a):
                 else:
                     edge = [(x0, z1), (x0, z0)]
                 (ax, az), (bx, bz) = edge
+                outside = not (0 <= r + dr < a.R and 0 <= c + dc < a.C)
+                if not nb and outside and a.data.get("mountains"):   # mountaintops: the board's outer edge drops
+                    low = 0.0                                        # straight to the table
+                feet = None   # the sky's side: down to the rim, which a low tile's deeper cliff pulls down where it
+                if not nb and a.float and not (outside and a.data.get("mountains")):   # touches: then the wall's foot
+                    # follows the underside's (or mountainside's) edge, point by point
+                    steps = a.float.get("steps", 4)
+                    feet = [a.rim_at((ax + (bx - ax) * k / steps) / TILE + a.C / 2, a.R / 2 - (az + (bz - az) * k / steps) / TILE)
+                            for k in range(steps + 1)]
+                    if max(feet) - min(feet) < 1e-9:
+                        low, feet = feet[0], None
+
+                def sky_low(px, pz, ax=ax, az=az, bx=bx, bz=bz, feet=feet):   # the foot at a point along the edge
+                    f = math.hypot(px - ax, pz - az) / (math.hypot(bx - ax, bz - az) or 1) * (len(feet) - 1)
+                    k = min(int(f), len(feet) - 2)
+                    return feet[k] + (feet[k + 1] - feet[k]) * (f - k)
+
                 half = a.C // 2   # strip slices: left half rock (outer walls), right half inner walls
                 pick = r * 5 + c * 3 + len(side)
                 key = own_key(a, t) if nb or own_outer(a, t) else None
@@ -1225,7 +1268,8 @@ def build_mesh(a):
                 else:
                     us = ((pick % (inner_n if nb else half)) + (half if nb else 0)) * PX
                     ua, ub = us, us + PX - 1
-                fs = sorted(set(edge_breaks(r, c) + (edge_breaks(r + dr, c + dc) if nb else [])))
+                fs = sorted(set(edge_breaks(r, c) + (edge_breaks(r + dr, c + dc) if nb else [])
+                                + ([k / (len(feet) - 1) for k in range(len(feet))] if feet else [])))
                 uv_for = None
                 if key in own and key[2] is not None:   # "above": under a wedge at either end of this wall (its band,
                     # out to the wedge's foot) the other surface's wall image all the way down, the tile's own image
@@ -1245,10 +1289,23 @@ def build_mesh(a):
                             mid = (f0 + f1) / 2
                             lo, hi = (oa, ob) if (band0 and mid < fw) or (band1 and mid > 1 - fw) else (ua, ub)
                             return lambda f, y: wall_uv(lo + f * (hi - lo), y)
-                if len(fs) > 2:   # a slope along this edge, here or next door: the wall follows both surfaces
+                if len(fs) > 2 and not (feet and len(fs) == len(feet) and not (edge_breaks(r, c)[1:-1])):
+                    # a slope along this edge, here or next door: the wall follows both surfaces
                     profile_wall(m, edge, fs, lambda px, pz: surface_at(r, c, px, pz),
-                                 (lambda px, pz: surface_at(r + dr, c + dc, px, pz)) if nb else (lambda px, pz: low),
+                                 (lambda px, pz: surface_at(r + dr, c + dc, px, pz)) if nb else
+                                 sky_low if feet else (lambda px, pz: low),
                                  normal, lambda f, y: wall_uv(ua + f * (ub - ua), y), uv_for=uv_for)
+                    continue
+                if feet:   # a flat top, its foot stepping with the underside's edge
+                    n = len(feet) - 1
+                    for k in range(n):
+                        p0 = (ax + (bx - ax) * k / n, az + (bz - az) * k / n)
+                        p1 = (ax + (bx - ax) * (k + 1) / n, az + (bz - az) * (k + 1) / n)
+                        u0, u1 = ua + (ub - ua) * k / n, ua + (ub - ua) * (k + 1) / n
+                        m.quad([(p0[0], wall_top, p0[1]), (p1[0], wall_top, p1[1]), (p1[0], feet[k + 1], p1[1]),
+                                (p0[0], feet[k], p0[1])],
+                               [wall_uv(u0, wall_top), wall_uv(u1, wall_top), wall_uv(u1, feet[k + 1]), wall_uv(u0, feet[k])],
+                               normal)
                     continue
                 if low >= wall_top:
                     continue
@@ -1256,25 +1313,10 @@ def build_mesh(a):
                        [wall_uv(ua, wall_top), wall_uv(ub, wall_top), wall_uv(ub, low), wall_uv(ua, low)],
                        normal)
     if a.float:
-        underside(a, m, wall_uv, a.float.get("steps", 4))
-    rails = a.data.get("rails")
-    for plat in (a.data.get("platforms") or []) if rails else []:   # a thin bar along each platform's path
-        path = plat["path"]
-        br, bc = path[1]
-        uv = [((bc + 0.5) * PX / W, 1 - (br + 0.5) * PX / H)] * 4   # its bend tile's square: the rail colour
-        top = a.floor0() + a.data.get("platform_level", 0) * LEVEL_H - rails["below"]
-        bot, hw = top - rails["height"], rails["width"] / 2
-        for (r0, c0), (r1, c1) in zip(path, path[1:]):   # each leg, a box reaching half its width past both ends
-            xa, xb = sorted((x(c0 + 0.5), x(c1 + 0.5)))
-            za, zb = sorted((z(r0 + 0.5), z(r1 + 0.5)))
-            xa, xb, za, zb = xa - hw, xb + hw, za - hw, zb + hw
-            for corners, normal in (([(xa, top, za), (xb, top, za), (xb, top, zb), (xa, top, zb)], (0, 1, 0)),
-                                    ([(xa, bot, za), (xb, bot, za), (xb, bot, zb), (xa, bot, zb)], (0, -1, 0)),
-                                    ([(xa, bot, za), (xb, bot, za), (xb, top, za), (xa, top, za)], (0, 0, -1)),
-                                    ([(xa, bot, zb), (xb, bot, zb), (xb, top, zb), (xa, top, zb)], (0, 0, 1)),
-                                    ([(xa, bot, za), (xa, bot, zb), (xa, top, zb), (xa, top, za)], (-1, 0, 0)),
-                                    ([(xb, bot, za), (xb, bot, zb), (xb, top, zb), (xb, top, za)], (1, 0, 0))):
-                m.quad(corners, uv, normal)
+        if a.data.get("mountains"):
+            flanks(a, m, wall_uv, a.float.get("steps", 4))
+        else:
+            underside(a, m, wall_uv, a.float.get("steps", 4))
     return m
 
 
@@ -1634,6 +1676,91 @@ def slope_surface(m, t, top, box, sloped, inner, tuv, curve=24, risen=None, rcor
                 m.tri(list(tri), [tuv(px, pz) for px, _, pz in tri], down=False)
 
 
+def flanks(a, m, wall_uv, S=4):
+    """Mountaintops: each island the top of its own mountain. From the foot of every cliff into the sky a rough rock
+    face runs down and out at `slope` to the table (where the clouds are), in two rows of facets with their foot and
+    middle jittered in and out (not at the ends of a tile's edge, so neighbouring faces meet); an island's outer
+    corners are closed with a cone, the faces at its inner corners run into each other. A face reaches out only
+    rim / slope, so with a steep slope the mountains stay apart over the gaps between islands. Where a face meets
+    the board's outer edge, an end piece closes it down to the table. Textured with the wall strip's rock."""
+    slope = a.data["mountains"].get("slope", 3.73)
+    rnd = random.Random(f"{a.data.get('name')}/mountains")
+    grid_pt = lambda px, pz: (px / TILE + a.C / 2, a.R / 2 - pz / TILE)   # world -> tile units (column, row)
+    W = a.C * PX
+
+    def u_of(px, pz):   # texture column: along the board, so neighbouring facets carry on the rock's pattern
+        gx, gy = grid_pt(px, pz)
+        return ((gx + gy) * PX) % W
+
+    def inside(r, c):
+        return 0 <= r < a.R and 0 <= c < a.C
+
+    outer = {"N": (0, 1), "S": (0, -1), "E": (1, 0), "W": (-1, 0)}   # a side's outward direction in world (x, z)
+    for r in range(a.R):
+        for c in range(a.C):
+            if not a.tile(r, c):
+                continue
+            x0, x1 = (c - a.C / 2) * TILE, (c + 1 - a.C / 2) * TILE
+            z0, z1 = (a.R / 2 - r) * TILE, (a.R / 2 - r - 1) * TILE
+            ends = {"N": ((x0, z0), (x1, z0)), "S": ((x1, z1), (x0, z1)), "E": ((x1, z0), (x1, z1)), "W": ((x0, z1), (x0, z0))}
+            for side, (dr, dc, _) in DIRS.items():
+                if a.tile(r + dr, c + dc) or not inside(r + dr, c + dc):
+                    continue   # land beside it, or the board's edge (its wall goes straight down)
+                (ax, az), (bx, bz) = ends[side]
+                nx, nz = outer[side]
+                cols = []
+                for k in range(S + 1):
+                    f = k / S
+                    px, pz = ax + (bx - ax) * f, az + (bz - az) * f
+                    top = a.rim_at(*grid_pt(px, pz))
+                    jm, jb = (1.0, 1.0) if k in (0, S) else (rnd.uniform(0.7, 1.35), rnd.uniform(0.8, 1.3))
+                    reach = top / slope
+                    cols.append([(px, top, pz), (px + nx * reach * 0.5 * jm, top * 0.5, pz + nz * reach * 0.5 * jm),
+                                 (px + nx * reach * jb, 0.0, pz + nz * reach * jb)])
+                normal = (nx * slope, 1.0, nz * slope)
+                ln = math.hypot(*normal)
+                normal = tuple(v / ln for v in normal)
+                for k in range(S):
+                    for row in (0, 1):
+                        q = [cols[k][row], cols[k + 1][row], cols[k + 1][row + 1], cols[k][row + 1]]
+                        m.quad(q, [wall_uv(u_of(qx, qz), qy) for qx, qy, qz in q], normal)
+                for (px, pz), col in (((ax, az), cols[0]), ((bx, bz), cols[S])):   # the board's edge: an end piece
+                    gx, gy = grid_pt(px, pz)
+                    if min(gx, gy) < 1e-6 or gx > a.C - 1e-6 or gy > a.R - 1e-6:
+                        en = (-1, 0, 0) if gx < 1e-6 else (1, 0, 0) if gx > a.C - 1e-6 else (0, 0, 1) if gy < 1e-6 else (0, 0, -1)
+                        foot = (px, 0.0, pz)
+                        m.tri_facing([col[0], col[2], foot], [wall_uv(u_of(px, pz), v[1]) for v in (col[0], col[2], foot)], en)
+                        m.tri_facing([col[0], col[1], col[2]], [wall_uv(u_of(px, pz), v[1]) for v in col], en)
+            # outer corners: both sides there face the sky (inside the board): a cone between the two faces' ends
+            for (s1, s2), (px, pz) in (((("N", "W"), (x0, z0))), (("N", "E"), (x1, z0)), (("S", "E"), (x1, z1)),
+                                       (("S", "W"), (x0, z1))):
+                if any(a.tile(r + DIRS[sd][0], c + DIRS[sd][1]) or not inside(r + DIRS[sd][0], c + DIRS[sd][1])
+                       for sd in (s1, s2)):
+                    continue
+                top = a.rim_at(*grid_pt(px, pz))
+                reach = top / slope
+                (n1x, n1z), (n2x, n2z) = outer[s1], outer[s2]
+                a1, a2 = math.atan2(n1z, n1x), math.atan2(n2z, n2x)
+                if a2 - a1 > math.pi:
+                    a2 -= 2 * math.pi
+                elif a1 - a2 > math.pi:
+                    a1 -= 2 * math.pi
+                fan = 4
+                ring = [(math.cos(a1 + (a2 - a1) * i / fan), math.sin(a1 + (a2 - a1) * i / fan)) for i in range(fan + 1)]
+                for (c1x, c1z), (c2x, c2z) in zip(ring, ring[1:]):
+                    mx, mz = (c1x + c2x) / 2, (c1z + c2z) / 2
+                    for (y0, k0), (y1, k1) in (((top, 0.0), (top * 0.5, 0.5)), ((top * 0.5, 0.5), (0.0, 1.0))):
+                        q = [(px + c1x * reach * k0, y0, pz + c1z * reach * k0), (px + c2x * reach * k0, y0, pz + c2z * reach * k0),
+                             (px + c2x * reach * k1, y1, pz + c2z * reach * k1), (px + c1x * reach * k1, y1, pz + c1z * reach * k1)]
+                        nrm = (mx * slope, 1.0, mz * slope)
+                        ln = math.hypot(*nrm)
+                        nrm = tuple(v / ln for v in nrm)
+                        if k0 == 0.0:   # the cone's tip: a triangle
+                            m.tri_facing([q[0], q[2], q[3]], [wall_uv(u_of(qx, qz), qy) for qx, qy, qz in (q[0], q[2], q[3])], nrm)
+                        else:
+                            m.quad(q, [wall_uv(u_of(qx, qz), qy) for qx, qy, qz in q], nrm)
+
+
 def underside(a, m, wall_uv, S=4):
     """Floating islands: the rock under every land tile, as a surface on a grid S x finer than the tiles. A point
     on an island's edge sits at the rim (where the cliff ends, so it meets the walls); farther in it hangs lower,
@@ -1660,6 +1787,12 @@ def underside(a, m, wall_uv, S=4):
     inner = np.minimum(1.0, dist * 2)                  # 0 on the edge (no jitter there, so it meets the walls)
     depth = np.minimum(f.get("max", 2.6), f.get("depth", 1.25) * dist ** f.get("power", 1.15))
     Yw = rim - depth - np.abs(rng.normal(0, 0.14, X.shape)) * inner
+    for r in range(a.R):   # under a low tile at the edge (rim_level above it): no higher than its own cliff's foot
+        for c in range(a.C):
+            t = a.tile(r, c)
+            if t and a.top(t) - f.get("cliff", 0.45) < rim:
+                near = (X >= c - 1e-9) & (X <= c + 1 + 1e-9) & (Y >= r - 1e-9) & (Y <= r + 1 + 1e-9)
+                Yw = np.where(near, np.minimum(Yw, a.top(t) - f.get("cliff", 0.45)), Yw)
     Xj = X + rng.uniform(-0.3, 0.3, X.shape) / S * (dist > 1e-6)
     Zj = Y + rng.uniform(-0.3, 0.3, X.shape) / S * (dist > 1e-6)
 

@@ -31,12 +31,12 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/flower-v1.obj, props/flower-red-v1.jpg, -blue-, -violet-  (Greenleaf: a flower, a flat bloom; own collider)
   props/grassbridge-v2.obj, props/grassbridge-v2.jpg, props/grassbridge-collider-v2.obj  (Greenleaf: one half of the
   grass bridge; v1, a single 5x2 deck that sank into the creek, superseded)
-  props/platform-v1.obj, props/platform-v1.jpg, props/platform-collider-v1.obj  (Avia: a floating platform)
+  props/platform-v2.obj, props/platform-v1.jpg, props/platform-collider-v1.obj  (Avia: a floating platform; v1 had
+  a post down to a rail under its track, since removed)
 tools/place_pieces.py puts them on an arena's marker tiles.
 
 Floating platform (Avia): a square wooden deck a tile across (a little less), planks in a dark frame with iron
-corner brackets, a lump of rock under it tapering down, and an iron post from the rock's bottom down to the rail the
-board has under its track (map.json rails.below). Its own frame: y = 0 is the deck's top, centred.
+corner brackets, a lump of rock under it tapering down. Its own frame: y = 0 is the deck's top, centred.
 
 Flower (Greenleaf): a thin flat bloom lying on its tile, eight round petals in its colour round a golden middle; a
 Pokemon stands on its middle (it carries the tile's snap point). Its own frame: y = 0 is the tile top.
@@ -149,7 +149,6 @@ GRASS_L, GRASS_W, GRASS_D = GRASS_TILES * TILE - 0.04, TILE - 0.02, 0.32   # a h
 PLAT_W = TILE - 0.1                     # Avia's floating platform: the deck, square (clear of the islands beside it)
 PLAT_D = 0.22                            # the deck's thickness
 PLAT_KEEL, PLAT_KEEL_K = 0.33, 0.45      # the rock under it: its depth, its bottom as a fraction of the deck
-PLAT_POST, PLAT_RAIL = 0.12, 0.75        # the post down to the rail: its width; the rail's top below the deck top
 PLAT_TEX = 512                           # texture: the deck's top (left 384 x 384), its sides (right), rock (bottom)
 
 
@@ -1080,7 +1079,7 @@ def plat_uv(u, v):
 
 def platform():
     """Avia's floating platform (see the module notes). Top: the texture's left 384 x 384; sides: its right strip;
-    the rock: its bottom strip; the post: the iron in the sides' band."""
+    the rock: its bottom strip."""
     m = PieceMesh()
     h, k, d0 = PLAT_W / 2, PLAT_W / 2 * PLAT_KEEL_K, -PLAT_D
     d1 = d0 - PLAT_KEEL
@@ -1100,11 +1099,6 @@ def platform():
                 [plat_uv(8, 392), plat_uv(504, 392), plat_uv(400, 504), plat_uv(112, 504)], [out] * 4)
     m.face4([(-k, d1, -k), (k, d1, -k), (k, d1, k), (-k, d1, k)],
             [plat_uv(150, 440), plat_uv(360, 440), plat_uv(360, 500), plat_uv(150, 500)], [(0, -1, 0)] * 4)
-    w = PLAT_POST / 2                                                                  # the post, down to the rail
-    iron = plat_uv(448, 192)
-    for (ax, az), (bx, bz), n in (((-w, -w), (w, -w), (0, 0, -1)), ((w, -w), (w, w), (1, 0, 0)),
-                                  ((w, w), (-w, w), (0, 0, 1)), ((-w, w), (-w, -w), (-1, 0, 0))):
-        m.face4([(ax, d1 + 0.02, az), (bx, d1 + 0.02, bz), (bx, -PLAT_RAIL, bz), (ax, -PLAT_RAIL, az)], [iron] * 4, [n] * 4)
     return m
 
 
@@ -1146,7 +1140,7 @@ def platform_texture():
     for _ in range(10):
         x = rng.uniform(388, n)
         d.line([(x, 0), (x + rng.uniform(-4, 4), 384)], fill=(52, 34, 20, 120), width=2)
-    d.rectangle([440, 0, 456, 384], fill=(70, 72, 78, 255))           # ...with an iron band (also the post's iron)
+    d.rectangle([440, 0, 456, 384], fill=(70, 72, 78, 255))           # ...with an iron band
     rock = np.asarray(Image.fromarray((rng.random((8, 32)) * 255).astype(np.uint8)).resize((n, 128), Image.BICUBIC),
                       np.float32) / 255
     rows = np.arange(128, dtype=np.float32)[:, None] / 128
@@ -1276,7 +1270,7 @@ def main():
         "grassbridge-v2.obj": lambda p: grass_bridge().write(p),
         "grassbridge-collider-v2.obj": lambda p: grass_bridge_collider().write(p),
         "grassbridge-v2.jpg": lambda p: grass_bridge_texture().save(p, quality=92),
-        "platform-v1.obj": lambda p: platform().write(p),
+        "platform-v2.obj": lambda p: platform().write(p),
         "platform-collider-v1.obj": lambda p: platform_collider().write(p),
         "platform-v1.jpg": lambda p: platform_texture().save(p, quality=92),
     }

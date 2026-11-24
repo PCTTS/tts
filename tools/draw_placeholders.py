@@ -85,6 +85,8 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 a shade darker (between the top floor and the stairs; the one in use;
                                                 v2, shaded like the stairs, was tried and reverted)
   arenas/avia/textures/skystone1.png, -2.png    Avia's low ground: pale cream flagstones, wind-worn streaks, pitting
+  arenas/avia/textures/mossbrick1.png, -2.png   Avia's stone cross (the user's pick over the flagstones): grey stone
+                                                bricks in staggered rows, mostly grown over with moss
   arenas/avia/textures/windgrass1.png, -2.png   Avia's high islands: short windswept grass, blades leaning together
   arenas/avia/textures/cloud-rock.png           cliffs and the islands' undersides: pale grey-violet layered rock,
                                                 seamless left-right
@@ -1419,6 +1421,41 @@ def skystone(seed, n=N):
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
 
 
+def moss_bricks(seed, n=N):
+    """Avia's stone cross: weathered grey stone bricks, 4 rows of 2 per tile in a running bond (the pattern repeats
+    exactly at the tile's edges, so neighbouring tiles carry it on), dark mortar, each brick a slightly different
+    shade with chipped, darker edges; moss growing out of the joints and over most of the bricks in big patches."""
+    rng = np.random.default_rng(seed)
+    rows, per = 4, 2
+    rh, bw = n // rows, n // per
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+    row = (yy // rh).astype(int)
+    off = (row % 2) * (bw // 2)                                  # every other row shifted half a brick
+    bx = ((xx + off) // bw).astype(int) % per
+    ex = np.minimum((xx + off) % bw, bw - 1 - (xx + off) % bw)   # distance to the brick's side, top/bottom
+    ey = np.minimum(yy % rh, rh - 1 - yy % rh)
+    edge = np.minimum(ex, ey)
+    shade = rng.uniform(0.86, 1.1, (rows, per))[row, bx]
+    img = mix((104, 104, 98), (150, 148, 138), fbm(n, n, rng, 6, 4)) * shade[..., None]
+    img *= (0.94 + 0.12 * fbm(n, n, rng, 32, 2))[..., None]     # grain
+    img *= (0.8 + 0.2 * np.clip(edge / 7, 0, 1))[..., None]     # rounded, darker edges
+    joint = edge < 3.5 + 2.5 * fbm(n, n, rng, 24, 2)             # mortar, a little uneven
+    img[joint] = mix((44, 46, 40), (62, 64, 56), fbm(n, n, rng, 16, 2))[joint]
+    near = np.clip(1 - edge / 22, 0, 1)                          # moss: out of the joints, and over most of the
+    patch = np.clip((fbm(n, n, rng, 5, 4) - 0.36) * 3.5, 0, 1)   # bricks in big patches (the user: more moss)
+    moss = np.clip(near * (0.5 + 0.9 * fbm(n, n, rng, 20, 3)) + patch, 0, 1) ** 0.9
+    green = mix((52, 78, 30), (96, 122, 48), fbm(n, n, rng, 28, 3))
+    img = img + (green - img) * (0.93 * moss)[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(int(2200 * float(moss.mean()) + 120)):           # moss tufts: small dots, thicker where it grows
+        x, y = rng.random() * n, rng.random() * n
+        if moss[int(y), int(x)] > 0.25:
+            r = rng.uniform(1.0, 2.6)
+            d.ellipse([x - r, y - r, x + r, y + r], fill=(120, 150, 60, 150) if rng.random() < 0.5 else (40, 64, 24, 140))
+    return out.filter(ImageFilter.GaussianBlur(0.5))
+
+
 def windgrass(seed):
     """Avia's high islands: short grass flattened by the wind, the blades leaning together, paler streaks where it
     lies flat."""
@@ -1505,6 +1542,8 @@ def main():
         "arenas/snow/textures/snow-rock.png": lambda p: snow_rock().save(p),
         "arenas/avia/textures/skystone1.png": lambda p: skystone(311).save(p),
         "arenas/avia/textures/skystone2.png": lambda p: skystone(312).save(p),
+        "arenas/avia/textures/mossbrick1.png": lambda p: moss_bricks(315).save(p),
+        "arenas/avia/textures/mossbrick2.png": lambda p: moss_bricks(316).save(p),
         "arenas/avia/textures/windgrass1.png": lambda p: windgrass(313).save(p),
         "arenas/avia/textures/windgrass2.png": lambda p: windgrass(314).save(p),
         "arenas/avia/textures/cloud-rock.png": lambda p: cloud_rock().save(p),

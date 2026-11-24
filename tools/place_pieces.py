@@ -99,7 +99,7 @@ GEAR_PLATES = {n: {"mesh": f"props/gear{n}-v1.obj", "collider": f"props/gear{n}-
                for n in (3, 4)}
 DOOR = {"mesh": "props/door-v1.obj", "collider": "props/door-v1.obj", "convex": True, "material": 3}
 FLOWER = {"mesh": "props/flower-v1.obj", "collider": "props/flower-v1.obj", "convex": True, "material": 3}
-PLATFORM = {"mesh": "props/platform-v1.obj", "diffuse": "props/platform-v1.jpg",
+PLATFORM = {"mesh": "props/platform-v2.obj", "diffuse": "props/platform-v1.jpg",
             "collider": "props/platform-collider-v1.obj", "convex": True, "material": 1}
 GRASS_BRIDGE = {"mesh": "props/grassbridge-v2.obj", "diffuse": "props/grassbridge-v2.jpg",
                 "collider": "props/grassbridge-collider-v2.obj", "convex": True, "material": 3}

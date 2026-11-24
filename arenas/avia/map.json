@@ -31,8 +31,8 @@
     "#": { "level": 1, "surface": "grass" },
     "H": { "level": 2, "surface": "grass", "slant": 0.559 },
     "_": { "level": 0, "surface": "floor", "slant": 0.559, "rise": true, "sheer": true },
-    "1": { "level": 1, "surface": "floor", "marker": "spawn1" },
-    "2": { "level": 1, "surface": "floor", "marker": "spawn2" },
+    "1": { "level": 1, "surface": "floor", "marker": "spawn1", "orient": "out" },
+    "2": { "level": 1, "surface": "floor", "marker": "spawn2", "orient": "out" },
     "F": { "level": 0, "surface": "floor", "slant": 0.559, "rise": true, "sheer": true, "marker": "flag", "paint": false, "piece": true },
     "G": { "level": 1, "surface": "grass", "marker": "flag", "paint": false, "piece": true },
     "^": { "level": 1, "surface": "grass", "marker": "jump-n" },
@@ -44,7 +44,9 @@
     "R": { "level": 1, "surface": "floor", "marker": "jump-e" },
     "L": { "level": 1, "surface": "floor", "marker": "jump-w" }
   },
-  "_platforms": "Floating platforms (3D pieces, tools/place_pieces.py): each starts on the first tile of its path (an x on the drawing) level with the land (platform_level), and its button glides it along the L to the last tile and back again (Global.lua), carrying the Pokemon on it. The board has a thin rail under each path (rails: its top this far below the platforms' deck, its width and height).",
+  "_marker_style": "plain: the spawns (an S with the player's number as a subscript, as drawn) and the jump pads' double chevrons are painted as bare translucent white symbols (the user's choice, like the buttons' icons), no rings or colours. The spawns have orient: out: their bottom toward the board's nearest edge, read from outside their island, as on the drawing.",
+  "marker_style": "plain",
+  "_platforms": "Floating platforms (3D pieces, tools/place_pieces.py): each starts on the first tile of its path (an x on the drawing) level with the land (platform_level), and its button glides it along the L to the last tile and back again (Global.lua), carrying the Pokemon on it.",
   "platforms": [
     { "path": [[2, 4], [2, 5], [3, 5]] },
     { "path": [[2, 12], [2, 11], [3, 11]] },
@@ -64,25 +66,25 @@
     { "path": [[14, 12], [14, 11], [13, 11]] }
   ],
   "platform_level": 1,
-  "rails": { "below": 0.75, "width": 0.18, "height": 0.1 },
-  "_float": "Floating islands like Illusio's: the whole board is lifted this many world units (at tile 3.24875) above the table (1.932: the land, level 1, tops out where Illusio's level 0 does, ~3.3 above the table), island edges drop a short cliff, and below that the rock tapers down to points (steps: its underside on a grid 3 x finer than the tiles, not 4: twice Illusio's land, so fewer vertices).",
-  "float": { "lift": 1.932, "cliff": 0.45, "depth": 1.25, "power": 1.15, "max": 2.6, "steps": 3 },
+  "_float": "Floating islands like Illusio's: the whole board is lifted this many world units (at tile 3.24875) above the table (1.932: the land, level 1, tops out where Illusio's level 0 does, ~3.3 above the table), island edges drop a short cliff below the land (rim_level 1: as thin as Illusio's islands; a low tile at the edge drops it below its own top), and below that the rock tapers down to points (steps: its underside on a grid 3 x finer than the tiles, not 4: twice Illusio's land, so fewer vertices).",
+  "float": { "lift": 1.932, "cliff": 0.45, "depth": 1.25, "power": 1.15, "max": 2.6, "steps": 3, "rim_level": 1 },
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v1.obj", "texture": "board-v1.jpg", "geometry": "board-v1.json" },
+  "board": { "mesh": "board-v2.obj", "texture": "board-v2.jpg", "geometry": "board-v2.json" },
+  "_mountains": "The islands are mountaintops (the user), each its own mountain: no underside; from the foot of each island's cliffs a rough rock face runs down and out at this slope (3.73: 75 degrees) to the table, a cover of clouds; steep enough that the mountains stay apart over the gaps between the islands. The board's outer edge drops straight to the table.",
+  "mountains": { "slope": 3.73 },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/clouds-placeholder-v1.jpg",
-  "_textures": "Placeholders from tools/draw_placeholders.py: pale wind-worn flagstones on the cross, windswept grass on the corner islands, pale layered rock on the cliffs and undersides.",
+  "_textures": "Placeholders from tools/draw_placeholders.py: mossy stone bricks on the cross (the user's pick over pale flagstones; not flipped, so the rows run the same way on every tile), windswept grass on the corner islands, pale layered rock on the cliffs and undersides.",
   "textures": {
-    "floor": { "images": ["textures/skystone1.png", "textures/skystone2.png"], "span": 1, "vary": true },
+    "floor": { "images": ["textures/mossbrick1.png", "textures/mossbrick2.png"], "span": 1 },
     "grass": { "images": ["textures/windgrass1.png", "textures/windgrass2.png"], "span": 1, "vary": true },
     "walls": { "image": "textures/cloud-rock.png", "outer": true }
   },
   "palette": {
-    "floor": "#CFC6B4",
+    "floor": "#7E8270",
     "grass": "#8DB25A",
     "cliff": "#8A8794",
     "base": "#5E5B68",
-    "rail": "#B8925A",
     "jump": "#2FA8E0"
   }
 }

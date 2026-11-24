@@ -1819,16 +1819,15 @@ function flowerClicked(_, _, id)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Floating platforms (Avia): a wooden deck in the sky, level with the low ground, riding a rail along an L (the board
--- has the rail). Its button (an L arrow the shape of its track) or right-click > Move platform glides it along the
--- rail, round the bend, to the other
+-- Floating platforms (Avia): a wooden deck in the sky, level with the land, moving along an L. Its button (an L arrow
+-- the shape of its track) or right-click > Move platform glides it along its track, round the bend, to the other
 -- end, carrying whatever stands on it (Pokémon keep the way they face); the next time it goes back. Its memo:
 -- { route = { {dx, dy, dz}, ... } (the bend and the far end, from its first tile), x, y, z (its first tile),
 -- at = 1 (there) or #route + 1 (at the far end), tile, arms (its L's arms from the bend, "ne" ...: the icon) }.
 ----------------------------------------------------------------------------------------------------
 PLATFORM_GLIDE_TIME, PLATFORM_GLIDE_FRAMES = 2.0, 120   -- seconds a move takes (game clock); frames without one
 PLATFORM_BUTTON = { x = 1.12, z = -1.12, y = 0.01 }      -- in a corner of the deck, clear of a Pokémon's base
-PLATFORM_DESC = "Floating platform. When a Pokémon ends its move on it, it glides along its rail to the other end, "
+PLATFORM_DESC = "Floating platform. When a Pokémon ends its move on it, it glides along its track to the other end, "
   .. "taking the Pokémon with it. Click the arrow on it to move it."
 gliding = {}                                            -- platform guid -> true while it moves
 
