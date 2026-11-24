@@ -11,8 +11,9 @@ link). stand-v1.obj (the light stand on props-v1.jpg) stays published for saves 
 Also the pedestals (script-managed objects, so a stand can hold 9 or 6 and they can slide): props/pedestal-v1.obj
 (a round wooden pedestal with its black HP sign floating above it), pedestal-plain-v1.obj (no sign: the spectator
 stand's), pedestal-collider-v1.obj, pedestal-v1.jpg; the spectator stand at the table's right end
-(spectators-v2.obj on the stand wood); the turn track for each arena's turn count (turns-<n>-v2.obj/.jpg) and its
-token (turntoken-v2.obj/.jpg, a Poke Ball seen from above). (turns-<n>-v1 / turntoken-v1: the first look, unused.)
+(spectators-v3.obj/.jpg: one block with the turn track, numbered 1-15, along its board side; spectators-v1/v2 and the
+separate turn track turns-<n>-v1/v2 came first) and the turn token (turntoken-v2.obj/.jpg, a Poke Ball seen from
+above; v1 unused).
 
 Stand, in its own frame (as placed on the near/south trim): the back face (toward the board) is z = 0 and the
 stand extends toward -z (toward the player); y = 0 is the table top. Cross-section: a flat top for the
@@ -511,6 +512,67 @@ def token_texture():
     return img.resize((TOKEN_TEX, TOKEN_TEX), Image.LANCZOS)
 
 
+# The spectator stand with the turn track (v3, the user's merge): one wooden block at the table's right end, as tall
+# as the team stands. In its own frame (Global.lua lays it turned round, yaw 180, so +x faces the board): along its
+# +x side the turn track, numbered slots 1-15 (1 at -z) reading from +x, the arena's last turn tinted gold by
+# Global.lua (object UI, no reload); along the middle the 6 pedestals' row; along -x the rows of stacked cards.
+SPEC3_W, SPEC3_L, SPEC3_PX = 8.0, 31.0, 80
+SPEC3_TRACK_X = 2.7                     # the slots' centre across the block (its own frame)
+SPEC3_GROOVE_X = 1.4                    # a dark line between the track and the seats
+SPEC3_TURNS = 15
+
+
+def spec3_layout():
+    top_h, side_h = round(SPEC3_W * SPEC3_PX), round(TOP_H * SPEC3_PX)
+    return round(SPEC3_L * SPEC3_PX), top_h, side_h, top_h + 8 + side_h
+
+
+def spec3_slots():
+    """The slot centres along the block (its own frame), turn 1 first."""
+    return [round(-SPEC3_TURNS * TURN_SLOT / 2 + (i - 0.5) * TURN_SLOT, 4) for i in range(1, SPEC3_TURNS + 1)]
+
+
+def spectators3():
+    m = StandeeMesh()
+    L, W, H = SPEC3_L, SPEC3_W, TOP_H
+    tw, top_h, side_h, th = spec3_layout()
+
+    def uv(z, x):          # top: image x from -z (left) to +z, image y from -x (top) to +x
+        return (z + L / 2) * SPEC3_PX / tw, 1 - (x + W / 2) * SPEC3_PX / th
+
+    def side_uv(a, y):
+        return a * SPEC3_PX / tw, 1 - (top_h + 8 + (H - y) * SPEC3_PX) / th
+    x0, x1, z0, z1 = -W / 2, W / 2, -L / 2, L / 2
+    top = [(x0, H, z0), (x1, H, z0), (x1, H, z1), (x0, H, z1)]
+    m.quad(top, [uv(c[2], c[0]) for c in top], (0, 1, 0))
+    for x, nx in ((x0, -1), (x1, 1)):
+        side = [(x, H, z0), (x, H, z1), (x, 0, z1), (x, 0, z0)]
+        m.quad(side, [side_uv(c[2] - z0, c[1]) for c in side], (nx, 0, 0))
+    for z, nz in ((z0, -1), (z1, 1)):
+        end = [(x0, H, z), (x1, H, z), (x1, 0, z), (x0, 0, z)]
+        m.quad(end, [side_uv(c[0] - x0, c[1]) for c in end], (0, 0, nz))
+    return m
+
+
+def spectators3_texture():
+    from PIL import ImageFont
+    L, W = SPEC3_L, SPEC3_W
+    tw, top_h, side_h, th = spec3_layout()
+    img = wood_texture(w=tw, h=th)
+    d = ImageDraw.Draw(img)
+    gy = (SPEC3_GROOVE_X + W / 2) * SPEC3_PX
+    d.line([(0, gy), (tw, gy)], fill=(14, 7, 4), width=4)
+    font = ImageFont.truetype("arialbd.ttf", round(SPEC3_PX * 1.05))
+    size = 1.7 * SPEC3_PX
+    cy = (SPEC3_TRACK_X + W / 2) * SPEC3_PX
+    for i, zc in enumerate(spec3_slots(), start=1):
+        cx = (zc + L / 2) * SPEC3_PX
+        d.rounded_rectangle([cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2], radius=SPEC3_PX * 0.22,
+                            fill=(222, 206, 172), outline=(96, 70, 44), width=max(2, SPEC3_PX // 18))
+        d.text((cx, cy + SPEC3_PX * 0.04), str(i), font=font, fill=(58, 34, 18), anchor="mm")
+    return img
+
+
 def slots():
     """Slot positions in the stand's frame. Card rotation is (0, yaw, tilt): the card is turned a quarter so it
     lies landscape, then tilted to the slope (see Global.lua for the yaw)."""
@@ -542,6 +604,8 @@ def main():
         "pedestal-collider-v1.obj": lambda p: pedestal_collider().write(p),
         "pedestal-v1.jpg": lambda p: pedestal_texture().save(p, quality=92),
         "spectators-v2.obj": lambda p: spectators().write(p),
+        "spectators-v3.obj": lambda p: spectators3().write(p),
+        "spectators-v3.jpg": lambda p: spectators3_texture().save(p, quality=90),
         "turntoken-v2.obj": lambda p: turn_token().write(p),
         "turntoken-v2.jpg": lambda p: token_texture().save(p, quality=92),
     }
