@@ -54,8 +54,10 @@
     { "rows": [0, 7], "cols": [9, 16], "by": 2 }
   ],
   "numbers": "both",
+  "_marker_style": "plain: the spawns are painted as a translucent white S with the player's number as a subscript (Avia's, the user's choice for every map), facing their own player.",
+  "marker_style": "plain",
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
-  "board": { "mesh": "board-v4.obj", "texture": "board-v4.jpg", "geometry": "board-v4.json" },
+  "board": { "mesh": "board-v4.obj", "texture": "board-v5.jpg", "geometry": "board-v4.json" },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",
   "table": "misc/cave-placeholder-v1.jpg",
   "_textures": "Placeholders from tools/draw_placeholders.py: hive earth, quicksand, layered earth cliffs.",

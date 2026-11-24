@@ -323,7 +323,7 @@ def main():
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
     check(got == [("Avia", False), ("Chrysalia", False), ("Fontaine", False), ("Greenleaf", False), ("Illusio", False), ("Ingis", False),
-                  ("Pugilis", True), ("Snow", False), ("Spectra", False), ("Terrera Mountain", False), ("Valora", False),
+                  ("Nixtorm", False), ("Pugilis", True), ("Spectra", False), ("Terrera Mountain", False), ("Valora", False),
                   ("Violight", False), ("Viperia", False), ("Yaksha", False)],
           f"map list shows the fourteen arenas, Pugilis on the table ({got})")
 
@@ -548,7 +548,7 @@ def main():
           f"picking Terrera Mountain: its board (centre and two side floors at three heights {heights}), 2 flags, a zone "
           f"on each floor at its height {zone_y}, the cave table")
 
-    # Snow: 18 tiles deep, so the table stretches front to back (its trims keep their width outside the board), the
+    # Nixtorm (once Snow): 18 tiles deep, so the table stretches front to back (its trims keep their width outside the board), the
     # snowfield covers the board's depth (a hair higher, over the trim), and the stands move back a tile with what's
     # on them; picking a 16-tile map puts it all back
     lua.execute(r"""
@@ -579,17 +579,20 @@ def main():
     """)
     n = len(calls.spawned)
     g.refreshMaps("White")
-    g.mapPick(player, "-1", row("Snow"))
+    g.mapPick(player, "-1", row("Nixtorm"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
     kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
-    sidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Snow"]
+    sidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Nixtorm"]
     panel = [s for s in new if s.data.Tags[1] == "ArenaBackdrop"]
     k = (58.4775 + 75.246 - 51.981) / 75.246
     stand_z = 58.4775 / 2 + 0.4095
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("snow", "mesh"))
           and kinds.count("Flag") == 4 and len(sidx["snaps"]) == 324 and abs(sidx["depth"] - 58.4775) < 1e-4
           and backdrop(new, "misc/snowfield-placeholder-v1.jpg"),
-          "picking Snow: its 18x18 board, 4 flags, a snap point on every tile, the snowfield table")
+          "picking Nixtorm (once Snow): its 18x18 board, 4 flags, a snap point on every tile, the snowfield table")
+    check(g.boardArena(lua.eval('{ getName = function() return "Snow" end }')) == "Nixtorm"
+          and g.boardArena(lua.eval('{ getName = function() return "Pugilis" end }')) == "Pugilis",
+          "a board saved under the old name Snow still counts as Nixtorm (its table stretch, turns, the map list)")
     check(abs(g.tableObj.scale.z - k) < 1e-6 and len(panel) == 1 and abs(panel[0].data.Transform.scaleZ - 58.4775 / 51.981) < 1e-6
           and abs(panel[0].position[2] - 0.9625) < 1e-9,
           f"the table stretches {k:.4f}x front to back (the trims keep their width outside the board) and the snowfield is "

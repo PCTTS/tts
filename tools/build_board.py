@@ -91,6 +91,8 @@ class Arena:
             sys.exit(f"map.json: rows must all be {self.C} wide and use only legend characters (unknown: {bad})")
         self.max_level = max(t.get("level", 0) for t in self.legend.values() if not t.get("void"))
         self.float = self.data.get("float")
+        self.seed = self.data.get("seed", self.data.get("name", ""))   # what the random choices are seeded with: a
+                                                                        # renamed map keeps its look (Nixtorm: "Snow")
         self.lift = self.float.get("lift", 0.0) if self.float else 0.0
 
     def tile(self, r, c):
@@ -204,7 +206,7 @@ def surface_layers(a, p):
             continue  # walls are textured in the wall strip (see draw_texture, own_walls)
         size = round(spec.get("span", max(a.R, a.C)) * p)
         choices = texture_choices(a, spec, surface, size, size)
-        rnd = random.Random(f"{a.data.get('name')}/{surface}")
+        rnd = random.Random(f"{a.seed}/{surface}")
         layer = Image.new("RGB", (a.C * p, a.R * p))
         oy, ox = (v * p % size for v in spec.get("offset", (0, 0)))
         for y in range(oy - size if oy else 0, a.R * p, size):
@@ -316,11 +318,11 @@ def paint_own_walls(a, img, layers, p):
 
     own, _ = own_walls(a)
     for (surface, top, split), slices in own.items():
-        rnd = random.Random(f"{a.data.get('name')}/walls:{surface}/{top:.4f}")
+        rnd = random.Random(f"{a.seed}/walls:{surface}/{top:.4f}")
         other = textures[f"walls:{surface}"].get("above") if split is not None else None
         if other and f"walls:{other}" not in textures:
             other = None
-        ornd = random.Random(f"{a.data.get('name')}/walls:{surface}/above:{other}/{split}")
+        ornd = random.Random(f"{a.seed}/walls:{surface}/above:{other}/{split}")
         for i in slices:
             col = image_column(surface, top, rnd)
             if other:   # the other surface's wall image down to the tiles' own top
@@ -367,7 +369,7 @@ def draw_texture(a):
         # the strip spans the board's full height range, a slice one tile's width
         tall = round(STRIP * SS * TILE / a.y_span())
         choices = texture_choices(a, wall_spec, "walls", p, tall)
-        rnd = random.Random(f"{a.data.get('name')}/walls")
+        rnd = random.Random(f"{a.seed}/walls")
         first = 0 if wall_spec.get("outer") else a.C // 2   # "outer": the board's outer edge uses it too
         for i in range(first, a.C):
             piece = rnd.choice(rnd.choice(choices))
@@ -624,7 +626,7 @@ def grass_fringe(a, img, layers, p):
     slope) give or take `wobble`; `rough` adds fine jaggedness to its top edge; `tufts` = blade tufts tried per
     slope, leaning up the slope just above the edge. The edge comes from a smooth function of the board position,
     so it runs on across tiles and corners."""
-    rnd = random.Random(f"{a.data.get('name')}/fringe")
+    rnd = random.Random(f"{a.seed}/fringe")
     phases = [(rnd.uniform(0, 6.3), rnd.uniform(0, 6.3)) for _ in range(6)]
 
     def ragged(gx, gy, rough):   # -1..1, wavy along any edge (gx, gy: board pixels at SS)
@@ -825,13 +827,18 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None, palette=None, st
     cx, cy, u = x0 + p / 2, y0 + p / 2, p / 128  # u = one design pixel
     ink = (45, 32, 22, 255)
     plain = (255, 255, 255, 115)   # "plain" style: translucent white (the ground shows through)
-    if style == "plain" and marker in ("spawn1", "spawn2"):   # an S with the player's number below right, as drawn
-        big, small, n = font(round(58 * u)), font(round(30 * u)), marker[5]
+    if style == "plain" and marker in ("spawn1", "spawn2", "spawn1-star", "spawn2-star"):   # an S with the player's
+        big, small, n = font(round(58 * u)), font(round(30 * u)), marker[5]               # number below right, as drawn
         sb, nb = big.getbbox("S", anchor="ls"), small.getbbox(n, anchor="ls")
         nx, ny = sb[2] + 3 * u - nb[0], 11 * u                 # the number's origin from the S's (baseline, left)
         ox, oy = cx - (sb[0] + sb[2]) / 2, cy - (sb[1] + sb[3]) / 2   # the S's ink centred on the tile, the number off it
         o.text((ox, oy), "S", font=big, fill=plain, anchor="ls")
         o.text((ox + nx, oy + ny), n, font=small, fill=plain, anchor="ls")
+        if marker.endswith("-star"):   # a controlled spawn: a small star above the S
+            sy = oy + sb[1] - 15 * u
+            o.polygon([(cx + (11 if k % 2 == 0 else 4.5) * u * math.cos(-math.pi / 2 + k * math.pi / 5),
+                        sy + (11 if k % 2 == 0 else 4.5) * u * math.sin(-math.pi / 2 + k * math.pi / 5)) for k in range(10)],
+                      fill=plain)
     elif style == "plain" and marker.startswith("jump-"):
         dx, dy = SAND_DIRS[marker[len("jump-"):]]
         px, py, arm = -dy, dx, 24 * u
@@ -970,7 +977,7 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None, palette=None, st
             o.text((cx, cy + 2 * u), n, font=font(round(52 * u)), fill=fill, anchor="mm")
     elif marker.startswith("sand-"):   # quicksand (Terrera): an arrow the way it drags a Pokémon that ends its turn here
         sand_arrow(o, cx, cy, u, SAND_DIRS[marker[len("sand-"):]])
-    elif marker.startswith("ice-"):   # ice (Snow): a deep blue arrow the way it slides a Pokémon (dirs as sand-)
+    elif marker.startswith("ice-"):   # ice (Nixtorm): a deep blue arrow the way it slides a Pokémon (dirs as sand-)
         sand_arrow(o, cx, cy, u, SAND_DIRS[marker[len("ice-"):]], 1.1, (24, 62, 112, 235))
     elif marker.startswith("jump-"):   # a jump pad (Avia): a dark round pad, a glowing ring (palette "jump") and a
         dx, dy = SAND_DIRS[marker[len("jump-"):]]   # double chevron pointing the way it throws (dirs as sand-)
@@ -1684,7 +1691,7 @@ def flanks(a, m, wall_uv, S=4):
     rim / slope, so with a steep slope the mountains stay apart over the gaps between islands. Where a face meets
     the board's outer edge, an end piece closes it down to the table. Textured with the wall strip's rock."""
     slope = a.data["mountains"].get("slope", 3.73)
-    rnd = random.Random(f"{a.data.get('name')}/mountains")
+    rnd = random.Random(f"{a.seed}/mountains")
     grid_pt = lambda px, pz: (px / TILE + a.C / 2, a.R / 2 - pz / TILE)   # world -> tile units (column, row)
     W = a.C * PX
 
@@ -1783,7 +1790,7 @@ def underside(a, m, wall_uv, S=4):
     for x0, y0, x1, y1 in segs:
         px, py = np.clip(X, min(x0, x1), max(x0, x1)), np.clip(Y, min(y0, y1), max(y0, y1))
         dist = np.minimum(dist, np.hypot(X - px, Y - py))
-    rng = np.random.default_rng(sum(map(ord, a.data.get("name", ""))))
+    rng = np.random.default_rng(sum(map(ord, a.seed)))
     inner = np.minimum(1.0, dist * 2)                  # 0 on the edge (no jitter there, so it meets the walls)
     depth = np.minimum(f.get("max", 2.6), f.get("depth", 1.25) * dist ** f.get("power", 1.15))
     Yw = rim - depth - np.abs(rng.normal(0, 0.14, X.shape)) * inner

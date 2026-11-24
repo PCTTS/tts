@@ -67,10 +67,12 @@
     [ 10, 15, 19 ],
     [ 9, 7, 20 ]
   ],
+  "_marker_style": "plain: the spawns are painted as a translucent white S with the player's number as a subscript (Avia's, the user's choice for every map), facing their own player.",
+  "marker_style": "plain",
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "board": {
     "mesh": "board-v1.obj",
-    "texture": "board-v4.jpg",
+    "texture": "board-v5.jpg",
     "geometry": "board-v1.json"
   },
   "_table": "Image for the table around the board (placeholder until the arena gets its own).",

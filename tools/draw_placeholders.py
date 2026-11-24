@@ -72,14 +72,14 @@ Writes (only files that are missing: bump a version when what a file holds chang
   arenas/greenleaf/textures/creek.png           the creek under the grass bridge: green-blue water, lily pads
   arenas/greenleaf/textures/soil.png            the creek's banks and the board's edge: garden soil, stones, roots
   misc/garden-placeholder-v1.jpg                table image around Greenleaf: lawn, round flower beds, low shrubs
-  arenas/snow/textures/snow1.png, snow2.png     Snow's high ground: fresh snow, blue-grey drift shading, glints
-  arenas/snow/textures/trampled1.png, -2.png    Snow's low ground: trampled grey snow, frozen earth and gravel
+  arenas/snow/textures/snow1.png, snow2.png     Nixtorm's high ground: fresh snow, blue-grey drift shading, glints
+  arenas/snow/textures/trampled1.png, -2.png    Nixtorm's low ground: trampled grey snow, frozen earth and gravel
   arenas/snow/textures/ice.png                  ice tiles: glassy pale blue, white cracks, streaks of light
   arenas/snow/textures/icy-water.png            water: dark cold blue, floating plates of ice
   arenas/snow/textures/snow-rock.png            the board's edge: grey layered rock, snow on its ledges, seamless
                                                 left-right
-  misc/snowfield-placeholder-v1.jpg             table image around Snow: snowfield, snowy pines, rocks (2048 x 1362:
-                                                Snow's deeper play area)
+  misc/snowfield-placeholder-v1.jpg             table image around Nixtorm: snowfield, snowy pines, rocks (2048 x 1362:
+                                                Nixtorm's deeper play area)
   misc/pugilis-dirt-v1.jpg                      table image around Pugilis: the user's Dirt 2 / Dirt 5 tiles (not a
                                                 placeholder), mixed like the board's floor and lined up with its tiles,
                                                 a shade darker (between the top floor and the stairs; the one in use;
@@ -1281,7 +1281,7 @@ def garden_table():
 
 
 def snow(seed):
-    """Snow's high ground: fresh snow, soft drifts shaded blue-grey, faint wind ripples, glints."""
+    """Nixtorm's high ground: fresh snow, soft drifts shaded blue-grey, faint wind ripples, glints."""
     rng = np.random.default_rng(seed)
     t = fbm(N, N, rng, 3, 5)
     img = mix((206, 216, 230), (246, 249, 252), np.clip((t - 0.25) * 1.8, 0, 1))
@@ -1298,7 +1298,7 @@ def snow(seed):
 
 
 def trampled(seed):
-    """Snow's low ground: trampled grey snow, frozen earth and gravel showing through in patches."""
+    """Nixtorm's low ground: trampled grey snow, frozen earth and gravel showing through in patches."""
     rng = np.random.default_rng(seed)
     img = mix((150, 158, 170), (196, 204, 214), fbm(N, N, rng, 4, 5))
     bare = np.clip((fbm(N, N, rng, 5, 4) - 0.56) * 4, 0, 1)
@@ -1313,7 +1313,7 @@ def trampled(seed):
 
 
 def ice():
-    """Snow's ice tiles: glassy pale blue, darker depths, white cracks and streaks of light."""
+    """Nixtorm's ice tiles: glassy pale blue, darker depths, white cracks and streaks of light."""
     rng = np.random.default_rng(281)
     t = fbm(N, N, rng, 3, 5)
     img = mix((120, 176, 214), (196, 230, 246), t)
@@ -1337,7 +1337,7 @@ def ice():
 
 
 def icy_water():
-    """Snow's water: dark cold blue, faint ripples, floating plates of ice."""
+    """Nixtorm's water: dark cold blue, faint ripples, floating plates of ice."""
     rng = np.random.default_rng(283)
     t = fbm(N, N, rng, 3, 5)
     rip = 0.5 + 0.5 * np.sin((t * 6 + fbm(N, N, rng, 2) * 2) * 2 * np.pi)
@@ -1355,7 +1355,7 @@ def icy_water():
 
 
 def snow_rock():
-    """Snow's board edge and cliffs: grey layered rock, snow lying on its ledges, seamless left-right."""
+    """Nixtorm's board edge and cliffs: grey layered rock, snow lying on its ledges, seamless left-right."""
     rng = np.random.default_rng(285)
     h, w = 1024, N
     warp = fbm(h, w, rng, 3, 4, wrap_x=True)
@@ -1369,7 +1369,7 @@ def snow_rock():
 
 def snowfield_table():
     """Around Snow: a wide snowfield, blue drift shadows, snowy pines and a few rocks poking through. Drawn deeper than
-    the other table images (2048 x 1362, the play area's width by Snow's 18 tiles): its panel is stretched to the
+    the other table images (2048 x 1362, the play area's width by Nixtorm's 18 tiles): its panel is stretched to the
     board's depth (Global.lua setTableDepth)."""
     rng = np.random.default_rng(287)
     h, w = 1362, 2048

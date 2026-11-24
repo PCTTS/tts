@@ -46,16 +46,8 @@
       "sheer": true,
       "shade": false
     },
-    "1": {
-      "level": 2,
-      "surface": "floor",
-      "marker": "spawn1"
-    },
-    "2": {
-      "level": 2,
-      "surface": "floor",
-      "marker": "spawn2"
-    },
+    "1": { "level": 2, "surface": "floor", "marker": "spawn1", "orient": "out" },
+    "2": { "level": 2, "surface": "floor", "marker": "spawn2", "orient": "out" },
     "F": {
       "level": 2,
       "surface": "floor",
@@ -141,12 +133,14 @@
       ]
     ]
   },
+  "_marker_style": "plain: the spawns are painted as a translucent white S with the player's number as a subscript (Avia's, the user's choice for every map); orient: out = facing out from the board's nearest edge (the user's choice for Pugilis).",
+  "marker_style": "plain",
   "_board": "The published board files the map picker uses (from tools/build_board.py; update when a new version is published), then run tools/build_arena_index.py.",
   "_stair_lines": "No step lines painted on the stairs (the user's choice, 2026-11-22).",
   "stair_lines": false,
   "board": {
     "mesh": "board-v42.obj",
-    "texture": "board-v42.jpg",
+    "texture": "board-v43.jpg",
     "geometry": "board-v42.json"
   },
   "_table": "Image for the table around the board: the user's Dirt 2 / Dirt 5 mixed like the top floor, a shade darker (between the top floor and the stairs; tools/draw_placeholders.py pugilis_table; v2, shaded like the stairs, was tried and reverted).",

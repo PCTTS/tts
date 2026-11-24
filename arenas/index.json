@@ -1421,7 +1421,7 @@
  },
  "Chrysalia": {
   "mesh": "arenas/chrysalia/board-v1.obj",
-  "texture": "arenas/chrysalia/board-v4.jpg",
+  "texture": "arenas/chrysalia/board-v5.jpg",
   "table": "misc/mulch-placeholder-v2.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -2798,7 +2798,7 @@
  },
  "Fontaine": {
   "mesh": "arenas/fontaine/board-v1.obj",
-  "texture": "arenas/fontaine/board-v1.jpg",
+  "texture": "arenas/fontaine/board-v2.jpg",
   "table": "misc/valley-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -5499,7 +5499,7 @@
  },
  "Greenleaf": {
   "mesh": "arenas/greenleaf/board-v1.obj",
-  "texture": "arenas/greenleaf/board-v1.jpg",
+  "texture": "arenas/greenleaf/board-v2.jpg",
   "table": "misc/garden-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -6688,7 +6688,7 @@
  },
  "Illusio": {
   "mesh": "arenas/illusio/board-v6.obj",
-  "texture": "arenas/illusio/board-v6.jpg",
+  "texture": "arenas/illusio/board-v7.jpg",
   "table": "misc/sky-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -7525,7 +7525,7 @@
  },
  "Ingis": {
   "mesh": "arenas/ingis/board-v6.obj",
-  "texture": "arenas/ingis/board-v5.jpg",
+  "texture": "arenas/ingis/board-v7.jpg",
   "table": "misc/volcano-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -8870,7 +8870,7 @@
  },
  "Pugilis": {
   "mesh": "arenas/pugilis/board-v42.obj",
-  "texture": "arenas/pugilis/board-v42.jpg",
+  "texture": "arenas/pugilis/board-v43.jpg",
   "table": "misc/pugilis-dirt-v1.jpg",
   "depth": 51.98,
   "turns": 15,
@@ -9923,9 +9923,9 @@
    }
   ]
  },
- "Snow": {
+ "Nixtorm": {
   "mesh": "arenas/snow/board-v2.obj",
-  "texture": "arenas/snow/board-v1.jpg",
+  "texture": "arenas/snow/board-v3.jpg",
   "table": "misc/snowfield-placeholder-v1.jpg",
   "depth": 58.4775,
   "turns": 12,
@@ -11620,7 +11620,7 @@
  },
  "Spectra": {
   "mesh": "arenas/spectra/board-v1.obj",
-  "texture": "arenas/spectra/board-v1.jpg",
+  "texture": "arenas/spectra/board-v2.jpg",
   "table": "misc/graveyard-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -12948,7 +12948,7 @@
  },
  "Terrera Mountain": {
   "mesh": "arenas/terrera/board-v4.obj",
-  "texture": "arenas/terrera/board-v4.jpg",
+  "texture": "arenas/terrera/board-v5.jpg",
   "table": "misc/cave-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -14325,7 +14325,7 @@
  },
  "Valora": {
   "mesh": "arenas/valora/board-v1.obj",
-  "texture": "arenas/valora/board-v1.jpg",
+  "texture": "arenas/valora/board-v2.jpg",
   "table": "misc/foundry-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -15480,7 +15480,7 @@
  },
  "Violight": {
   "mesh": "arenas/violight/board-v1.obj",
-  "texture": "arenas/violight/board-v1.jpg",
+  "texture": "arenas/violight/board-v2.jpg",
   "table": "misc/violight-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,
@@ -16823,7 +16823,7 @@
  },
  "Viperia": {
   "mesh": "arenas/viperia/board-v1.obj",
-  "texture": "arenas/viperia/board-v2.jpg",
+  "texture": "arenas/viperia/board-v3.jpg",
   "table": "misc/jungle-placeholder-v1.jpg",
   "depth": 48.7312,
   "turns": 10,
@@ -17907,7 +17907,7 @@
  },
  "Yaksha": {
   "mesh": "arenas/yaksha/board-v9.obj",
-  "texture": "arenas/yaksha/board-v6.jpg",
+  "texture": "arenas/yaksha/board-v10.jpg",
   "table": "misc/court-placeholder-v1.jpg",
   "depth": 51.98,
   "turns": 10,

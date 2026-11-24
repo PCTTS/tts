@@ -680,11 +680,20 @@ function currentBoard()
   end
 end
 
+-- Renamed arenas: a board saved under its old name still counts as the arena (Snow is now Nixtorm).
+RENAMED_ARENAS = { Snow = "Nixtorm" }
+
+-- The arena name a board on the table stands for (its name, or the new name of a renamed arena).
+function boardArena(board)
+  local name = board and board.getName()
+  return name and (RENAMED_ARENAS[name] or name)
+end
+
 -- { {name="Pugilis", current=true}, ... } sorted by name
 function mapList()
   local board, list = currentBoard(), {}
   for name in pairs(arenas) do
-    list[#list + 1] = { name = name, current = board ~= nil and board.getName() == name }
+    list[#list + 1] = { name = name, current = board ~= nil and boardArena(board) == name }
   end
   table.sort(list, function(a, b) return a.name < b.name end)
   return list
@@ -732,7 +741,7 @@ function currentBackdrop()
 end
 
 ----------------------------------------------------------------------------------------------------
--- The table follows the board's depth. A board deeper than the usual play area (Snow: 18 tiles) gets the table
+-- The table follows the board's depth. A board deeper than the usual play area (Nixtorm: 18 tiles) gets the table
 -- stretched front to back just enough that its near and far trims stay their usual width outside the board: the
 -- map's picture is stretched to the board's depth and lies over the trim's inner part (a hair higher: the trim
 -- sits a little above the play area), and the team stands move back to the usual gap from the board, with
@@ -806,7 +815,7 @@ end
 function fitTableToBoard()
   for _, o in ipairs(getAllObjects()) do
     if o.hasTag("Board3D") then
-      local a = arenas[o.getName()]
+      local a = arenas[boardArena(o)]
       if a then
         setTableDepth(a.depth)
         ensureTurnTrack(a.turns)
@@ -2378,7 +2387,7 @@ end
 local function spawnSpectatorStand()
   local turns = 10
   local board = currentBoard()
-  local a = board and arenas[board.getName()]
+  local a = board and arenas[boardArena(board)]
   if a and a.turns then turns = a.turns end
   local stand = spawnObjectData({
     data = {
