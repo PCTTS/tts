@@ -6,8 +6,12 @@ Toolbar (right edge, a third of the way down the screen), one panel open at a ti
   * Potion:   scroll through (or search) the item cards, click one and it goes in the next free item slot.
   * Swords:   scroll through (or search) the warrior skill cards, click one and it goes in the next free skill slot.
   * Sparkle:  the same for Pokémon ability cards (the bottom row of the stand).
-Team stands (tagged "Stand") sit on the two long sides: six pedestals on top, an item card and a warrior skill
-card on the slope under each. Which stand is yours depends on your seat colour (SEAT_SIDE).
+Team stands (tagged "Stand") sit on the two long sides: pedestals on top (9 for a whole team; once 3 have been
+sent to the spectator stand with the bench button in front of their pedestals, the other 6 slide apart), an item,
+a warrior skill and an ability card on the slope under each. Which stand is yours depends on your seat colour
+(SEAT_SIDE). A Pokémon taken off its pedestal leaves a phantom of itself there; picking a map brings everyone back
+to their stands (9 slots again). The spectator stand at the table's right end carries the turn track (1-15, the
+arena's last turn in gold) and its Poké Ball token.
   * Swirl:    pick a status, then pick up a Pokémon to give it that status (it's tinted in the status's
               type colour). One main status at a time; Confused and Flinched can stack on top.
               "Clear status" returns a Pokémon to normal.
@@ -18,7 +22,7 @@ Water gates (Fontaine): click the arrows on a gate (or right-click it) to open o
 drains or fills.
 Gears (Valora): click the turning arrow on a gear (or right-click it) to turn it 270 degrees, carrying what stands
 on it round; a numbered gear's doors button opens or closes its blockers.
-HP: the sign above each pedestal shows "current/max" HP of the Pokémon on it; click the number and type 120 (set), -35 or +20.
+HP: the sign above each pedestal shows "current/max" HP of its Pokémon (wherever it is); click the number and type 120 (set), -35 or +20.
 
 The roster (figures/index.json) and the cards (cards/index.json) are downloaded from the PCTTS site when the
 game loads, so new Pokémon and changed cards appear without editing the mod. The last copies are kept in the
@@ -32,17 +36,19 @@ ICONS = {
 }
 PIECE_ICONS = { die = "ui/icons/die-v3.png", updown = "ui/icons/updown-v3.png",   -- buttons on arena pieces
   turnccw = "ui/icons/turnccw-v3.png", turncw = "ui/icons/turncw-v3.png", doors = "ui/icons/doors-v3.png",
-  fling = "ui/icons/fling-v3.png" }
+  fling = "ui/icons/fling-v3.png", bench = "ui/icons/spectate-v3.png",
+  ["glide-ne"] = "ui/icons/glide-ne-v3.png", ["glide-nw"] = "ui/icons/glide-nw-v3.png",   -- a platform's L, by the
+  ["glide-se"] = "ui/icons/glide-se-v3.png", ["glide-sw"] = "ui/icons/glide-sw-v3.png" }  -- arms from its bend
 -- Toolbar geometry in UI units. Icons are drawn at 64 px, close to their on-screen size: TTS doesn't smooth
 -- UI images it shrinks, so a much larger image looks jagged.
 BAR_ICON, BAR_MARGIN, BAR_GAP = 32, 3, 6
 TOOLS = {
-  { kind = "dex", icon = "pokeball", tip = "Spawn a Pokémon" },
-  { kind = "items", icon = "item", tip = "Item cards" },
-  { kind = "skills", icon = "skill", tip = "Warrior skill cards" },
-  { kind = "abilities", icon = "ability", tip = "Pokémon ability cards" },
-  { kind = "status", icon = "status", tip = "Give a status" },
-  { kind = "maps", icon = "map", tip = "Choose the map" },
+  { kind = "dex", icon = "pokeball" },        -- Spawn a Pokémon
+  { kind = "items", icon = "item" },          -- Item cards
+  { kind = "skills", icon = "skill" },        -- Warrior skill cards
+  { kind = "abilities", icon = "ability" },   -- Pokémon ability cards
+  { kind = "status", icon = "status" },       -- Give a status
+  { kind = "maps", icon = "map" },            -- Choose the map
 }
 -- The toolbar and its panels sit in a frame covering the top two-thirds of the screen, the toolbar at the frame's
 -- middle: a third of the way down the screen at any resolution. A panel's top stays level with the toolbar's.
@@ -122,6 +128,10 @@ STAND = {
   cardScale = { 1.5, 1.5 },
   snapLift = 0.55,  -- card snap points float this far off the slope, so a card held flat clears the rising slope
 }
+-- The pedestal columns along a stand (its frame): a whole team of 9 packed close (the cards in their columns
+-- almost touch), or the 6 that play at the stand's first spacing.
+SLOTS = { [9] = { -18.8, -14.1, -9.4, -4.7, 0, 4.7, 9.4, 14.1, 18.8 }, [6] = STAND.x }
+BENCH_SIZE = 3       -- how many of a team of 9 sit out
 CARD_YAW = 270  -- cards lie landscape: turned a quarter so the name reads left-to-right for the stand's player
 PEDESTAL_TOP = 0.25  -- a pedestal's height above the stand top
 COLORS = { "White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Grey", "Black" }
@@ -238,7 +248,8 @@ READERS = {
       gear = true, size = true, door = true, sx = true, sy = true, sz = true, group = true, hy = true }
     for _, f in ipairs(rows) do
       if f[1] == "arena" then
-        cur = { mesh = f[3], texture = f[4], table = f[5] or "", depth = tonumber(f[6] or ""), snaps = {}, pieces = {} }
+        cur = { mesh = f[3], texture = f[4], table = f[5] or "", depth = tonumber(f[6] or ""), turns = tonumber(f[7] or ""),
+          snaps = {}, pieces = {} }
         t[f[2]] = cur
       elseif f[1] == "snaps" and cur and (f[2] or "") ~= "" then
         for i, p in ipairs(splitPlain(f[2], ";")) do cur.snaps[i] = numbers(p) end
@@ -303,13 +314,16 @@ function onLoad(saved)
         plainStandee(obj)
       elseif obj.hasTag("Portal") or obj.hasTag("Bridge") or obj.hasTag("Zone") or obj.hasTag("Trap")
         or obj.hasTag("GateFrame") or obj.hasTag("Gate") or obj.hasTag("Water") or obj.hasTag("Gear") or obj.hasTag("Door")
-        or obj.hasTag("Flower")
-        or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") or obj.hasTag("Pillar") then
+        or obj.hasTag("Flower") or obj.hasTag("Pedestal") or obj.hasTag("SpectatorStand") or obj.hasTag("TurnTrack")
+        or obj.hasTag("Platform") or obj.hasTag("ArenaBackdrop") or obj.hasTag("Board3D") or obj.hasTag("Pillar") then
         pieceSetup(obj)
       elseif obj.type == "Card" and (obj.hasTag("Item") or obj.hasTag("WarriorSkill") or obj.hasTag("Ability")) then
         unstretchCard(obj)
       end
     end
+    ensureSpectators()
+    pedestalUI = {}      -- the pedestals' saved UI may have replaced ours
+    refreshPedestals()
     ensureHandZones()
   end, 2)
 end
@@ -328,7 +342,7 @@ end
 -- pieces still need clicks (HP signs, flags, buttons), so players just can't delete or cut them; the map picker
 -- replaces them by script, which isn't a player action.
 PROTECTED_TAGS = { "Stand", "Flag", "Portal", "Bridge", "Zone", "Bell", "BellStand", "GateFrame", "Gate", "Water",
-  "Fountain", "Statue", "Gear", "Door", "Flower" }
+  "Fountain", "Statue", "Gear", "Door", "Flower", "Pedestal", "SpectatorStand", "TurnTrack", "Platform" }
 
 function onPlayerAction(player, action, targets)
   if action == Player.Action.Select or action == Player.Action.PickUp then
@@ -537,12 +551,12 @@ local function slopeLift(d)
   return d * math.cos(a), -d * math.sin(a)  -- (y, z)
 end
 
--- The stand's card snap points (one per card slot), a little above the slope, rotation snapping to the slope.
-function standSnapPoints()
+-- The stand's card snap points (one per card slot, n columns), a little above the slope, rotation snapping to the slope.
+function standSnapPoints(n)
   local dy, dz = slopeLift(STAND.snapLift)
   local tilt = STAND.tilt * (CARD_YAW == 270 and 1 or -1)
   local snaps = {}
-  for _, x in ipairs(STAND.x) do
+  for _, x in ipairs(SLOTS[n or 6]) do
     for _, kind in ipairs(CARD_KINDS) do
       local c = STAND.cards[kind]
       snaps[#snaps + 1] = { position = { x, c.y + dy, c.z + dz }, rotation = { 0, CARD_YAW, tilt }, rotation_snap = true }
@@ -557,18 +571,25 @@ function cardRotation(stand)
   return Vector(0, stand.getRotation().y + CARD_YAW, tilt)
 end
 
--- First free spot on the player's stand, columns from the player's left. kind: "dex" (pedestal) or a card kind.
+-- First free spot on the player's stand, columns from the player's left. kind: "dex" (a pedestal with no Pokémon of
+-- its own, not sat out) or a card kind (not in a sat-out column).
 function freeSpot(color, kind)
   local stand = standFor(color)
   if not stand then return nil end
-  for _, x in ipairs(STAND.x) do
-    local spot
-    if kind == "dex" then
-      spot = stand.positionToWorld(Vector(x, STAND.pedestal.y + PEDESTAL_TOP, STAND.pedestal.z))
-    else
-      spot = stand.positionToWorld(Vector(x, STAND.cards[kind].y, STAND.cards[kind].z))
+  local peds = standPedestals(stand)
+  if kind == "dex" then
+    for _, p in ipairs(peds) do
+      local st = pedestalState(p.obj)
+      local spot = p.obj.getPosition() + Vector(0, PEDESTAL_TOP, 0)
+      if not st.benched and not pedestalMon(p.obj, st) and not taken(spot, false) then return spot, stand end
     end
-    if not taken(spot, kind ~= "dex") then return spot, stand end
+  else
+    local benched = {}
+    for i, p in ipairs(peds) do benched[i] = pedestalState(p.obj).benched end
+    for i, x in ipairs(SLOTS[standSlots(stand)]) do
+      local spot = stand.positionToWorld(Vector(x, STAND.cards[kind].y, STAND.cards[kind].z))
+      if not benched[i] and not taken(spot, true) then return spot, stand end
+    end
   end
   -- all full: past the stand's right-hand end (from its player's side)
   return stand.positionToWorld(Vector(STAND.length / 2 + 3, 3, -5)), stand, true
@@ -700,6 +721,7 @@ function loadArena(name, entry, base)
   for _, p in ipairs(a.pieces or {}) do spawnArenaPiece(p, spot, base) end
   if a.table and a.table ~= "" then setBackdrop(base .. a.table, base, tableLayout(a.depth)) end
   setTableDepth(a.depth)
+  setTurnTrack(a.turns)
   return true
 end
 
@@ -785,7 +807,10 @@ function fitTableToBoard()
   for _, o in ipairs(getAllObjects()) do
     if o.hasTag("Board3D") then
       local a = arenas[o.getName()]
-      if a then setTableDepth(a.depth) end
+      if a then
+        setTableDepth(a.depth)
+        ensureTurnTrack(a.turns)
+      end
       return
     end
   end
@@ -847,6 +872,13 @@ function spawnArenaPiece(p, origin, base)
       if s ~= "" then targets[#targets + 1] = numbers(s) end
     end
     data.Memo = JSON.encode({ targets = targets, tile = p.tile or BOARD_TILE })
+  elseif p.kind == "Platform" then   -- starts on its first tile; its route: "dx,dy,dz;..." from there to the others
+    local route = {}
+    for _, s in ipairs(splitPlain(p.route or "", ";")) do
+      if s ~= "" then route[#route + 1] = numbers(s) end
+    end
+    data.Memo = JSON.encode({ route = route, at = 1, x = pos.x, y = pos.y, z = pos.z, tile = p.tile or BOARD_TILE,
+      arms = p.arms })
   elseif p.kind == "Gate" then   -- gates start open: the sluice block sunk into the river bed
     data.Memo = JSON.encode({ gate = p.gate, branch = p.branch, part = p.part, open = true, y = pos.y })
     pos = Vector(pos.x, pos.y - GATE_DROP, pos.z)
@@ -879,8 +911,8 @@ local function toolbarXml()
   local items = {}
   for i, t in ipairs(TOOLS) do
     local y = -(BAR_MARGIN + (i - 1) * (BAR_ICON + BAR_GAP))
-    local place = string.format('rectAlignment="UpperCenter" offsetXY="0 %d" width="%d" height="%d" tooltip="%s" onClick="toolClick"',
-      y, BAR_ICON, BAR_ICON, t.tip)
+    local place = string.format('rectAlignment="UpperCenter" offsetXY="0 %d" width="%d" height="%d" onClick="toolClick"',
+      y, BAR_ICON, BAR_ICON)
     items[#items + 1] = string.format('<Button id="tool_%s" class="bar" %s/>', t.kind, place)
     items[#items + 1] = string.format('<Image id="toolIcon_%s" class="barIcon" image="%s" %s/>', t.kind, t.icon, place)
   end
@@ -960,8 +992,8 @@ function buildUI()
 
   local xml = { [[
 <Defaults>
-  <Button class="bar" colors="#00000000|#FFFFFF26|#FFFFFF4D|#00000000" tooltipPosition="Left"/>
-  <Image class="barIcon" raycastTarget="false" preserveAspect="true" tooltipPosition="Left"/>
+  <Button class="bar" colors="#00000000|#FFFFFF26|#FFFFFF4D|#00000000"/>
+  <Image class="barIcon" raycastTarget="false" preserveAspect="true"/>
   <Button class="row" fontSize="15" textAlignment="MiddleLeft" padding="10 0 0 0" textColor="#111111"
           colors="#E4E4E4|#B3D1FF|#8DB8F7|#E4E4E4" preferredHeight="28" flexibleHeight="0"/>
   <Button class="close" fontSize="14" textColor="#FFFFFF" colors="#2a2a2a|#c0392b|#962d22|#2a2a2a"/>
@@ -1108,6 +1140,7 @@ function mapPick(player, _, id)
   local m = mapRows[c] and mapRows[c][tonumber(id:match("_(%d+)$"))]
   if not m or m.current then return end
   if not loadArena(m.name) then return end
+  resetStands()
   Wait.frames(function()
     for _, other in ipairs(COLORS) do
       if openPanel[other] == "maps" then refreshMaps(other) end
@@ -1270,13 +1303,13 @@ local function memoTable(obj)
 end
 
 -- A clear button lying on a piece (object UI: 100 units = 1 world unit, canvas y = the object's z, -z = up),
--- with an icon that reads the same from either side of the table.
-local function pieceButtonXml(id, x, z, y, onClick, tip, icon)
+-- with an icon that reads the same from either side of the table. No hover text on buttons (the user's call).
+local function pieceButtonXml(id, x, z, y, onClick, icon)
   return string.format([[
-<Button id="%s" position="%d %d %d" width="56" height="56" onClick="Global/%s" tooltip="%s" tooltipPosition="Above"
+<Button id="%s" position="%d %d %d" width="56" height="56" onClick="Global/%s"
   colors="#00000040|#FFFFFF66|#FFFFFF99|#00000040"/>
 <Image image="%s" position="%d %d %d" width="46" height="46" raycastTarget="false" color="#FFFFFFE0" preserveAspect="true"/>
-]], id, math.floor(x * 100 + 0.5), math.floor(z * 100 + 0.5), math.floor(-y * 100 + 0.5), onClick, tip,
+]], id, math.floor(x * 100 + 0.5), math.floor(z * 100 + 0.5), math.floor(-y * 100 + 0.5), onClick,
     icon, math.floor(x * 100 + 0.5), math.floor(z * 100 + 0.5), math.floor(-y * 100 - 0.5))
 end
 
@@ -1386,7 +1419,7 @@ function grassBridgeUI(obj, st)
   if st.lead then
     local bx, bz = st.up and (st.sx or 0) or 0, st.up and (st.sz or 0) or 0
     obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
-    obj.UI.setXml(pieceButtonXml("bridgeArrows", bx, bz, (st.hy or 0) + 0.02, "bridgeClicked", "Open or close the bridge",
+    obj.UI.setXml(pieceButtonXml("bridgeArrows", bx, bz, (st.hy or 0) + 0.02, "bridgeClicked",
       "updown"))
   end
 end
@@ -1786,6 +1819,114 @@ function flowerClicked(_, _, id)
 end
 
 ----------------------------------------------------------------------------------------------------
+-- Floating platforms (Avia): a wooden deck in the sky, level with the low ground, riding a rail along an L (the board
+-- has the rail). Its button (an L arrow the shape of its track) or right-click > Move platform glides it along the
+-- rail, round the bend, to the other
+-- end, carrying whatever stands on it (Pokémon keep the way they face); the next time it goes back. Its memo:
+-- { route = { {dx, dy, dz}, ... } (the bend and the far end, from its first tile), x, y, z (its first tile),
+-- at = 1 (there) or #route + 1 (at the far end), tile, arms (its L's arms from the bend, "ne" ...: the icon) }.
+----------------------------------------------------------------------------------------------------
+PLATFORM_GLIDE_TIME, PLATFORM_GLIDE_FRAMES = 2.0, 120   -- seconds a move takes (game clock); frames without one
+PLATFORM_BUTTON = { x = 1.12, z = -1.12, y = 0.01 }      -- in a corner of the deck, clear of a Pokémon's base
+PLATFORM_DESC = "Floating platform. When a Pokémon ends its move on it, it glides along its rail to the other end, "
+  .. "taking the Pokémon with it. Click the arrow on it to move it."
+gliding = {}                                            -- platform guid -> true while it moves
+
+function platformState(obj)
+  local st = memoTable(obj)
+  st.route, st.tile, st.at = st.route or {}, st.tile or BOARD_TILE, st.at or 1
+  return st
+end
+
+-- Its stops in order: its first tile, then the route's (world positions of the deck's top).
+function platformStops(st)
+  local stops = { Vector(st.x, st.y, st.z) }
+  for _, r in ipairs(st.route) do
+    stops[#stops + 1] = Vector(st.x + (r[1] or 0), st.y + (r[2] or 0), st.z + (r[3] or 0))
+  end
+  return stops
+end
+
+-- What rides on a platform: anything loose (Pokémon, gift boxes) over its deck and not in someone's hand.
+function platformRiders(plat, st)
+  local c, half, riders = plat.getPosition(), st.tile / 2, {}
+  for _, o in ipairs(getAllObjects()) do
+    if o ~= plat and not o.getLock() and not o.held_by_color then
+      local p = o.getPosition()
+      if math.abs(p.x - c.x) < half and math.abs(p.z - c.z) < half and p.y > c.y - 0.5 and p.y < c.y + 5 then
+        riders[#riders + 1] = { obj = o, dx = p.x - c.x, dy = p.y - c.y, dz = p.z - c.z }
+      end
+    end
+  end
+  return riders
+end
+
+-- Glide a platform to the other end of its route, a little each frame (eased in and out over the whole way, round
+-- the bend), its riders with it (locked meanwhile so physics doesn't drop them, unlocked at the end).
+function movePlatform(plat)
+  if not plat or gliding[plat.guid] then return false end
+  local st = platformState(plat)
+  if not st.x or #st.route == 0 then return false end
+  local stops, path = platformStops(st), {}
+  local back = st.at > 1
+  for i = 1, #stops do path[i] = stops[back and #stops + 1 - i or i] end
+  path[1] = plat.getPosition()   -- from where it actually is
+  local legs, total = {}, 0
+  for i = 2, #path do
+    local a, b = path[i - 1], path[i]
+    legs[i] = math.sqrt((b.x - a.x) ^ 2 + (b.y - a.y) ^ 2 + (b.z - a.z) ^ 2)
+    total = total + legs[i]
+  end
+  local riders = platformRiders(plat, st)
+  gliding[plat.guid] = true
+  for _, r in ipairs(riders) do r.obj.setLock(true) end
+  local clock = Time and Time.time and function() return Time.time end
+  local k, t0 = 0, clock and clock()
+  local function finish()
+    for _, r in ipairs(riders) do
+      if r.obj ~= nil then r.obj.setLock(false) end
+    end
+    gliding[plat.guid] = nil
+  end
+  local function step()
+    if plat == nil then   -- gone (the map changed)
+      finish()
+      return
+    end
+    k = k + 1
+    local t = math.min(1, clock and (clock() - t0) / PLATFORM_GLIDE_TIME or k / PLATFORM_GLIDE_FRAMES)
+    local s = total * t * t * (3 - 2 * t)
+    local i = 2
+    while i < #path and s > legs[i] do
+      s = s - legs[i]
+      i = i + 1
+    end
+    local a, b = path[i - 1], path[i]
+    local f = legs[i] > 0 and math.min(1, s / legs[i]) or 1
+    local x, y, z = a.x + (b.x - a.x) * f, a.y + (b.y - a.y) * f, a.z + (b.z - a.z) * f
+    plat.setPosition({ x, y, z })
+    for _, r in ipairs(riders) do
+      if r.obj ~= nil then r.obj.setPosition({ x + r.dx, y + r.dy, z + r.dz }) end
+    end
+    if t < 1 then
+      Wait.frames(step, 1)
+    else
+      st.at = back and 1 or #stops
+      plat.memo = JSON.encode(st)
+      finish()
+    end
+  end
+  step()
+  return true
+end
+
+-- A platform's button: its id is "glide_<its guid>".
+function platformClicked(_, _, id)
+  local plat = getObjectFromGUID(tostring(id or ""):sub(7))
+  if plat then movePlatform(plat) end
+end
+
+----------------------------------------------------------------------------------------------------
 -- Traps (Chrysalia): a trap piece on its tile; once it has caught a Pokémon, right-click > Spring trap removes it.
 ----------------------------------------------------------------------------------------------------
 TRAP_DESC = "Trap. A Pokémon that ends its turn here finishes its activation and skips its next one; then the trap "
@@ -1799,6 +1940,19 @@ function pieceSetup(obj)
     obj.interactable = false
     return
   end
+  if obj.hasTag("SpectatorStand") then   -- the turn track's slots (the token snaps to them) and its gold last turn
+    if #(obj.getSnapPoints() or {}) ~= TURN_TRACK.turns then obj.setSnapPoints(turnSnaps()) end
+    showLastTurn(obj)
+    return
+  end
+  if obj.hasTag("Pedestal") then   -- a Pokémon dropped near snaps onto its middle
+    if #(obj.getSnapPoints() or {}) ~= 1 then obj.setSnapPoints({ { position = { 0, PEDESTAL_TOP, 0 }, rotation_snap = false } }) end
+    return
+  end
+  if obj.hasTag("TurnTrack") then  -- the separate track of an older layout: the spectator stand has it now
+    obj.destruct()
+    return
+  end
   if obj.hasTag("Flag") then
     obj.setDescription(FLAG_DESC)
   elseif obj.hasTag("Portal") then
@@ -1806,7 +1960,7 @@ function pieceSetup(obj)
     setPortalPair(obj, PORTAL_COLORS[pair] and pair or 1)
     obj.UI.setCustomAssets({ { name = "die", url = BASE_URL .. PIECE_ICONS.die } })
     obj.UI.setXml(pieceButtonXml("portalDie", PORTAL_BUTTON.x, PORTAL_BUTTON.z, PORTAL_BUTTON.y, "portalClicked",
-      "Shuffle the portals", "die"))
+      "die"))
     obj.clearContextMenu()
     obj.addContextMenuItem("Shuffle portals", function(color) shufflePortals(color) end)
   elseif obj.hasTag("Trap") then
@@ -1828,7 +1982,7 @@ function pieceSetup(obj)
       obj.setDescription(bridgeDescription(st.up))
       obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
       obj.UI.setXml(pieceButtonXml("bridgeArrows", 0, BRIDGE_BUTTON.z, BRIDGE_BUTTON.y, "bridgeClicked",
-        "Raise or drop the bridges", "updown"))
+        "updown"))
       obj.addContextMenuItem("Raise this bridge", function() setBridgeUp(obj, true) end)
       obj.addContextMenuItem("Drop this bridge", function() setBridgeUp(obj, false) end)
     end
@@ -1837,7 +1991,7 @@ function pieceSetup(obj)
     obj.setDescription(GATE_DESC)
     obj.UI.setCustomAssets({ { name = "updown", url = BASE_URL .. PIECE_ICONS.updown } })
     obj.UI.setXml(pieceButtonXml("gate_" .. n, GATE_BUTTON.x, GATE_BUTTON.z, GATE_BUTTON.y, "gateClicked",
-      "Open or close the gate", "updown"))
+      "updown"))
     obj.clearContextMenu()
     obj.addContextMenuItem("Open gate", function() setGateOpen(n, true) end)
     obj.addContextMenuItem("Close gate", function() setGateOpen(n, false) end)
@@ -1848,13 +2002,13 @@ function pieceSetup(obj)
     if #(obj.getSnapPoints() or {}) ~= st.size * st.size then obj.setSnapPoints(gearSnaps(st)) end
     local icon, h = st.turn == "cw" and "turncw" or "turnccw", st.size * st.tile / 2 - GEAR_BUTTON_IN
     local assets = { { name = icon, url = BASE_URL .. PIECE_ICONS[icon] } }
-    local xml = pieceButtonXml("gear_" .. obj.guid, h, -h, GEAR_T + 0.01, "gearClicked", "Turn the gear", icon)
+    local xml = pieceButtonXml("gear_" .. obj.guid, h, -h, GEAR_T + 0.01, "gearClicked", icon)
     obj.clearContextMenu()
     obj.addContextMenuItem("Turn gear", function() turnGear(obj) end)
     if st.gear > 0 then
       assets[2] = { name = "doors", url = BASE_URL .. PIECE_ICONS.doors }
       xml = xml .. pieceButtonXml("doors_" .. st.gear, -h, h, GEAR_T + 0.01, "doorsClicked",
-        "Open or close blockers " .. st.gear, "doors")
+        "doors")
       obj.addContextMenuItem("Blockers " .. st.gear .. " open/close", function() toggleDoors(st.gear) end)
     end
     obj.UI.setCustomAssets(assets)
@@ -1866,9 +2020,21 @@ function pieceSetup(obj)
     obj.setDescription(FLOWER_DESC)
     obj.UI.setCustomAssets({ { name = "fling", url = BASE_URL .. PIECE_ICONS.fling } })
     obj.UI.setXml(pieceButtonXml("fling_" .. obj.guid, FLOWER_BUTTON.x, FLOWER_BUTTON.z, FLOWER_T + 0.01, "flowerClicked",
-      "Fling the Pokémon on it", "fling"))
+      "fling"))
     obj.clearContextMenu()
     obj.addContextMenuItem("Fling Pokémon", function() flingFromFlower(obj) end)
+  elseif obj.hasTag("Platform") then
+    if #(obj.getSnapPoints() or {}) ~= 1 then   -- its tile's snap point, on the deck
+      obj.setSnapPoints({ { position = { 0, 0.02, 0 }, rotation = { 0, 0, 0 }, rotation_snap = false } })
+    end
+    obj.setDescription(PLATFORM_DESC)
+    local icon = "glide-" .. (platformState(obj).arms or "ne")
+    if not PIECE_ICONS[icon] then icon = "glide-ne" end
+    obj.UI.setCustomAssets({ { name = icon, url = BASE_URL .. PIECE_ICONS[icon] } })
+    obj.UI.setXml(pieceButtonXml("glide_" .. obj.guid, PLATFORM_BUTTON.x, PLATFORM_BUTTON.z, PLATFORM_BUTTON.y,
+      "platformClicked", icon))
+    obj.clearContextMenu()
+    obj.addContextMenuItem("Move platform", function() movePlatform(obj) end)
   elseif obj.hasTag("Door") then
     obj.interactable = false   -- opened and closed from its gear
   elseif obj.hasTag("Water") then
@@ -1886,21 +2052,34 @@ function onObjectSpawn(obj)
   elseif obj.hasTag("Pokemon") then
     plainStandee(obj)
     Wait.time(refreshPedestals, 1.5)   -- once it has landed
+  elseif obj.hasTag("Pedestal") then
+    Wait.time(refreshPedestals, 0.5)
   end
 end
 
 ----------------------------------------------------------------------------------------------------
--- HP signs: each team stand (props/stand-v3.obj) has a sign board above each pedestal, showing "Y/X" for the
--- Pokémon standing on that pedestal (blank when it's empty). One label on each face of the board: TTS draws an
--- object's UI in a fixed order regardless of which part is nearer, but solid geometry hides UI behind it, so
--- each side of the table reads its own label the right way round.
+-- Pedestals and HP signs. A team stand's pedestals are objects of their own (tag "Pedestal", props/pedestal-v1.obj: a
+-- round pedestal with a black sign floating above it), so a stand can hold a whole team of 9 and then slide to 6
+-- (below). A Pokémon put on a pedestal becomes that pedestal's (the pedestal's memo keeps its guid): taken off to
+-- the board, it leaves a phantom behind, its picture faintly on the pedestal (object UI: nothing to bump into), and
+-- the sign keeps showing its HP; put back, the phantom goes. Another Pokémon put on the pedestal takes it over.
+-- The sign shows "Y/X" on each face: TTS draws an object's UI in a fixed order regardless of which part is nearer,
+-- but solid geometry hides UI behind it, so each side of the table reads its own label the right way round.
 -- Click the number and type 120 to set it, -35 to take damage or +20 to heal (kept between 0 and its max).
 -- Current and max HP live in the Pokémon's memo (it keeps them when it moves); the max comes from the sheet.
 ----------------------------------------------------------------------------------------------------
-STAND_MESH, STAND_TEX = "props/stand-v4.obj", "props/stand-wood-v2.jpg"   -- black signs floating above the pedestals
-SIGN = { y = 5.4, z = -1.6, face = 0.03 }   -- a sign's centre in the stand's frame (build_props.py SIGN_*)
+STAND_MESH, STAND_TEX = "props/stand-v2.obj", "props/stand-wood-v2.jpg"   -- the plain stand: the signs are on the pedestals
+PEDESTAL = { mesh = "props/pedestal-v1.obj", plain = "props/pedestal-plain-v1.obj",
+  collider = "props/pedestal-collider-v1.obj", tex = "props/pedestal-v1.jpg" }
+SIGN = { y = 2.8, face = 0.03 }   -- a pedestal's sign: its centre above the pedestal's bottom (build_props.py PED_SIGN_Y)
+PHANTOM = { y = 1.38, size = 200, color = "#FFFFFF8C" }   -- the picture: its centre above the pedestal's bottom, its size
+BENCH_BUTTON = { x = 1.2, size = 50 }   -- beside the sign (on its player's side), level with it
 HP_COLOR, HP_FAINTED = "#FFFFFF", "#FF6B6B"
 PEDESTAL_REACH = 1.5 -- a Pokémon this close (sideways) to a pedestal's centre, and resting on it, counts as on it
+pedestalUI = {}      -- pedestal guid -> { assets, xml } it shows (set again only when they change)
+flying = {}          -- Pokémon guid -> true while it flies to or from the spectator stand
+seatTaken = {}       -- spectator pedestal guid -> true while a Pokémon flies to it
+sliding = {}         -- team stand guid -> true while its pedestals slide
 
 function maxHp(name)
   local s = stats[name]
@@ -1920,53 +2099,219 @@ function hpState(obj)
   return st
 end
 
--- The Pokémon resting on a stand's pedestal (column 1..6), or nil.
-function pokemonOn(stand, col)
-  local top = stand.positionToWorld(Vector(STAND.x[col], STAND.pedestal.y + PEDESTAL_TOP, STAND.pedestal.z))
-  for _, obj in ipairs(getAllObjects()) do
-    if obj.hasTag("Pokemon") then
-      local p = obj.getPosition()
-      if near(p, top, PEDESTAL_REACH) and math.abs(p.y - top.y) < 1 then return obj end
-    end
+local function teamStands()
+  local out = {}
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Stand") then out[#out + 1] = o end
   end
+  return out
 end
 
--- One face's label (an input box under 50 high hides its text). Object UI: 100 units = 1 world unit, x = x (not mirrored), the UI's
--- +y is the object's +z and -z is up.
-local function signLabelXml(stand, col, side, rotation, z, st)
+-- Is this position on a stand's top where its pedestals stand? (and where, in the stand's frame)
+local function onStandTop(stand, pos)
+  local lp = stand.positionToLocal(pos)
+  return math.abs(lp.x) <= STAND.length / 2 and math.abs(lp.z - STAND.pedestal.z) < 1
+    and math.abs(lp.y - STAND.pedestal.y) < 0.6, lp
+end
+
+-- A team stand's pedestals from its player's left: { { obj = pedestal, x = along the stand (its frame) } }.
+function standPedestals(stand)
+  local out = {}
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Pedestal") then
+      local on, lp = onStandTop(stand, o.getPosition())
+      if on then out[#out + 1] = { obj = o, x = lp.x } end
+    end
+  end
+  table.sort(out, function(a, b) return a.x < b.x end)
+  return out
+end
+
+-- (Each lookup below ends with an explicit "return nil": in TTS's Lua a function that just ends returns a "void"
+-- that breaks when stored in a table.)
+function pedestalStand(ped)
+  for _, s in ipairs(teamStands()) do
+    if onStandTop(s, ped.getPosition()) then return s end
+  end
+  return nil
+end
+
+-- How many pedestals a team stand has: 9 (a whole team) or 6 (the ones that play).
+function standSlots(stand)
+  local n = memoTable(stand).slots
+  return (n == 9 or n == 6) and n or 6
+end
+
+-- The Pokémon resting on a pedestal (not in a hand, not flying), or nil.
+function restingOn(ped, mons)
+  local top = ped.getPosition() + Vector(0, PEDESTAL_TOP, 0)
+  for _, o in ipairs(mons or getAllObjects()) do
+    if o.hasTag("Pokemon") and not o.held_by_color and not flying[o.guid] then
+      local p = o.getPosition()
+      if near(p, top, PEDESTAL_REACH) and math.abs(p.y - top.y) < 1 then return o end
+    end
+  end
+  return nil
+end
+
+-- A pedestal's memo: { mon = its Pokémon's guid, benched = sat out (a team stand's), spect = the spectator stand's }.
+function pedestalState(ped)
+  return memoTable(ped)
+end
+
+-- The Pokémon a pedestal belongs to, wherever it is now, or nil.
+function pedestalMon(ped, st)
+  st = st or memoTable(ped)
+  local mon = st.mon and getObjectFromGUID(st.mon)
+  if mon and mon.hasTag("Pokemon") then return mon end
+  return nil
+end
+
+-- One face's label (an input box under 50 high hides its text). Object UI: 100 units = 1 world unit, x = x (not
+-- mirrored), the UI's +y is the object's +z and -z is up.
+local function signLabelXml(ped, side, rotation, z, st)
   local hp, max = st and st.hp, st and st.maxHp
   return string.format([[
-<Panel position="%d %d %d" rotation="%s" width="170" height="50" color="#000000C8" active="%s">
-  <InputField id="hpIn_%s_%d_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" offsetXY="9 0" width="84" height="50"
+<Panel position="0 %d %d" rotation="%s" width="170" height="50" color="#000000C8" active="%s">
+  <InputField id="hpIn_%s_%s" onEndEdit="Global/hpEdited" text="%d" rectAlignment="MiddleLeft" offsetXY="9 0" width="84" height="50"
     fontSize="26" textColor="%s" textAlignment="MiddleRight" characterLimit="8"
     colors="#00000000|#FFFFFF22|#FFFFFF33|#00000000"/>
   <Text rectAlignment="MiddleRight" width="85" height="50" fontSize="26" color="#FFFFFF" alignment="MiddleLeft">/%d</Text>
 </Panel>
-]], math.floor(STAND.x[col] * 100 + 0.5), math.floor(z * 100 + 0.5), math.floor(-SIGN.y * 100 + 0.5), rotation,
-    hp and "true" or "false", stand.guid, col, side, hp or 0, (hp or 1) > 0 and HP_COLOR or HP_FAINTED, max or 0)
+]], math.floor(z * 100 + 0.5), math.floor(-SIGN.y * 100 + 0.5), rotation, hp and "true" or "false", ped.guid, side,
+    hp or 0, (hp or 1) > 0 and HP_COLOR or HP_FAINTED, max or 0)
 end
 
--- Rewrite a stand's signs from the Pokémon now on its pedestals.
-function refreshStand(stand)
-  local parts = {}
-  for col = 1, #STAND.x do
-    local mon = pokemonOn(stand, col)
-    local st = mon and hpState(mon)
-    if st and not st.maxHp then st = nil end
-    parts[#parts + 1] = signLabelXml(stand, col, "F", "-90 0 0", SIGN.z - SIGN.face, st)
-    parts[#parts + 1] = signLabelXml(stand, col, "B", "90 0 180", SIGN.z + SIGN.face, st)
+-- The phantom: the Pokémon's picture standing on the pedestal, see-through, facing the pedestal's player (seen
+-- mirrored from behind, like a standee).
+local function phantomXml()
+  return string.format([[<Image image="phantom" position="0 0 %d" rotation="-90 0 0" width="%d" height="%d" color="%s" raycastTarget="false"/>
+]], math.floor(-PHANTOM.y * 100 + 0.5), PHANTOM.size, PHANTOM.size, PHANTOM.color)
+end
+
+-- The bench button: standing beside the sign, facing the pedestal's player.
+local function benchButtonXml(ped)
+  local s, x, y = BENCH_BUTTON.size, math.floor(BENCH_BUTTON.x * 100 + 0.5), math.floor(-SIGN.y * 100 + 0.5)
+  local z = math.floor(-SIGN.face * 100 + 0.5) - 1
+  return string.format([[
+<Button id="bench_%s" position="%d %d %d" rotation="-90 0 0" width="%d" height="%d" onClick="Global/benchClicked"
+  colors="#000000B0|#FFFFFF66|#FFFFFF99|#000000B0"/>
+<Image image="bench" position="%d %d %d" rotation="-90 0 0" width="%d" height="%d" raycastTarget="false" color="#FFFFFFE0" preserveAspect="true"/>
+]], ped.guid, x, z, y, s, s, x, z - 1, y, s - 10, s - 10)
+end
+
+-- A team pedestal's UI: the sign, the phantom while its Pokémon is away, the bench button while its stand holds 9.
+function updatePedestal(ped, st, mon, resting, stand)
+  local hp = mon and hpState(mon)
+  if hp and not hp.maxHp then hp = nil end
+  local parts = { signLabelXml(ped, "F", "-90 0 0", -SIGN.face, hp), signLabelXml(ped, "B", "90 0 180", SIGN.face, hp) }
+  local link
+  if mon and resting ~= mon then
+    local files = roster[figureState(mon).pokemon] or roster[mon.getName()]
+    if files and files.front then
+      link = BASE_URL .. files.front
+      parts[#parts + 1] = phantomXml()
+    end
   end
-  stand.UI.setXml(table.concat(parts))
+  local bench = stand ~= nil and standSlots(stand) == 9 and not st.benched and not sliding[stand.guid]
+  if bench then parts[#parts + 1] = benchButtonXml(ped) end
+  local ui, xml, assets = pedestalUI[ped.guid] or {}, table.concat(parts), (bench and "bench" or "") .. "|" .. (link or "")
+  local fresh = ui.assets ~= assets
+  if fresh then
+    local list = {}
+    if bench then list[#list + 1] = { name = "bench", url = BASE_URL .. PIECE_ICONS.bench } end
+    if link then list[#list + 1] = { name = "phantom", url = link } end
+    ped.UI.setCustomAssets(list)
+    ui.assets, ui.xml = assets, nil
+  end
+  if ui.xml ~= xml then
+    ped.UI.setXml(xml)
+    ui.xml = xml
+  end
+  pedestalUI[ped.guid] = ui
+  if fresh then   -- an image that was still downloading shows blank until the UI is set again
+    for _, delay in ipairs({ 1, 3 }) do
+      Wait.time(function()
+        if ped ~= nil and pedestalUI[ped.guid] == ui and ui.xml == xml then ped.UI.setXml(xml) end
+      end, delay)
+    end
+  end
 end
 
+-- Who belongs to which pedestal, and every team pedestal's sign, phantom and button. A Pokémon resting on a pedestal
+-- is that pedestal's (and no other's); a pedestal whose Pokémon is gone is empty again.
 function refreshPedestals()
-  for _, obj in ipairs(getAllObjects()) do
-    if obj.hasTag("Stand") then refreshStand(obj) end
+  local peds, mons, stands = {}, {}, teamStands()
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Pedestal") then
+      if not memoTable(o).spect then peds[#peds + 1] = o end
+    elseif o.hasTag("Pokemon") then
+      mons[#mons + 1] = o
+    end
+  end
+  local states, rest, dirty = {}, {}, {}
+  for i, ped in ipairs(peds) do
+    states[i], rest[i] = memoTable(ped), restingOn(ped, mons)
+  end
+  for i in ipairs(peds) do
+    local mon = rest[i]
+    if mon and states[i].mon ~= mon.guid then
+      for j in ipairs(peds) do
+        if j ~= i and states[j].mon == mon.guid then states[j].mon, dirty[j] = nil, true end
+      end
+      states[i].mon, states[i].benched, dirty[i] = mon.guid, nil, true   -- put back on a sat-out pedestal: it plays again
+    end
+  end
+  for i, ped in ipairs(peds) do
+    local st = states[i]
+    local mon = pedestalMon(ped, st)
+    if st.mon and not mon then st.mon, dirty[i] = nil, true end
+    if dirty[i] then ped.memo = JSON.encode(st) end
+    local stand
+    for _, s in ipairs(stands) do
+      if onStandTop(s, ped.getPosition()) then stand = s end
+    end
+    if stand and rest[i] then restoreCards(rest[i], ped, stand) end
+    updatePedestal(ped, st, mon, rest[i], stand)
   end
 end
 
--- A stand gets the model with the signs (reloading it; it comes back through onObjectSpawn with its card snap
--- points put back if the reload dropped them), then its labels.
+-- A new pedestal (a team stand's with its sign, or a plain one for the spectator stand), locked.
+function spawnPedestal(pos, yaw, plain, memo)
+  return spawnObjectData({
+    data = {
+      Name = "Custom_Model", Nickname = "", Tags = { "Pedestal" }, Locked = true, Memo = memo or "",
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      CustomMesh = { MeshURL = BASE_URL .. (plain and PEDESTAL.plain or PEDESTAL.mesh), DiffuseURL = BASE_URL .. PEDESTAL.tex,
+        NormalURL = "", ColliderURL = BASE_URL .. PEDESTAL.collider, Convex = true, MaterialIndex = 3, TypeIndex = 0,
+        CastShadows = true },
+    },
+    position = pos, rotation = { 0, yaw, 0 },
+  })
+end
+
+local function slotSpot(stand, x)
+  return stand.positionToWorld(Vector(x, STAND.pedestal.y, STAND.pedestal.z))
+end
+
+-- Cards on a stand's slope in the column around x (the stand's frame), within `half` of it.
+function columnCards(stand, x, half)
+  local out = {}
+  for _, o in ipairs(getAllObjects()) do
+    if o.type == "Card" and not o.held_by_color and not flying[o.guid] then
+      local lp = stand.positionToLocal(o.getPosition())
+      if math.abs(lp.x - x) < half and lp.z < STAND.pedestal.z - 1.2 and lp.z > -STAND_DEPTH - 0.5 and lp.y > -0.5
+          and lp.y < STAND.pedestal.y + 1 then
+        out[#out + 1] = o
+      end
+    end
+  end
+  return out
+end
+
+-- A stand gets the plain model (reloading it; it comes back through onObjectSpawn), then its own pedestals: the old
+-- fixed ones (backgammon discs) give way to 9 for a whole team, or 6 if a team is already on it. Then its card
+-- snap points and the pedestals' signs.
 function setupStand(stand)
   if not (stand and stand.hasTag("Stand")) then return end
   local mesh = (stand.getCustomObject() or {}).mesh or ""
@@ -1975,8 +2320,532 @@ function setupStand(stand)
     stand.reload()
     return
   end
-  if #(stand.getSnapPoints() or {}) ~= #STAND.x * #CARD_KINDS then stand.setSnapPoints(standSnapPoints()) end   -- card slots: one per row per column
-  refreshStand(stand)
+  local st = memoTable(stand)
+  local count = #standPedestals(stand)
+  if count == 0 then
+    local busy = #columnCards(stand, 0, STAND.length / 2 + 1) > 0
+    for _, o in ipairs(getAllObjects()) do
+      if o ~= stand and onStandTop(stand, o.getPosition()) then
+        if (o.name or ""):find("backgammon_piece", 1, true) then
+          o.destruct()
+        elseif o.hasTag("Pokemon") then   -- lifted a little: the new pedestal is a hair taller
+          busy = true
+          local p = o.getPosition()
+          o.setPosition({ p.x, p.y + 0.2, p.z })
+        end
+      end
+    end
+    st.slots = busy and 6 or 9
+    stand.memo = JSON.encode(st)
+    for _, x in ipairs(SLOTS[st.slots]) do spawnPedestal(slotSpot(stand, x), stand.getRotation().y) end
+  elseif st.slots ~= 9 and st.slots ~= 6 then
+    st.slots = count >= 9 and 9 or 6
+    stand.memo = JSON.encode(st)
+  end
+  local n = standSlots(stand)
+  if #(stand.getSnapPoints() or {}) ~= #SLOTS[n] * #CARD_KINDS then stand.setSnapPoints(standSnapPoints(n)) end   -- card slots
+  refreshPedestals()
+end
+
+----------------------------------------------------------------------------------------------------
+-- The spectator stand (tag "SpectatorStand", props/spectators-v3) at the table's right end, clear of every board
+-- (between Yaksha's gift boxes), as tall as the team stands: along its board side the turn track (below), along its
+-- middle 6 plain pedestals evenly spaced, each player's 3 on their own half, and beside each (the outer side) its
+-- Pokémon's cards, stacked. A team of 9
+-- sends 3 there with the bench buttons, each with the cards from its column; a Pokémon put back on its sat-out
+-- pedestal plays again (its cards follow). Once 3 have been sent, the stand's other 6 pedestals slide to the usual
+-- spacing, taking their Pokémon and cards (an empty pedestal sat out goes with any cards left in its column).
+-- Picking a map makes it 9 again just as it was: the 6 slide back to their own slots (each pedestal remembers its
+-- slot of the 9, memo "home"), the sat-out pedestals come back where they were, and everyone comes home with their
+-- cards, the benched to the slot they left (the Pokémon's memo "home"), so the team's order is as before.
+----------------------------------------------------------------------------------------------------
+SPECTATORS = { mesh = "props/spectators-v3.obj", tex = "props/spectators-v3.jpg", pos = { 37.0, 0.961, 0 }, yaw = 180,
+  top = 2.6,
+  z = { 12.5, 7.5, 2.5 },    -- seat i: z = -z[i] on the near half, +z[i] on the far half (each player's end first)
+  seatX = 0.1, cardX = 2.65, -- across the stand (from its middle, toward the table's end): the pedestals, the card stacks
+  cardYaw = 0 }               -- the stacked cards lie along the stand, reading from the board side
+SLIDE_TIME, SLIDE_FRAMES = 1.0, 60
+ARC_TIME, ARC_FRAMES, ARC_PEAK = 1.2, 72, 3.0
+
+function spectatorStand()
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("SpectatorStand") then return o end
+  end
+  return nil
+end
+
+-- The spectator stand and its 6 pedestals, if any are missing. An older stand (another model: the earlier ones had
+-- no turn track) gives way to the current one, and each half's pedestals go to their seats with the Pokémon on them.
+local function spawnSpectatorStand()
+  local turns = 10
+  local board = currentBoard()
+  local a = board and arenas[board.getName()]
+  if a and a.turns then turns = a.turns end
+  local stand = spawnObjectData({
+    data = {
+      Name = "Custom_Model", Nickname = "Spectator stand", Tags = { "SpectatorStand" }, Locked = true,
+      Memo = JSON.encode({ turns = turns }),
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      CustomMesh = { MeshURL = BASE_URL .. SPECTATORS.mesh, DiffuseURL = BASE_URL .. SPECTATORS.tex, NormalURL = "",
+        ColliderURL = BASE_URL .. SPECTATORS.mesh, Convex = true, MaterialIndex = 3, TypeIndex = 0, CastShadows = true },
+    },
+    position = SPECTATORS.pos, rotation = { 0, SPECTATORS.yaw, 0 },
+  })
+  if stand then pieceSetup(stand) end   -- (again once it has loaded: onObjectSpawn)
+end
+
+function ensureSpectators()
+  local stand = spectatorStand()
+  local want = Vector(SPECTATORS.pos[1], SPECTATORS.pos[2], SPECTATORS.pos[3])
+  if stand and not ((stand.getCustomObject() or {}).mesh or ""):find(SPECTATORS.mesh, 1, true) then
+    stand.destruct()
+    stand = nil
+  end
+  if not stand then
+    spawnSpectatorStand()
+  else
+    local at = stand.getPosition()
+    if math.abs(at.x - want.x) + math.abs(at.z - want.z) > 0.01 then stand.setPosition(want) end
+  end
+  for _, near_ in ipairs({ true, false }) do
+    local have = {}
+    for _, o in ipairs(getAllObjects()) do
+      if o.hasTag("Pedestal") and memoTable(o).spect and (o.getPosition().z < 0) == near_ then have[#have + 1] = o end
+    end
+    table.sort(have, function(a, b) return math.abs(a.getPosition().z) > math.abs(b.getPosition().z) end)
+    for i, z in ipairs(SPECTATORS.z) do
+      local spot = Vector(want.x + SPECTATORS.seatX, want.y + SPECTATORS.top, want.z + (near_ and -z or z))
+      local ped = have[i]
+      if not ped then
+        spawnPedestal(spot, near_ and 0 or 180, true, JSON.encode({ spect = true }))
+      else
+        local p = ped.getPosition()
+        local d = spot - p
+        if math.abs(d.x) + math.abs(d.y) + math.abs(d.z) > 0.01 then
+          local mon = restingOn(ped)
+          ped.setPosition(spot)
+          if mon then
+            local q = mon.getPosition()
+            mon.setPosition({ q.x + d.x, q.y + d.y, q.z + d.z })
+          end
+        end
+      end
+    end
+  end
+end
+
+-- Where a spectator seat's cards stack: beside its pedestal, on the stand's outer side (i = 0 at the bottom).
+function seatCardSpot(seat, i)
+  local p = seat.getPosition()
+  return Vector(p.x + SPECTATORS.cardX - SPECTATORS.seatX, p.y + 0.02 + 0.03 * i, p.z)
+end
+
+-- The spectator pedestals on a team stand's half, its player's end first.
+function spectatorSeats(stand)
+  local near_ = stand.getPosition().z < 0
+  local out = {}
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("Pedestal") and memoTable(o).spect and (o.getPosition().z < 0) == near_ then out[#out + 1] = o end
+  end
+  table.sort(out, function(a, b) return math.abs(a.getPosition().z) > math.abs(b.getPosition().z) end)
+  return out
+end
+
+-- Move objects together to where they're going over SLIDE_TIME (locked meanwhile), then done().
+-- moves: { { obj, from = Vector, to = Vector } }
+local function slideAll(moves, done)
+  for _, m in ipairs(moves) do
+    m.locked = m.obj.getLock()
+    m.obj.setLock(true)
+  end
+  local clock = Time and Time.time and function() return Time.time end
+  local k, t0 = 0, clock and clock()
+  local function step()
+    k = k + 1
+    local t = math.min(1, clock and (clock() - t0) / SLIDE_TIME or k / SLIDE_FRAMES)
+    local e = t * t * (3 - 2 * t)
+    for _, m in ipairs(moves) do
+      if m.obj ~= nil then m.obj.setPosition(m.from + (m.to - m.from) * e) end
+    end
+    if t < 1 then
+      Wait.frames(step, 1)
+    else
+      for _, m in ipairs(moves) do
+        if m.obj ~= nil then m.obj.setLock(m.locked) end
+      end
+      if done then done() end
+    end
+  end
+  step()
+end
+
+-- Fly a Pokémon (or a card) along an arc to dest (locked meanwhile, turned to rot if given), then done().
+local function arcTo(obj, dest, rot, done)
+  local from = obj.getPosition()
+  local dx, dy, dz = dest.x - from.x, dest.y - from.y, dest.z - from.z
+  local peak = ARC_PEAK + 0.1 * math.sqrt(dx * dx + dz * dz)
+  local wasLocked = obj.getLock()
+  flying[obj.guid] = true
+  obj.setLock(true)
+  if rot then obj.setRotation(rot) end
+  local clock = Time and Time.time and function() return Time.time end
+  local k, t0 = 0, clock and clock()
+  local function step()
+    if obj == nil then return end
+    k = k + 1
+    local t = math.min(1, clock and (clock() - t0) / ARC_TIME or k / ARC_FRAMES)
+    obj.setPosition({ from.x + dx * t, from.y + dy * t + 4 * peak * t * (1 - t), from.z + dz * t })
+    if t < 1 then
+      Wait.frames(step, 1)
+    else
+      obj.setLock(wasLocked)
+      flying[obj.guid] = nil
+      if done then done() end
+    end
+  end
+  step()
+end
+
+-- Each pedestal of a stand with what rides along when it slides: the Pokémon resting on it, the cards in its column.
+local function slideMoves(stand, peds, xs, half)
+  local moves = {}
+  for i, p in ipairs(peds) do
+    local x = xs[i]
+    if x then
+      local d = stand.positionToWorld(Vector(x, 0, 0)) - stand.positionToWorld(Vector(p.x, 0, 0))
+      local riders = columnCards(stand, p.x, half)
+      riders[#riders + 1] = p.obj
+      riders[#riders + 1] = restingOn(p.obj)
+      for _, o in ipairs(riders) do
+        local from = o.getPosition()
+        moves[#moves + 1] = { obj = o, from = from, to = from + d }
+      end
+    end
+  end
+  return moves
+end
+
+-- Which slot (1-9) of a stand's 9 a pedestal stands in (the nearest).
+function slotIndex(stand, ped)
+  local x = stand.positionToLocal(ped.getPosition()).x
+  local best, bd = 1, nil
+  for i, sx in ipairs(SLOTS[9]) do
+    if not bd or math.abs(sx - x) < bd then best, bd = i, math.abs(sx - x) end
+  end
+  return best
+end
+
+function benchedCount(stand)
+  local n = 0
+  for _, p in ipairs(standPedestals(stand)) do
+    if memoTable(p.obj).benched then n = n + 1 end
+  end
+  return n
+end
+
+-- Once 3 of a team of 9 are sat out: their pedestals and cards go, the other 6 slide to the usual spacing.
+function compactStand(stand)
+  if sliding[stand.guid] or standSlots(stand) ~= 9 then return false end
+  local peds, keep, out = standPedestals(stand), {}, {}
+  for _, p in ipairs(peds) do
+    if memoTable(p.obj).benched then out[#out + 1] = p else keep[#keep + 1] = p end
+  end
+  if #out < BENCH_SIZE or #keep ~= #SLOTS[6] then return false end
+  local half = (SLOTS[9][2] - SLOTS[9][1]) / 2
+  for _, p in ipairs(keep) do   -- each remembers its slot of the 9, to go back to it
+    local ps = memoTable(p.obj)
+    ps.home = slotIndex(stand, p.obj)
+    p.obj.memo = JSON.encode(ps)
+  end
+  for _, p in ipairs(out) do
+    for _, c in ipairs(columnCards(stand, p.x, half)) do c.destruct() end
+    p.obj.destruct()
+  end
+  local st = memoTable(stand)
+  st.slots = 6
+  stand.memo = JSON.encode(st)
+  sliding[stand.guid] = true
+  refreshPedestals()   -- the bench buttons go
+  slideAll(slideMoves(stand, keep, SLOTS[6], half), function()
+    stand.setSnapPoints(standSnapPoints(6))
+    sliding[stand.guid] = nil
+    refreshPedestals()
+  end)
+  return true
+end
+
+-- Send a pedestal's Pokémon to its player's half of the spectator stand (an empty pedestal is just sat out).
+function benchFrom(ped)
+  local stand = ped and pedestalStand(ped)
+  if not stand or standSlots(stand) ~= 9 or sliding[stand.guid] then return false end
+  local st = memoTable(ped)
+  if st.benched then return false end
+  local mon = pedestalMon(ped, st) or restingOn(ped)
+  local seat
+  if mon then
+    for _, s in ipairs(spectatorSeats(stand)) do
+      if not seat and not seatTaken[s.guid] and not restingOn(s) then seat = s end
+    end
+    if not seat then return false end
+  end
+  st.benched, st.mon = true, nil
+  ped.memo = JSON.encode(st)
+  local function after()
+    if benchedCount(stand) >= BENCH_SIZE then compactStand(stand) else refreshPedestals() end
+  end
+  if mon then
+    seatTaken[seat.guid] = true
+    local x = stand.positionToLocal(ped.getPosition()).x
+    local cards = columnCards(stand, x, (SLOTS[9][2] - SLOTS[9][1]) / 2)
+    table.sort(cards, function(a, b) return stand.positionToLocal(a.getPosition()).y < stand.positionToLocal(b.getPosition()).y end)
+    local fst, guids = figureState(mon), {}
+    for i, c in ipairs(cards) do   -- the bottom row's card at the bottom of the stack, the item on top
+      guids[i] = c.guid
+      arcTo(c, seatCardSpot(seat, i - 1), { 0, SPECTATORS.cardYaw, 0 })
+    end
+    fst.cards = #guids > 0 and guids or nil
+    fst.home = slotIndex(stand, ped)
+    mon.memo = JSON.encode(fst)
+    arcTo(mon, seat.getPosition() + Vector(0, PEDESTAL_TOP + 0.02, 0), { 0, stand.getRotation().y + FRONT_YAW, 0 }, function()
+      seatTaken[seat.guid] = nil
+      after()
+    end)
+    refreshPedestals()
+  else
+    after()
+  end
+  return true
+end
+
+-- A pedestal's bench button: its id is "bench_<pedestal guid>".
+function benchClicked(_, _, id)
+  local ped = getObjectFromGUID(tostring(id or ""):sub(7))
+  if ped then benchFrom(ped) end
+end
+
+-- A stand back to 9 pedestals (sliding its 6 along and adding 3), then done(); with 9 already, nobody is sat out.
+function expandStand(stand, done)
+  if sliding[stand.guid] then return false end
+  local peds = standPedestals(stand)
+  if standSlots(stand) == 9 then
+    for _, p in ipairs(peds) do
+      local ps = memoTable(p.obj)
+      if ps.benched then
+        ps.benched = nil
+        p.obj.memo = JSON.encode(ps)
+      end
+    end
+    if done then done() end
+    return true
+  end
+  local st = memoTable(stand)
+  st.slots = 9
+  stand.memo = JSON.encode(st)
+  local homes, used, xs = {}, {}, {}
+  for i, p in ipairs(peds) do
+    local h = memoTable(p.obj).home
+    if h and SLOTS[9][h] and not used[h] then homes[i], used[h] = h, true end
+  end
+  local nextSlot = 1
+  for i in ipairs(peds) do   -- (a pedestal that doesn't know its slot: the first free one)
+    if not homes[i] then
+      while used[nextSlot] do nextSlot = nextSlot + 1 end
+      homes[i], used[nextSlot] = nextSlot, true
+    end
+    xs[i] = SLOTS[9][homes[i]]
+  end
+  sliding[stand.guid] = true
+  slideAll(slideMoves(stand, peds, xs, (SLOTS[6][2] - SLOTS[6][1]) / 2), function()
+    for i, x in ipairs(SLOTS[9]) do
+      if not used[i] then spawnPedestal(slotSpot(stand, x), stand.getRotation().y) end
+    end
+    for _, p in ipairs(peds) do
+      local ps = memoTable(p.obj)
+      if ps.home then
+        ps.home = nil
+        p.obj.memo = JSON.encode(ps)
+      end
+    end
+    stand.setSnapPoints(standSnapPoints(9))
+    sliding[stand.guid] = nil
+    refreshPedestals()
+    if done then done() end
+  end)
+  return true
+end
+
+-- Everyone back to a stand: each Pokémon to its own pedestal, then the ones on its player's half of the spectator
+-- stand to the slot they left (or, if that's taken, the first free one).
+function returnTeam(stand)
+  local free, rot = {}, { 0, stand.getRotation().y + FRONT_YAW, 0 }
+  for _, p in ipairs(standPedestals(stand)) do
+    local st = memoTable(p.obj)
+    local mon, resting = pedestalMon(p.obj, st), restingOn(p.obj)
+    if mon and resting ~= mon and not flying[mon.guid] then
+      arcTo(mon, p.obj.getPosition() + Vector(0, PEDESTAL_TOP + 0.02, 0), rot, refreshPedestals)
+    elseif not mon and not resting then
+      free[#free + 1] = p.obj
+    end
+  end
+  local taken = {}
+  for _, seat in ipairs(spectatorSeats(stand)) do
+    local mon = restingOn(seat)
+    if mon then
+      local home, to = figureState(mon).home, nil
+      for _, f in ipairs(free) do
+        if not to and not taken[f.guid] and home and slotIndex(stand, f) == home then to = f end
+      end
+      for _, f in ipairs(free) do
+        if not to and not taken[f.guid] then to = f end
+      end
+      if to then
+        taken[to.guid] = true
+        arcTo(mon, to.getPosition() + Vector(0, PEDESTAL_TOP + 0.02, 0), rot, refreshPedestals)
+      end
+    end
+  end
+end
+
+-- A Pokémon that went to the spectator stand with its cards, now back on a team pedestal: its cards fly back to
+-- that pedestal's column, each to its own row.
+function restoreCards(mon, ped, stand)
+  local st = figureState(mon)
+  if type(st.cards) ~= "table" and not st.home then return end
+  local guids = type(st.cards) == "table" and st.cards or {}
+  st.cards, st.home = nil, nil
+  mon.memo = JSON.encode(st)
+  local x, rot = stand.positionToLocal(ped.getPosition()).x, cardRotation(stand)
+  local dy, dz = slopeLift(0.15)
+  for _, g in ipairs(guids) do
+    local c = getObjectFromGUID(g)
+    if c and c.type == "Card" then
+      local kind
+      for _, k in ipairs(CARD_KINDS) do
+        if c.hasTag(CATALOGS[k].tag) then kind = k end
+      end
+      if kind then
+        arcTo(c, stand.positionToWorld(Vector(x, STAND.cards[kind].y + dy, STAND.cards[kind].z + dz)), rot)
+      end
+    end
+  end
+end
+
+-- A new map: both stands back to 9 with their whole teams.
+function resetStands()
+  for _, stand in ipairs(teamStands()) do
+    expandStand(stand, function() returnTeam(stand) end)
+  end
+end
+
+----------------------------------------------------------------------------------------------------
+-- The turn track along the spectator stand's board side: slots 1-15 (1 at the far end: the left, seen from the
+-- board), the arena's last turn in gold (object UI over its slot, its number on it; the stand's memo keeps the
+-- arena's turn count),
+-- and a token (tag "TurnToken", a Poké Ball, its white half toward the board) that snaps to the slots. A new map
+-- tints its last turn and puts the token back on 1.
+----------------------------------------------------------------------------------------------------
+TURN_TRACK = { x = 2.7, slot = 2.0, turns = 15,   -- the slots in the stand's own frame: across at x, 1 at -z
+  token = "props/turntoken-v2.obj", tokenTex = "props/turntoken-v2.jpg",
+  gold = "#E8C462", goldSize = 156, ink = "#3A2212" }   -- the last turn's slot: gold, its size (UI units), the number's colour
+
+-- A slot's middle along the stand (its own frame).
+local function slotZ(i)
+  return (2 * i - TURN_TRACK.turns - 1) * TURN_TRACK.slot / 2
+end
+
+function turnSnaps()
+  local snaps = {}
+  for i = 1, TURN_TRACK.turns do
+    snaps[i] = { position = { TURN_TRACK.x, SPECTATORS.top, slotZ(i) }, rotation = { 0, 0, 0 }, rotation_snap = false }
+  end
+  return snaps
+end
+
+-- The arena's last turn (the stand's memo's turn count) in gold: a gold square over its slot with its number, turned
+-- to read from the board side like the slots' own numbers.
+function showLastTurn(stand)
+  local n = math.max(1, math.min(TURN_TRACK.turns, math.floor(memoTable(stand).turns or 10)))
+  stand.UI.setXml(string.format([[<Panel position="%d %d %d" width="%d" height="%d" color="%s" raycastTarget="false">
+  <Text rotation="0 0 90" fontSize="100" fontStyle="Bold" color="%s">%d</Text>
+</Panel>]], math.floor(TURN_TRACK.x * 100 + 0.5), math.floor(slotZ(n) * 100 + 0.5),
+    math.floor(-(SPECTATORS.top + 0.01) * 100 + 0.5), TURN_TRACK.goldSize, TURN_TRACK.goldSize, TURN_TRACK.gold, TURN_TRACK.ink, n))
+end
+
+-- Where the token sits on turn 1 (in the world: the stand is turned round).
+local function firstTurnSpot()
+  local c, k = SPECTATORS.pos, SPECTATORS.yaw == 180 and -1 or 1
+  return Vector(c[1] + k * TURN_TRACK.x, c[2] + SPECTATORS.top + 0.1, c[3] + k * slotZ(1))
+end
+
+local function spawnToken()
+  spawnObjectData({
+    data = {
+      Name = "Custom_Model", Nickname = "Turn", Tags = { "TurnToken" },
+      Transform = { posX = 0, posY = 0, posZ = 0, rotX = 0, rotY = 0, rotZ = 0, scaleX = 1, scaleY = 1, scaleZ = 1 },
+      CustomMesh = { MeshURL = BASE_URL .. TURN_TRACK.token, DiffuseURL = BASE_URL .. TURN_TRACK.tokenTex, NormalURL = "",
+        ColliderURL = BASE_URL .. TURN_TRACK.token, Convex = true, MaterialIndex = 3, TypeIndex = 0, CastShadows = true },
+    },
+    position = firstTurnSpot(), rotation = { 0, 0, 0 },
+  })
+end
+
+-- A new map: its last turn in gold, the token back on 1 (a new one if it's gone). (The separate track of an older
+-- layout goes.)
+function setTurnTrack(turns)
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("TurnTrack") then o.destruct() end
+  end
+  local stand = spectatorStand()
+  if stand then
+    local st = memoTable(stand)
+    st.turns = turns or 10
+    stand.memo = JSON.encode(st)
+    showLastTurn(stand)
+  end
+  local token
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("TurnToken") then
+      if token then o.destruct() else token = o end
+    end
+  end
+  if token then
+    token.setPosition(firstTurnSpot())
+    token.setRotation({ 0, 0, 0 })
+  else
+    spawnToken()
+  end
+end
+
+-- Is the token on the track? (on the stand's slots row)
+local function onTrack(token)
+  local p, first = token.getPosition(), firstTurnSpot()
+  return math.abs(p.x - first.x) < 1.5 and math.abs(p.z - SPECTATORS.pos[3]) < TURN_TRACK.turns * TURN_TRACK.slot / 2 + 0.5
+    and p.y > first.y - 0.6
+end
+
+-- After a load: the stand shows the last turn of the arena on the table, and there's a token (left where it is, if
+-- it's on the track: one from an older layout goes back to 1).
+function ensureTurnTrack(turns)
+  local stand = spectatorStand()
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("TurnTrack") then o.destruct() end
+  end
+  if stand and memoTable(stand).turns ~= (turns or 10) then
+    local st = memoTable(stand)
+    st.turns = turns or 10
+    stand.memo = JSON.encode(st)
+    showLastTurn(stand)
+  end
+  for _, o in ipairs(getAllObjects()) do
+    if o.hasTag("TurnToken") then
+      if not onTrack(o) and not o.held_by_color then
+        o.setPosition(firstTurnSpot())
+        o.setRotation({ 0, 0, 0 })
+      end
+      return
+    end
+  end
+  spawnToken()
 end
 
 -- Pokémon use the plain standee (no sign of their own) and no labels of their own.
@@ -2018,12 +2887,12 @@ function parseHp(text, current, max)
   return math.max(0, math.min(max, v))
 end
 
--- A sign's number was edited ("hpIn_<stand guid>_<column>_<side>"): change the HP of the Pokémon on it.
+-- A sign's number was edited ("hpIn_<pedestal guid>_<side>"): change the HP of that pedestal's Pokémon.
 function hpEdited(player, value, id)
-  local guid, col = id:match("^hpIn_(%w+)_(%d+)_%a$")
-  local stand = guid and getObjectFromGUID(guid)
-  if not stand then return end
-  local mon = pokemonOn(stand, tonumber(col))
+  local guid = id:match("^hpIn_(%w+)_%a$")
+  local ped = guid and getObjectFromGUID(guid)
+  if not ped then return end
+  local mon = pedestalMon(ped)
   if mon then
     local st = hpState(mon)
     if st.maxHp then
@@ -2035,6 +2904,7 @@ function hpEdited(player, value, id)
       end
     end
   end
-  refreshStand(stand)   -- shows the result, or puts back the number if the entry wasn't one
-  refreshZones()        -- a fainted Pokémon no longer holds a zone
+  pedestalUI[ped.guid] = nil   -- shows the result, or puts back the number if the entry wasn't one
+  refreshPedestals()
+  refreshZones()               -- a fainted Pokémon no longer holds a zone
 end

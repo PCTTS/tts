@@ -13,7 +13,14 @@ TTS mirrors OBJ files on X when it loads them, so x is written negated.
 Floating islands (map.json "float": {lift, cliff, depth, power, max}, world units): everything is lifted `lift`
 above the table; where land meets the sky its edge drops `cliff`, and below that the rock hangs down, deeper the
 farther a point is from the island's edge (depth * distance-in-tiles ^ power, at most `max`), so each island
-tapers to rough points underneath. No geometry under the sky tiles.
+tapers to rough points underneath (on a grid `steps` x finer than the tiles, default 4: fewer for a board with a
+lot of land, to keep the model's vertex count down). No geometry under the sky tiles.
+
+Floating platforms (map.json "platforms": [{"path": [[row, col], ...]}], Avia): the platforms are 3D pieces
+(tools/place_pieces.py); with "rails": {below, width, height} the board gets a thin rail along each path (from
+tile middle to tile middle, its top `below` under the platforms' deck: the top of level "platform_level", default 0),
+coloured palette "rail" (painted into the
+atlas square of the path's bend tile, which is sky: nothing else uses it).
 """
 import json, math, random, sys
 from pathlib import Path
@@ -332,6 +339,12 @@ def draw_texture(a):
                 else:
                     base = a.palette[surface]
                     d.rectangle([box[0], box[1], box[2] - 1, box[3] - 1], fill=shade(base, rnd.uniform(0.96, 1.04)))
+    if a.data.get("rails"):   # each platform's rail colour, in its bend tile's (sky) square: see build_mesh
+        for plat in a.data.get("platforms") or []:
+            br, bc = plat["path"][1]
+            if a.tile(br, bc):
+                sys.exit(f"platform {plat['path']}: its bend tile must be sky (its rail's colour goes there)")
+            d.rectangle([bc * p, br * p, (bc + 1) * p - 1, (br + 1) * p - 1], fill=a.palette.get("rail", (184, 146, 90)))
     # wall strip, below the tiles. Left half: rock with horizontal strata, darker toward the bottom (outer walls).
     # Right half: the "walls" texture, if the map has one (inner walls); otherwise rock too. With "outer": true
     # in the walls texture, the left half (the board's outer edge) gets it as well.
@@ -706,8 +719,8 @@ def marker_turn(a, r, c, t):
     explicit "orient" wins ("away-from-pit": bottom away from the lower neighbours); anything else has its bottom
     toward the nearer left/right edge."""
     marker = painted_marker(t) or ""
-    if marker == "spawn1" or marker.startswith(("sand-", "ice-")) or marker == "cracked":   # quicksand and ice
-        return 0                                                                    # arrows point the way they push
+    if marker == "spawn1" or marker.startswith(("sand-", "ice-", "jump-")) or marker == "cracked":   # quicksand, ice
+        return 0                                                    # and jump pad arrows point the way they act
     if marker.startswith("spawn2"):
         return 180
     if both_ways(a, t):   # N/N reads the same from either player's end: not turned
@@ -933,6 +946,18 @@ def draw_marker(im, marker, x0, y0, p, both=False, button=None, palette=None):
         sand_arrow(o, cx, cy, u, SAND_DIRS[marker[len("sand-"):]])
     elif marker.startswith("ice-"):   # ice (Snow): a deep blue arrow the way it slides a Pokémon (dirs as sand-)
         sand_arrow(o, cx, cy, u, SAND_DIRS[marker[len("ice-"):]], 1.1, (24, 62, 112, 235))
+    elif marker.startswith("jump-"):   # a jump pad (Avia): a dark round pad, a glowing ring (palette "jump") and a
+        dx, dy = SAND_DIRS[marker[len("jump-"):]]   # double chevron pointing the way it throws (dirs as sand-)
+        col = tuple((palette or {}).get("jump", (47, 168, 224)))
+        r = 46 * u
+        o.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(30, 36, 48, 235), outline=col + (255,), width=round(5 * u))
+        o.ellipse([cx - 36 * u, cy - 36 * u, cx + 36 * u, cy + 36 * u], outline=col + (110,), width=round(2 * u))
+        px, py, arm = -dy, dx, 17 * u
+        for off in (-11, 11):   # the two chevrons, tips 22 apart, centred on the pad
+            tx, ty = cx + dx * (off + 8) * u, cy + dy * (off + 8) * u
+            o.line([(tx - dx * arm + px * arm, ty - dy * arm + py * arm), (tx, ty),
+                    (tx - dx * arm - px * arm, ty - dy * arm - py * arm)], fill=(236, 248, 255, 255),
+                   width=round(8 * u), joint="curve")
     elif marker.startswith("tunnel"):   # a tunnel's mouth (Terrera): a dark burrow, its number (the d4 roll) on it;
         n, _, way = marker[len("tunnel"):].partition("-")   # "tunnel3-se": also quicksand pushing south-east
         r = 34 * u
@@ -1231,7 +1256,25 @@ def build_mesh(a):
                        [wall_uv(ua, wall_top), wall_uv(ub, wall_top), wall_uv(ub, low), wall_uv(ua, low)],
                        normal)
     if a.float:
-        underside(a, m, wall_uv)
+        underside(a, m, wall_uv, a.float.get("steps", 4))
+    rails = a.data.get("rails")
+    for plat in (a.data.get("platforms") or []) if rails else []:   # a thin bar along each platform's path
+        path = plat["path"]
+        br, bc = path[1]
+        uv = [((bc + 0.5) * PX / W, 1 - (br + 0.5) * PX / H)] * 4   # its bend tile's square: the rail colour
+        top = a.floor0() + a.data.get("platform_level", 0) * LEVEL_H - rails["below"]
+        bot, hw = top - rails["height"], rails["width"] / 2
+        for (r0, c0), (r1, c1) in zip(path, path[1:]):   # each leg, a box reaching half its width past both ends
+            xa, xb = sorted((x(c0 + 0.5), x(c1 + 0.5)))
+            za, zb = sorted((z(r0 + 0.5), z(r1 + 0.5)))
+            xa, xb, za, zb = xa - hw, xb + hw, za - hw, zb + hw
+            for corners, normal in (([(xa, top, za), (xb, top, za), (xb, top, zb), (xa, top, zb)], (0, 1, 0)),
+                                    ([(xa, bot, za), (xb, bot, za), (xb, bot, zb), (xa, bot, zb)], (0, -1, 0)),
+                                    ([(xa, bot, za), (xb, bot, za), (xb, top, za), (xa, top, za)], (0, 0, -1)),
+                                    ([(xa, bot, zb), (xb, bot, zb), (xb, top, zb), (xa, top, zb)], (0, 0, 1)),
+                                    ([(xa, bot, za), (xa, bot, zb), (xa, top, zb), (xa, top, za)], (-1, 0, 0)),
+                                    ([(xb, bot, za), (xb, bot, zb), (xb, top, zb), (xb, top, za)], (1, 0, 0))):
+                m.quad(corners, uv, normal)
     return m
 
 

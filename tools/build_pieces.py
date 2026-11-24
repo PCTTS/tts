@@ -31,7 +31,12 @@ Writes (only files that are missing: bump a version when what a file holds chang
   props/flower-v1.obj, props/flower-red-v1.jpg, -blue-, -violet-  (Greenleaf: a flower, a flat bloom; own collider)
   props/grassbridge-v2.obj, props/grassbridge-v2.jpg, props/grassbridge-collider-v2.obj  (Greenleaf: one half of the
   grass bridge; v1, a single 5x2 deck that sank into the creek, superseded)
+  props/platform-v1.obj, props/platform-v1.jpg, props/platform-collider-v1.obj  (Avia: a floating platform)
 tools/place_pieces.py puts them on an arena's marker tiles.
+
+Floating platform (Avia): a square wooden deck a tile across (a little less), planks in a dark frame with iron
+corner brackets, a lump of rock under it tapering down, and an iron post from the rock's bottom down to the rail the
+board has under its track (map.json rails.below). Its own frame: y = 0 is the deck's top, centred.
 
 Flower (Greenleaf): a thin flat bloom lying on its tile, eight round petals in its colour round a golden middle; a
 Pokemon stands on its middle (it carries the tile's snap point). Its own frame: y = 0 is the tile top.
@@ -139,6 +144,13 @@ FLOWER_COLORS = {"red": (226, 52, 60), "blue": (60, 123, 234), "violet": (154, 8
 GRASS_TILES = 5                           # Greenleaf's grass bridge: each half is a line of 5 tiles
 GRASS_L, GRASS_W, GRASS_D = GRASS_TILES * TILE - 0.04, TILE - 0.02, 0.32   # a half: length, width, thickness (a
                                           # little short of its tiles, so it never rubs the banks or its hedge)
+
+
+PLAT_W = TILE - 0.1                     # Avia's floating platform: the deck, square (clear of the islands beside it)
+PLAT_D = 0.22                            # the deck's thickness
+PLAT_KEEL, PLAT_KEEL_K = 0.33, 0.45      # the rock under it: its depth, its bottom as a fraction of the deck
+PLAT_POST, PLAT_RAIL = 0.12, 0.75        # the post down to the rail: its width; the rail's top below the deck top
+PLAT_TEX = 512                           # texture: the deck's top (left 384 x 384), its sides (right), rock (bottom)
 
 
 def gear_file(size, turn, number=0):
@@ -1061,6 +1073,90 @@ def grass_bridge_texture():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.6))
 
 
+# ------------------------------------------------------------------------------------------------ platform
+def plat_uv(u, v):
+    return (u / PLAT_TEX, 1 - v / PLAT_TEX)
+
+
+def platform():
+    """Avia's floating platform (see the module notes). Top: the texture's left 384 x 384; sides: its right strip;
+    the rock: its bottom strip; the post: the iron in the sides' band."""
+    m = PieceMesh()
+    h, k, d0 = PLAT_W / 2, PLAT_W / 2 * PLAT_KEEL_K, -PLAT_D
+    d1 = d0 - PLAT_KEEL
+    top = lambda x, z: plat_uv(192 + x / h * 190, 192 - z / h * 190)
+    m.face4([(-h, 0, h), (h, 0, h), (h, 0, -h), (-h, 0, -h)], [top(-h, h), top(h, h), top(h, -h), top(-h, -h)],
+            [(0, 1, 0)] * 4)
+    side = [plat_uv(390, 4), plat_uv(390, 380), plat_uv(506, 380), plat_uv(506, 4)]   # (top edge at u 390)
+    corners = [(-h, h), (h, h), (h, -h), (-h, -h)]                                    # round the deck
+    kc = [(-k, k), (k, k), (k, -k), (-k, -k)]
+    for i in range(4):
+        (ax, az), (bx, bz) = corners[i], corners[(i + 1) % 4]
+        n = norm(((ax + bx) / 2, 0, (az + bz) / 2))
+        m.face4([(ax, 0, az), (bx, 0, bz), (bx, d0, bz), (ax, d0, az)], side, [n] * 4)
+        (cx, cz), (ex, ez) = kc[i], kc[(i + 1) % 4]                                    # the rock's sloping side
+        out = norm((n[0] * PLAT_KEEL, -(h - k), n[2] * PLAT_KEEL))
+        m.face4([(ax, d0, az), (bx, d0, bz), (ex, d1, ez), (cx, d1, cz)],
+                [plat_uv(8, 392), plat_uv(504, 392), plat_uv(400, 504), plat_uv(112, 504)], [out] * 4)
+    m.face4([(-k, d1, -k), (k, d1, -k), (k, d1, k), (-k, d1, k)],
+            [plat_uv(150, 440), plat_uv(360, 440), plat_uv(360, 500), plat_uv(150, 500)], [(0, -1, 0)] * 4)
+    w = PLAT_POST / 2                                                                  # the post, down to the rail
+    iron = plat_uv(448, 192)
+    for (ax, az), (bx, bz), n in (((-w, -w), (w, -w), (0, 0, -1)), ((w, -w), (w, w), (1, 0, 0)),
+                                  ((w, w), (-w, w), (0, 0, 1)), ((-w, w), (-w, -w), (-1, 0, 0))):
+        m.face4([(ax, d1 + 0.02, az), (bx, d1 + 0.02, bz), (bx, -PLAT_RAIL, bz), (ax, -PLAT_RAIL, az)], [iron] * 4, [n] * 4)
+    return m
+
+
+def platform_collider():
+    m = PieceMesh()
+    box(m, -PLAT_W / 2, PLAT_W / 2, -PLAT_D - PLAT_KEEL, 0, -PLAT_W / 2, PLAT_W / 2)
+    return m
+
+
+def platform_texture():
+    """The deck: six planks of weathered wood with grain and nail heads, in a dark frame with iron brackets at the
+    corners (left 384 x 384); its sides: the dark frame with an iron band (right strip); rock (bottom strip)."""
+    rng = np.random.default_rng(521)
+    n = PLAT_TEX
+    img = Image.new("RGB", (n, n), (96, 66, 40))
+    d = ImageDraw.Draw(img, "RGBA")
+    frame, inner = 20, (20, 364)
+    for i in range(6):                                                 # planks, along x
+        y0 = inner[0] + i * (inner[1] - inner[0]) / 6
+        y1 = y0 + (inner[1] - inner[0]) / 6
+        base = np.array((150, 108, 66)) * rng.uniform(0.86, 1.08)
+        d.rectangle([frame, y0, n - 128 - frame, y1], fill=tuple(int(v) for v in base))
+        for _ in range(16):                                            # grain
+            gy = rng.uniform(y0 + 3, y1 - 3)
+            pts = [(x, gy + 2.5 * math.sin(x / rng.uniform(18, 40) + rng.random() * 6)) for x in range(frame, 364, 8)]
+            d.line(pts, fill=(96, 64, 36, 90), width=2)
+        d.line([(frame, y0), (n - 128 - frame, y0)], fill=(52, 34, 20, 255), width=3)   # the gap between planks
+        for x in (44, 192, 340):                                       # nail heads
+            for yy in (y0 + 10, y1 - 10):
+                d.ellipse([x - 3, yy - 3, x + 3, yy + 3], fill=(60, 58, 56, 255))
+    d.rectangle([0, 0, 383, 383], outline=(70, 46, 28, 255), width=frame)          # frame
+    for cx, cy in ((0, 0), (383, 0), (0, 383), (383, 383)):           # iron corner brackets
+        sx, sy = (1 if cx == 0 else -1), (1 if cy == 0 else -1)
+        d.polygon([(cx, cy), (cx + sx * 64, cy), (cx + sx * 64, cy + sy * 22), (cx + sx * 22, cy + sy * 22),
+                   (cx + sx * 22, cy + sy * 64), (cx, cy + sy * 64)], fill=(70, 72, 78, 255))
+        for bx, by in ((40, 11), (11, 40), (11, 11)):
+            d.ellipse([cx + sx * bx - 4, cy + sy * by - 4, cx + sx * bx + 4, cy + sy * by + 4], fill=(150, 152, 158, 255))
+    d.rectangle([384, 0, n, 384], fill=(70, 46, 28, 255))             # sides: the frame...
+    for _ in range(10):
+        x = rng.uniform(388, n)
+        d.line([(x, 0), (x + rng.uniform(-4, 4), 384)], fill=(52, 34, 20, 120), width=2)
+    d.rectangle([440, 0, 456, 384], fill=(70, 72, 78, 255))           # ...with an iron band (also the post's iron)
+    rock = np.asarray(Image.fromarray((rng.random((8, 32)) * 255).astype(np.uint8)).resize((n, 128), Image.BICUBIC),
+                      np.float32) / 255
+    rows = np.arange(128, dtype=np.float32)[:, None] / 128
+    bands = 0.5 + 0.5 * np.sin((rows * 3 + rock * 1.2) * 2 * np.pi)
+    col = np.array((104, 100, 114), np.float32) + (np.array((166, 162, 174), np.float32) - (104, 100, 114)) * (
+        0.6 * bands + 0.4 * rock)[..., None]
+    img.paste(Image.fromarray(np.clip(col * (1 - 0.35 * rows[..., None]), 0, 255).astype(np.uint8), "RGB"), (0, 384))
+    return img.filter(ImageFilter.GaussianBlur(0.5))
+
+
 # ------------------------------------------------------------------------------------------------ backdrop
 def backdrop():
     """A flat panel the size of the table's play area: an arena's surroundings are shown on it instead of on the
@@ -1180,6 +1276,9 @@ def main():
         "grassbridge-v2.obj": lambda p: grass_bridge().write(p),
         "grassbridge-collider-v2.obj": lambda p: grass_bridge_collider().write(p),
         "grassbridge-v2.jpg": lambda p: grass_bridge_texture().save(p, quality=92),
+        "platform-v1.obj": lambda p: platform().write(p),
+        "platform-collider-v1.obj": lambda p: platform_collider().write(p),
+        "platform-v1.jpg": lambda p: platform_texture().save(p, quality=92),
     }
     for name, make in files.items():
         if not (OUT / name).exists():

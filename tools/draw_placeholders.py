@@ -84,6 +84,12 @@ Writes (only files that are missing: bump a version when what a file holds chang
                                                 placeholder), mixed like the board's floor and lined up with its tiles,
                                                 a shade darker (between the top floor and the stairs; the one in use;
                                                 v2, shaded like the stairs, was tried and reverted)
+  arenas/avia/textures/skystone1.png, -2.png    Avia's low ground: pale cream flagstones, wind-worn streaks, pitting
+  arenas/avia/textures/windgrass1.png, -2.png   Avia's high islands: short windswept grass, blades leaning together
+  arenas/avia/textures/cloud-rock.png           cliffs and the islands' undersides: pale grey-violet layered rock,
+                                                seamless left-right
+  misc/clouds-placeholder-v1.jpg                table image under Avia: a sea of clouds seen from above, deep blue sky
+                                                in the gaps (2048 x 1287: Avia's 17 tiles deep)
 """
 from pathlib import Path
 
@@ -1387,6 +1393,78 @@ def snowfield_table():
     return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.7))
 
 
+def skystone(seed, n=N):
+    """Avia's low ground: a pale cream flagstone, worn by the wind: faint streaks one way, small pits, a hairline
+    crack or two, a little darker toward its edge."""
+    rng = np.random.default_rng(seed)
+    img = mix((184, 176, 158), (224, 216, 198), fbm(n, n, rng, 4, 5))
+    yy, xx = np.mgrid[0:n, 0:n].astype(np.float32)
+    streak = np.sin((yy / n * 23 + fbm(n, n, rng, 3, 3) * 4) * np.pi)
+    img *= (0.975 + 0.025 * streak)[..., None]
+    edge = np.minimum.reduce([xx, yy, n - 1 - xx, n - 1 - yy]) / n
+    img *= (0.9 + 0.1 * np.clip(edge / 0.07, 0, 1))[..., None]
+    out = to_img(img).convert("RGBA")
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(260):                                    # pits
+        x, y, r = rng.random() * n, rng.random() * n, rng.uniform(0.8, 2.4)
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(120, 110, 94, 110))
+    for _ in range(rng.integers(1, 3)):                     # hairline cracks
+        x, y, ang = rng.random() * n, rng.random() * n, rng.random() * 2 * np.pi
+        pts = [(x, y)]
+        for _ in range(rng.integers(6, 12)):
+            ang += rng.normal(0, 0.5)
+            x, y = x + 11 * np.cos(ang), y + 11 * np.sin(ang)
+            pts.append((x, y))
+        d.line(pts, fill=(110, 100, 86, 120), width=2)
+    return out.convert("RGB").filter(ImageFilter.GaussianBlur(0.5))
+
+
+def windgrass(seed):
+    """Avia's high islands: short grass flattened by the wind, the blades leaning together, paler streaks where it
+    lies flat."""
+    rng = np.random.default_rng(seed)
+    t = fbm(N, N, rng, 3)
+    img = mix((104, 140, 62), (156, 188, 92), np.clip((t - 0.3) * 2.0, 0, 1))
+    rows = np.arange(N, dtype=np.float32)[:, None]
+    flat = np.clip((np.sin((rows / N * 7 + fbm(N, N, rng, 2, 3) * 3) * 2 * np.pi) - 0.55) * 2.5, 0, 1)
+    img = img + (np.array((196, 210, 132), np.float32) - img) * (0.35 * flat)[..., None]
+    out = to_img(img)
+    d = ImageDraw.Draw(out, "RGBA")
+    for _ in range(3200):                                   # blades, all leaning the wind's way
+        x, y = rng.random() * N, rng.random() * N
+        ang = rng.normal(-0.35, 0.25)
+        ln = rng.uniform(6, 15)
+        col = (206, 224, 140, 120) if rng.random() < 0.45 else (58, 92, 34, 120)
+        d.line([(x, y), (x + ln * np.cos(ang), y + ln * np.sin(ang))], fill=col, width=2)
+    return out.filter(ImageFilter.GaussianBlur(0.5))
+
+
+def cloud_rock():
+    """Avia's cliffs and the islands' undersides: pale grey-violet rock in wavy layers, seamless left-right."""
+    rng = np.random.default_rng(301)
+    h, w = 1024, N
+    warp = fbm(h, w, rng, 3, 4, wrap_x=True)
+    rows = np.arange(h, dtype=np.float32)[:, None] / h
+    bands = 0.5 + 0.5 * np.sin((rows * 8 + warp * 1.5) * 2 * np.pi)
+    img = mix((104, 100, 114), (170, 166, 178), 0.55 * bands + 0.45 * fbm(h, w, rng, 6, 4, wrap_x=True))
+    img *= (0.92 + 0.16 * fbm(h, w, rng, 32, 2, wrap_x=True))[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(0.6))
+
+
+def clouds_table():
+    """Under Avia: a sea of clouds seen from above, lit on top and shadowed underneath, deep blue sky in the gaps.
+    2048 x 1287 (the play area's width by Avia's 17 tiles: its panel is stretched to the board's depth)."""
+    rng = np.random.default_rng(303)
+    h, w = 1287, 2048
+    img = mix((58, 104, 168), (96, 146, 206), fbm(h, w, rng, 3, 3))
+    c = fbm(h, w, rng, 4, 6)
+    cover = np.clip((c - 0.42) / 0.16, 0, 1)
+    lit = np.clip((c - np.roll(c, 14, axis=0)) * 9 + 0.5, 0, 1)        # brighter where the cloud rises toward the light
+    cloud = mix((196, 204, 222), (252, 252, 255), lit * 0.7 + 0.3 * fbm(h, w, rng, 12, 3))
+    img = img + (cloud - img) * cover[..., None]
+    return to_img(img).filter(ImageFilter.GaussianBlur(1.0))
+
+
 def pugilis_table(sand=(213, 180, 139)):
     """Around Pugilis: the user's own dirt (arenas/pugilis/textures/dirt2.png, dirt5.png) like the board's top floor,
     a little darker (the user's pick, v1): each image recoloured so its median is `sand`, halfway between the raw
@@ -1425,6 +1503,12 @@ def main():
         "arenas/snow/textures/ice.png": lambda p: ice().save(p),
         "arenas/snow/textures/icy-water.png": lambda p: icy_water().save(p),
         "arenas/snow/textures/snow-rock.png": lambda p: snow_rock().save(p),
+        "arenas/avia/textures/skystone1.png": lambda p: skystone(311).save(p),
+        "arenas/avia/textures/skystone2.png": lambda p: skystone(312).save(p),
+        "arenas/avia/textures/windgrass1.png": lambda p: windgrass(313).save(p),
+        "arenas/avia/textures/windgrass2.png": lambda p: windgrass(314).save(p),
+        "arenas/avia/textures/cloud-rock.png": lambda p: cloud_rock().save(p),
+        "misc/clouds-placeholder-v1.jpg": lambda p: clouds_table().save(p, quality=90),
         "misc/pugilis-dirt-v1.jpg": lambda p: pugilis_table().save(p, quality=90),
         "misc/pugilis-dirt-v2.jpg": lambda p: pugilis_table((200, 166, 118)).save(p, quality=90),
         "misc/snowfield-placeholder-v1.jpg": lambda p: snowfield_table().save(p, quality=90),

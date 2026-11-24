@@ -61,7 +61,9 @@ Color = { fromString = function(c)
   return ({ Red = { r = 0.856, g = 0.1, b = 0.094 }, Blue = { r = 0.118, g = 0.53, b = 1 } })[c] or { r = 1, g = 1, b = 1 }
 end }
 objects = {}
-local function stub(o)
+local guids = 0
+function stub(o)
+  if not o.guid then guids = guids + 1; o.guid = string.format("g%05d", guids) end
   o.hasTag = o.hasTag or function(tag) for _, t in ipairs(o.tags or {}) do if t == tag then return true end end return false end
   o.getLock = o.getLock or function() return o.locked or false end
   o.getStates = o.getStates or function() return nil end            -- every real TTS object has these
@@ -72,18 +74,26 @@ local function stub(o)
   o.destruct = o.destruct or function() o.destroyed = true end
   o.clearContextMenu = o.clearContextMenu or function() end
   o.addContextMenuItem = o.addContextMenuItem or function() end
-  o.UI = o.UI or { setXml = function() end, setAttribute = function() end }
+  o.getSnapPoints = o.getSnapPoints or function() return o.snaps or {} end
+  o.setSnapPoints = o.setSnapPoints or function(p) o.snaps = p end
+  o.setLock = o.setLock or function(v) o.locked = v end
+  o.setRotation = o.setRotation or function(v) o.rot = Vector(v[1] or v.x, v[2] or v.y, v[3] or v.z) end
+  o.UI = o.UI or { setXml = function(x) o.uiXml = x end, setAttribute = function() end,
+    setCustomAssets = function(a) o.assets = a end, getXml = function() return o.uiXml or "" end }
   objects[#objects + 1] = o
   return o
+end
+function getObjectFromGUID(g)
+  for _, o in ipairs(objects) do if o.guid == g and not o.destroyed then return o end end
 end
 -- team stands: near (south) at z = -26.4 facing the near player, far (north) turned 180 degrees
 local function makeStand(z, yaw)
   local s = { tags = { "Stand" }, type = "Generic", locked = true, snaps = {} }
   s.getSnapPoints = function() return s.snaps end
   s.setSnapPoints = function(p) s.snaps = p end
-  s.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/props/stand-v4.obj" } end
+  s.getCustomObject = function() return { mesh = s.newMesh or "https://pctts.github.io/tts/props/stand-v4.obj" } end
   s.setCustomObject = function(c) s.newMesh = c.mesh end
-  s.reload = function() s.reloaded = true end
+  s.reload = function() s.reloaded = true; onObjectSpawn(s) end   -- TTS respawns a reloaded object
   s.UI = { setXml = function(x) s.uiXml = x end, getXml = function() return s.uiXml or "" end }
   s.getPosition = function() return Vector(0, 0.961, z) end
   s.getRotation = function() return Vector(0, yaw, 0) end
@@ -102,12 +112,18 @@ function spawnObjectData(t)
   calls.spawned[#calls.spawned + 1] = t
   local kind = t.data.Name == "CardCustom" and "Card" or ((t.data.Name == "Figurine_Custom" or (t.data.CustomMesh and t.data.CustomMesh.TypeIndex == 1)) and "Figurine" or "Generic")
   local cm = t.data.CustomMesh
-  return stub({ tags = t.data.Tags, type = kind, getName = function() return t.data.Nickname end,
+  return stub({ tags = t.data.Tags, type = kind, memo = t.data.Memo, name = t.data.Name, locked = t.data.Locked,
+    getName = function() return t.data.Nickname end,
     getPosition = function()   -- always a Vector in TTS, whatever it was spawned with
       local p = t.position or {}
       return p.x and p or Vector(p[1] or 0, p[2] or 0, p[3] or 0)
     end,
     setPosition = function(v) t.position = Vector(v[1] or v.x, v[2] or v.y, v[3] or v.z) end,
+    getRotation = function()
+      local r = t.rotation or {}
+      return r.x and r or Vector(r[1] or 0, r[2] or 0, r[3] or 0)
+    end,
+    setRotation = function(v) t.rotation = Vector(v[1] or v.x, v[2] or v.y, v[3] or v.z) end,
     getCustomObject = function() return cm and { mesh = cm.MeshURL, diffuse = cm.DiffuseURL } or {} end })
 end
 
@@ -184,6 +200,8 @@ def main():
         root = ET.fromstring("<root>" + xml + "</root>")
         ids = [e.get("id") for e in root.iter() if e.get("id")]
         check(len(ids) == len(set(ids)), f"UI XML parses; {len(ids)} ids, all unique")
+        check("tooltip" not in xml and "tooltip" not in (REPO / "lua" / "Global.lua").read_text(encoding="utf-8"),
+              "no hover text on any button (toolbar or pieces)")
         bar = next(e for e in root.iter() if e.get("id") == "toolbar")
         check((bar.get("width"), bar.get("height")) == ("38", "228"), f"toolbar is 38 x 228, six icons ({bar.get('width')} x {bar.get('height')})")
         hud = next(e for e in root.iter() if e.get("id") == "hud")
@@ -229,6 +247,64 @@ def main():
           "search panel row 1 shows 'Charizard'")
     check(calls.attrs["dexRes_White_8.active"] == "false", "unused rows hidden")
 
+    # on load: the stands get the plain model and 9 pedestals of their own (the old backgammon discs go), the spectator
+    # stand appears with its 6, and the turn track for the arena on the table (Pugilis: 15 turns) with its token on 1
+    lua.execute(r"""
+      function pedsOf(stand)
+        local xs = {}
+        for _, p in ipairs(standPedestals(stand)) do xs[#xs + 1] = p.x end
+        return xs
+      end
+      function tagged(tag)
+        local out = {}
+        for _, o in ipairs(getAllObjects()) do if o.hasTag(tag) then out[#out + 1] = o end end
+        return out
+      end
+    """)
+    sx, nx = list(g.pedsOf(g.southStand).values()), list(g.pedsOf(g.northStand).values())
+    nine = [-18.8, -14.1, -9.4, -4.7, 0, 4.7, 9.4, 14.1, 18.8]
+    check(str(g.southStand.newMesh).endswith("props/stand-v2.obj") and g.southStand.reloaded
+          and all(abs(a - b) < 1e-6 for a, b in zip(sx, nine)) and len(sx) == 9 and len(nx) == 9
+          and json.loads(g.southStand.memo)["slots"] == 9 and len(g.southStand.snaps) == 27,
+          "on load each team stand gets the plain model and 9 pedestals of its own, 27 card snap points")
+    spect = list(g.tagged("SpectatorStand").values())
+    seats = sorted((round(p.getPosition().x, 3), round(p.getPosition().z, 3)) for p in g.tagged("Pedestal").values()
+                   if json.loads(p.memo or "{}").get("spect"))
+    check(len(spect) == 1 and spect[0].getPosition().x == 37.0 and spect[0].getRotation().y == 180
+          and spect[0].getCustomObject().mesh.endswith("props/spectators-v3.obj")
+          and seats == [(37.1, z) for z in (-12.5, -7.5, -2.5, 2.5, 7.5, 12.5)]
+          and all(abs(p.getPosition().y - (0.961 + 2.6)) < 1e-9 for p in g.tagged("Pedestal").values()),
+          "the spectator stand at the right end, as tall as the team stands, turned so its turn track faces the board, "
+          "with 6 evenly spaced pedestals along its middle, 3 on each half")
+    token = list(g.tagged("TurnToken").values())
+    sp = spect[0]
+    gold = ET.fromstring(sp.uiXml)
+    check(len(g.tagged("TurnTrack")) == 0 and json.loads(sp.memo)["turns"] == 15 and len(sp.snaps) == 15
+          and abs(sp.snaps[1].position[3] - (-14)) < 1e-9 and abs(sp.snaps[1].position[2] - 2.6) < 1e-9
+          and abs(sp.snaps[1].position[1] - 2.7) < 1e-9 and gold.get("position") == "270 1400 -261"
+          and gold.get("color") == "#E8C462" and gold.find("Text").text == "15" and gold.find("Text").get("rotation") == "0 0 90"
+          and len(token) == 1
+          and abs(token[0].getPosition().z - 14) < 1e-9 and abs(token[0].getPosition().x - 34.3) < 1e-9
+          and abs(token[0].getPosition().y - (0.961 + 2.6 + 0.1)) < 1e-9 and token[0].getRotation().y == 0,
+          "the stand's turn track (slots 1-15 along its board side) shows Pugilis's last turn (15) in gold; the token "
+          "snaps to the slots and starts on 1 at the far end (the left, seen from the board)")
+    lua.execute(r"""
+      local s = tagged("SpectatorStand")[1]
+      local movers = { s }
+      for _, o in ipairs(tagged("Pedestal")) do
+        if (o.memo or ""):find("spect", 1, true) then movers[#movers + 1] = o end
+      end
+      for _, o in ipairs(movers) do local p = o.getPosition(); o.setPosition({ p.x - 5.7, p.y, p.z }) end
+      oldSeatCount = #tagged("Pedestal")
+      ensureSpectators()
+    """)
+    seats = sorted((round(p.getPosition().x, 3), round(p.getPosition().z, 3)) for p in g.tagged("Pedestal").values()
+                   if json.loads(p.memo or "{}").get("spect"))
+    check(g.tagged("SpectatorStand")[1].getPosition().x == 37.0 and seats == [(37.1, z) for z in (-12.5, -7.5, -2.5, 2.5, 7.5, 12.5)]
+          and len(g.tagged("Pedestal")) == g.oldSeatCount,
+          "a spectator stand out of place moves back with its pedestals")
+    lua.execute("calls.spawned = {}")
+
     # spawning
     g.searchPick(player, "-1", "dexRes_White_1")
     spawned = calls.spawned[1]
@@ -241,15 +317,15 @@ def main():
     want = json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Charizard"]["hp"]
     check(memo.get("hp") == want and memo.get("maxHp") == want, f"it starts at full HP ({memo})")
     check(memo.get("owner") == "White", "it belongs to White (who spawned it)")
-    check(abs(spawned.position.x - (-17.625)) < 0.01 and abs(spawned.position.z - (-28.0)) < 0.01,
+    check(abs(spawned.position.x - (-18.8)) < 0.01 and abs(spawned.position.z - (-28.0)) < 0.01,
           f"White's Pokemon goes on the first pedestal of the near stand ({spawned.position.x:.2f}, {spawned.position.z:.2f})")
 
     # maps: the arenas from arenas/index.json; picking one puts its board, snap points and pieces on the table
     got = [(m.name, bool(m.current)) for m in g.mapList().values()]
-    check(got == [("Chrysalia", False), ("Fontaine", False), ("Greenleaf", False), ("Illusio", False), ("Ingis", False),
+    check(got == [("Avia", False), ("Chrysalia", False), ("Fontaine", False), ("Greenleaf", False), ("Illusio", False), ("Ingis", False),
                   ("Pugilis", True), ("Snow", False), ("Spectra", False), ("Terrera Mountain", False), ("Valora", False),
                   ("Violight", False), ("Viperia", False), ("Yaksha", False)],
-          f"map list shows the thirteen arenas, Pugilis on the table ({got})")
+          f"map list shows the fourteen arenas, Pugilis on the table ({got})")
 
     def row(name):   # the map panel's row for an arena (alphabetical)
         return f"mapRes_White_{[m.name for m in g.mapList().values()].index(name) + 1}"
@@ -278,7 +354,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Illusio"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("illusio", "mesh"))
           and kinds.count("Flag") == 6 and kinds.count("Portal") == 6 and kinds.count("Bridge") == 6
           and backdrop(new, "misc/sky-placeholder-v1.jpg"),
@@ -298,7 +374,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Ingis"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("ingis", "mesh"))
           and len(zones) == 3 and len(kinds) == 5 and all(abs(z.data.ColorDiffuse.r - 0.6) < 1e-6 for z in zones)
@@ -315,7 +391,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Viperia"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     vmap = json.loads((REPO / "arenas" / "viperia" / "map.json").read_text(encoding="utf-8"))
     walls = sum(row.count("#") for row in vmap["grid"])
     vidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Viperia"]
@@ -323,13 +399,20 @@ def main():
           and kinds.count("Flag") == 3 and len(kinds) == 5 and len(vidx["snaps"]) == 16 * 15 - walls
           and backdrop(new, "misc/jungle-placeholder-v1.jpg"),
           f"picking Viperia: its board, 3 flags, snap points on all {16 * 15 - walls} tiles but the {walls} walls, the jungle table")
+    sp = g.tagged("SpectatorStand")[1]
+    tok = list(g.tagged("TurnToken").values())
+    check(not [x for x in new if x.data.Tags[1] in ("TurnTrack", "TurnToken", "SpectatorStand")]
+          and json.loads(sp.memo)["turns"] == 10 and ET.fromstring(sp.uiXml).get("position") == "270 400 -261"
+          and ET.fromstring(sp.uiXml).find("Text").text == "10"
+          and len(tok) == 1 and abs(tok[0].getPosition().z - 14) < 1e-9 and abs(tok[0].getPosition().x - 34.3) < 1e-9,
+          "a new map tints its own last turn (Viperia: 10) and puts the token back on 1")
 
     # Violight: 4 capture zone frames round the spire, no snap points on the spire, the steel table
     n = len(calls.spawned)
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Violight"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     lidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Violight"]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("violight", "mesh"))
           and kinds.count("Zone") == 4 and len(kinds) == 6 and len(lidx["snaps"]) == 256 - 4
@@ -341,7 +424,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Chrysalia"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("chrysalia", "mesh"))
           and kinds.count("Zone") == 3 and kinds.count("Trap") == 2 and len(kinds) == 7   # + the backdrop
           and backdrop(new, "misc/mulch-placeholder-v2.jpg"),
@@ -366,7 +449,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Yaksha"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     zones = [s for s in new if s.data.Tags[1] == "Zone"]
     free =[s for s in new if s.data.Tags[1] in ("Tree", "Gift")]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("yaksha", "mesh"))
@@ -380,7 +463,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Spectra"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     statues = [s for s in new if s.data.Tags[1] == "Statue"]
     sidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Spectra"]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("spectra", "mesh"))
@@ -393,7 +476,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Fontaine"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     fidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Fontaine"]
     gates = [s for s in new if s.data.Tags[1] == "Gate"]
     check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("fontaine", "mesh"))
@@ -455,7 +538,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Terrera Mountain"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     tidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Terrera Mountain"]
     zone_y = sorted(round(s.position.y - 0.961, 2) for s in new if s.data.Tags[1] == "Zone")
     heights = sorted({round(p[1], 2) for p in tidx["snaps"]})
@@ -498,7 +581,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Snow"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     sidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Snow"]
     panel = [s for s in new if s.data.Tags[1] == "ArenaBackdrop"]
     k = (58.4775 + 75.246 - 51.981) / 75.246
@@ -534,7 +617,7 @@ def main():
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Valora"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     vidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Valora"]
     gears = [json.loads(s.data.Memo) for s in new if s.data.Tags[1] == "Gear"]
     doors = [(s, json.loads(s.data.Memo)) for s in new if s.data.Tags[1] == "Door"]
@@ -617,13 +700,35 @@ def main():
     check(abs(dA.pos.x - 1) < 1e-6 and json.loads(dA.memo)["open"] is False and abs(dB.pos.y - (1.37 - 1.94)) < 1e-6,
           "pressed again they close; a blocker with no wall beside it sinks into the floor")
 
+    # Avia: 5 flags and 16 floating platforms on their first tiles (picked before Greenleaf: Avia is deeper than the
+    # play area and stretches the table; Greenleaf puts it back for the stand checks further on)
+    lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')
+    n = len(calls.spawned)
+    g.refreshMaps("White")
+    g.mapPick(player, "-1", row("Avia"))
+    new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]
+    aidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Avia"]
+    plats = [(s, json.loads(s.data.Memo)) for s in new if s.data.Tags[1] == "Platform"]
+    T = 3.24875
+    first = next((m for s, m in plats if abs(s.position.x - 0.01 + 4 * T) < 1e-3 and abs(s.position.z + 0.01 - 6 * T) < 1e-3), None)
+    check(kinds[0] == "Board3D" and new[0].data.CustomMesh.MeshURL.endswith(board("avia", "mesh"))
+          and kinds.count("Flag") == 5 and len(plats) == 16
+          and all(s.data.Nickname == "Floating platform" and s.data.Locked and m["at"] == 1 and len(m["route"]) == 2
+                  and abs(m["y"] - s.position.y) < 1e-6 and abs(s.position.y - 0.961 - 3.3147) < 1e-3 for s, m in plats)
+          and first is not None and all(abs(a - b) < 1e-3 for a, b in zip(first["route"][0] + first["route"][1], [T, 0, 0, T, 0, -T]))
+          and sorted(m["arms"] for _, m in plats) == sorted(["ne", "nw", "se", "sw"] * 4) and first["arms"] == "sw"
+          and all(s.data.CustomMesh.DiffuseURL.endswith("props/platform-v1.jpg") for s, _ in plats)
+          and len(aidx["snaps"]) == 205 and aidx["turns"] == 10 and backdrop(new, "misc/clouds-placeholder-v1.jpg"),
+          "picking Avia: its board, 5 flags, 16 floating platforms on their first tiles level with the low ground (the "
+          "one at row 2 col 4 goes right then down: its arrow's arms point left and down from the bend), a snap point on every land tile, the clouds table, 10 turns")
     # Greenleaf: 4 flags, 4 traps, 3 flowers (each with its 3 spots), the grass bridge's two halves inside their hedges
     lua.execute('for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end')   # the stand-ins
     n = len(calls.spawned)
     g.refreshMaps("White")
     g.mapPick(player, "-1", row("Greenleaf"))
     new = [calls.spawned[i] for i in range(n + 1, len(calls.spawned) + 1)]
-    kinds = [s.data.Tags[1] for s in new]
+    kinds = [s.data.Tags[1] for s in new if s.data.Tags[1] not in ("TurnTrack", "TurnToken")]   # (a new turn track too)
     gidx = json.loads((REPO / "arenas" / "index.json").read_text(encoding="utf-8"))["Greenleaf"]
     flowers = {s.data.Nickname: json.loads(s.data.Memo) for s in new if s.data.Tags[1] == "Flower"}
     halves = [(s, json.loads(s.data.Memo)) for s in new if s.data.Tags[1] == "Bridge"]
@@ -753,6 +858,49 @@ def main():
     """)
     check(g.allTaken is False and g.noneOn is False, "with all three spots taken, or nobody on the flower, nothing is thrown")
 
+    # Avia's platforms: one glides along its L, round the bend, to the other end and back, carrying the Pokemon on it
+    lua.execute(r"""
+      for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end
+      local T = 3.24875
+      plat = standIn({ "Platform", "ArenaPiece" }, { route = { { T, 0, 0 }, { T, 0, -T } }, at = 1, x = 300, y = 4.28, z = 0,
+        tile = T, arms = "sw" }, Vector(300, 4.28, 0))
+      plat.locked = true
+      onObjectSpawn(plat)
+      trail, offL = {}, false
+      local set = plat.setPosition
+      plat.setPosition = function(p)
+        set(p)
+        trail[#trail + 1] = { plat.pos.x, plat.pos.z }
+        -- along the L: first along x (z stays 0), then along -z (x stays 300 + T); never cutting the corner
+        local x, z = plat.pos.x - 300, plat.pos.z
+        if not ((math.abs(z) < 1e-9 and x <= T + 1e-9) or (math.abs(x - T) < 1e-9 and z <= 1e-9)) then offL = true end
+      end
+      onPlat = standIn({ "Pokemon" }, nil, Vector(300.3, 4.35, 0.2))
+      onPlat.rot = Vector(0, 55, 0)
+      besides = standIn({ "Pokemon" }, nil, Vector(300 - 3.24875, 4.35, 0))
+      glideOk = platformClicked(nil, nil, "glide_" .. plat.guid)
+    """)
+    pl, rider, other = g.plat, g.onPlat, g.besides
+    check(len(list(pl.snaps.values())) == 1 and abs(pl.snaps[1].position[2] - 0.02) < 1e-9
+          and f'id="glide_{pl.guid}"' in str(pl.ui.xml) and 'onClick="Global/platformClicked"' in str(pl.ui.xml)
+          and 'image="glide-sw"' in str(pl.ui.xml) and pl.ui.assets[1].url.endswith("ui/icons/glide-sw-v3.png")
+          and [m.label for m in pl.menu.values()] == ["Move platform"]
+          and str(pl.desc).startswith("Floating platform."),
+          "a platform carries its tile's snap point, its button (an L icon the shape of its track), the menu and its "
+          "description")
+    check(abs(pl.pos.x - (300 + T)) < 1e-6 and abs(pl.pos.z + T) < 1e-6 and abs(pl.pos.y - 4.28) < 1e-9
+          and json.loads(pl.memo)["at"] == 3 and pl.moves == 120 and not g.offL and not g.gliding[pl.guid]
+          and abs(rider.pos.x - (300.3 + T)) < 1e-6 and abs(rider.pos.z - (0.2 - T)) < 1e-6 and abs(rider.pos.y - 4.35) < 1e-9
+          and rider.rot.y == 55 and rider.lockLog == "true false " and abs(other.pos.x - (300 - T)) < 1e-9
+          and other.lockLog is None,
+          f"its button glides it along its rail, round the bend, to the far end ({pl.moves} steps), the Pokemon on it "
+          f"carried along (facing kept, unlocked after), the one beside it left alone")
+    lua.execute('trail = {}; plat.menu[1].fn("Red")')
+    check(abs(pl.pos.x - 300) < 1e-6 and abs(pl.pos.z) < 1e-6 and json.loads(pl.memo)["at"] == 1 and not g.offL
+          and abs(rider.pos.x - 300.3) < 1e-6 and abs(rider.pos.z - 0.2) < 1e-6,
+          "pressed again (right-click > Move platform) it glides back the same way, round the bend, with its rider")
+    lua.execute("plat.destroyed = true; onPlat.destroyed = true; besides.destroyed = true")
+
     # bridges: the arrows raise them all; dropping skips one with a Pokemon on it; right-click does just one
     lua.execute(r"""
       for _, o in ipairs(objects) do if o.hasTag("ArenaPiece") then o.destroyed = true end end   -- the stand-ins above
@@ -875,7 +1023,7 @@ def main():
           and "/cards/items/sitrus-berry-" in entry.FaceURL and "cards/back-items-v" in entry.BackURL
           and card.data.CardID == int(next(iter(deck.keys()))) * 100, "clicking it spawns the Sitrus Berry card")
     lift_z = 0.15 * __import__("math").sin(__import__("math").radians(16.492))
-    check(abs(card.position.x - (-17.625)) < 0.01 and abs(card.position.z - (-26.4 - 4.5856 - lift_z)) < 0.01
+    check(abs(card.position.x - (-18.8)) < 0.01 and abs(card.position.z - (-26.4 - 4.5856 - lift_z)) < 0.01
           and card.rotation.y == 270 and abs(card.rotation.z - 16.492) < 0.01 and card.data.SidewaysCard
           and (card.data.Transform.scaleX, card.data.Transform.scaleZ) == (1.5, 1.5),
           "the item card lies landscape in the first item slot on White's stand, tilted to the slope, scaled evenly (1.5)")
@@ -893,7 +1041,7 @@ def main():
     g.searchPick(player, "-1", "skillsRes_White_1")
     sk = calls.spawned[n + 2]
     check(sk.data.Nickname == "Belief" and sk.data.Tags[1] == "WarriorSkill"
-          and abs(sk.position.x - (-17.625)) < 0.01 and abs(sk.position.z - (-26.4 - 6.9252 - lift_z)) < 0.01,
+          and abs(sk.position.x - (-18.8)) < 0.01 and abs(sk.position.z - (-26.4 - 6.9252 - lift_z)) < 0.01,
           "the warrior skill card goes in the first skill slot (below the item)")
     g.searchChanged(player, "levitate", "abilitiesIn_White")
     g.searchPick(player, "-1", "abilitiesRes_White_1")
@@ -905,15 +1053,16 @@ def main():
     g.searchPick(player, "-1", "itemsRes_White_1")
     check(len(calls.spawned) == n + 2, "a stale click on the other panel's rows does nothing")
     g.spawnCard("items", "Sitrus Berry", "White")
-    check(abs(calls.spawned[n + 3].position.x - (-10.575)) < 0.01, "the next item card takes the next column")
+    check(abs(calls.spawned[n + 3].position.x - (-14.1)) < 0.01, "the next item card takes the next column")
     g.spawnCard("items", "Sitrus Berry", "Green")
     far = calls.spawned[n + 4]
-    check(abs(far.position.x - 17.625) < 0.01 and abs(far.position.z - (26.4 + 4.5856 + lift_z)) < 0.01 and far.rotation.y == 450,
+    check(abs(far.position.x - 18.8) < 0.01 and abs(far.position.z - (26.4 + 4.5856 + lift_z)) < 0.01 and far.rotation.y == 450,
           "a far-side seat (Green) uses the far stand, starting from its own left")
-    snaps = g.standSnapPoints()
+    snaps = g.standSnapPoints(6)
     first = snaps[1].position
-    check(len(snaps) == 18 and abs(first[2] - (2.2198 + 0.55 * 0.9589)) < 0.01 and snaps[1].rotation_snap,
-          "18 card snap points per stand (3 rows), lifted off the slope, snapping rotation")
+    check(len(snaps) == 18 and len(g.standSnapPoints(9)) == 27 and abs(first[2] - (2.2198 + 0.55 * 0.9589)) < 0.01
+          and abs(first[1] - (-17.625)) < 1e-9 and abs(g.standSnapPoints(9)[1].position[1] - (-18.8)) < 1e-9 and snaps[1].rotation_snap,
+          "card snap points per stand: 3 rows of 6 (or 9), lifted off the slope, snapping rotation")
     g.spawnPokemon("Gengar", "Grey")
     check(abs(calls.spawned[n + 5].position.x - (-35)) < 0.01, "a spectator's Pokemon appears in the left strip")
 
@@ -940,61 +1089,159 @@ def main():
     g.listPick(player, "-1", f"itemsAll_{i}")
     check(len(calls.spawned) == n + 1 and calls.spawned[n + 1].data.Nickname == "Sitrus Berry", "clicking Sitrus Berry in the list spawns it")
 
-    # HP signs: the stand's sign above a pedestal shows the HP of the Pokemon on it; typing sets or changes it
+    # HP signs: each pedestal's sign shows the HP of its Pokemon; typing sets or changes it. A Pokemon taken off its
+    # pedestal leaves a phantom there (and the sign keeps its HP); put on another pedestal, that one takes it over.
     lua.execute(r"""
       local keep = {}   -- clear the Pokemon spawned by earlier checks (one is on pedestal 1)
       for _, o in ipairs(objects) do if not (o.hasTag and o.hasTag("Pokemon")) then keep[#keep + 1] = o end end
       objects = keep
-      southStand.guid = "s0uth1"
-      southStand.ui = {}
-      southStand.UI = { setXml = function(x) southStand.ui.xml = x end }
-      southStand.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/props/stand-v4.obj" } end
-      southStand.getSnapPoints = function() return { 1 } end
-      northStand.UI = { setXml = function() end }
-      hpFig = { memo = '{"pokemon":"Gengar"}', guid = "abc123", name = "Custom_Model", tags = { "Pokemon" } }
-      hpFig.pos = Vector(-17.625, 0.961 + 2.6 + 0.25, -28.0)                -- resting on White's first pedestal
-      hpFig.getPosition = function() return hpFig.pos end
-      hpFig.getCustomObject = function() return { mesh = "https://pctts.github.io/tts/models/standee-v1.obj" } end
-      hpFig.UI = { getXml = function() return "" end, setXml = function() end }
-      hpFig.hasTag = function(t) return t == "Pokemon" end
-      objects[#objects + 1] = hpFig
-      getObjectFromGUID = function(g) if g == "s0uth1" then return southStand end end
+      pedestalUI = {}
+      south = {}
+      for _, p in ipairs(standPedestals(southStand)) do south[#south + 1] = p.obj end
+      function mon(name, guid, ped)
+        local m = stub({ memo = JSON.encode({ pokemon = name }), guid = guid, name = "Custom_Model", tags = { "Pokemon" } })
+        m.pos = ped and (ped.getPosition() + Vector(0, 0.25, 0)) or Vector(0, 3.3, 0)
+        m.getPosition = function() return m.pos end
+        m.setPosition = function(v) m.pos = Vector(v[1] or v.x, v[2] or v.y, v[3] or v.z) end
+        m.getName = function() return name end
+        return m
+      end
+      hpFig = mon("Gengar", "abc123", south[1])
       refreshPedestals()
     """)
     h, gmax = g.hpFig, json.loads((REPO / "data" / "pokemon.json").read_text(encoding="utf-8"))["Gengar"]["hp"]
+    peds = g.south
 
-    def sign():
-        root = ET.fromstring("<root>" + g.southStand.ui.xml + "</root>")
-        return {e.get("id"): e for e in root.iter() if e.get("id")}, [p for p in root if p.tag == "Panel"]
+    def ui(i):
+        root = ET.fromstring("<root>" + (peds[i].uiXml or "") + "</root>")
+        return {e.get("id"): e for e in root.iter() if e.get("id")}, [p for p in root if p.tag == "Panel"], root
 
-    ids, panels = sign()
-    f1, b1 = ids["hpIn_s0uth1_1_F"], ids["hpIn_s0uth1_1_B"]
-    check(len(panels) == 12 and json.loads(h.memo).get("hp") == gmax and f1.get("text") == str(gmax)
-          and panels[0].get("active") == "true" and panels[2].get("active") == "false",
-          f"the stand's first sign shows the Gengar on its pedestal ({gmax}/{gmax}); empty pedestals' signs are blank")
+    ids, panels, root = ui(1)
+    p1 = peds[1].guid
+    f1 = ids[f"hpIn_{p1}_F"]
+    check(len(panels) == 2 and json.loads(h.memo).get("hp") == gmax and f1.get("text") == str(gmax)
+          and panels[0].get("active") == "true" and ui(2)[1][0].get("active") == "false"
+          and json.loads(peds[1].memo)["mon"] == "abc123",
+          f"pedestal 1's sign shows the Gengar on it ({gmax}/{gmax}), which is now its Pokemon; empty pedestals' signs are blank")
     check((panels[0].get("rotation"), panels[1].get("rotation")) == ("-90 0 0", "90 0 180")
-          and panels[0].get("position") == "-1762 -163 -540" and panels[1].get("position") == "-1762 -157 -540",
-          "a label on each face of the board above pedestal 1, facing out")
+          and panels[0].get("position") == "0 -3 -280" and panels[1].get("position") == "0 3 -280",
+          "a label on each face of the sign floating above the pedestal, facing out")
+    bench = ids.get(f"bench_{p1}")
+    assets = {a.name: a.url for a in peds[1].assets.values()}
+    check(bench is not None and bench.get("onClick") == "Global/benchClicked" and bench.get("position") == "120 -4 -280"
+          and bench.get("rotation") == "-90 0 0" and bench.get("tooltip") is None
+          and assets.get("bench", "").endswith("ui/icons/spectate-v3.png") and "phantom" not in assets
+          and not any(e.get("image") == "phantom" for e in root.iter("Image")),
+          "while the stand holds 9, a bench button stands beside the sign, facing its player; no phantom while Gengar stands on it")
 
     def hp():
         return json.loads(h.memo)["hp"]
-    g.hpEdited(player, "-35", "hpIn_s0uth1_1_F")
-    check(hp() == gmax - 35 and sign()[0]["hpIn_s0uth1_1_B"].get("text") == str(gmax - 35),
+    g.hpEdited(player, "-35", f"hpIn_{p1}_F")
+    check(hp() == gmax - 35 and ui(1)[0][f"hpIn_{p1}_B"].get("text") == str(gmax - 35),
           "typing -35 on the sign takes 35 HP from that Pokemon and updates both faces")
-    g.hpEdited(player, "+500", "hpIn_s0uth1_1_B")
+    g.hpEdited(player, "+500", f"hpIn_{p1}_B")
     check(hp() == gmax, "+500 heals only up to the max")
-    g.hpEdited(player, "120/230", "hpIn_s0uth1_1_F")
+    g.hpEdited(player, "120/230", f"hpIn_{p1}_F")
     check(hp() == 120, "typing a number sets it (a trailing /max is ignored)")
-    g.hpEdited(player, "0", "hpIn_s0uth1_1_F")
-    check(hp() == 0 and sign()[0]["hpIn_s0uth1_1_F"].get("textColor") == "#FF6B6B", "0 HP turns the number red")
-    g.hpEdited(player, "lots", "hpIn_s0uth1_1_F")
-    check(hp() == 0 and sign()[0]["hpIn_s0uth1_1_F"].get("text") == "0", "something that isn't a number changes nothing")
+    g.hpEdited(player, "0", f"hpIn_{p1}_F")
+    check(hp() == 0 and ui(1)[0][f"hpIn_{p1}_F"].get("textColor") == "#FF6B6B", "0 HP turns the number red")
+    g.hpEdited(player, "lots", f"hpIn_{p1}_F")
+    check(hp() == 0 and ui(1)[0][f"hpIn_{p1}_F"].get("text") == "0", "something that isn't a number changes nothing")
 
-    lua.execute("hpFig.pos = Vector(0, 3.3, 0); refreshPedestals()")   # moved onto the board
-    check(sign()[1][0].get("active") == "false" and hp() == 0, "moved off the pedestal: the sign goes blank, the Pokemon keeps its HP")
-    lua.execute("hpFig.pos = Vector(-3.525, 0.961 + 2.6 + 0.25, -28.0); refreshPedestals()")   # onto pedestal 3
-    check(sign()[1][4].get("active") == "true" and sign()[0]["hpIn_s0uth1_3_F"].get("text") == "0",
-          "put on another pedestal, that pedestal's sign shows its HP")
+    lua.execute("hpFig.pos = Vector(0, 3.3, 0); refreshPedestals()")   # deployed on the board
+    ids, panels, root = ui(1)
+    ph = [e for e in root.iter("Image") if e.get("image") == "phantom"]
+    assets = {a.name: a.url for a in peds[1].assets.values()}
+    check(len(ph) == 1 and ph[0].get("rotation") == "-90 0 0" and ph[0].get("position") == "0 0 -138"
+          and ph[0].get("raycastTarget") == "false" and assets.get("phantom", "").endswith("figures/gengar.webp")
+          and panels[0].get("active") == "true" and ids[f"hpIn_{p1}_F"].get("text") == "0"
+          and json.loads(peds[1].memo)["mon"] == "abc123",
+          "taken to the board, Gengar leaves a see-through phantom of its picture on its pedestal, and the sign keeps its HP")
+    n = len(calls.spawned)
+    g.spawnPokemon("Absol", "White")
+    check(abs(calls.spawned[n + 1].position.x - (-14.1)) < 0.01, "a new Pokemon skips the phantom's pedestal")
+    lua.execute("objects[#objects].destroyed = true")
+    lua.execute("hpFig.pos = south[3].getPosition() + Vector(0, 0.25, 0); refreshPedestals()")   # onto pedestal 3
+    check(ui(3)[1][0].get("active") == "true" and json.loads(peds[3].memo)["mon"] == "abc123"
+          and "mon" not in json.loads(peds[1].memo) and ui(1)[1][0].get("active") == "false"
+          and not any(e.get("image") == "phantom" for e in ui(1)[2].iter("Image")),
+          "put on another pedestal, that one takes it over (its sign shows the HP); the first is empty again")
+    lua.execute("hpFig.pos = south[1].getPosition() + Vector(0, 0.25, 0); refreshPedestals()")
+    lua.execute("other = mon('Abra', 'abra01', nil); hpFig.pos = Vector(0, 3.3, 0); refreshPedestals()")
+    lua.execute("other.pos = south[1].getPosition() + Vector(0, 0.25, 0); refreshPedestals()")
+    check(json.loads(peds[1].memo)["mon"] == "abra01", "another Pokemon put on a phantom's pedestal takes it over")
+    lua.execute("other.destroyed = true; hpFig.pos = south[1].getPosition() + Vector(0, 0.25, 0); refreshPedestals()")
+    lua.execute("hpFig.destroyed = true; refreshPedestals()")
+    check("mon" not in json.loads(peds[1].memo) and ui(1)[1][0].get("active") == "false",
+          "a pedestal whose Pokemon is deleted is empty again")
+
+    # benching: the button sends a pedestal's Pokemon to its player's half of the spectator stand; once 3 of the 9
+    # are sat out, their pedestals and cards go and the other 6 slide to the usual spacing with their Pokemon and cards
+    lua.execute(r"""
+      gen = mon("Gengar", "gen001", nil)
+      gen.pos = Vector(5, 1.4, 5)   -- out on the board: benched from there
+      south[1].memo = JSON.encode({ mon = "gen001" })
+      abra = mon("Abra", "abra02", south[3])
+      function card(x)
+        local c = stub({ type = "Card", tags = { "Item" } })
+        c.pos = southStand.positionToWorld(Vector(x, STAND.cards.items.y, STAND.cards.items.z))
+        c.getPosition = function() return c.pos end
+        c.setPosition = function(v) c.pos = Vector(v[1] or v.x, v[2] or v.y, v[3] or v.z) end
+        return c
+      end
+      for _, o in ipairs(objects) do if o.type == "Card" then o.destroyed = true end end   -- the cards dealt earlier
+      card3, card4 = card(-9.4), card(-4.7)
+      genItem = card(-18.8)
+      genSkill = card(-18.8)
+      genSkill.tags = { "WarriorSkill" }
+      genSkill.pos = southStand.positionToWorld(Vector(-18.8, STAND.cards.skills.y, STAND.cards.skills.z))
+      refreshPedestals()
+      benchClicked(nil, nil, "bench_" .. south[1].guid)
+    """)
+    gp, gi, gs = g.gen.pos, g.genItem.pos, g.genSkill.pos
+    check(abs(gi.x - 39.65) < 1e-6 and abs(gi.z - (-12.5)) < 1e-6 and abs(gs.x - 39.65) < 1e-6 and abs(gs.z - (-12.5)) < 1e-6
+          and abs(gs.y - (0.961 + 2.6 + 0.02)) < 1e-6 and abs(gi.y - (0.961 + 2.6 + 0.05)) < 1e-6
+          and g.genItem.rot.y == 0 and g.genItem.locked is False
+          and json.loads(g.gen.memo)["cards"] == [g.genSkill.guid, g.genItem.guid],
+          "its cards fly along and lie stacked beside its seat (the skill below, the item on top), reading from the board side")
+    check(abs(gp.x - 37.1) < 1e-6 and abs(gp.z - (-12.5)) < 1e-6 and abs(gp.y - (0.961 + 2.6 + 0.25 + 0.02)) < 1e-6
+          and json.loads(g.south[1].memo).get("benched") and "mon" not in json.loads(g.south[1].memo)
+          and g.gen.locked is False and not g.flying["gen001"] and f"bench_{p1}" not in (peds[1].uiXml or ""),
+          "the bench button flies Gengar to the near half's first spectator seat (the player's end); its pedestal is sat out")
+    lua.execute('benchClicked(nil, nil, "bench_" .. south[2].guid)')   # an empty pedestal is just sat out
+    check(json.loads(g.south[2].memo).get("benched") and len(list(g.pedsOf(g.southStand).values())) == 9,
+          "an empty pedestal can be sat out too; with 2 out the stand still holds 9")
+    lua.execute('benchClicked(nil, nil, "bench_" .. south[4].guid)')
+    xs = list(g.pedsOf(g.southStand).values())
+    six = [-17.625, -10.575, -3.525, 3.525, 10.575, 17.625]
+    check(len(xs) == 6 and all(abs(a - b) < 1e-6 for a, b in zip(xs, six)) and g.south[1].destroyed and g.south[4].destroyed
+          and g.card4.destroyed and not g.card3.destroyed and abs(g.card3.pos.x - (-17.625)) < 1e-6
+          and not g.genItem.destroyed and abs(g.genItem.pos.x - 39.65) < 1e-6
+          and abs(g.abra.pos.x - (-17.625)) < 1e-6 and json.loads(g.southStand.memo)["slots"] == 6
+          and len(g.southStand.snaps) == 18 and not g.sliding[g.southStand.guid]
+          and all("bench_" not in (p.uiXml or "") for p in (g.south[3], g.south[5])),
+          "the third sat out: their pedestals go (and cards left in their columns; Gengar's stay with it); the other 6 "
+          "slide to the usual spacing with Abra and its card")
+    n = len(calls.spawned)
+    g.spawnCard("items", "Sitrus Berry", "White")
+    check(abs(calls.spawned[n + 1].position.x - (-10.575)) < 0.01, "cards now go in the 6 columns (the first is Abra's)")
+
+    # a new map: the stands go back to 9 and everyone comes home (the benched to the free pedestals)
+    lua.execute("resetStands()")
+    xs = list(g.pedsOf(g.southStand).values())
+    check(len(xs) == 9 and all(abs(a - b) < 1e-6 for a, b in zip(xs, nine)) and json.loads(g.southStand.memo)["slots"] == 9
+          and len(g.southStand.snaps) == 27 and abs(g.abra.pos.x - (-9.4)) < 1e-6 and abs(g.card3.pos.x - (-9.4)) < 1e-6
+          and abs(g.gen.pos.x - (-18.8)) < 1e-6 and abs(g.gen.pos.z - (-28.0)) < 1e-6
+          and all("home" not in json.loads(p.obj.memo or "{}") for p in g.standPedestals(g.southStand).values())
+          and "home" not in json.loads(g.gen.memo),
+          "picking a map: the stand goes back to 9 just as it was: Abra (and its card) slides back to slot 3, the sat-out "
+          "pedestals reappear in slots 1, 2 and 4, and Gengar flies home to slot 1")
+    lift_y, lift_z = 0.15 * __import__("math").cos(__import__("math").radians(16.492)), 0.15 * __import__("math").sin(__import__("math").radians(16.492))
+    gi, gs = g.genItem.pos, g.genSkill.pos
+    check(abs(gi.x - (-18.8)) < 1e-6 and abs(gi.z - (-26.4 - 4.5856 - lift_z)) < 0.01 and abs(gi.y - (0.961 + 2.2198 + lift_y)) < 0.01
+          and abs(gs.x - (-18.8)) < 1e-6 and abs(gs.z - (-26.4 - 6.9252 - lift_z)) < 0.01 and g.genItem.rot.y == 270
+          and "cards" not in json.loads(g.gen.memo),
+          "and its cards fly back with it, each to its own row in its old column")
 
     # Pokemon on the old model with its own sign go back to the plain standee
     lua.execute(r"""

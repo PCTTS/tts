@@ -44,6 +44,12 @@ before (tag "ArenaPiece") and spawns new ones, locked, relative to the board, fo
   flower-<name> (Greenleaf): a flat bloom (Flower) carrying the tile's snap point; its spots are the tiles marked
         landing-<name>1, 2, 3 (painted), passed on as "targets": "dx,dy,dz;..." from the flower's tile top to each
         spot's. Its button throws the Pokemon on it to one of them at random (Global.lua).
+  platforms (Avia, map.json "platforms": [{"path": [[row, col], ...]}], sky tiles): a floating platform (Platform)
+        on the path's first tile, its deck at the top of level map.json "platform_level" (default 0), carrying that
+        tile's snap point;
+        passed on as "route": "dx,dy,dz;..." from there to each later tile of the path (the bend, the far end).
+        "arms": the L's two arms from its bend ("ne": toward row 0 and toward the right, ...): its button's icon.
+        Its button glides it along the path to the far end and back (Global.lua).
 Models come from tools/build_pieces.py. Global.lua's spawnArenaPiece spawns them, as the map picker does. TTS only
 keeps the result in memory: save the game afterwards.
 """
@@ -93,6 +99,8 @@ GEAR_PLATES = {n: {"mesh": f"props/gear{n}-v1.obj", "collider": f"props/gear{n}-
                for n in (3, 4)}
 DOOR = {"mesh": "props/door-v1.obj", "collider": "props/door-v1.obj", "convex": True, "material": 3}
 FLOWER = {"mesh": "props/flower-v1.obj", "collider": "props/flower-v1.obj", "convex": True, "material": 3}
+PLATFORM = {"mesh": "props/platform-v1.obj", "diffuse": "props/platform-v1.jpg",
+            "collider": "props/platform-collider-v1.obj", "convex": True, "material": 1}
 GRASS_BRIDGE = {"mesh": "props/grassbridge-v2.obj", "diffuse": "props/grassbridge-v2.jpg",
                 "collider": "props/grassbridge-collider-v2.obj", "convex": True, "material": 3}
 WATER_DEPTH = 0.62   # Fontaine: the water's surface above the river bed (the canal walls are 0.968 high)
@@ -330,6 +338,20 @@ def pieces(arena, info):
     for size, pos, slant in zones(data, info):
         out.append({"kind": "Zone", "name": "Capture zone", "model": (RAISED_ZONES[slant] if slant else ZONES)[size], "pos": list(pos), "yaw": 0,
                     "desc": "", "tiles": size, "tile": round(T, 5)})
+    for plat in data.get("platforms", []):   # Avia: on the first tile of its path, level with the land
+        path = plat["path"]
+        if any(grid.tile(r, c) for r, c in path):
+            sys.exit(f"platform {path}: its path must be all sky tiles")
+        (r0, c0), top = path[0], info["floor0"] + data.get("platform_level", 0) * info["level_height"]
+        route = ";".join(f"{(c - c0) * T:g},0,{(r0 - r) * T:g}" for r, c in path[1:])
+        if len(path) != 3:
+            sys.exit(f"platform {path}: a path is an L: its first tile, the bend, the last tile")
+        (rb, cb), ends = path[1], (path[0], path[2])
+        vert = next(("n" if r < rb else "s") for r, c in ends if r != rb)    # its arms from the bend: its icon's L
+        horiz = next(("w" if c < cb else "e") for r, c in ends if c != cb)
+        out.append({"kind": "Platform", "name": "Floating platform", "model": PLATFORM, "arms": vert + horiz,
+                    "pos": [(c0 + 0.5 - C / 2) * T, top, (R / 2 - r0 - 0.5) * T], "yaw": 0, "desc": "",
+                    "route": route, "tile": round(T, 5)})
     groups = 0
     for kind, rows, cols, top, along_x in bridges(data, grid, info):
         if kind is True:

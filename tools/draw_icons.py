@@ -174,9 +174,42 @@ def spectate(d):
     d.polygon(P(96, 10, 70, 48, 122, 48), fill=255)
 
 
+def glide(arms):
+    """Move a floating platform (Avia): an L with a head at each end, the shape of its track. arms: the L's two arms
+    from its bend, "n"/"s" then "e"/"w", as seen by player 1 (n = up the image = the far side, e = right). The button
+    lies flat on the platform (never turned): object UI shows it the same way round as the board (checked in TTS)."""
+    way = {"n": (0, -1), "s": (0, 1), "e": (1, 0), "w": (-1, 0)}
+    a, b = way[arms[0]], way[arms[1]]
+    arm, head, half, sw = 84, 30, 20, STROKE * 1.25
+
+    def parts(bx, by):   # each arm: its line (from just past the bend: a square join) and its head
+        out = []
+        for dx, dy in (a, b):
+            tip = (bx + dx * arm, by + dy * arm)
+            neck = (tip[0] - dx * head, tip[1] - dy * head)
+            px, py = -dy, dx
+            out.append(((bx - dx * sw / 2, by - dy * sw / 2), neck,
+                        [tip, (neck[0] + px * half, neck[1] + py * half), (neck[0] - px * half, neck[1] - py * half)]))
+        return out
+    # centre the ink itself (the heads stick out to the sides of the arms): its bounding box on the button's middle
+    pts = []
+    for (s0, s1, headp), (dx, dy) in zip(parts(0, 0), (a, b)):
+        px, py = -dy, dx
+        pts += [(x + px * k * sw / 2, y + py * k * sw / 2) for x, y in (s0, s1) for k in (-1, 1)] + headp
+    xs, ys = [x for x, _ in pts], [y for _, y in pts]
+    bx, by = 64 - (min(xs) + max(xs)) / 2, 64 - (min(ys) + max(ys)) / 2
+
+    def shape(d):
+        for s0, s1, headp in parts(bx, by):
+            d.line(P(*s0, *s1), fill=255, width=round(sw * K))
+            d.polygon(P(*[v for q in headp for v in q]), fill=255)
+    return shape
+
+
 SHAPES = {"pokeball": pokeball, "map": folded_map, "status": swirl, "item": potion, "skill": swords, "ability": sparkle,
           "die": die, "updown": updown, "turnccw": turn, "turncw": lambda d: turn(d, False), "doors": doors,
-          "fling": fling, "spectate": spectate}
+          "fling": fling, "spectate": spectate,
+          **{f"glide-{a}": glide(a) for a in ("ne", "nw", "se", "sw")}}
 
 
 def render(shape, size=N, ss=SS):
